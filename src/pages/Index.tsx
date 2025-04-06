@@ -3,7 +3,8 @@ import React from 'react';
 import LayoutBase from '../frontend/navigation/components/LayoutBase';
 import NavbarInferior from '../frontend/navigation/components/NavbarInferior';
 import HeaderConBusqueda from '../frontend/navigation/components/HeaderConBusqueda';
-import { Button, Card } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 const Index = () => {
   return (
@@ -18,7 +19,7 @@ const Index = () => {
             This is the foundation for the Vett application. The UI components will be added
             incrementally based on design files.
           </p>
-          <Button variant="primary">Explore Features</Button>
+          <Button variant="default">Explore Features</Button>
         </Card>
 
         <h2 className="text-xl font-semibold mb-4">Project Structure</h2>

@@ -6,7 +6,7 @@ export interface Appointment {
   date: string;
   time: string;
   status: 'scheduled' | 'completed' | 'canceled';
-  type: 'check-up' | 'vaccination' | 'emergency' | 'surgery' | 'follow-up';
+  type: 'check-up' | 'vaccination' | 'emergency' | 'surgery' | 'follow-up' | 'dental-cleaning';
   notes?: string;
 }
 
