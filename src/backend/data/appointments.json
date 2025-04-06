@@ -1,0 +1,40 @@
+
+[
+  {
+    "id": "apt1",
+    "petId": "pet1",
+    "vetId": "vet1",
+    "date": "2025-04-15",
+    "time": "10:00:00",
+    "status": "scheduled",
+    "type": "check-up",
+    "notes": "Annual health check-up"
+  },
+  {
+    "id": "apt2",
+    "petId": "pet2",
+    "vetId": "vet2",
+    "date": "2025-04-18",
+    "time": "14:30:00",
+    "status": "scheduled",
+    "type": "dental-cleaning"
+  },
+  {
+    "id": "apt3",
+    "petId": "pet3",
+    "vetId": "vet3",
+    "date": "2025-04-10",
+    "time": "11:15:00",
+    "status": "completed",
+    "type": "vaccination"
+  },
+  {
+    "id": "apt4",
+    "petId": "pet4",
+    "vetId": "vet4",
+    "date": "2025-04-20",
+    "time": "15:45:00",
+    "status": "scheduled",
+    "type": "check-up"
+  }
+]

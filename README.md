@@ -1,73 +1,102 @@
-# Welcome to your Lovable project
 
-## Project info
+# Vett - Veterinary Services Booking App
 
-**URL**: https://lovable.dev/projects/9746e333-5803-4c2b-9257-f73bf969a2b7
+A mobile-first application designed for pet owners to find and book veterinary-related services. Think of it as "Doctoralia for pets" - connecting pet owners with the right veterinary care when they need it.
 
-## How can I edit this code?
+## Project Description
 
-There are several ways of editing your application.
+Vett makes it easy for pet owners to:
+- Find qualified veterinarians based on specialty, location, and availability
+- Book appointments for routine check-ups, vaccinations, or emergency care
+- Manage their pets' health records and medical history
+- Receive reminders for upcoming appointments and preventive care
 
-**Use Lovable**
+Veterinarians can:
+- Manage their availability and appointments
+- Access patient records and medical histories
+- Communicate with pet owners before and after appointments
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9746e333-5803-4c2b-9257-f73bf969a2b7) and start prompting.
+## Project Structure
 
-Changes made via Lovable will be committed automatically to this repo.
+The project follows a feature-based architecture with clear separation of concerns:
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── frontend/               # Client-side code
+│   ├── auth/               # Authentication and user management
+│   ├── pets/               # Pet profiles and management
+│   ├── vets/               # Veterinarian listings and profiles
+│   ├── appointments/       # Appointment booking and management
+│   ├── navigation/         # Navigation components and routing
+│   ├── shared/             # Shared utilities and constants
+│   └── ui/                 # Shared UI components
+│
+├── backend/                # Mock backend (will be replaced with Firebase/Supabase)
+│   ├── api/                # API functions
+│   └── data/               # JSON mock data
+│
+├── pages/                  # Top-level pages (with routes)
+└── ...                     # Configuration files
 ```
 
-**Edit a file directly in GitHub**
+## Setup Instructions
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Prerequisites
 
-**Use GitHub Codespaces**
+- Node.js 16+ and npm
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Installation
 
-## What technologies are used for this project?
+1. Clone the repository
+   ```
+   git clone <repository-url>
+   cd vett
+   ```
 
-This project is built with:
+2. Install dependencies
+   ```
+   npm install
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+3. Start the development server
+   ```
+   npm run dev
+   ```
 
-## How can I deploy this project?
+4. Open your browser to view the app
+   ```
+   http://localhost:8080
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/9746e333-5803-4c2b-9257-f73bf969a2b7) and click on Share -> Publish.
+## Development
 
-## Can I connect a custom domain to my Lovable project?
+### Code Style and Quality
 
-Yes it is!
+The project uses ESLint and Prettier to maintain code quality and consistent formatting.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Run linting:
+  ```
+  npm run lint
+  ```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Format code with Prettier:
+  ```
+  npm run format
+  ```
+
+### Adding New Features
+
+1. Create components in the appropriate feature folder
+2. Update mock data as needed in the backend/data folder
+3. Add new routes in App.tsx if creating new pages
+
+## Current Status
+
+This is the initial project skeleton with the basic architecture set up. UI components and screens will be added incrementally based on design files.
+
+## Future Improvements
+
+- Implement authentication with Firebase/Supabase
+- Replace mock backend with real APIs
+- Add push notifications for appointment reminders
+- Implement real-time chat between pet owners and vets

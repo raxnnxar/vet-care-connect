@@ -1,0 +1,75 @@
+
+[
+  {
+    "id": "vet1",
+    "name": "Dr. Elena Martinez",
+    "specialization": ["General Care", "Surgery"],
+    "clinic": "PawCare Veterinary Clinic",
+    "address": "123 Main St, Anytown, CA 94123",
+    "rating": 4.8,
+    "reviewCount": 124,
+    "availableDays": ["Monday", "Wednesday", "Friday"],
+    "imageUrl": "https://randomuser.me/api/portraits/women/10.jpg",
+    "description": "Dr. Martinez has been practicing veterinary medicine for over 10 years, with a special focus on surgical procedures and preventive care for cats and dogs.",
+    "experience": 10,
+    "languages": ["English", "Spanish"],
+    "fees": {
+      "consultation": 75,
+      "followUp": 45
+    }
+  },
+  {
+    "id": "vet2",
+    "name": "Dr. Michael Williams",
+    "specialization": ["Dental Care", "Dermatology"],
+    "clinic": "Happy Paws Clinic",
+    "address": "456 Oak Ave, Anytown, CA 94123",
+    "rating": 4.9,
+    "reviewCount": 98,
+    "availableDays": ["Tuesday", "Thursday", "Saturday"],
+    "imageUrl": "https://randomuser.me/api/portraits/men/10.jpg",
+    "description": "Dr. Williams is a certified veterinary dermatologist with expertise in treating skin conditions and dental problems in all kinds of pets.",
+    "experience": 8,
+    "languages": ["English"],
+    "fees": {
+      "consultation": 85,
+      "followUp": 55
+    }
+  },
+  {
+    "id": "vet3",
+    "name": "Dr. Sarah Johnson",
+    "specialization": ["Exotic Pets", "Birds"],
+    "clinic": "Exotic Animal Care",
+    "address": "789 Pine St, Anytown, CA 94123",
+    "rating": 4.7,
+    "reviewCount": 76,
+    "availableDays": ["Monday", "Tuesday", "Thursday"],
+    "imageUrl": "https://randomuser.me/api/portraits/women/20.jpg",
+    "description": "Dr. Johnson specializes in the care of exotic pets including birds, reptiles, and small mammals. She has extensive experience with unusual species.",
+    "experience": 12,
+    "languages": ["English", "French"],
+    "fees": {
+      "consultation": 90,
+      "followUp": 60
+    }
+  },
+  {
+    "id": "vet4",
+    "name": "Dr. James Thompson",
+    "specialization": ["Cardiology", "Internal Medicine"],
+    "clinic": "Heart & Paw Veterinary",
+    "address": "234 Elm St, Anytown, CA 94123",
+    "rating": 4.6,
+    "reviewCount": 114,
+    "availableDays": ["Wednesday", "Friday", "Saturday"],
+    "imageUrl": "https://randomuser.me/api/portraits/men/20.jpg",
+    "description": "Dr. Thompson is a veterinary cardiologist with specialized training in diagnosing and treating heart conditions in dogs and cats.",
+    "experience": 15,
+    "languages": ["English"],
+    "fees": {
+      "consultation": 100,
+      "followUp": 65
+    }
+  }
+]

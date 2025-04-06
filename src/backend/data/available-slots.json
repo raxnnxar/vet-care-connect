@@ -1,0 +1,59 @@
+
+[
+  {
+    "id": "slot1",
+    "vetId": "vet1",
+    "date": "2025-04-15",
+    "time": "09:00:00",
+    "isAvailable": true
+  },
+  {
+    "id": "slot2",
+    "vetId": "vet1",
+    "date": "2025-04-15",
+    "time": "10:00:00",
+    "isAvailable": false
+  },
+  {
+    "id": "slot3",
+    "vetId": "vet1",
+    "date": "2025-04-15",
+    "time": "11:00:00",
+    "isAvailable": true
+  },
+  {
+    "id": "slot4",
+    "vetId": "vet2",
+    "date": "2025-04-16",
+    "time": "14:00:00",
+    "isAvailable": true
+  },
+  {
+    "id": "slot5",
+    "vetId": "vet2",
+    "date": "2025-04-16",
+    "time": "15:00:00",
+    "isAvailable": true
+  },
+  {
+    "id": "slot6",
+    "vetId": "vet3",
+    "date": "2025-04-17",
+    "time": "09:30:00",
+    "isAvailable": true
+  },
+  {
+    "id": "slot7",
+    "vetId": "vet3",
+    "date": "2025-04-17",
+    "time": "10:30:00",
+    "isAvailable": true
+  },
+  {
+    "id": "slot8",
+    "vetId": "vet4",
+    "date": "2025-04-18",
+    "time": "13:00:00",
+    "isAvailable": true
+  }
+]
