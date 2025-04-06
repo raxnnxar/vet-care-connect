@@ -1,8 +1,6 @@
 
 import React from 'react';
-import LayoutBase from '../../frontend/navigation/components/LayoutBase';
-import NavbarInferior from '../../frontend/navigation/components/NavbarInferior';
-import HeaderConBusqueda from '../../frontend/navigation/components/HeaderConBusqueda';
+import { LayoutBase, NavbarInferior, HeaderConBusqueda } from '../../frontend/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
