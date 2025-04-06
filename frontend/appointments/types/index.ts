@@ -1,3 +1,3 @@
 
 // Re-export appointment types
-export * from '../../../src/frontend/appointments/types';
+export * from '../../src/frontend/appointments/types';
