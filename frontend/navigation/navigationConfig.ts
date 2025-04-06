@@ -3,9 +3,6 @@
  * Common navigation configuration
  */
 
-import { ParamListBase, RouteProp } from '@react-navigation/native';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-
 // Screen names constants to avoid typos and enable auto-completion
 export const SCREENS = {
   // Auth screens
@@ -27,7 +24,7 @@ export const SCREENS = {
 };
 
 // Default screen options that can be reused across navigators
-export const defaultScreenOptions: NativeStackNavigationOptions = {
+export const defaultScreenOptions = {
   headerStyle: {
     backgroundColor: '#ffffff',
   },
@@ -36,16 +33,7 @@ export const defaultScreenOptions: NativeStackNavigationOptions = {
     fontWeight: '600',
   },
   headerShadowVisible: false,
-  animation: 'slide_from_right',
-};
-
-// Helper function to generate screen-specific options
-export const getScreenOptions = <T extends ParamListBase>() => {
-  return {
-    screenOptions: defaultScreenOptions,
-  };
 };
 
 // Navigation types
 export type UserRole = 'owner' | 'vet' | 'unauthenticated';
-

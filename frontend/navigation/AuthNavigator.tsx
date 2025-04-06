@@ -1,16 +1,8 @@
 
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SCREENS, defaultScreenOptions } from './navigationConfig';
+import React, { useState } from 'react';
+import { SCREENS } from './navigationConfig';
 
-// Define the auth stack param list
-type AuthStackParamList = {
-  [SCREENS.LOGIN]: undefined;
-  [SCREENS.SIGNUP]: undefined;
-  [SCREENS.FORGOT_PASSWORD]: undefined;
-};
-
-const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+type AuthScreen = 'Login' | 'Signup' | 'ForgotPassword';
 
 // Placeholder screen components
 const LoginScreen = () => (
@@ -38,27 +30,53 @@ const ForgotPasswordScreen = () => (
 );
 
 const AuthNavigator = () => {
+  const [currentScreen, setCurrentScreen] = useState<AuthScreen>('Login');
+  
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'Login':
+        return <LoginScreen />;
+      case 'Signup':
+        return <SignupScreen />;
+      case 'ForgotPassword':
+        return <ForgotPasswordScreen />;
+      default:
+        return <LoginScreen />;
+    }
+  };
+  
   return (
-    <AuthStack.Navigator 
-      initialRouteName={SCREENS.LOGIN}
-      screenOptions={defaultScreenOptions}
-    >
-      <AuthStack.Screen 
-        name={SCREENS.LOGIN} 
-        component={LoginScreen}
-        options={{ title: 'Sign In' }}
-      />
-      <AuthStack.Screen 
-        name={SCREENS.SIGNUP} 
-        component={SignupScreen}
-        options={{ title: 'Create Account' }}
-      />
-      <AuthStack.Screen 
-        name={SCREENS.FORGOT_PASSWORD} 
-        component={ForgotPasswordScreen}
-        options={{ title: 'Reset Password' }}
-      />
-    </AuthStack.Navigator>
+    <div className="relative h-full">
+      <div className="bg-white p-4 shadow-sm border-b">
+        <h1 className="text-lg font-semibold">
+          {currentScreen === 'Login' ? 'Sign In' : 
+           currentScreen === 'Signup' ? 'Create Account' : 'Reset Password'}
+        </h1>
+      </div>
+      
+      {renderScreen()}
+      
+      <nav className="fixed bottom-20 left-0 right-0 p-4 flex justify-center gap-4">
+        <button 
+          className={`px-4 py-2 rounded ${currentScreen === 'Login' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          onClick={() => setCurrentScreen('Login')}
+        >
+          Login
+        </button>
+        <button 
+          className={`px-4 py-2 rounded ${currentScreen === 'Signup' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          onClick={() => setCurrentScreen('Signup')}
+        >
+          Signup
+        </button>
+        <button 
+          className={`px-4 py-2 rounded ${currentScreen === 'ForgotPassword' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          onClick={() => setCurrentScreen('ForgotPassword')}
+        >
+          Forgot Password
+        </button>
+      </nav>
+    </div>
   );
 };
 

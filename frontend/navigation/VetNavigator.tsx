@@ -1,20 +1,9 @@
 
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState } from 'react';
 import { Home, Calendar, Users, User } from 'lucide-react';
-import { SCREENS, defaultScreenOptions } from './navigationConfig';
+import { SCREENS } from './navigationConfig';
 
-// Define the vet stack param list
-type VetStackParamList = {
-  [SCREENS.VET_DASHBOARD]: undefined;
-  [SCREENS.VET_APPOINTMENTS]: undefined;
-  [SCREENS.VET_PATIENTS]: undefined;
-  [SCREENS.VET_PROFILE]: undefined;
-};
-
-const VetTab = createBottomTabNavigator<VetStackParamList>();
-const VetStack = createNativeStackNavigator<VetStackParamList>();
+type VetScreen = 'VetDashboard' | 'VetAppointments' | 'VetPatients' | 'VetProfile';
 
 // Placeholder screen components
 const VetDashboardScreen = () => (
@@ -51,49 +40,69 @@ const VetProfileScreen = () => (
 
 // Main vet navigator with bottom tabs
 const VetNavigator = () => {
+  const [currentScreen, setCurrentScreen] = useState<VetScreen>('VetDashboard');
+  
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'VetDashboard':
+        return <VetDashboardScreen />;
+      case 'VetAppointments':
+        return <VetAppointmentsScreen />;
+      case 'VetPatients':
+        return <VetPatientsScreen />;
+      case 'VetProfile':
+        return <VetProfileScreen />;
+      default:
+        return <VetDashboardScreen />;
+    }
+  };
+
   return (
-    <VetTab.Navigator 
-      initialRouteName={SCREENS.VET_DASHBOARD}
-      screenOptions={{ 
-        tabBarActiveTintColor: '#0284c7',
-        tabBarInactiveTintColor: '#64748b',
-        headerShown: true,
-        ...defaultScreenOptions
-      }}
-    >
-      <VetTab.Screen 
-        name={SCREENS.VET_DASHBOARD} 
-        component={VetDashboardScreen}
-        options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color }) => <Home size={24} color={color} />
-        }}
-      />
-      <VetTab.Screen 
-        name={SCREENS.VET_APPOINTMENTS} 
-        component={VetAppointmentsScreen}
-        options={{
-          title: 'Schedule',
-          tabBarIcon: ({ color }) => <Calendar size={24} color={color} />
-        }}
-      />
-      <VetTab.Screen 
-        name={SCREENS.VET_PATIENTS} 
-        component={VetPatientsScreen}
-        options={{
-          title: 'Patients',
-          tabBarIcon: ({ color }) => <Users size={24} color={color} />
-        }}
-      />
-      <VetTab.Screen 
-        name={SCREENS.VET_PROFILE} 
-        component={VetProfileScreen}
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <User size={24} color={color} />
-        }}
-      />
-    </VetTab.Navigator>
+    <div className="relative h-full">
+      {/* Header */}
+      <div className="bg-white p-4 shadow-sm border-b">
+        <h1 className="text-lg font-semibold">
+          {currentScreen === 'VetDashboard' ? 'Dashboard' : 
+           currentScreen === 'VetAppointments' ? 'Schedule' :
+           currentScreen === 'VetPatients' ? 'Patients' : 'Profile'}
+        </h1>
+      </div>
+      
+      {/* Screen content */}
+      {renderScreen()}
+
+      {/* Bottom navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center p-3">
+        <button 
+          onClick={() => setCurrentScreen('VetDashboard')}
+          className={`flex flex-col items-center ${currentScreen === 'VetDashboard' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <Home size={24} />
+          <span className="text-xs mt-1">Dashboard</span>
+        </button>
+        <button 
+          onClick={() => setCurrentScreen('VetAppointments')}
+          className={`flex flex-col items-center ${currentScreen === 'VetAppointments' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <Calendar size={24} />
+          <span className="text-xs mt-1">Schedule</span>
+        </button>
+        <button 
+          onClick={() => setCurrentScreen('VetPatients')}
+          className={`flex flex-col items-center ${currentScreen === 'VetPatients' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <Users size={24} />
+          <span className="text-xs mt-1">Patients</span>
+        </button>
+        <button 
+          onClick={() => setCurrentScreen('VetProfile')}
+          className={`flex flex-col items-center ${currentScreen === 'VetProfile' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <User size={24} />
+          <span className="text-xs mt-1">Profile</span>
+        </button>
+      </div>
+    </div>
   );
 };
 

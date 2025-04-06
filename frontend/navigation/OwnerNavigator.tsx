@@ -1,20 +1,9 @@
 
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState } from 'react';
 import { Home, Calendar, Search, User } from 'lucide-react';
-import { SCREENS, defaultScreenOptions } from './navigationConfig';
+import { SCREENS } from './navigationConfig';
 
-// Define the owner stack param list
-type OwnerStackParamList = {
-  [SCREENS.OWNER_HOME]: undefined;
-  [SCREENS.OWNER_PETS]: undefined;
-  [SCREENS.OWNER_APPOINTMENTS]: undefined;
-  [SCREENS.OWNER_PROFILE]: undefined;
-};
-
-const OwnerTab = createBottomTabNavigator<OwnerStackParamList>();
-const OwnerStack = createNativeStackNavigator<OwnerStackParamList>();
+type OwnerScreen = 'OwnerHome' | 'OwnerPets' | 'OwnerAppointments' | 'OwnerProfile';
 
 // Placeholder screen components
 const OwnerHomeScreen = () => (
@@ -51,49 +40,69 @@ const OwnerProfileScreen = () => (
 
 // Main owner navigator with bottom tabs
 const OwnerNavigator = () => {
+  const [currentScreen, setCurrentScreen] = useState<OwnerScreen>('OwnerHome');
+  
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'OwnerHome':
+        return <OwnerHomeScreen />;
+      case 'OwnerPets':
+        return <OwnerPetsScreen />;
+      case 'OwnerAppointments':
+        return <OwnerAppointmentsScreen />;
+      case 'OwnerProfile':
+        return <OwnerProfileScreen />;
+      default:
+        return <OwnerHomeScreen />;
+    }
+  };
+
   return (
-    <OwnerTab.Navigator 
-      initialRouteName={SCREENS.OWNER_HOME}
-      screenOptions={{ 
-        tabBarActiveTintColor: '#0284c7',
-        tabBarInactiveTintColor: '#64748b',
-        headerShown: true,
-        ...defaultScreenOptions
-      }}
-    >
-      <OwnerTab.Screen 
-        name={SCREENS.OWNER_HOME} 
-        component={OwnerHomeScreen}
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Home size={24} color={color} />
-        }}
-      />
-      <OwnerTab.Screen 
-        name={SCREENS.OWNER_PETS} 
-        component={OwnerPetsScreen}
-        options={{
-          title: 'My Pets',
-          tabBarIcon: ({ color }) => <Search size={24} color={color} />
-        }}
-      />
-      <OwnerTab.Screen 
-        name={SCREENS.OWNER_APPOINTMENTS} 
-        component={OwnerAppointmentsScreen}
-        options={{
-          title: 'Appointments',
-          tabBarIcon: ({ color }) => <Calendar size={24} color={color} />
-        }}
-      />
-      <OwnerTab.Screen 
-        name={SCREENS.OWNER_PROFILE} 
-        component={OwnerProfileScreen}
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <User size={24} color={color} />
-        }}
-      />
-    </OwnerTab.Navigator>
+    <div className="relative h-full">
+      {/* Header */}
+      <div className="bg-white p-4 shadow-sm border-b">
+        <h1 className="text-lg font-semibold">
+          {currentScreen === 'OwnerHome' ? 'Home' : 
+           currentScreen === 'OwnerPets' ? 'My Pets' :
+           currentScreen === 'OwnerAppointments' ? 'Appointments' : 'Profile'}
+        </h1>
+      </div>
+      
+      {/* Screen content */}
+      {renderScreen()}
+
+      {/* Bottom navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center p-3">
+        <button 
+          onClick={() => setCurrentScreen('OwnerHome')}
+          className={`flex flex-col items-center ${currentScreen === 'OwnerHome' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <Home size={24} />
+          <span className="text-xs mt-1">Home</span>
+        </button>
+        <button 
+          onClick={() => setCurrentScreen('OwnerPets')}
+          className={`flex flex-col items-center ${currentScreen === 'OwnerPets' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <Search size={24} />
+          <span className="text-xs mt-1">My Pets</span>
+        </button>
+        <button 
+          onClick={() => setCurrentScreen('OwnerAppointments')}
+          className={`flex flex-col items-center ${currentScreen === 'OwnerAppointments' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <Calendar size={24} />
+          <span className="text-xs mt-1">Appointments</span>
+        </button>
+        <button 
+          onClick={() => setCurrentScreen('OwnerProfile')}
+          className={`flex flex-col items-center ${currentScreen === 'OwnerProfile' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <User size={24} />
+          <span className="text-xs mt-1">Profile</span>
+        </button>
+      </div>
+    </div>
   );
 };
 

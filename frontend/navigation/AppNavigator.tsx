@@ -1,14 +1,9 @@
 
 import React, { useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AuthNavigator from './AuthNavigator';
 import OwnerNavigator from './OwnerNavigator';
 import VetNavigator from './VetNavigator';
 import { UserRole } from './navigationConfig';
-
-// Root stack for conditional navigation between flows
-const RootStack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   // This would normally come from a context or state management
@@ -16,20 +11,43 @@ const AppNavigator = () => {
   const [userRole, setUserRole] = useState<UserRole>('unauthenticated');
 
   return (
-    <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {userRole === 'unauthenticated' ? (
-          // Auth flow
-          <RootStack.Screen name="Auth" component={AuthNavigator} />
-        ) : userRole === 'owner' ? (
-          // Pet Owner flow
-          <RootStack.Screen name="OwnerFlow" component={OwnerNavigator} />
-        ) : (
-          // Vet flow
-          <RootStack.Screen name="VetFlow" component={VetNavigator} />
-        )}
-      </RootStack.Navigator>
-    </NavigationContainer>
+    <div className="w-full h-screen bg-gray-50">
+      {userRole === 'unauthenticated' ? (
+        // Auth flow
+        <AuthNavigator />
+      ) : userRole === 'owner' ? (
+        // Pet Owner flow
+        <OwnerNavigator />
+      ) : (
+        // Vet flow
+        <VetNavigator />
+      )}
+
+      {/* Role switcher for demo purposes */}
+      <div className="fixed bottom-4 left-4 p-2 bg-white rounded-md shadow-md">
+        <p className="text-sm font-semibold mb-2">Switch Role (Demo):</p>
+        <div className="flex gap-2">
+          <button
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'unauthenticated' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setUserRole('unauthenticated')}
+          >
+            Auth
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'owner' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setUserRole('owner')}
+          >
+            Owner
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'vet' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setUserRole('vet')}
+          >
+            Vet
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
