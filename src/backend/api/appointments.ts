@@ -12,18 +12,18 @@ export const getAppointments = async (userId: string, role: 'pet_owner' | 'veter
     // In a real app, we'd first get the pets owned by this user
     // Here we'll just hardcode pet1 and pet2 to user1 for simplicity
     const userPetIds = userId === 'user1' ? ['pet1', 'pet2'] : ['pet3', 'pet4'];
-    return appointmentsData.filter(apt => userPetIds.includes(apt.petId));
+    return (appointmentsData as unknown as Appointment[]).filter(apt => userPetIds.includes(apt.petId));
   }
   
   // If it's a veterinarian, filter by vet ID
-  return appointmentsData.filter(apt => apt.vetId === userId);
+  return (appointmentsData as unknown as Appointment[]).filter(apt => apt.vetId === userId);
 };
 
 export const getAppointment = async (appointmentId: string): Promise<Appointment | null> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  const appointment = appointmentsData.find(a => a.id === appointmentId);
+  const appointment = (appointmentsData as unknown as Appointment[]).find(a => a.id === appointmentId);
   return appointment || null;
 };
 
@@ -50,10 +50,10 @@ export const bookAppointment = async (appointmentData: Omit<Appointment, 'id' | 
   // 3. Create the appointment
   
   // Here we just return with a generated ID
-  const newAppointment = {
+  const newAppointment: Appointment = {
     ...appointmentData,
     id: `apt${Date.now()}`,
-    status: 'scheduled' as const
+    status: 'scheduled'
   };
   
   return newAppointment;
@@ -66,7 +66,7 @@ export const updateAppointmentStatus = async (
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  const appointment = appointmentsData.find(a => a.id === appointmentId);
+  const appointment = (appointmentsData as unknown as Appointment[]).find(a => a.id === appointmentId);
   
   if (!appointment) {
     throw new Error('Appointment not found');
