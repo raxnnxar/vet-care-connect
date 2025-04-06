@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Home, Calendar, Users, User } from 'lucide-react';
@@ -19,27 +18,35 @@ const VetStack = createNativeStackNavigator<VetStackParamList>();
 
 // Placeholder screen components
 const VetDashboardScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Vet Dashboard Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Vet Dashboard Screen</h2>
+    </div>
+  </div>
 );
 
 const VetAppointmentsScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Vet Appointments Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Vet Appointments Screen</h2>
+    </div>
+  </div>
 );
 
 const VetPatientsScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Vet Patients Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Vet Patients Screen</h2>
+    </div>
+  </div>
 );
 
 const VetProfileScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Vet Profile Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Vet Profile Screen</h2>
+    </div>
+  </div>
 );
 
 // Main vet navigator with bottom tabs

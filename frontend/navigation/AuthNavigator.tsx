@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Text, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SCREENS, defaultScreenOptions } from './navigationConfig';
 
@@ -15,21 +14,27 @@ const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
 // Placeholder screen components
 const LoginScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Login Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Login Screen</h2>
+    </div>
+  </div>
 );
 
 const SignupScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Signup Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Signup Screen</h2>
+    </div>
+  </div>
 );
 
 const ForgotPasswordScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Forgot Password Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Forgot Password Screen</h2>
+    </div>
+  </div>
 );
 
 const AuthNavigator = () => {

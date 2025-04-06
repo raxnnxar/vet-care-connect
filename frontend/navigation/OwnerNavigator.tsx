@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Home, Calendar, Search, User } from 'lucide-react';
@@ -19,27 +18,35 @@ const OwnerStack = createNativeStackNavigator<OwnerStackParamList>();
 
 // Placeholder screen components
 const OwnerHomeScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Owner Home Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Owner Home Screen</h2>
+    </div>
+  </div>
 );
 
 const OwnerPetsScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Owner Pets Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Owner Pets Screen</h2>
+    </div>
+  </div>
 );
 
 const OwnerAppointmentsScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Owner Appointments Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Owner Appointments Screen</h2>
+    </div>
+  </div>
 );
 
 const OwnerProfileScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Owner Profile Screen</Text>
-  </View>
+  <div className="flex items-center justify-center h-screen">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold">Owner Profile Screen</h2>
+    </div>
+  </div>
 );
 
 // Main owner navigator with bottom tabs
