@@ -3,22 +3,34 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppNavigator } from "../frontend/navigation";
+import { AuthProvider } from "./features/auth/hooks/useAuth";
 
 // Create a new QueryClient instance
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      retry: 1,
+    },
+  }
+});
+
+// Import our navigation component
+import AppNavigator from "./navigation/AppNavigator";
 
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {/* Toast notifications */}
-        <Toaster />
-        <Sonner />
-        
-        {/* Application navigation */}
-        <AppNavigator />
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          {/* Toast notifications */}
+          <Toaster />
+          <Sonner />
+          
+          {/* Application navigation */}
+          <AppNavigator />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
