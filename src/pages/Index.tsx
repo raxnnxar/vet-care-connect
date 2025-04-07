@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { LayoutBase, NavbarInferior, HeaderConBusqueda } from '../../frontend/navigation';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { LayoutBase, NavbarInferior, HeaderConBusqueda } from '../frontend/navigation/components';
+import { Button } from '@/ui/atoms/button';
+import { Card } from '@/ui/molecules/card';
 
 const Index = () => {
   return (
