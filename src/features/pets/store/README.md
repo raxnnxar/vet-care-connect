@@ -1,8 +1,4 @@
 
 # Pet Store
 
-This directory contains state management for pets, including:
-
-- Pet context
-- Pet reducers
-- Pet actions
+This directory contains state management logic for pet management features.
