@@ -1,4 +1,3 @@
-
 /**
  * Authentication API service
  * 
@@ -11,14 +10,32 @@ import { User, LoginCredentials, SignupData, AuthResponse } from '../types';
  * Log in with email and password
  */
 export const login = async (credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> => {
-  return apiClient.auth.signIn(credentials.email, credentials.password) as Promise<ApiResponse<AuthResponse>>;
+  const response = await apiClient.auth.signIn(credentials.email, credentials.password);
+  
+  // Transform the response to match our expected AuthResponse type
+  return {
+    data: response.data ? {
+      user: response.data.user as User,
+      token: 'placeholder-token' // In real implementation, this would come from session
+    } : null,
+    error: response.error
+  };
 };
 
 /**
  * Register a new user
  */
 export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResponse>> => {
-  return apiClient.auth.signUp(userData.email, userData.password) as Promise<ApiResponse<AuthResponse>>;
+  const response = await apiClient.auth.signUp(userData.email, userData.password);
+  
+  // Transform the response to match our expected AuthResponse type
+  return {
+    data: response.data ? {
+      user: response.data.user as User,
+      token: 'placeholder-token' // In real implementation, this would come from session
+    } : null,
+    error: response.error
+  };
 };
 
 /**

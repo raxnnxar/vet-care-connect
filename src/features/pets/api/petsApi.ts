@@ -1,4 +1,3 @@
-
 /**
  * Pets API service
  * 
@@ -25,14 +24,38 @@ export const getPetById = async (id: string): Promise<ApiResponse<Pet>> => {
  * Create a new pet
  */
 export const createPet = async (petData: CreatePetData): Promise<ApiResponse<Pet>> => {
-  return apiClient.pets.insert<Pet>(petData);
+  // Transform the CreatePetData to be compatible with what the API client expects
+  const transformedData: Partial<Pet> = { 
+    ...petData,
+    // If medicalHistory exists, ensure each record has a temporary id for type compatibility
+    medicalHistory: petData.medicalHistory ? 
+      petData.medicalHistory.map(record => ({
+        ...record, 
+        id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` // Temporary ID that will be replaced by the backend
+      })) : 
+      undefined
+  };
+  
+  return apiClient.pets.insert<Pet>(transformedData);
 };
 
 /**
  * Update an existing pet
  */
 export const updatePet = async (id: string, petData: UpdatePetData): Promise<ApiResponse<Pet>> => {
-  return apiClient.pets.update<Pet>(id, petData);
+  // Transform the UpdatePetData to be compatible with what the API client expects
+  const transformedData: Partial<Pet> = {
+    ...petData,
+    // If medicalHistory exists, ensure each record has a temporary id for type compatibility
+    medicalHistory: petData.medicalHistory ?
+      petData.medicalHistory.map(record => ({
+        ...record,
+        id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` // Temporary ID that will be replaced by the backend
+      })) :
+      undefined
+  };
+  
+  return apiClient.pets.update<Pet>(id, transformedData);
 };
 
 /**
