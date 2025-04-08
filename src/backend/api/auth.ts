@@ -1,6 +1,6 @@
 
 import usersData from '../data/users.json';
-import { User } from '../../frontend/auth/types';
+import { User } from '../../features/auth/types';
 
 interface LoginCredentials {
   email: string;

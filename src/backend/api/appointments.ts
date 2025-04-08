@@ -1,7 +1,7 @@
 
 import appointmentsData from '../data/appointments.json';
 import availableSlotsData from '../data/available-slots.json';
-import { Appointment, AppointmentSlot } from '../../frontend/appointments/types';
+import { Appointment, AppointmentSlot } from '../../features/appointments/types';
 
 export const getAppointments = async (userId: string, role: 'pet_owner' | 'veterinarian'): Promise<Appointment[]> => {
   // Simulate API call delay

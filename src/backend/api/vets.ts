@@ -1,6 +1,6 @@
 
 import vetsData from '../data/vets.json';
-import { Veterinarian } from '../../frontend/vets/types';
+import { Veterinarian } from '../../features/vets/types';
 
 export const getVets = async (): Promise<Veterinarian[]> => {
   // Simulate API call delay

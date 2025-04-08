@@ -1,6 +1,6 @@
 
 import petsData from '../data/pets.json';
-import { Pet } from '../../frontend/pets/types';
+import { Pet } from '../../features/pets/types';
 
 export const getPets = async (ownerId: string): Promise<Pet[]> => {
   // Simulate API call delay
