@@ -1,6 +1,8 @@
 
 /**
  * Authentication related types
+ * 
+ * These types define the shape of authentication data in the application
  */
 
 export interface User {
@@ -33,4 +35,13 @@ export interface SignupData {
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  newPassword: string;
+}
+
+export interface PasswordResetRequest {
+  email: string;
 }
