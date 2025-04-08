@@ -1,4 +1,8 @@
 
+/**
+ * Pet related types
+ */
+
 export interface Pet {
   id: string;
   name: string;

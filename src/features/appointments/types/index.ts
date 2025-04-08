@@ -1,4 +1,8 @@
 
+/**
+ * Appointment related types
+ */
+
 export interface Appointment {
   id: string;
   petId: string;

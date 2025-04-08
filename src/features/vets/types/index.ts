@@ -1,4 +1,8 @@
 
+/**
+ * Veterinarian related types
+ */
+
 export interface Veterinarian {
   id: string;
   name: string;

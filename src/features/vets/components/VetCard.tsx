@@ -2,7 +2,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { Veterinarian } from '../types';
-import Card from '../../ui/components/Card';
+import { Card } from '@/ui/molecules/card';
 
 interface VetCardProps {
   vet: Veterinarian;

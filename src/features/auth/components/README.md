@@ -1,19 +1,9 @@
 
 # Auth Components
 
-This directory contains UI components specific to authentication and user management.
+This directory contains UI components specific to authentication functionality, such as:
 
-## Components
-
-- Login form
-- Signup form
+- Login forms
+- Registration forms
 - Password reset forms
-- User profile editing
-- Role-based access control components
-
-## Usage Guidelines
-
-- Keep authentication UI consistent
-- Use form validation from shared libraries
-- Follow accessibility best practices for forms
-- Handle authentication states clearly (loading, error, success)
+- Account verification components
