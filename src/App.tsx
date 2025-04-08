@@ -2,7 +2,7 @@
 import { Toaster } from "@/ui/templates/toaster";
 import { Toaster as Sonner } from "@/ui/templates/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/ui/molecules/tooltip";
 import { AuthProvider } from "./features/auth/hooks/useAuth";
 
 // Create a new QueryClient instance
