@@ -5,13 +5,19 @@
  * This file centralizes all API endpoints used in the application
  */
 
+// Import environment variables
+import { env } from '../core/config/env';
+
+// Base API URL from environment
+const API_BASE_URL = env.apiBaseUrl;
+
 // Base paths for different resource types
 export const API_PATHS = {
-  AUTH: '/auth',
-  USERS: '/users',
-  PETS: '/pets',
-  VETS: '/vets',
-  APPOINTMENTS: '/appointments',
+  AUTH: `${API_BASE_URL}/auth`,
+  USERS: `${API_BASE_URL}/users`,
+  PETS: `${API_BASE_URL}/pets`,
+  VETS: `${API_BASE_URL}/vets`,
+  APPOINTMENTS: `${API_BASE_URL}/appointments`,
 };
 
 // Authentication endpoints
