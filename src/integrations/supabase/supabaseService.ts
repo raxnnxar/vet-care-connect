@@ -106,6 +106,9 @@ export const authService = {
  * Returns CRUD methods for a specific table
  */
 export const createDatabaseService = <T extends keyof Database['public']['Tables']>(tableName: T) => {
+  // Define type for the ID based on our database schema
+  type IdType = string | number;
+
   return {
     /**
      * Get all records from a table with optional filtering
@@ -152,7 +155,7 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
      * Get a record by its ID
      */
     getById: async <R = Database['public']['Tables'][T]['Row']>(
-      id: string
+      id: IdType
     ): Promise<ServiceResponse<R>> => {
       const { data, error } = await supabase
         .from(tableName)
@@ -188,7 +191,7 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
      * Update an existing record
      */
     update: async <R = Database['public']['Tables'][T]['Row']>(
-      id: string,
+      id: IdType,
       changes: Partial<Database['public']['Tables'][T]['Update']>
     ): Promise<ServiceResponse<R>> => {
       const { data, error } = await supabase
@@ -207,7 +210,7 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
     /**
      * Delete a record
      */
-    delete: async (id: string): Promise<ServiceResponse<null>> => {
+    delete: async (id: IdType): Promise<ServiceResponse<null>> => {
       const { error } = await supabase
         .from(tableName)
         .delete()
