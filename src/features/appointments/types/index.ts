@@ -4,6 +4,7 @@
  * 
  * These types define the shape of appointment data in the application
  */
+import { APPOINTMENT_STATUS, APPOINTMENT_TYPES, AppointmentStatusType, AppointmentTypeType } from '@/core/constants/app.constants';
 
 export interface Appointment {
   id: string;
@@ -11,8 +12,8 @@ export interface Appointment {
   vetId: string;
   date: string;
   time: string;
-  status: 'scheduled' | 'completed' | 'canceled';
-  type: 'check-up' | 'vaccination' | 'emergency' | 'surgery' | 'follow-up' | 'dental-cleaning';
+  status: AppointmentStatusType;
+  type: AppointmentTypeType;
   notes?: string;
 }
 
@@ -35,8 +36,8 @@ export type AppointmentFilters = {
   vetId?: string;
   startDate?: string;
   endDate?: string;
-  status?: Appointment['status'];
-  type?: Appointment['type'];
+  status?: AppointmentStatusType;
+  type?: AppointmentTypeType;
 };
 
 // Extended appointment type with related data

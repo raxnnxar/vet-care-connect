@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Calendar, Search, User } from 'lucide-react';
 import { ROUTES } from '../../shared/constants/routes';
+import { cn } from '@/lib/utils';
 
 interface NavbarInferiorProps {
   activeTab?: 'home' | 'appointments' | 'vets' | 'profile';
@@ -10,7 +11,7 @@ interface NavbarInferiorProps {
 
 const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) => {
   return (
-    <div className="flex justify-around items-center py-3 px-4 bg-white">
+    <div className="flex justify-around items-center py-3 px-4 bg-white border-t border-gray-200 shadow-sm fixed bottom-0 left-0 right-0">
       <NavItem 
         icon={<Home size={24} />} 
         label="Home" 
@@ -50,9 +51,10 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, isActive }) => {
   return (
     <Link
       to={to}
-      className={`flex flex-col items-center ${
-        isActive ? 'text-blue-600' : 'text-gray-500'
-      }`}
+      className={cn(
+        "flex flex-col items-center",
+        isActive ? "text-primary" : "text-gray-500"
+      )}
     >
       {icon}
       <span className="text-xs mt-1">{label}</span>

@@ -4,12 +4,13 @@
  * 
  * These types define the shape of authentication data in the application
  */
+import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
 
 export interface User {
   id: string;
   email: string;
   displayName: string;
-  role: 'pet_owner' | 'veterinarian';
+  role: UserRoleType;
   profileImage?: string;
   phone?: string;
 }
@@ -29,7 +30,7 @@ export interface SignupData {
   email: string;
   password: string;
   displayName: string;
-  role: 'pet_owner' | 'veterinarian';
+  role: UserRoleType;
 }
 
 export interface AuthResponse {
