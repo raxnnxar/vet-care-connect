@@ -106,14 +106,16 @@ export const authService = {
  * Returns CRUD methods for a specific table
  */
 export const createDatabaseService = <T extends keyof Database['public']['Tables']>(tableName: T) => {
-  // Define type for the ID based on our database schema
-  type IdType = string | number;
-
+  // Get the table type from Database
+  type TableRow = Database['public']['Tables'][T]['Row'];
+  type TableInsert = Database['public']['Tables'][T]['Insert'];
+  type TableUpdate = Database['public']['Tables'][T]['Update'];
+  
   return {
     /**
      * Get all records from a table with optional filtering
      */
-    getAll: async <R = Database['public']['Tables'][T]['Row']>(
+    getAll: async <R = TableRow>(
       options?: QueryOptions
     ): Promise<ServiceResponse<R[]>> => {
       let query = supabase
@@ -154,8 +156,8 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
     /**
      * Get a record by its ID
      */
-    getById: async <R = Database['public']['Tables'][T]['Row']>(
-      id: IdType
+    getById: async <R = TableRow>(
+      id: string | number
     ): Promise<ServiceResponse<R>> => {
       const { data, error } = await supabase
         .from(tableName)
@@ -172,12 +174,12 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
     /**
      * Insert a new record
      */
-    insert: async <R = Database['public']['Tables'][T]['Row']>(
-      record: Omit<Database['public']['Tables'][T]['Insert'], 'id'>
+    insert: async <R = TableRow>(
+      record: TableInsert
     ): Promise<ServiceResponse<R>> => {
       const { data, error } = await supabase
         .from(tableName)
-        .insert(record as any)
+        .insert(record)
         .select()
         .single();
       
@@ -190,13 +192,13 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
     /**
      * Update an existing record
      */
-    update: async <R = Database['public']['Tables'][T]['Row']>(
-      id: IdType,
-      changes: Partial<Database['public']['Tables'][T]['Update']>
+    update: async <R = TableRow>(
+      id: string | number,
+      changes: TableUpdate
     ): Promise<ServiceResponse<R>> => {
       const { data, error } = await supabase
         .from(tableName)
-        .update(changes as any)
+        .update(changes)
         .eq('id', id)
         .select()
         .single();
@@ -210,7 +212,7 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
     /**
      * Delete a record
      */
-    delete: async (id: IdType): Promise<ServiceResponse<null>> => {
+    delete: async (id: string | number): Promise<ServiceResponse<null>> => {
       const { error } = await supabase
         .from(tableName)
         .delete()
