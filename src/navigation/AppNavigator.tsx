@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import AuthNavigator from './AuthNavigator';
 import OwnerNavigator from './OwnerNavigator';
 import VetNavigator from './VetNavigator';
+import { USER_ROLES, UserRoleType } from '../core/constants/app.constants';
 import { UserRole } from './navigationConfig';
 
 const AppNavigator = () => {
@@ -15,7 +16,7 @@ const AppNavigator = () => {
       {userRole === 'unauthenticated' ? (
         // Auth flow
         <AuthNavigator />
-      ) : userRole === 'owner' ? (
+      ) : userRole === 'pet_owner' ? (
         // Pet Owner flow
         <OwnerNavigator />
       ) : (
@@ -34,14 +35,14 @@ const AppNavigator = () => {
             Auth
           </button>
           <button
-            className={`px-3 py-1 rounded-md text-sm ${userRole === 'owner' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => setUserRole('owner')}
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'pet_owner' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setUserRole('pet_owner')}
           >
             Owner
           </button>
           <button
-            className={`px-3 py-1 rounded-md text-sm ${userRole === 'vet' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => setUserRole('vet')}
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'veterinarian' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setUserRole('veterinarian')}
           >
             Vet
           </button>
