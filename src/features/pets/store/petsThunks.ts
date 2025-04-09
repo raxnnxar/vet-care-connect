@@ -1,14 +1,7 @@
 
 import { AppDispatch } from '../../../state/store';
 import { petsActions } from './petsSlice';
-import { 
-  getPets, 
-  getPetById, 
-  createPet, 
-  updatePet, 
-  deletePet, 
-  getPetsByOwner 
-} from '../api/petsApi';
+import { petsApi } from '../api/petsApi';
 import { CreatePetData, UpdatePetData, PetFilters } from '../types';
 import { QueryOptions } from '../../../core/api/apiClient';
 
@@ -23,7 +16,7 @@ export const fetchPets = (filters?: PetFilters) => async (dispatch: AppDispatch)
       filters: filters as Record<string, any> 
     };
     
-    const { data, error } = await getPets(options);
+    const { data, error } = await petsApi.getPets(options);
     
     if (error) throw new Error(error.message || 'Failed to fetch pets');
     
@@ -40,7 +33,7 @@ export const fetchPetById = (id: string) => async (dispatch: AppDispatch) => {
   dispatch(petsActions.requestStarted());
   
   try {
-    const { data, error } = await getPetById(id);
+    const { data, error } = await petsApi.getPetById(id);
     
     if (error) throw new Error(error.message || 'Failed to fetch pet');
     if (!data) throw new Error('Pet not found');
@@ -58,7 +51,7 @@ export const addPet = (petData: CreatePetData) => async (dispatch: AppDispatch) 
   dispatch(petsActions.requestStarted());
   
   try {
-    const { data, error } = await createPet(petData);
+    const { data, error } = await petsApi.createPet(petData);
     
     if (error) throw new Error(error.message || 'Failed to add pet');
     if (!data) throw new Error('Pet creation returned no data');
@@ -76,7 +69,7 @@ export const modifyPet = (id: string, petData: UpdatePetData) => async (dispatch
   dispatch(petsActions.requestStarted());
   
   try {
-    const { data, error } = await updatePet(id, petData);
+    const { data, error } = await petsApi.updatePet(id, petData);
     
     if (error) throw new Error(error.message || 'Failed to update pet');
     if (!data) throw new Error('Pet update returned no data');
@@ -94,7 +87,7 @@ export const removePet = (id: string) => async (dispatch: AppDispatch) => {
   dispatch(petsActions.requestStarted());
   
   try {
-    const { error } = await deletePet(id);
+    const { error } = await petsApi.deletePet(id);
     
     if (error) throw new Error(error.message || 'Failed to delete pet');
     
@@ -111,7 +104,7 @@ export const fetchPetsByOwner = (ownerId: string) => async (dispatch: AppDispatc
   dispatch(petsActions.requestStarted());
   
   try {
-    const { data, error } = await getPetsByOwner(ownerId);
+    const { data, error } = await petsApi.getPetsByOwner(ownerId);
     
     if (error) throw new Error(error.message || 'Failed to fetch owner\'s pets');
     
