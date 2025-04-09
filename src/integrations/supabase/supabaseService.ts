@@ -1,4 +1,3 @@
-
 import { supabase } from './client';
 import { User } from '@supabase/supabase-js';
 import type { Database } from './types';
@@ -106,11 +105,11 @@ export const authService = {
  * Returns CRUD methods for a specific table
  */
 export const createDatabaseService = <T extends keyof Database['public']['Tables']>(tableName: T) => {
-  // Get the table type from Database
+  // Define types from Database
   type TableRow = Database['public']['Tables'][T]['Row'];
   type TableInsert = Database['public']['Tables'][T]['Insert'];
   type TableUpdate = Database['public']['Tables'][T]['Update'];
-  
+
   return {
     /**
      * Get all records from a table with optional filtering
@@ -162,7 +161,7 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
       const { data, error } = await supabase
         .from(tableName)
         .select('*')
-        .eq('id', id)
+        .eq('id', id as any)
         .single();
       
       return {
@@ -179,7 +178,7 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
     ): Promise<ServiceResponse<R>> => {
       const { data, error } = await supabase
         .from(tableName)
-        .insert(record)
+        .insert(record as any)
         .select()
         .single();
       
@@ -198,8 +197,8 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
     ): Promise<ServiceResponse<R>> => {
       const { data, error } = await supabase
         .from(tableName)
-        .update(changes)
-        .eq('id', id)
+        .update(changes as any)
+        .eq('id', id as any)
         .select()
         .single();
       
@@ -216,7 +215,7 @@ export const createDatabaseService = <T extends keyof Database['public']['Tables
       const { error } = await supabase
         .from(tableName)
         .delete()
-        .eq('id', id);
+        .eq('id', id as any);
       
       return {
         data: null,
