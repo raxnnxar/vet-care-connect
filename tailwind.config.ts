@@ -1,4 +1,6 @@
+
 import type { Config } from "tailwindcss";
+import { theme as vettTheme } from "./src/theme/theme";
 
 export default {
 	darkMode: ["class"],
@@ -25,33 +27,48 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#7ECEC4', // Main teal from logo
+					50: vettTheme.colors.primary[50],
+					100: vettTheme.colors.primary[100],
+					200: vettTheme.colors.primary[200],
+					300: vettTheme.colors.primary[300],
+					400: vettTheme.colors.primary[400],
+					500: vettTheme.colors.primary[500],
+					600: vettTheme.colors.primary[600],
+					700: vettTheme.colors.primary[700],
+					800: vettTheme.colors.primary[800],
+					900: vettTheme.colors.primary[900],
+					foreground: '#FFFFFF',
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#FFFFFF', // White from logo
+					foreground: '#1F2937',
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					DEFAULT: vettTheme.colors.error.DEFAULT,
+					foreground: vettTheme.colors.error.light,
 				},
 				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					DEFAULT: vettTheme.colors.gray[100],
+					foreground: vettTheme.colors.gray[500],
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: vettTheme.colors.gray[100],
+					foreground: vettTheme.colors.gray[900],
 				},
 				popover: {
-					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
+					DEFAULT: '#FFFFFF',
+					foreground: vettTheme.colors.text.DEFAULT,
 				},
 				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					DEFAULT: '#FFFFFF',
+					foreground: vettTheme.colors.text.DEFAULT,
 				},
+				success: vettTheme.colors.success,
+				warning: vettTheme.colors.warning,
+				error: vettTheme.colors.error,
+				info: vettTheme.colors.info,
+				gray: vettTheme.colors.gray,
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -64,10 +81,21 @@ export default {
 				}
 			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				lg: vettTheme.borderRadius.lg,
+				md: vettTheme.borderRadius.md,
+				sm: vettTheme.borderRadius.sm,
 			},
+			fontFamily: {
+				sans: [vettTheme.typography.fontFamily.sans],
+				display: [vettTheme.typography.fontFamily.display],
+				mono: [vettTheme.typography.fontFamily.mono],
+			},
+			fontSize: vettTheme.typography.fontSize,
+			fontWeight: vettTheme.typography.fontWeight,
+			lineHeight: vettTheme.typography.lineHeight,
+			letterSpacing: vettTheme.typography.letterSpacing,
+			spacing: vettTheme.spacing,
+			boxShadow: vettTheme.shadows,
 			keyframes: {
 				'accordion-down': {
 					from: {
@@ -84,12 +112,40 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'fade-out': {
+					'0%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					},
+					'100%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					}
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'fade-out': 'fade-out 0.3s ease-out',
+			},
+			zIndex: vettTheme.zIndex,
+			screens: vettTheme.breakpoints,
+			transitionProperty: {
+				height: 'height',
+				spacing: 'margin, padding',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
