@@ -11,10 +11,15 @@ import {
 } from '../store/petsThunks';
 import { petsActions } from '../store/petsSlice';
 import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
+import { serviceProvider } from '../../../core/services/serviceProvider';
+import { IPetsApi } from '../api/petsApiInterface';
 
 export const usePets = () => {
   const dispatch = useAppDispatch();
   const { pets, currentPet, isLoading, error } = useAppSelector(state => state.pets);
+  
+  // Get the pets API service from the service provider
+  const petsApiService = serviceProvider.get<IPetsApi>('petsApi');
   
   return {
     // State
@@ -31,5 +36,9 @@ export const usePets = () => {
     modifyPet: useCallback((id: string, petData: UpdatePetData) => dispatch(modifyPet(id, petData)), [dispatch]),
     removePet: useCallback((id: string) => dispatch(removePet(id)), [dispatch]),
     clearErrors: useCallback(() => dispatch(petsActions.clearErrors()), [dispatch]),
+    
+    // Direct API access (useful for components that don't need Redux)
+    api: petsApiService
   };
 };
+
