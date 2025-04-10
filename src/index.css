@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -98,6 +97,13 @@
     @apply bg-background text-foreground font-sans;
   }
 
+  /* Animation classes for the welcome screen */
+  .animate-on-mount {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  
   /* Add utility classes that use your theme values */
   .vett-container {
     @apply px-4 mx-auto max-w-7xl sm:px-6 lg:px-8;
