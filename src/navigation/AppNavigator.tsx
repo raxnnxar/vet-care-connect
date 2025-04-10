@@ -22,8 +22,6 @@ const AppNavigator = () => {
         // Vet flow
         <VetNavigator />
       )}
-
-      {/* Role switcher has been removed per requirements */}
     </div>
   );
 };

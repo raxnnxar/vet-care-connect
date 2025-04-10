@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/ui/molecules/tooltip";
 import { ReduxProvider } from "./state/ReduxProvider";
 import { AuthProvider } from "./features/auth/hooks/useAuth";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -22,7 +22,7 @@ import AppNavigator from "./navigation/AppNavigator";
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <QueryClientProvider client={queryClient}>
         <ReduxProvider>
           <AuthProvider>
@@ -37,7 +37,7 @@ const App = () => {
           </AuthProvider>
         </ReduxProvider>
       </QueryClientProvider>
-    </BrowserRouter>
+    </Router>
   );
 };
 

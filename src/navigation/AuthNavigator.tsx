@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { SCREENS } from './navigationConfig';
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
 
