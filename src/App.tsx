@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/ui/molecules/tooltip";
 import { ReduxProvider } from "./state/ReduxProvider";
 import { AuthProvider } from "./features/auth/hooks/useAuth";
+import { BrowserRouter } from "react-router-dom";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -21,20 +22,22 @@ import AppNavigator from "./navigation/AppNavigator";
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReduxProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            {/* Toast notifications */}
-            <Toaster />
-            <Sonner />
-            
-            {/* Application navigation */}
-            <AppNavigator />
-          </TooltipProvider>
-        </AuthProvider>
-      </ReduxProvider>
-    </QueryClientProvider>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <ReduxProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              {/* Toast notifications */}
+              <Toaster />
+              <Sonner />
+              
+              {/* Application navigation */}
+              <AppNavigator />
+            </TooltipProvider>
+          </AuthProvider>
+        </ReduxProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 };
 
