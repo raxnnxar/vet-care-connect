@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import VettLogo from '@/ui/atoms/VettLogo';
 
 interface WelcomeScreenProps {
   onGetStarted: () => void;
@@ -26,16 +27,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   return (
     <div className="relative min-h-screen bg-primary flex flex-col items-center justify-center px-6 py-12">
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md gap-10">
-        {/* Logo - white version directly on teal background */}
+        {/* SVG Logo - directly rendered as white on teal background */}
         <div 
           className="w-[60%] sm:w-[50%] lg:w-[40%] animate-on-mount transition-all duration-500 opacity-0 translate-y-4 mb-8"
           style={{ transformOrigin: 'center' }}
         >
-          <img 
-            src="/lovable-uploads/915815b7-5193-4544-9de0-cab182d80456.png" 
-            alt="Vett Logo" 
-            className="w-full h-auto invert" // Use invert to make the logo white
-          />
+          <VettLogo color="white" className="w-full h-auto" />
         </div>
         
         {/* Tagline with clean white typography */}
