@@ -35,12 +35,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           <VettLogo color="white" className="w-full h-auto" />
         </div>
         
-        {/* Tagline with clean white typography */}
+        {/* Updated tagline with darker color for better contrast */}
         <p 
-          className="text-center text-white font-medium text-lg md:text-xl leading-relaxed max-w-sm animate-on-mount transition-all duration-500 opacity-0 translate-y-4 mb-10"
+          className="text-center font-medium text-lg md:text-xl leading-relaxed max-w-sm animate-on-mount transition-all duration-500 opacity-0 translate-y-4 mb-10 text-[#F3F4F6]"
           style={{ transitionDelay: '200ms' }}
         >
-          Conectando dueños de mascotas con atención veterinaria
+          Todo para tu mascota en un solo lugar
         </p>
         
         {/* Buttons container with animation */}
