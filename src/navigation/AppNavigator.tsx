@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import AuthNavigator from './AuthNavigator';
 import OwnerNavigator from './OwnerNavigator';
 import VetNavigator from './VetNavigator';
-import { USER_ROLES, UserRoleType } from '../core/constants/app.constants';
 import { UserRole } from './navigationConfig';
 
 const AppNavigator = () => {
@@ -29,19 +28,19 @@ const AppNavigator = () => {
         <p className="text-sm font-semibold mb-2">Switch Role (Demo):</p>
         <div className="flex gap-2">
           <button
-            className={`px-3 py-1 rounded-md text-sm ${userRole === 'unauthenticated' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'unauthenticated' ? 'bg-[#7ECEC4] text-white' : 'bg-gray-200'}`}
             onClick={() => setUserRole('unauthenticated')}
           >
             Auth
           </button>
           <button
-            className={`px-3 py-1 rounded-md text-sm ${userRole === 'pet_owner' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'pet_owner' ? 'bg-[#7ECEC4] text-white' : 'bg-gray-200'}`}
             onClick={() => setUserRole('pet_owner')}
           >
             Owner
           </button>
           <button
-            className={`px-3 py-1 rounded-md text-sm ${userRole === 'veterinarian' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-3 py-1 rounded-md text-sm ${userRole === 'veterinarian' ? 'bg-[#7ECEC4] text-white' : 'bg-gray-200'}`}
             onClick={() => setUserRole('veterinarian')}
           >
             Vet

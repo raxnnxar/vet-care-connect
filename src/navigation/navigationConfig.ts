@@ -5,6 +5,9 @@
 
 // Screen names constants to avoid typos and enable auto-completion
 export const SCREENS = {
+  // Welcome/Splash screen
+  WELCOME: 'Welcome',
+  
   // Auth screens
   LOGIN: 'Login',
   SIGNUP: 'Signup',
