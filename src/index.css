@@ -127,4 +127,22 @@
   .vett-hover-scale {
     @apply transition-transform duration-200 hover:scale-105;
   }
+  
+  /* New animation classes for the welcome screen */
+  .animate-on-mount {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  
+  /* Gradient background utility classes */
+  .bg-vett-gradient {
+    @apply bg-gradient-to-b from-primary-100 to-primary-300;
+  }
+  
+  /* Pattern overlay utility */
+  .bg-vett-pattern {
+    background-image: radial-gradient(circle, #ffffff 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
 }
