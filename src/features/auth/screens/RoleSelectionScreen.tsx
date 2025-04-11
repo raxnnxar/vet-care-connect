@@ -67,15 +67,18 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
         </button>
       </div>
       
-      {/* Main content with adjusted position - moved higher up */}
-      <div className="flex flex-col flex-1 justify-start z-10 px-6 mt-14">
-        {/* Header text with improved spacing and styling - moved higher */}
-        <div className="text-center mb-10 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <h1 className="text-white text-2xl font-bold mb-2 text-shadow-sm tracking-wide">Elige tu rol</h1>
+      {/* Main content - adjusted position */}
+      <div className="flex flex-col flex-1 z-10 px-6">
+        {/* Header text with improved styling and prominence */}
+        <div className="text-center mt-10 mb-6 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <h1 className="text-white text-3xl font-bold mb-2 text-shadow-sm tracking-wide">
+            Elige tu rol
+          </h1>
+          <div className="w-16 h-1 bg-white/70 mx-auto rounded-full mt-1"></div>
         </div>
         
-        {/* Role selection with enhanced visual appeal - moved higher */}
-        <div className="flex flex-col gap-6 items-center w-full max-w-md mx-auto z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        {/* Role selection with enhanced visual appeal - moved down slightly */}
+        <div className="flex flex-col gap-6 items-center w-full max-w-md mx-auto mt-8 z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <RadioGroup 
             value={selectedRole || ''} 
             onValueChange={(value) => {
@@ -89,19 +92,19 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
                 }, 300);
               }
             }}
-            className="w-full space-y-6"
+            className="w-full space-y-8"
           >
-            {/* Pet Owner Option with enhanced styling */}
+            {/* Pet Owner Option with improved text alignment and spacing */}
             <label 
               id="role-PET_OWNER"
-              className={`relative flex flex-col p-6 rounded-xl transition-all transform duration-300 ${
+              className={`relative flex flex-col p-7 rounded-xl transition-all transform duration-300 ${
                 selectedRole === USER_ROLES.PET_OWNER 
                   ? 'bg-white shadow-lg border-2 border-accent1' 
                   : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F8FAFC]'
               }`}
             >
-              <div className="flex items-start">
-                <div className={`p-3 rounded-lg mr-4 ${
+              <div className="flex items-center">
+                <div className={`p-3 rounded-lg mr-5 ${
                   selectedRole === USER_ROLES.PET_OWNER 
                     ? 'bg-accent1/15 text-accent1' 
                     : 'bg-gray-100 text-gray-500'
@@ -114,24 +117,24 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
                     <RadioGroupItem 
                       value={USER_ROLES.PET_OWNER} 
                       id="pet-owner"
-                      className={`h-5 w-5 ${selectedRole === USER_ROLES.PET_OWNER ? 'border-accent1 text-accent1' : ''}`}
+                      className={`h-5 w-5 ml-4 ${selectedRole === USER_ROLES.PET_OWNER ? 'border-accent1 text-accent1' : ''}`}
                     />
                   </div>
                 </div>
               </div>
             </label>
 
-            {/* Service Provider Option with enhanced styling */}
+            {/* Service Provider Option with improved text alignment and spacing */}
             <label 
               id="role-VETERINARIAN"
-              className={`relative flex flex-col p-6 rounded-xl transition-all transform duration-300 ${
+              className={`relative flex flex-col p-7 rounded-xl transition-all transform duration-300 ${
                 selectedRole === USER_ROLES.VETERINARIAN 
                   ? 'bg-white shadow-lg border-2 border-accent1' 
                   : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F8FAFC]'
               }`}
             >
-              <div className="flex items-start">
-                <div className={`p-3 rounded-lg mr-4 ${
+              <div className="flex items-center">
+                <div className={`p-3 rounded-lg mr-5 ${
                   selectedRole === USER_ROLES.VETERINARIAN 
                     ? 'bg-accent1/15 text-accent1' 
                     : 'bg-gray-100 text-gray-500'
@@ -144,7 +147,7 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
                     <RadioGroupItem 
                       value={USER_ROLES.VETERINARIAN} 
                       id="veterinarian"
-                      className={`h-5 w-5 ${selectedRole === USER_ROLES.VETERINARIAN ? 'border-accent1 text-accent1' : ''}`}
+                      className={`h-5 w-5 ml-4 ${selectedRole === USER_ROLES.VETERINARIAN ? 'border-accent1 text-accent1' : ''}`}
                     />
                   </div>
                 </div>
