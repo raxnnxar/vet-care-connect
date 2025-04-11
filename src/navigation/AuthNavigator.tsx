@@ -5,20 +5,13 @@ import { SCREENS } from './navigationConfig';
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
 import RoleSelectionScreen from '../features/auth/screens/RoleSelectionScreen';
 import ServiceTypeSelectionScreen from '../features/auth/screens/ServiceTypeSelectionScreen';
+import SignupScreen from '../features/auth/screens/SignupScreen';
 
 // Placeholder screen components
 const LoginScreen = () => (
   <div className="flex items-center justify-center h-screen">
     <div className="text-center">
       <h2 className="text-xl font-semibold">Login Screen</h2>
-    </div>
-  </div>
-);
-
-const SignupScreen = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="text-center">
-      <h2 className="text-xl font-semibold">Signup Screen</h2>
     </div>
   </div>
 );

@@ -57,6 +57,50 @@ export type Database = {
           },
         ]
       }
+      pet_grooming: {
+        Row: {
+          availability: Json | null
+          created_at: string | null
+          id: string
+          pricing_info: Json | null
+          service_provider_id: string
+          services_offered: Json | null
+          specialization: string | null
+          updated_at: string | null
+          years_of_experience: number | null
+        }
+        Insert: {
+          availability?: Json | null
+          created_at?: string | null
+          id?: string
+          pricing_info?: Json | null
+          service_provider_id: string
+          services_offered?: Json | null
+          specialization?: string | null
+          updated_at?: string | null
+          years_of_experience?: number | null
+        }
+        Update: {
+          availability?: Json | null
+          created_at?: string | null
+          id?: string
+          pricing_info?: Json | null
+          service_provider_id?: string
+          services_offered?: Json | null
+          specialization?: string | null
+          updated_at?: string | null
+          years_of_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_grooming_service_provider_id_fkey"
+            columns: ["service_provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pet_owners: {
         Row: {
           address: string | null
