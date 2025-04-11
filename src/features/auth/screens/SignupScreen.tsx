@@ -19,7 +19,6 @@ import { toast } from 'sonner';
 import { authService } from '@/integrations/supabase/supabaseService';
 import { profilesService } from '@/integrations/supabase/supabaseService';
 import { USER_ROLES } from '@/core/constants/app.constants';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { ServiceTypeType } from './ServiceTypeSelectionScreen';
 
 // Define signup form schema with validation
@@ -77,7 +76,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
       onBack();
     } else {
       // Navigate back based on role
-      if (role === USER_ROLES.SERVICE_PROVIDER && serviceType) {
+      if (role === USER_ROLES.VETERINARIAN && serviceType) {
         navigate('/service-type-selection', { state: { role } });
       } else {
         navigate('/role-selection');
@@ -123,7 +122,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
       }
       
       // Create service provider record if applicable
-      if (role === USER_ROLES.SERVICE_PROVIDER && serviceType) {
+      if (role === USER_ROLES.VETERINARIAN && serviceType) {
         // We would create the service provider record here
         // This depends on the specific tables in your database
         // For now, we'll just show a success message

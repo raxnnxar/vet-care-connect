@@ -1,6 +1,6 @@
 
 import usersData from '../data/users.json';
-import { User } from '../../features/auth/types';
+import { User, UserRoleType } from '../../features/auth/types';
 import { supabase } from '../../integrations/supabase/client';
 
 interface LoginCredentials {
@@ -12,7 +12,7 @@ interface SignupData {
   email: string;
   password: string;
   displayName: string;
-  role: string;
+  role: UserRoleType;
   serviceType?: string;
 }
 
