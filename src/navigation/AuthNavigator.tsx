@@ -3,6 +3,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { SCREENS } from './navigationConfig';
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
+import RoleSelectionScreen from '../features/auth/screens/RoleSelectionScreen';
 
 // Placeholder screen components
 const LoginScreen = () => (
@@ -25,14 +26,6 @@ const ForgotPasswordScreen = () => (
   <div className="flex items-center justify-center h-screen">
     <div className="text-center">
       <h2 className="text-xl font-semibold">Forgot Password Screen</h2>
-    </div>
-  </div>
-);
-
-const RoleSelectionScreen = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="text-center">
-      <h2 className="text-xl font-semibold">Role Selection Screen</h2>
     </div>
   </div>
 );

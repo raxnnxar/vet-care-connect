@@ -12,7 +12,7 @@ const WelcomeScreen: React.FC = () => {
   const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
 
   const handleGetStarted = () => {
-    navigate('/signup');
+    navigate('/role-selection');
   };
 
   const handleLogin = () => {
