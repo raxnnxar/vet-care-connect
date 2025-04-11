@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/ui/atoms/button';
 import { VettLogo } from '@/ui/atoms/VettLogo';
@@ -7,7 +6,7 @@ import { PawPrint } from 'lucide-react';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const brandColor = "#93B8B0"; // Updated to the requested color
+  const brandColor = "#B4CFC9"; // Updated to a less opaque color
   const accentColor = "#FF8A65"; // Coral accent for warmth
   const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
 
@@ -25,7 +24,7 @@ const WelcomeScreen: React.FC = () => {
       <div 
         className="absolute inset-0 w-full h-full z-0" 
         style={{ 
-          background: `radial-gradient(circle at 50% 40%, #A5C4BD, ${brandColor})`,
+          background: `radial-gradient(circle at 50% 40%, #C5DBD7, ${brandColor})`,
         }}
       />
       
