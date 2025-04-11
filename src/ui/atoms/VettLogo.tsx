@@ -12,7 +12,7 @@ export const VettLogo: React.FC<VettLogoProps> = ({ className = "", color = "#84
       <svg 
         width="60" 
         height="60" 
-        viewBox="0 0 1320 1000" 
+        viewBox="0 0 600 600" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
         className="mr-3"
