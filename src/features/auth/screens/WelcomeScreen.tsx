@@ -43,7 +43,7 @@ const WelcomeScreen: React.FC = () => {
       <div className="w-full max-w-sm space-y-7 mb-4 z-10 relative animate-fade-up" style={{ animationDelay: '400ms' }}>
         <Button 
           variant="default" 
-          className="w-full py-7 rounded-full bg-white hover:bg-gray-50 shadow-lg transition-all group" {/* Increased padding for more spacious button */}
+          className="w-full py-7 rounded-full bg-white hover:bg-gray-50 shadow-lg transition-all group" 
           style={{ 
             color: "#1F2937", 
             opacity: 0.9,
