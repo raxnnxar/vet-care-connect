@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const brandColor = "#8DD8C8"; // Matches the background color in the logo
+  const brandColor = "#84D3C5";
 
   const handleGetStarted = () => {
     navigate('/signup');
