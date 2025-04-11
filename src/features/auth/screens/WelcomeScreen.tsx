@@ -7,7 +7,7 @@ import { PawPrint } from 'lucide-react';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const brandColor = "#9EE5C8"; // Updated to a more vibrant, friendly color
+  const brandColor = "#7ee5c9"; // Updated to requested color
   const accentColor = "#FF8A65"; // Coral accent for warmth
   const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
 
@@ -25,18 +25,18 @@ const WelcomeScreen: React.FC = () => {
       <div 
         className="absolute inset-0 w-full h-full z-0" 
         style={{ 
-          background: `radial-gradient(circle at 50% 40%, #C8EFDB, ${brandColor})`,
+          background: `radial-gradient(circle at 50% 40%, #aff0dc, ${brandColor})`,
         }}
       />
       
-      {/* Content container moved higher */}
+      {/* Content container moved higher with more spacing */}
       <div className="flex-1 flex flex-col items-center justify-center z-10 relative pt-0 pb-20">
-        {/* Logo container with larger margin-bottom and fixed alignment */}
-        <div className="mb-16 animate-fade-in flex flex-col items-center">
+        {/* Logo container with increased bottom margin for more separation from subtitle */}
+        <div className="mb-20 animate-fade-in flex flex-col items-center">
           <VettLogo color="white" size="2xl" className="mb-0" />
         </div>
         
-        {/* Subtitle with adjusted line height and positioning */}
+        {/* Subtitle positioning */}
         <p className="text-white text-opacity-90 text-center text-lg font-light tracking-wide max-w-xs animate-fade-in" 
           style={{ 
             animationDelay: '200ms', 
@@ -46,7 +46,7 @@ const WelcomeScreen: React.FC = () => {
         </p>
       </div>
 
-      {/* Button section moved up to create better balance */}
+      {/* Button section */}
       <div className="w-full max-w-sm space-y-7 mb-8 z-10 relative animate-fade-up" style={{ animationDelay: '400ms' }}>
         <Button 
           variant="default" 
