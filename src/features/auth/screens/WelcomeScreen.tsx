@@ -19,7 +19,7 @@ const WelcomeScreen: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-between h-screen p-8" style={{ backgroundColor: brandColor }}>
       <div className="flex-1 flex flex-col items-center justify-center">
-        {/* Ensure proper sizing and spacing for the logo */}
+        {/* Logo with proper sizing */}
         <div className="mb-8">
           <VettLogo color="white" className="scale-150" />
         </div>
