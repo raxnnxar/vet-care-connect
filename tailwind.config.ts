@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 import { theme as vettTheme } from "./src/theme/theme";
 
@@ -20,6 +19,12 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: [vettTheme.typography.fontFamily.sans],
+				display: [vettTheme.typography.fontFamily.display],
+				mono: [vettTheme.typography.fontFamily.mono],
+				manrope: ['Manrope', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -64,7 +69,6 @@ export default {
 					DEFAULT: '#FFFFFF',
 					foreground: vettTheme.colors.text.DEFAULT,
 				},
-				// New accent colors
 				accent1: {
 					DEFAULT: '#FF8A65', // Coral
 					light: '#FFB299',
@@ -100,11 +104,6 @@ export default {
 				lg: vettTheme.borderRadius.lg,
 				md: vettTheme.borderRadius.md,
 				sm: vettTheme.borderRadius.sm,
-			},
-			fontFamily: {
-				sans: [vettTheme.typography.fontFamily.sans],
-				display: [vettTheme.typography.fontFamily.display],
-				mono: [vettTheme.typography.fontFamily.mono],
 			},
 			fontSize: vettTheme.typography.fontSize,
 			fontWeight: vettTheme.typography.fontWeight,
