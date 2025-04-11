@@ -6,7 +6,7 @@ interface VettLogoProps {
   color?: string;
 }
 
-export const VettLogo: React.FC<VettLogoProps> = ({ className = "", color = "white" }) => {
+export const VettLogo: React.FC<VettLogoProps> = ({ className = "", color = "#84D3C5" }) => {
   return (
     <div className={`flex items-center ${className}`}>
       <svg 

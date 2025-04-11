@@ -16,7 +16,7 @@ const WelcomeScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between h-screen bg-teal-300 p-8">
+    <div className="flex flex-col items-center justify-between h-screen p-8" style={{ backgroundColor: '#84D3C5' }}>
       <div className="flex-1 flex flex-col items-center justify-center">
         {/* Ensure proper sizing and spacing for the logo */}
         <div className="mb-8">
@@ -31,7 +31,7 @@ const WelcomeScreen: React.FC = () => {
       <div className="w-full max-w-md">
         <Button 
           variant="default" 
-          className="w-full mb-4 bg-white text-teal-500 hover:bg-gray-100"
+          className="w-full mb-4 bg-white text-[#84D3C5] hover:bg-gray-100"
           onClick={handleGetStarted}
         >
           Empezar
