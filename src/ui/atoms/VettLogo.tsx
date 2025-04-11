@@ -36,7 +36,8 @@ export const VettLogo: React.FC<VettLogoProps> = ({
           alt="Vett Logo" 
           className={`${iconSizes[size]}`}
           style={{
-            filter: color === "#FFFFFF" ? "brightness(0) invert(1)" : "none"
+            filter: color === "#FFFFFF" ? "brightness(0) invert(1)" : "none",
+            transform: "translateY(-1px)" // Fine-tune vertical alignment with text
           }}
         />
       </div>
