@@ -22,9 +22,9 @@ import AppNavigator from "./navigation/AppNavigator";
 
 const App = () => {
   return (
-    <Router>
-      <QueryClientProvider client={queryClient}>
-        <ReduxProvider>
+    <QueryClientProvider client={queryClient}>
+      <ReduxProvider>
+        <Router>
           <AuthProvider>
             <TooltipProvider>
               {/* Toast notifications */}
@@ -35,9 +35,9 @@ const App = () => {
               <AppNavigator />
             </TooltipProvider>
           </AuthProvider>
-        </ReduxProvider>
-      </QueryClientProvider>
-    </Router>
+        </Router>
+      </ReduxProvider>
+    </QueryClientProvider>
   );
 };
 

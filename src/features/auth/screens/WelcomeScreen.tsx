@@ -30,7 +30,7 @@ const WelcomeScreen: React.FC = () => {
 
       <div className="w-full max-w-md">
         <Button 
-          variant="primary" 
+          variant="default" 
           className="w-full mb-4 bg-white text-teal-500 hover:bg-gray-100"
           onClick={handleGetStarted}
         >
