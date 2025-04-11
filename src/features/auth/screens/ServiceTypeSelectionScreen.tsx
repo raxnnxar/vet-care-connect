@@ -73,21 +73,21 @@ const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({
         </button>
       </div>
       
-      {/* Main content */}
-      <div className="flex flex-col flex-1 z-10 px-6">
-        {/* Header text with styling */}
-        <div className="text-center mt-10 mb-4 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <h1 className="text-white text-3xl font-bold mb-2 text-shadow-sm tracking-wide">
+      {/* Main content with proper spacing */}
+      <div className="flex flex-col flex-1 z-10 px-6 py-4">
+        {/* Header text with enhanced styling */}
+        <div className="text-center mt-6 mb-8 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <h1 className="text-white text-3xl font-bold mb-3 text-shadow-sm tracking-wide">
             Tipo de servicio
           </h1>
-          <div className="w-16 h-1 bg-white/70 mx-auto rounded-full mt-1 mb-3"></div>
+          <div className="w-20 h-1 bg-white/70 mx-auto rounded-full mt-1 mb-4"></div>
           <p className="text-white text-lg opacity-90">
             Selecciona qué tipo de servicio ofreces
           </p>
         </div>
         
-        {/* Service type selection */}
-        <div className="flex flex-col gap-6 items-center w-full max-w-md mx-auto mt-8 z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        {/* Service type selection with better spacing */}
+        <div className="flex flex-col gap-5 items-center w-full max-w-md mx-auto mt-4 z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <RadioGroup 
             value={selectedServiceType || ''} 
             onValueChange={(value) => {
@@ -101,19 +101,19 @@ const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({
                 }, 300);
               }
             }}
-            className="w-full space-y-8"
+            className="w-full space-y-5"
           >
             {/* Veterinarian Option */}
             <label 
               id={`service-${SERVICE_TYPES.VETERINARIAN}`}
-              className={`relative flex flex-col p-7 rounded-xl transition-all transform duration-300 ${
+              className={`relative flex flex-col p-6 rounded-xl transition-all transform duration-300 ${
                 selectedServiceType === SERVICE_TYPES.VETERINARIAN 
                   ? 'bg-white shadow-lg border-2 border-accent1' 
                   : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F8FAFC]'
               }`}
             >
               <div className="flex items-center">
-                <div className={`p-3 rounded-lg mr-5 ${
+                <div className={`p-3 rounded-lg mr-6 ${
                   selectedServiceType === SERVICE_TYPES.VETERINARIAN 
                     ? 'bg-accent1/15 text-accent1' 
                     : 'bg-gray-100 text-gray-500'
@@ -136,14 +136,14 @@ const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({
             {/* Grooming Option */}
             <label 
               id={`service-${SERVICE_TYPES.GROOMING}`}
-              className={`relative flex flex-col p-7 rounded-xl transition-all transform duration-300 ${
+              className={`relative flex flex-col p-6 rounded-xl transition-all transform duration-300 ${
                 selectedServiceType === SERVICE_TYPES.GROOMING 
                   ? 'bg-white shadow-lg border-2 border-accent1' 
                   : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F8FAFC]'
               }`}
             >
               <div className="flex items-center">
-                <div className={`p-3 rounded-lg mr-5 ${
+                <div className={`p-3 rounded-lg mr-6 ${
                   selectedServiceType === SERVICE_TYPES.GROOMING 
                     ? 'bg-accent1/15 text-accent1' 
                     : 'bg-gray-100 text-gray-500'
@@ -163,21 +163,16 @@ const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({
               </div>
             </label>
 
-            {/* Coming Soon Option (Disabled) */}
-            <div className="relative flex flex-col p-7 rounded-xl bg-[#F1F5F9] border border-white/60 opacity-70">
+            {/* Coming Soon Option (Disabled) - with better spacing and no descriptive text */}
+            <div className="relative flex flex-col p-6 rounded-xl bg-[#F1F5F9] border border-white/60 opacity-70">
               <div className="flex items-center">
-                <div className="p-3 rounded-lg mr-5 bg-gray-100 text-gray-400">
+                <div className="p-3 rounded-lg mr-6 bg-gray-100 text-gray-400">
                   <div className="w-6 h-6 flex items-center justify-center">
                     <span className="text-xl font-bold">+</span>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="font-semibold text-gray-500 text-lg">Más servicios próximamente</span>
-                      <div className="text-xs text-gray-400 mt-1">Estamos trabajando en más opciones</div>
-                    </div>
-                  </div>
+                  <span className="font-semibold text-gray-500 text-lg">Más servicios próximamente</span>
                 </div>
               </div>
             </div>
@@ -185,12 +180,12 @@ const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({
         </div>
       </div>
       
-      {/* Continue button with enhanced styling */}
-      <div className="flex flex-col items-center mt-auto mb-14 z-10 w-full max-w-xs mx-auto px-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
+      {/* Continue button with proper spacing */}
+      <div className="z-10 w-full max-w-xs mx-auto px-6 mb-10 mt-auto animate-fade-up" style={{ animationDelay: '300ms' }}>
         <Button 
           onClick={handleContinue}
           disabled={!selectedServiceType}
-          className="w-full py-7 rounded-full transition-all group"
+          className="w-full py-6 rounded-full transition-all group"
           style={{ 
             backgroundColor: selectedServiceType ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
             color: selectedServiceType ? '#1F2937' : 'rgba(0, 0, 0, 0.6)',
