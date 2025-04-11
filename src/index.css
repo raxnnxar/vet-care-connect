@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -48,43 +49,7 @@
   }
 
   .dark {
-    --background: 215 28% 12%;
-    --foreground: 0 0% 98%;
-
-    --card: 215 28% 12%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 215 28% 12%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 174 50% 65%;
-    --primary-foreground: 215 28% 12%;
-
-    --secondary: 215 28% 17%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 215 28% 17%;
-    --muted-foreground: 215 20% 75%;
-
-    --accent: 174 30% 25%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
-    --ring: 174 50% 65%;
-
-    /* Sidebar specific tokens for dark mode */
-    --sidebar-background: 215 28% 12%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 174 50% 65%;
-    --sidebar-primary-foreground: 215 28% 12%;
-    --sidebar-accent: 174 30% 25%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 215 28% 17%;
-    --sidebar-ring: 174 50% 65%;
+    /* ... keep existing code (dark mode variables) */
   }
 }
 
@@ -134,13 +99,6 @@
     @apply transition-transform duration-200 hover:scale-105;
   }
   
-  /* New animation classes for the welcome screen */
-  .animate-on-mount {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  
   /* Gradient background utility classes */
   .bg-vett-gradient {
     @apply bg-gradient-to-b from-primary-100 to-primary-300;
@@ -150,5 +108,28 @@
   .bg-vett-pattern {
     background-image: radial-gradient(circle, #ffffff 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+
+  /* New utility classes for our enhanced UI */
+  .cta-button {
+    @apply relative overflow-hidden transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.98];
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  }
+
+  .cta-button:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .inner-shadow {
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Refined focus states */
+  .focus-visible:focus-visible {
+    @apply outline-none ring-2 ring-accent1 ring-opacity-50;
   }
 }

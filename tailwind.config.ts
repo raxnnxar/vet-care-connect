@@ -27,7 +27,7 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#7ECEC4', // Main teal from logo
+					DEFAULT: '#91CFC2', // Main teal from logo
 					50: vettTheme.colors.primary[50],
 					100: vettTheme.colors.primary[100],
 					200: vettTheme.colors.primary[200],
@@ -63,6 +63,22 @@ export default {
 				card: {
 					DEFAULT: '#FFFFFF',
 					foreground: vettTheme.colors.text.DEFAULT,
+				},
+				// New accent colors
+				accent1: {
+					DEFAULT: '#FF8A65', // Coral
+					light: '#FFB299',
+					dark: '#E65832',
+				},
+				accent2: {
+					DEFAULT: '#FFD782', // Soft yellow
+					light: '#FFEABF',
+					dark: '#FFC445',
+				},
+				accent3: {
+					DEFAULT: '#4DA6A8', // Deep teal
+					light: '#7BC5C7',
+					dark: '#368789',
 				},
 				success: vettTheme.colors.success,
 				warning: vettTheme.colors.warning,
@@ -133,12 +149,34 @@ export default {
 						transform: 'translateY(10px)'
 					}
 				},
+				'fade-up': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'slide-in-top': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(-10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.3s ease-out',
+				'fade-in': 'fade-in 0.5s ease-out',
 				'fade-out': 'fade-out 0.3s ease-out',
+				'fade-up': 'fade-up 0.6s ease-out',
+				'slide-in-top': 'slide-in-top 0.4s ease-out',
 			},
 			zIndex: vettTheme.zIndex,
 			screens: vettTheme.breakpoints,
