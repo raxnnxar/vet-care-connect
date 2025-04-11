@@ -1,4 +1,3 @@
-
 /**
  * Navigation configuration for the application
  */
@@ -14,6 +13,7 @@ export const SCREENS = {
   FORGOT_PASSWORD: 'ForgotPassword',
   RESET_PASSWORD: 'ResetPassword',
   ROLE_SELECTION: 'RoleSelection',
+  SERVICE_TYPE_SELECTION: 'ServiceTypeSelection',
   
   // Owner screens
   OWNER_HOME: 'OwnerHome',

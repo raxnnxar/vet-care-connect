@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import { SCREENS } from './navigationConfig';
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
 import RoleSelectionScreen from '../features/auth/screens/RoleSelectionScreen';
+import ServiceTypeSelectionScreen from '../features/auth/screens/ServiceTypeSelectionScreen';
 
 // Placeholder screen components
 const LoginScreen = () => (
@@ -39,6 +40,7 @@ const AuthNavigator = () => {
         <Route path="/signup" element={<SignupScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/role-selection" element={<RoleSelectionScreen />} />
+        <Route path="/service-type-selection" element={<ServiceTypeSelectionScreen />} />
       </Routes>
     </div>
   );

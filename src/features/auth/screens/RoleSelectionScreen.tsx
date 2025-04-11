@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Users, Briefcase } from 'lucide-react';
@@ -35,8 +34,12 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
     if (selectedRole && onRoleSelected) {
       onRoleSelected(selectedRole);
     } else if (selectedRole) {
-      // Default navigation if no callback provided
-      navigate('/signup');
+      // Route to different screens based on selected role
+      if (selectedRole === USER_ROLES.VETERINARIAN) {
+        navigate('/service-type-selection');
+      } else {
+        navigate('/signup');
+      }
     }
   };
 
