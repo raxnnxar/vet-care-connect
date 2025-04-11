@@ -30,16 +30,18 @@ export const VettLogo: React.FC<VettLogoProps> = ({
   
   return (
     <div className={`flex items-center gap-3 ${className} animate-slide-in-top`}>
-      <img 
-        src="/lovable-uploads/053f0f17-f20a-466e-b7fe-5f6b4edbd41b.png" 
-        alt="Vett Logo" 
-        className={`${iconSizes[size]}`}
-        style={{
-          filter: color === "#FFFFFF" ? "brightness(0) invert(1)" : "none"
-        }}
-      />
+      <div className="flex items-center">
+        <img 
+          src="/lovable-uploads/053f0f17-f20a-466e-b7fe-5f6b4edbd41b.png" 
+          alt="Vett Logo" 
+          className={`${iconSizes[size]}`}
+          style={{
+            filter: color === "#FFFFFF" ? "brightness(0) invert(1)" : "none"
+          }}
+        />
+      </div>
       <span 
-        className={`font-bold tracking-wider ${sizeClasses[size]} font-baloo`} 
+        className={`font-bold tracking-wider ${sizeClasses[size]} font-baloo flex items-center`} 
         style={{color: color}}
       >
         Vett

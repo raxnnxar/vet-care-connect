@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/ui/atoms/button';
 import { VettLogo } from '@/ui/atoms/VettLogo';
@@ -6,7 +7,7 @@ import { PawPrint } from 'lucide-react';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const brandColor = "#B4CFC9"; // Updated to a less opaque color
+  const brandColor = "#9EE5C8"; // Updated to a more vibrant, friendly color
   const accentColor = "#FF8A65"; // Coral accent for warmth
   const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
 
@@ -24,22 +25,29 @@ const WelcomeScreen: React.FC = () => {
       <div 
         className="absolute inset-0 w-full h-full z-0" 
         style={{ 
-          background: `radial-gradient(circle at 50% 40%, #C5DBD7, ${brandColor})`,
+          background: `radial-gradient(circle at 50% 40%, #C8EFDB, ${brandColor})`,
         }}
       />
       
-      <div className="flex-1 flex flex-col items-center justify-center z-10 relative">
-        <div className="mb-12 animate-fade-in">
-          <VettLogo color="white" size="2xl" className="mb-4" />
+      {/* Content container moved higher */}
+      <div className="flex-1 flex flex-col items-center justify-center z-10 relative pt-0 pb-20">
+        {/* Logo container with larger margin-bottom and fixed alignment */}
+        <div className="mb-16 animate-fade-in flex flex-col items-center">
+          <VettLogo color="white" size="2xl" className="mb-0" />
         </div>
         
-        <p className="text-white text-opacity-90 text-center text-lg font-light tracking-wide mb-16 max-w-xs animate-fade-in" 
-          style={{ animationDelay: '200ms', lineHeight: '1.4' }}>
+        {/* Subtitle with adjusted line height and positioning */}
+        <p className="text-white text-opacity-90 text-center text-lg font-light tracking-wide max-w-xs animate-fade-in" 
+          style={{ 
+            animationDelay: '200ms', 
+            lineHeight: '1.3' 
+          }}>
           Todo para tu mascota en un solo lugar
         </p>
       </div>
 
-      <div className="w-full max-w-sm space-y-7 mb-4 z-10 relative animate-fade-up" style={{ animationDelay: '400ms' }}>
+      {/* Button section moved up to create better balance */}
+      <div className="w-full max-w-sm space-y-7 mb-8 z-10 relative animate-fade-up" style={{ animationDelay: '400ms' }}>
         <Button 
           variant="default" 
           className="w-full py-7 rounded-full bg-white hover:bg-gray-50 shadow-lg transition-all group" 
