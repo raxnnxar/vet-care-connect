@@ -4,17 +4,24 @@ import React from 'react';
 interface VettLogoProps {
   className?: string;
   color?: string;
+  showText?: boolean;
 }
 
-export const VettLogo: React.FC<VettLogoProps> = ({ className = "", color = "#84D3C5" }) => {
+export const VettLogo: React.FC<VettLogoProps> = ({ 
+  className = "", 
+  color = "#FFFFFF", 
+  showText = true 
+}) => {
   return (
     <div className={`flex items-center ${className}`}>
       <img 
-        src="/lovable-uploads/cde03fa6-037a-4fbd-a017-5846edb8f19f.png" 
+        src="/lovable-uploads/b9a82cb0-b95f-426c-ac6c-37aa534c9530.png" 
         alt="Vett Logo" 
-        className="h-12 w-12 mr-3"
+        className="h-12 w-auto"
       />
-      <span className="text-4xl font-bold" style={{color: color}}>Vett</span>
+      {showText && (
+        <span className="text-5xl font-bold ml-2" style={{color: color}}>Vett</span>
+      )}
     </div>
   );
 };

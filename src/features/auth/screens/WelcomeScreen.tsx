@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const brandColor = "#84D3C5";
+  const brandColor = "#8DD8C8"; // Matched from the provided image
 
   const handleGetStarted = () => {
     navigate('/signup');
@@ -19,7 +19,7 @@ const WelcomeScreen: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-between h-screen p-8" style={{ backgroundColor: brandColor }}>
       <div className="flex-1 flex flex-col items-center justify-center">
-        {/* Logo with proper sizing */}
+        {/* Logo with proper sizing to match reference image */}
         <div className="mb-8">
           <VettLogo color="white" className="scale-150" />
         </div>
