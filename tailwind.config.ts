@@ -24,6 +24,7 @@ export default {
 				display: [vettTheme.typography.fontFamily.display],
 				mono: [vettTheme.typography.fontFamily.mono],
 				manrope: ['Manrope', 'sans-serif'],
+				baloo: ['"Baloo 2"', 'cursive'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

@@ -23,9 +23,9 @@ export const VettLogo: React.FC<VettLogoProps> = ({
   const iconSizes = {
     sm: "h-6 w-6",
     md: "h-8 w-8",
-    lg: "h-12 w-12", // Increased from h-10 w-10
-    xl: "h-16 w-16", // Increased from h-12 w-12
-    '2xl': "h-20 w-20" // New larger size
+    lg: "h-12 w-12",
+    xl: "h-16 w-16",
+    '2xl': "h-20 w-20"
   };
   
   return (
@@ -39,7 +39,7 @@ export const VettLogo: React.FC<VettLogoProps> = ({
         }}
       />
       <span 
-        className={`font-semibold tracking-wider ${sizeClasses[size]} font-manrope`} 
+        className={`font-bold tracking-wider ${sizeClasses[size]} font-baloo`} 
         style={{color: color}}
       >
         Vett

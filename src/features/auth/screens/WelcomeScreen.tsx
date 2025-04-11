@@ -7,7 +7,7 @@ import { PawPrint } from 'lucide-react';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const brandColor = "#91CFC2"; // Primary teal color
+  const brandColor = "#93B8B0"; // Updated to the requested color
   const accentColor = "#FF8A65"; // Coral accent for warmth
   const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
 
@@ -25,17 +25,17 @@ const WelcomeScreen: React.FC = () => {
       <div 
         className="absolute inset-0 w-full h-full z-0" 
         style={{ 
-          background: `radial-gradient(circle at 50% 40%, #9DDBD0, ${brandColor})`,
+          background: `radial-gradient(circle at 50% 40%, #A5C4BD, ${brandColor})`,
         }}
       />
       
       <div className="flex-1 flex flex-col items-center justify-center z-10 relative">
-        <div className="mb-12 animate-fade-in"> {/* Increased margin-bottom for better spacing */}
-          <VettLogo color="white" size="2xl" className="mb-4" /> {/* Increased to 2xl size and more bottom margin */}
+        <div className="mb-12 animate-fade-in">
+          <VettLogo color="white" size="2xl" className="mb-4" />
         </div>
         
         <p className="text-white text-opacity-90 text-center text-lg font-light tracking-wide mb-16 max-w-xs animate-fade-in" 
-          style={{ animationDelay: '200ms', lineHeight: '1.4' }}> {/* Adjusted line-height and increased margin-bottom */}
+          style={{ animationDelay: '200ms', lineHeight: '1.4' }}>
           Todo para tu mascota en un solo lugar
         </p>
       </div>
@@ -51,9 +51,9 @@ const WelcomeScreen: React.FC = () => {
           }}
           onClick={handleGetStarted}
         >
-          <div className="flex items-center justify-center gap-3"> {/* Increased gap for better spacing */}
-            <PawPrint className="w-6 h-6 text-accent1 opacity-90 group-hover:scale-110 transition-transform" /> {/* Increased icon size */}
-            <span className="text-xl font-medium">Empezar</span> {/* Increased font size */}
+          <div className="flex items-center justify-center gap-3">
+            <PawPrint className="w-6 h-6 text-accent1 opacity-90 group-hover:scale-110 transition-transform" />
+            <span className="text-xl font-medium">Empezar</span>
           </div>
         </Button>
         
