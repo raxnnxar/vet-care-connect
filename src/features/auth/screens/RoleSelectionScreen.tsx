@@ -51,44 +51,52 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
         }}
       />
       
-      {/* Back button positioned at the top */}
-      <div className="flex items-center mb-6 z-10">
+      {/* Header section with aligned logo and back button */}
+      <div className="flex items-center z-10 mb-12">
         <button 
           onClick={handleBackClick}
-          className="flex items-center justify-center p-2 rounded-full bg-white/30 backdrop-blur-sm transition-all hover:bg-white/40"
+          className="flex items-center justify-center p-2 rounded-full bg-white/30 backdrop-blur-sm transition-all hover:bg-white/40 mr-3"
           aria-label="Go back"
         >
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
-      </div>
-      
-      {/* Logo (smaller version) */}
-      <div className="flex items-center justify-center mb-10 z-10">
+        
+        {/* Logo aligned with back button */}
         <VettLogo color="white" size="md" />
       </div>
       
-      {/* Header section */}
+      {/* Header text - removed subtitle */}
       <div className="text-center mb-8 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
         <h1 className="text-white text-2xl font-bold mb-2 text-shadow-sm">Elige tu rol</h1>
-        <p className="text-white/90 font-medium">Selecciona cómo quieres usar Vett</p>
       </div>
       
-      {/* Role selection */}
-      <div className="flex flex-col gap-4 items-center w-full max-w-md mx-auto z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
+      {/* Role selection - with increased spacing */}
+      <div className="flex flex-col gap-6 items-center w-full max-w-md mx-auto z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
         <RadioGroup 
           value={selectedRole || ''} 
-          onValueChange={(value) => setSelectedRole(value as UserRoleType)}
-          className="w-full space-y-4"
+          onValueChange={(value) => {
+            setSelectedRole(value as UserRoleType);
+            // Add animation effect when selecting a role
+            const targetEl = document.getElementById(`role-${value}`);
+            if (targetEl) {
+              targetEl.classList.add('scale-105');
+              setTimeout(() => {
+                targetEl.classList.remove('scale-105');
+              }, 300);
+            }
+          }}
+          className="w-full space-y-6"
         >
           {/* Pet Owner Option */}
           <label 
-            className={`relative flex flex-col p-4 rounded-xl transition-all ${
+            id="role-PET_OWNER"
+            className={`relative flex flex-col p-4 rounded-xl transition-all transform duration-300 ${
               selectedRole === USER_ROLES.PET_OWNER 
                 ? 'bg-white shadow-md border-2 border-accent1' 
-                : 'bg-white/90 border border-white/60'
+                : 'bg-white/90 border border-white/60 hover:bg-white/95'
             }`}
           >
-            <div className="flex items-start mb-2">
+            <div className="flex items-start">
               <div className={`p-2 rounded-lg mr-3 ${
                 selectedRole === USER_ROLES.PET_OWNER 
                   ? 'bg-accent1/10 text-accent1' 
@@ -105,22 +113,20 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
                     className={selectedRole === USER_ROLES.PET_OWNER ? 'border-accent1 text-accent1' : ''}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  Programa citas veterinarias y gestiona la salud de tus mascotas
-                </p>
               </div>
             </div>
           </label>
 
-          {/* Veterinarian Option */}
+          {/* Service Provider Option (renamed from Veterinarian) */}
           <label 
-            className={`relative flex flex-col p-4 rounded-xl transition-all ${
+            id="role-VETERINARIAN"
+            className={`relative flex flex-col p-4 rounded-xl transition-all transform duration-300 ${
               selectedRole === USER_ROLES.VETERINARIAN 
                 ? 'bg-white shadow-md border-2 border-accent1' 
-                : 'bg-white/90 border border-white/60'
+                : 'bg-white/90 border border-white/60 hover:bg-white/95'
             }`}
           >
-            <div className="flex items-start mb-2">
+            <div className="flex items-start">
               <div className={`p-2 rounded-lg mr-3 ${
                 selectedRole === USER_ROLES.VETERINARIAN 
                   ? 'bg-accent1/10 text-accent1' 
@@ -130,23 +136,20 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-gray-800">Veterinario</span>
+                  <span className="font-semibold text-gray-800">Proveedor de servicios</span>
                   <RadioGroupItem 
                     value={USER_ROLES.VETERINARIAN} 
                     id="veterinarian"
                     className={selectedRole === USER_ROLES.VETERINARIAN ? 'border-accent1 text-accent1' : ''}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  Administra tus citas y pacientes
-                </p>
               </div>
             </div>
           </label>
         </RadioGroup>
       </div>
       
-      {/* Continue button */}
+      {/* Continue button with improved contrast */}
       <div className="flex flex-col items-center mt-auto mb-8 z-10 w-full max-w-xs mx-auto animate-fade-up" style={{ animationDelay: '300ms' }}>
         <Button 
           onClick={handleContinue}
@@ -154,12 +157,13 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
           className="w-full py-6 rounded-full transition-all group"
           style={{ 
             backgroundColor: selectedRole ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
-            color: selectedRole ? '#1F2937' : 'rgba(31, 41, 55, 0.7)',
+            color: selectedRole ? '#000000' : 'rgba(0, 0, 0, 0.6)',
             opacity: selectedRole ? 1 : 0.85,
             boxShadow: selectedRole ? "0 8px 20px -5px rgba(0,0,0,0.15)" : "none",
+            fontWeight: selectedRole ? 600 : 500,
           }}
         >
-          <span className={`text-xl font-semibold ${!selectedRole ? 'opacity-70' : ''}`}>
+          <span className={`text-xl ${!selectedRole ? 'opacity-70' : ''}`}>
             Continuar
           </span>
         </Button>
