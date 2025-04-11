@@ -10,9 +10,9 @@ const Index = () => {
       <HeaderConBusqueda />
       <div className="container mx-auto p-4">
         <Card className="mb-5 p-5">
-          <h1 className="text-2xl font-bold mb-4">Welcome to VetCare Connect</h1>
-          <p className="mb-4">This is your pet's health companion app.</p>
-          <Button>Get Started</Button>
+          <h1 className="text-2xl font-bold mb-4">Bienvenido a Vett</h1>
+          <p className="mb-4">La aplicación compañera para la salud de tu mascota.</p>
+          <Button>Empezar</Button>
         </Card>
       </div>
       <NavbarInferior />
