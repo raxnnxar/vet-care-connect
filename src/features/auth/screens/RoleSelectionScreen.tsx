@@ -19,6 +19,11 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
   const [selectedRole, setSelectedRole] = useState<UserRoleType | null>(null);
   const navigate = useNavigate();
   
+  // Define the brandColor variable that was missing
+  const brandColor = "#79d0b8"; // Teal color for the brand
+  const accentColor = "#FF8A65"; // Coral accent for warmth
+  const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
+  
   const handleBackClick = () => {
     if (onBack) {
       onBack();
