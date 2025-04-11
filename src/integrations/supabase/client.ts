@@ -3,18 +3,10 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Validate that the required environment variables are defined
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Check if environment variables are set
-if (!SUPABASE_URL) {
-  throw new Error('VITE_SUPABASE_URL is not defined in environment variables');
-}
-
-if (!SUPABASE_ANON_KEY) {
-  throw new Error('VITE_SUPABASE_ANON_KEY is not defined in environment variables');
-}
+// Define the Supabase URL and anon key directly
+// These values are public and can be exposed in the client-side code
+const SUPABASE_URL = 'https://qfqnctbatpreuberetga.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmcW5jdGJhdHByZXViZXJldGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyMjQ3NTksImV4cCI6MjA1OTgwMDc1OX0.GNQVoCSAIDfMdJ5GGkPx1pH08R8vJTQBVOUwBO4a-WA';
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
