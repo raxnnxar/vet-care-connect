@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const brandColor = "#8DD8C8"; // Matches the background color in the logo
+  const brandColor = "#91CFC2"; // Updated background color
 
   const handleGetStarted = () => {
     navigate('/signup');
@@ -17,31 +17,38 @@ const WelcomeScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between h-screen p-8" style={{ backgroundColor: brandColor }}>
+    <div 
+      className="flex flex-col items-center justify-between h-screen p-8" 
+      style={{ backgroundColor: brandColor }}
+    >
       <div className="flex-1 flex flex-col items-center justify-center">
-        {/* Logo with proper sizing */}
-        <div className="mb-8">
+        <div className="mb-10">
           <VettLogo color="white" className="scale-150" />
         </div>
         
-        <p className="text-white text-center text-lg mb-12">
+        <p className="text-white text-center text-lg font-light tracking-wide mb-6">
           Todo para tu mascota en un solo lugar
         </p>
       </div>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md space-y-6 mb-4">
         <Button 
           variant="default" 
-          className="w-full mb-4 bg-white hover:bg-gray-100"
+          className="w-full py-6 rounded-full bg-white hover:bg-gray-50 shadow-md transition-all"
           style={{ color: brandColor }}
           onClick={handleGetStarted}
         >
-          Empezar
+          <span className="text-lg font-medium">Empezar</span>
         </Button>
         
-        <p className="text-white text-center">
-          Si ya tienes una cuenta, <button onClick={handleLogin} className="underline">inicia sesión</button>
-        </p>
+        <div className="flex justify-center">
+          <button 
+            onClick={handleLogin} 
+            className="text-white text-base opacity-90 hover:opacity-100 transition-opacity font-light"
+          >
+            Ya tengo una cuenta
+          </button>
+        </div>
       </div>
     </div>
   );
