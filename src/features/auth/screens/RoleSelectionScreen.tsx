@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/ui/atoms/button';
-import { VettLogo } from '@/ui/atoms/VettLogo';
 import { ArrowLeft, Users, Briefcase } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
 import { useNavigate } from 'react-router-dom';
@@ -51,31 +50,26 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
         }}
       />
       
-      {/* Header section with centered logo and back button on the left */}
-      <div className="flex items-center z-10 mb-12">
+      {/* Header section with back button only - removed logo as requested */}
+      <div className="flex items-center z-10 mb-8">
         <button 
           onClick={handleBackClick}
-          className="absolute left-6 p-2 rounded-full bg-white/30 backdrop-blur-sm transition-all hover:bg-white/40"
+          className="p-2 rounded-full bg-white/30 backdrop-blur-sm transition-all hover:bg-white/40"
           aria-label="Go back"
         >
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
-        
-        {/* Centered logo */}
-        <div className="w-full flex justify-center">
-          <VettLogo color="white" size="md" />
-        </div>
       </div>
       
-      {/* Main content - moved further down */}
+      {/* Main content - moved further down with increased spacing */}
       <div className="flex flex-col flex-1 justify-center z-10">
-        {/* Header text - title only, subtitle removed */}
-        <div className="text-center mb-8 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
+        {/* Header text - with increased spacing below */}
+        <div className="text-center mb-12 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <h1 className="text-white text-2xl font-bold mb-2 text-shadow-sm">Elige tu rol</h1>
         </div>
         
-        {/* Role selection - with increased spacing */}
-        <div className="flex flex-col gap-6 items-center w-full max-w-md mx-auto z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        {/* Role selection - with increased spacing between cards */}
+        <div className="flex flex-col gap-8 items-center w-full max-w-md mx-auto z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <RadioGroup 
             value={selectedRole || ''} 
             onValueChange={(value) => {
@@ -89,15 +83,15 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
                 }, 300);
               }
             }}
-            className="w-full space-y-6"
+            className="w-full space-y-8"
           >
-            {/* Pet Owner Option */}
+            {/* Pet Owner Option - adjusted with light gray background and increased padding */}
             <label 
               id="role-PET_OWNER"
-              className={`relative flex flex-col p-4 rounded-xl transition-all transform duration-300 ${
+              className={`relative flex flex-col p-5 rounded-xl transition-all transform duration-300 ${
                 selectedRole === USER_ROLES.PET_OWNER 
                   ? 'bg-white shadow-md border-2 border-accent1' 
-                  : 'bg-white/90 border border-white/60 hover:bg-white/95'
+                  : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F1F5F9]/95'
               }`}
             >
               <div className="flex items-start">
@@ -121,13 +115,13 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
               </div>
             </label>
 
-            {/* Service Provider Option (updated icon from Stethoscope to Briefcase) */}
+            {/* Service Provider Option - adjusted with light gray background and increased padding */}
             <label 
               id="role-VETERINARIAN"
-              className={`relative flex flex-col p-4 rounded-xl transition-all transform duration-300 ${
+              className={`relative flex flex-col p-5 rounded-xl transition-all transform duration-300 ${
                 selectedRole === USER_ROLES.VETERINARIAN 
                   ? 'bg-white shadow-md border-2 border-accent1' 
-                  : 'bg-white/90 border border-white/60 hover:bg-white/95'
+                  : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F1F5F9]/95'
               }`}
             >
               <div className="flex items-start">
@@ -162,7 +156,7 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
           className="w-full py-6 rounded-full transition-all group"
           style={{ 
             backgroundColor: selectedRole ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
-            color: selectedRole ? '#000000' : 'rgba(0, 0, 0, 0.6)',
+            color: selectedRole ? '#1F2937' : 'rgba(0, 0, 0, 0.6)',
             opacity: selectedRole ? 1 : 0.85,
             boxShadow: selectedRole ? "0 8px 20px -5px rgba(0,0,0,0.15)" : "none",
             fontWeight: selectedRole ? 600 : 500,
