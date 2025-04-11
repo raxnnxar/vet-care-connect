@@ -67,15 +67,15 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
         </button>
       </div>
       
-      {/* Main content with improved vertical distribution */}
-      <div className="flex flex-col flex-1 justify-center z-10 px-6 mt-4">
-        {/* Header text with improved spacing and styling */}
-        <div className="text-center mb-14 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
+      {/* Main content with adjusted position - moved higher up */}
+      <div className="flex flex-col flex-1 justify-start z-10 px-6 mt-14">
+        {/* Header text with improved spacing and styling - moved higher */}
+        <div className="text-center mb-10 z-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <h1 className="text-white text-2xl font-bold mb-2 text-shadow-sm tracking-wide">Elige tu rol</h1>
         </div>
         
-        {/* Role selection with enhanced visual appeal */}
-        <div className="flex flex-col gap-10 items-center w-full max-w-md mx-auto z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        {/* Role selection with enhanced visual appeal - moved higher */}
+        <div className="flex flex-col gap-6 items-center w-full max-w-md mx-auto z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <RadioGroup 
             value={selectedRole || ''} 
             onValueChange={(value) => {
@@ -89,7 +89,7 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
                 }, 300);
               }
             }}
-            className="w-full space-y-10"
+            className="w-full space-y-6"
           >
             {/* Pet Owner Option with enhanced styling */}
             <label 
