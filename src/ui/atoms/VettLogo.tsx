@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface VettLogoProps {
@@ -5,7 +6,7 @@ interface VettLogoProps {
   color?: string;
 }
 
-const VettLogo: React.FC<VettLogoProps> = ({ className = "", color = "white" }) => {
+export const VettLogo: React.FC<VettLogoProps> = ({ className = "", color = "white" }) => {
   return (
     <div className={`flex items-center ${className}`}>
       <svg 

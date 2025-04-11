@@ -1,13 +1,20 @@
+
 import React from 'react';
 import { Button } from '../atoms/Button';
-import { VettLogo } from '../atoms/VettLogo';
+import { VettLogo } from '@/ui/atoms/VettLogo';
+import { useNavigate } from 'react-router-dom';
 
-interface WelcomeScreenProps {
-  onGetStarted: () => void;
-  onLogin: () => void;
-}
+const WelcomeScreen: React.FC = () => {
+  const navigate = useNavigate();
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted, onLogin }) => {
+  const handleGetStarted = () => {
+    navigate('/signup');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="flex flex-col items-center justify-between h-screen bg-teal-300 p-8">
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -25,13 +32,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted, onLogin }) 
         <Button 
           variant="primary" 
           className="w-full mb-4 bg-white text-teal-500 hover:bg-gray-100"
-          onClick={onGetStarted}
+          onClick={handleGetStarted}
         >
           Empezar
         </Button>
         
         <p className="text-white text-center">
-          Si ya tienes una cuenta, <button onClick={onLogin} className="underline">inicia sesión</button>
+          Si ya tienes una cuenta, <button onClick={handleLogin} className="underline">inicia sesión</button>
         </p>
       </div>
     </div>
