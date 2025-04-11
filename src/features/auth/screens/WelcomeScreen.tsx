@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from '../atoms/Button';
+import { Button } from '@/ui/atoms/button';
 import { VettLogo } from '@/ui/atoms/VettLogo';
 import { useNavigate } from 'react-router-dom';
 
