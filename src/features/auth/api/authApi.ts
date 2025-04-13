@@ -178,7 +178,7 @@ export const updateUserProfile = async (userData: Partial<User>): Promise<ApiRes
   }
 
   try {
-    const { data: user, error } = await supabase.auth.updateUser({
+    const { data, error } = await supabase.auth.updateUser({
       data: {
         displayName: userData.displayName,
         role: userData.role
@@ -186,11 +186,11 @@ export const updateUserProfile = async (userData: Partial<User>): Promise<ApiRes
     });
     
     return {
-      data: user ? {
-        id: user.id,
-        email: user.email || '',
-        displayName: userData.displayName || user.user_metadata?.displayName || '',
-        role: userData.role || user.user_metadata?.role || 'pet_owner',
+      data: data.user ? {
+        id: data.user.id,
+        email: data.user.email || '',
+        displayName: userData.displayName || data.user.user_metadata?.displayName || '',
+        role: userData.role || data.user.user_metadata?.role || 'pet_owner',
       } as User : null,
       error: error ? new Error(error.message) : null
     };
