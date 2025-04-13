@@ -1,3 +1,4 @@
+
 /**
  * Authentication API service
  * 
@@ -5,12 +6,23 @@
  */
 import { ApiResponse } from '../../../core/api/apiClient';
 import { User, LoginCredentials, SignupData, AuthResponse } from '../types';
-import { supabase } from '../../../integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '../../../integrations/supabase/client';
+
+// Helper for returning a consistent error response when Supabase is not configured
+const notConfiguredError = <T>(): ApiResponse<T> => ({
+  data: null,
+  error: new Error('Supabase is not configured. Please set up your Supabase connection first.')
+});
 
 /**
  * Log in with email and password
  */
 export const login = async (credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: login attempt');
+    return notConfiguredError();
+  }
+
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: credentials.email,
@@ -42,8 +54,12 @@ export const login = async (credentials: LoginCredentials): Promise<ApiResponse<
  * Register a new user
  */
 export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResponse>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: signup attempt');
+    return notConfiguredError();
+  }
+
   try {
-    // Only handle authentication with Supabase - profile creation will be handled by the database trigger
     const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
@@ -55,7 +71,6 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
       }
     });
     
-    // Return the response without trying to create a profile
     return {
       data: data.user ? {
         user: {
@@ -80,6 +95,11 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
  * Log out the current user
  */
 export const logout = async (): Promise<ApiResponse<null>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: logout attempt');
+    return notConfiguredError();
+  }
+
   try {
     const { error } = await supabase.auth.signOut();
     
@@ -99,6 +119,11 @@ export const logout = async (): Promise<ApiResponse<null>> => {
  * Get the current authenticated user
  */
 export const getCurrentUser = async (): Promise<ApiResponse<User | null>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: getCurrentUser attempt');
+    return notConfiguredError();
+  }
+
   try {
     const { data, error } = await supabase.auth.getUser();
     
@@ -123,6 +148,11 @@ export const getCurrentUser = async (): Promise<ApiResponse<User | null>> => {
  * Reset password for a user
  */
 export const resetPassword = async (email: string): Promise<ApiResponse<null>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: resetPassword attempt');
+    return notConfiguredError();
+  }
+
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     

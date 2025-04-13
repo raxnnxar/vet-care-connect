@@ -16,8 +16,7 @@ import {
   FormMessage,
 } from '@/ui/molecules/form';
 import { toast } from 'sonner';
-import { authService } from '@/integrations/supabase/supabaseService';
-import { profilesService } from '@/integrations/supabase/supabaseService';
+import { isSupabaseConfigured } from '@/integrations/supabase/client';
 import { USER_ROLES } from '@/core/constants/app.constants';
 import { ServiceTypeType } from './ServiceTypeSelectionScreen';
 
@@ -88,64 +87,47 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     setIsLoading(true);
     
     try {
-      // Register user with Supabase
-      const authResponse = await authService.signUp(
-        data.email, 
-        data.password,
-        { 
-          role,
-          serviceType,
-          displayName: data.displayName
-        }
-      );
-      
-      if (authResponse.error) {
-        throw new Error(authResponse.error.message);
+      // Check if Supabase is configured
+      if (!isSupabaseConfigured) {
+        toast.error('La conexión con Supabase no está configurada. Por favor configure primero su conexión de Supabase.');
+        setIsLoading(false);
+        return;
       }
 
-      if (!authResponse.data?.id) {
-        throw new Error("No se pudo crear la cuenta");
-      }
+      // Here would be the original signup logic with your Supabase connection
+      // Temporarily disabled until Supabase is reconfigured
       
-      // Create profile record
-      const profileData = {
-        id: authResponse.data.id,
-        email: data.email,
-        display_name: data.displayName,
-        role: role,
-      };
+      toast.warning('Registro temporalmente deshabilitado. Supabase no está configurado.');
       
-      const profileResponse = await profilesService.insert(profileData);
-      
-      if (profileResponse.error) {
-        throw new Error(profileResponse.error.message);
-      }
-      
-      // Create service provider record if applicable
-      if (role === USER_ROLES.VETERINARIAN && serviceType) {
-        // We would create the service provider record here
-        // This depends on the specific tables in your database
-        // For now, we'll just show a success message
-      }
-      
-      toast.success('¡Cuenta creada con éxito!');
-      
-      // Navigate based on role
-      if (onRegisterComplete) {
-        onRegisterComplete();
-      } else {
-        if (role === USER_ROLES.PET_OWNER) {
-          navigate('/owner-dashboard');
-        } else {
-          navigate('/provider-dashboard');
-        }
-      }
     } catch (error) {
       console.error('Registration error:', error);
       toast.error(error instanceof Error ? error.message : 'Error al crear la cuenta');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Render a warning banner if Supabase is not configured
+  const renderSupabaseWarning = () => {
+    if (!isSupabaseConfigured) {
+      return (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm">
+                La conexión con Supabase no está configurada. El registro de usuarios está deshabilitado.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -178,6 +160,9 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         {/* Registration form */}
         <div className="w-full max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+            {/* Supabase warning message */}
+            {renderSupabaseWarning()}
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <FormField
@@ -276,7 +261,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
                 <Button
                   type="submit"
                   className="w-full h-12 mt-6 bg-[#79D0B8] hover:bg-[#6abfaa] text-white font-semibold rounded-lg text-lg"
-                  disabled={isLoading}
+                  disabled={isLoading || !isSupabaseConfigured}
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center">

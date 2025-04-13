@@ -1,138 +1,74 @@
-import { createClient } from '@supabase/supabase-js';
-import { User } from '../../features/auth/types';
-import { env } from '../../core/config/env';
 
-// Create a direct Supabase client instance
-const supabaseUrl = env.supabaseUrl;
-const supabaseAnonKey = env.supabaseAnonKey;
+import { createClient } from '@supabase/supabase-js';
+
+// Placeholder values - these will need to be replaced with actual values
+const supabaseUrl = '';
+const supabaseAnonKey = '';
+
+// Create a minimal Supabase client instance
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /**
- * Supabase service for handling database operations
+ * Placeholder Supabase service
+ * 
+ * This file needs to be updated with proper configuration
+ * when you're ready to connect to Supabase.
  */
 export const supabaseService = {
-  /**
-   * Get user profile by ID
-   */
-  async getUserProfile(userId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (error) {
-      throw new Error(error.message);
-    }
-    
-    return data;
+  // Basic placeholder methods that will be properly implemented later
+  async getUserProfile() {
+    console.log('Supabase not configured: getUserProfile');
+    return null;
   },
   
-  /**
-   * Update user profile
-   */
-  async updateUserProfile(userId: string, profileData: Partial<User>) {
-    const { error } = await supabase
-      .from('profiles')
-      .update(profileData)
-      .eq('id', userId);
-    
-    if (error) {
-      throw new Error(error.message);
-    }
-    
-    return true;
+  async updateUserProfile() {
+    console.log('Supabase not configured: updateUserProfile');
+    return null;
   },
   
-  /**
-   * Get current authenticated user with profile data
-   */
   async getCurrentUserWithProfile() {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !authData.user) {
-      throw new Error(authError?.message || 'User not authenticated');
-    }
-    
-    try {
-      const profileData = await this.getUserProfile(authData.user.id);
-      
-      return {
-        ...authData.user,
-        profile: profileData
-      };
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      return authData.user;
-    }
+    console.log('Supabase not configured: getCurrentUserWithProfile');
+    return null;
   },
   
-  /**
-   * Upload file to storage
-   */
-  async uploadFile(bucket: string, path: string, file: File) {
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(path, file, {
-        upsert: true
-      });
-    
-    if (error) {
-      throw new Error(error.message);
-    }
-    
-    return data;
+  async uploadFile() {
+    console.log('Supabase not configured: uploadFile');
+    return null;
   },
   
-  /**
-   * Get public URL for a file
-   */
-  getPublicUrl(bucket: string, path: string) {
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(path);
-    
-    return data.publicUrl;
+  getPublicUrl() {
+    console.log('Supabase not configured: getPublicUrl');
+    return '';
   },
   
-  // Auth methods
+  // Auth methods placeholder
   auth: {
-    /**
-     * Sign in with email and password
-     */
-    async signInWithPassword(credentials: { email: string; password: string }) {
-      return await supabase.auth.signInWithPassword(credentials);
+    async signInWithPassword() {
+      console.log('Supabase not configured: signInWithPassword');
+      return { data: null, error: new Error('Supabase not configured') };
     },
     
-    /**
-     * Sign up a new user
-     */
-    async signUp(signUpData: { email: string; password: string; options?: any }) {
-      return await supabase.auth.signUp(signUpData);
+    async signUp() {
+      console.log('Supabase not configured: signUp');
+      return { data: null, error: new Error('Supabase not configured') };
     },
     
-    /**
-     * Sign out the current user
-     */
     async signOut() {
-      return await supabase.auth.signOut();
+      console.log('Supabase not configured: signOut');
+      return { data: null, error: null };
     },
     
-    /**
-     * Get the current user
-     */
     async getUser() {
-      return await supabase.auth.getUser();
+      console.log('Supabase not configured: getUser');
+      return { data: null, error: null };
     },
     
-    /**
-     * Reset password for a user
-     */
-    async resetPasswordForEmail(email: string) {
-      return await supabase.auth.resetPasswordForEmail(email);
+    async resetPasswordForEmail() {
+      console.log('Supabase not configured: resetPasswordForEmail');
+      return { data: null, error: null };
     }
   }
 };
 
-// Export the supabase client directly as well
+// Export the placeholder Supabase client
 export { supabase };
