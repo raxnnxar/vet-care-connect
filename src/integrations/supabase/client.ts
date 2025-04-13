@@ -1,22 +1,17 @@
+/**
+ * Supabase client configuration
+ * 
+ * This file initializes and exports the Supabase client for use throughout the application.
+ */
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
 import { env } from '../../core/config/env';
 
-// Use environment variables from env.ts
+// Use environment variables
 const supabaseUrl = env.supabaseUrl;
 const supabaseAnonKey = env.supabaseAnonKey;
 
-// Log whether we're using environment variables
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase URL or anon key not found in environment variables');
-} else {
-  console.log('Using Supabase credentials from environment variables');
-}
+// Create and export the Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Create the Supabase client
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-
-// Export specific services for better type safety
-export const authService = supabase.auth;
-export const storageService = supabase.storage;
-export const dbService = supabase;
+// Log initialization status
+console.log(`Supabase client initialized with URL: ${supabaseUrl.substring(0, 20)}...`);

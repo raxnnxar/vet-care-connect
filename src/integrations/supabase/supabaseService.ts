@@ -1,242 +1,138 @@
-import { supabase } from './client';
-import { User } from '@supabase/supabase-js';
-import type { Database } from './types';
+import { createClient } from '@supabase/supabase-js';
+import { User } from '../../features/auth/types';
+import { env } from '../../core/config/env';
+
+// Create a direct Supabase client instance
+const supabaseUrl = env.supabaseUrl;
+const supabaseAnonKey = env.supabaseAnonKey;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /**
- * Supabase Service
- * 
- * This service centralizes all database operations and authentication
- * to provide a consistent interface for working with Supabase.
+ * Supabase service for handling database operations
  */
-
-// Type for query options (filtering, pagination, etc.)
-export type QueryOptions = {
-  limit?: number;
-  offset?: number;
-  orderBy?: string;
-  orderDirection?: 'asc' | 'desc';
-  filters?: Record<string, any>;
-};
-
-// Generic response type
-export type ServiceResponse<T> = {
-  data: T | null;
-  error: Error | null;
-};
-
-/**
- * Authentication methods
- */
-export const authService = {
+export const supabaseService = {
   /**
-   * Sign up a new user with email and password
+   * Get user profile by ID
    */
-  signUp: async (email: string, password: string, metadata?: Record<string, any>): Promise<ServiceResponse<User>> => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata
-      }
-    });
+  async getUserProfile(userId: string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
     
-    return {
-      data: data?.user || null,
-      error: error ? new Error(error.message) : null
-    };
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    return data;
   },
   
   /**
-   * Sign in with email and password
+   * Update user profile
    */
-  signIn: async (email: string, password: string): Promise<ServiceResponse<User>> => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+  async updateUserProfile(userId: string, profileData: Partial<User>) {
+    const { error } = await supabase
+      .from('profiles')
+      .update(profileData)
+      .eq('id', userId);
     
-    return {
-      data: data?.user || null,
-      error: error ? new Error(error.message) : null
-    };
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    return true;
   },
   
   /**
-   * Sign out the current user
+   * Get current authenticated user with profile data
    */
-  signOut: async (): Promise<ServiceResponse<null>> => {
-    const { error } = await supabase.auth.signOut();
+  async getCurrentUserWithProfile() {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
     
-    return {
-      data: null,
-      error: error ? new Error(error.message) : null
-    };
+    if (authError || !authData.user) {
+      throw new Error(authError?.message || 'User not authenticated');
+    }
+    
+    try {
+      const profileData = await this.getUserProfile(authData.user.id);
+      
+      return {
+        ...authData.user,
+        profile: profileData
+      };
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      return authData.user;
+    }
   },
   
   /**
-   * Get the current authenticated user
+   * Upload file to storage
    */
-  getCurrentUser: async (): Promise<ServiceResponse<User>> => {
-    const { data, error } = await supabase.auth.getUser();
+  async uploadFile(bucket: string, path: string, file: File) {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(path, file, {
+        upsert: true
+      });
     
-    return {
-      data: data?.user || null,
-      error: error ? new Error(error.message) : null
-    };
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    return data;
   },
-
+  
   /**
-   * Get the current session
+   * Get public URL for a file
    */
-  getSession: async () => {
-    return await supabase.auth.getSession();
+  getPublicUrl(bucket: string, path: string) {
+    const { data } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(path);
+    
+    return data.publicUrl;
   },
-
-  /**
-   * Setup auth state change listener
-   */
-  onAuthStateChange: (callback: (event: string, session: any) => void) => {
-    return supabase.auth.onAuthStateChange(callback);
+  
+  // Auth methods
+  auth: {
+    /**
+     * Sign in with email and password
+     */
+    async signInWithPassword(credentials: { email: string; password: string }) {
+      return await supabase.auth.signInWithPassword(credentials);
+    },
+    
+    /**
+     * Sign up a new user
+     */
+    async signUp(signUpData: { email: string; password: string; options?: any }) {
+      return await supabase.auth.signUp(signUpData);
+    },
+    
+    /**
+     * Sign out the current user
+     */
+    async signOut() {
+      return await supabase.auth.signOut();
+    },
+    
+    /**
+     * Get the current user
+     */
+    async getUser() {
+      return await supabase.auth.getUser();
+    },
+    
+    /**
+     * Reset password for a user
+     */
+    async resetPasswordForEmail(email: string) {
+      return await supabase.auth.resetPasswordForEmail(email);
+    }
   }
 };
 
-/**
- * Database service factory
- * Returns CRUD methods for a specific table
- */
-export const createDatabaseService = <T extends keyof Database['public']['Tables']>(tableName: T) => {
-  // Define types from Database
-  type TableRow = Database['public']['Tables'][T]['Row'];
-  type TableInsert = Database['public']['Tables'][T]['Insert'];
-  type TableUpdate = Database['public']['Tables'][T]['Update'];
-
-  return {
-    /**
-     * Get all records from a table with optional filtering
-     */
-    getAll: async <R = TableRow>(
-      options?: QueryOptions
-    ): Promise<ServiceResponse<R[]>> => {
-      let query = supabase
-        .from(tableName)
-        .select('*');
-      
-      // Apply filters if provided
-      if (options?.filters) {
-        Object.entries(options.filters).forEach(([key, value]) => {
-          query = query.eq(key, value);
-        });
-      }
-      
-      // Apply pagination
-      if (options?.limit) {
-        query = query.limit(options.limit);
-      }
-      
-      if (options?.offset) {
-        query = query.range(options.offset, (options.offset + (options.limit || 10) - 1));
-      }
-      
-      // Apply sorting
-      if (options?.orderBy) {
-        query = query.order(options.orderBy, { 
-          ascending: options.orderDirection !== 'desc' 
-        });
-      }
-      
-      const { data, error } = await query;
-      
-      return {
-        data: data as R[] || [],
-        error: error ? new Error(error.message) : null
-      };
-    },
-    
-    /**
-     * Get a record by its ID
-     */
-    getById: async <R = TableRow>(
-      id: string | number
-    ): Promise<ServiceResponse<R>> => {
-      const { data, error } = await supabase
-        .from(tableName)
-        .select('*')
-        .eq('id', id as any)
-        .single();
-      
-      return {
-        data: data as R || null,
-        error: error ? new Error(error.message) : null
-      };
-    },
-    
-    /**
-     * Insert a new record
-     */
-    insert: async <R = TableRow>(
-      record: TableInsert
-    ): Promise<ServiceResponse<R>> => {
-      const { data, error } = await supabase
-        .from(tableName)
-        .insert(record as any)
-        .select()
-        .single();
-      
-      return {
-        data: data as R || null,
-        error: error ? new Error(error.message) : null
-      };
-    },
-    
-    /**
-     * Update an existing record
-     */
-    update: async <R = TableRow>(
-      id: string | number,
-      changes: TableUpdate
-    ): Promise<ServiceResponse<R>> => {
-      const { data, error } = await supabase
-        .from(tableName)
-        .update(changes as any)
-        .eq('id', id as any)
-        .select()
-        .single();
-      
-      return {
-        data: data as R || null,
-        error: error ? new Error(error.message) : null
-      };
-    },
-    
-    /**
-     * Delete a record
-     */
-    delete: async (id: string | number): Promise<ServiceResponse<null>> => {
-      const { error } = await supabase
-        .from(tableName)
-        .delete()
-        .eq('id', id as any);
-      
-      return {
-        data: null,
-        error: error ? new Error(error.message) : null
-      };
-    },
-
-    /**
-     * Custom query builder
-     * For more complex queries that need multiple conditions
-     */
-    query: () => {
-      return supabase.from(tableName);
-    }
-  };
-};
-
-/**
- * Pre-initialized services for common tables
- */
-export const petsService = createDatabaseService('pets');
-export const appointmentsService = createDatabaseService('appointments');
-export const profilesService = createDatabaseService('profiles');
-export const veterinariansService = createDatabaseService('veterinarians');
+// Export the supabase client directly as well
+export { supabase };
