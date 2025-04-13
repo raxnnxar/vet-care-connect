@@ -15,3 +15,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Create the Supabase client
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+
+// Export specific services for better type safety
+export const authService = supabase.auth;
+export const storageService = supabase.storage;
+export const dbService = supabase;
