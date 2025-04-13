@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
@@ -19,8 +18,9 @@ import { toast } from 'sonner';
 import { isSupabaseConfigured } from '@/integrations/supabase/client';
 import { USER_ROLES } from '@/core/constants/app.constants';
 import { ServiceTypeType } from './ServiceTypeSelectionScreen';
+import { useDispatch } from 'react-redux';
+import { signup } from '../store/authThunks';
 
-// Define signup form schema with validation
 const signupFormSchema = z.object({
   displayName: z.string().min(2, {
     message: 'El nombre debe tener al menos 2 caracteres.',
@@ -54,12 +54,10 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // Get role and serviceType from location state
   const state = location.state as { role?: string; serviceType?: ServiceTypeType } | undefined;
   const role = state?.role || USER_ROLES.PET_OWNER;
   const serviceType = state?.serviceType;
 
-  // Set up form with validation
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
@@ -74,7 +72,6 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     if (onBack) {
       onBack();
     } else {
-      // Navigate back based on role
       if (role === USER_ROLES.VETERINARIAN && serviceType) {
         navigate('/service-type-selection', { state: { role } });
       } else {
@@ -87,18 +84,31 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     setIsLoading(true);
     
     try {
-      // Check if Supabase is configured
       if (!isSupabaseConfigured) {
         toast.error('La conexión con Supabase no está configurada. Por favor configure primero su conexión de Supabase.');
         setIsLoading(false);
         return;
       }
 
-      // Here would be the original signup logic with your Supabase connection
-      // Temporarily disabled until Supabase is reconfigured
+      const signupData = {
+        email: data.email,
+        password: data.password,
+        displayName: data.displayName,
+        role: role
+      };
+
+      const result = await dispatch(signup(signupData) as any);
       
-      toast.warning('Registro temporalmente deshabilitado. Supabase no está configurado.');
-      
+      if (result) {
+        toast.success('¡Cuenta creada con éxito!');
+        if (onRegisterComplete) {
+          onRegisterComplete();
+        } else {
+          navigate(role === USER_ROLES.PET_OWNER ? '/owner' : '/vet');
+        }
+      } else {
+        toast.error('Hubo un problema al crear tu cuenta. Intenta nuevamente.');
+      }
     } catch (error) {
       console.error('Registration error:', error);
       toast.error(error instanceof Error ? error.message : 'Error al crear la cuenta');
@@ -107,7 +117,6 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     }
   };
 
-  // Render a warning banner if Supabase is not configured
   const renderSupabaseWarning = () => {
     if (!isSupabaseConfigured) {
       return (
@@ -132,7 +141,6 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
 
   return (
     <div className="relative flex flex-col min-h-screen overflow-hidden bg-gradient-to-b from-[#7ECEC4] to-[#79D0B8]">
-      {/* Header with back button */}
       <div className="flex items-center z-10 pt-8 px-6">
         <button 
           onClick={handleBackClick}
@@ -143,9 +151,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         </button>
       </div>
       
-      {/* Main content */}
       <div className="flex flex-col flex-1 z-10 px-6 py-4">
-        {/* Header text */}
         <div className="text-center mt-4 mb-8">
           <h1 className="text-white text-3xl font-bold mb-2">
             Crear cuenta
@@ -157,10 +163,8 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
           </p>
         </div>
         
-        {/* Registration form */}
         <div className="w-full max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            {/* Supabase warning message */}
             {renderSupabaseWarning()}
             
             <Form {...form}>
