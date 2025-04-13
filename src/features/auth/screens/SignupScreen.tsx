@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
@@ -16,10 +17,11 @@ import {
 } from '@/ui/molecules/form';
 import { toast } from 'sonner';
 import { isSupabaseConfigured } from '@/integrations/supabase/client';
-import { USER_ROLES } from '@/core/constants/app.constants';
+import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
 import { ServiceTypeType } from './ServiceTypeSelectionScreen';
 import { useDispatch } from 'react-redux';
 import { signup } from '../store/authThunks';
+import { AppDispatch } from '@/state/store';
 
 const signupFormSchema = z.object({
   displayName: z.string().min(2, {
@@ -53,8 +55,9 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
   
-  const state = location.state as { role?: string; serviceType?: ServiceTypeType } | undefined;
+  const state = location.state as { role?: UserRoleType; serviceType?: ServiceTypeType } | undefined;
   const role = state?.role || USER_ROLES.PET_OWNER;
   const serviceType = state?.serviceType;
 
@@ -94,7 +97,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         email: data.email,
         password: data.password,
         displayName: data.displayName,
-        role: role
+        role: role as UserRoleType
       };
 
       const result = await dispatch(signup(signupData) as any);
