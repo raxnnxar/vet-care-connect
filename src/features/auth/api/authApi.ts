@@ -167,3 +167,61 @@ export const resetPassword = async (email: string): Promise<ApiResponse<null>> =
     };
   }
 };
+
+/**
+ * Update user profile information
+ */
+export const updateUserProfile = async (userData: Partial<User>): Promise<ApiResponse<User>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: updateUserProfile attempt');
+    return notConfiguredError();
+  }
+
+  try {
+    const { data: user, error } = await supabase.auth.updateUser({
+      data: {
+        displayName: userData.displayName,
+        role: userData.role
+      }
+    });
+    
+    return {
+      data: user ? {
+        id: user.id,
+        email: user.email || '',
+        displayName: userData.displayName || user.user_metadata?.displayName || '',
+        role: userData.role || user.user_metadata?.role || 'pet_owner',
+      } as User : null,
+      error: error ? new Error(error.message) : null
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error('Unknown error updating user profile')
+    };
+  }
+};
+
+/**
+ * Request a password reset
+ */
+export const requestPasswordReset = async (email: string): Promise<ApiResponse<null>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: requestPasswordReset attempt');
+    return notConfiguredError();
+  }
+
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    
+    return {
+      data: null,
+      error: error ? new Error(error.message) : null
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error('Unknown error requesting password reset')
+    };
+  }
+};
