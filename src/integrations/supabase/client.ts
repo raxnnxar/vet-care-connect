@@ -1,21 +1,26 @@
 
 /**
- * Placeholder for Supabase client
+ * Supabase client configuration
  * 
- * This file will need to be updated with proper Supabase credentials
- * when you're ready to connect.
+ * This file creates and exports the Supabase client for use throughout the app.
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { env } from '../../core/config/env';
 
-// Placeholder values - these will need to be replaced with actual values
-const supabaseUrl = '';
-const supabaseAnonKey = '';
+// Get Supabase URL and anon key from environment variables
+const supabaseUrl = env.supabaseUrl || '';
+const supabaseAnonKey = env.supabaseAnonKey || '';
 
-// Create and export a minimal Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Check if Supabase credentials are set
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
-// Export a flag indicating the client is not properly configured
-export const isSupabaseConfigured = false;
+// Create and export the Supabase client
+export const supabase = createClient(supabaseUrl || 'https://placeholder-url.supabase.co', supabaseAnonKey);
 
-console.log('Supabase client initialized but not configured');
+// Log initialization status
+if (isSupabaseConfigured) {
+  console.log('Supabase client initialized with configuration');
+} else {
+  console.warn('Supabase client initialized with placeholder values - functionality will be limited');
+}
