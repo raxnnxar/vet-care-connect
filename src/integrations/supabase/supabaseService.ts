@@ -1,4 +1,3 @@
-
 /**
  * Supabase service wrapper
  * 
@@ -61,31 +60,55 @@ export const supabaseService = {
     return '';
   },
   
-  // Auth methods placeholder
+  // Auth methods 
   auth: {
-    async signInWithPassword() {
-      console.warn('Supabase not configured: signInWithPassword');
-      return { data: null, error: new Error('Supabase not configured') };
+    async signInWithPassword(credentials) {
+      if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured: signInWithPassword');
+        return { data: null, error: new Error('Supabase not configured') };
+      }
+      return await supabase.auth.signInWithPassword(credentials);
     },
     
-    async signUp() {
-      console.warn('Supabase not configured: signUp');
-      return { data: null, error: new Error('Supabase not configured') };
+    async signUp(signUpData) {
+      if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured: signUp');
+        return { data: null, error: new Error('Supabase not configured') };
+      }
+      return await supabase.auth.signUp(signUpData);
     },
     
     async signOut() {
-      console.warn('Supabase not configured: signOut');
-      return { data: null, error: null };
+      if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured: signOut');
+        return { data: null, error: null };
+      }
+      return await supabase.auth.signOut();
     },
     
     async getUser() {
-      console.warn('Supabase not configured: getUser');
-      return { data: null, error: null };
+      if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured: getUser');
+        return { data: null, error: null };
+      }
+      return await supabase.auth.getUser();
     },
     
-    async resetPasswordForEmail() {
-      console.warn('Supabase not configured: resetPasswordForEmail');
-      return { data: null, error: null };
+    async resetPasswordForEmail(email) {
+      if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured: resetPasswordForEmail');
+        return { data: null, error: null };
+      }
+      return await supabase.auth.resetPasswordForEmail(email);
+    },
+    
+    onAuthStateChange(callback) {
+      if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured: onAuthStateChange');
+        // Return a dummy subscription with unsubscribe method
+        return { data: { subscription: { unsubscribe: () => {} } } };
+      }
+      return supabase.auth.onAuthStateChange(callback);
     }
   }
 };
