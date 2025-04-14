@@ -77,6 +77,7 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
     
     if (data.user) {
       // After successful signup, create the appropriate role-specific record
+      console.log(`Attempting to create role record for user ${data.user.id} with role ${userData.role}`);
       await createUserRoleRecord(data.user.id, userData.role, userData.serviceType);
     }
     
@@ -116,22 +117,54 @@ async function createUserRoleRecord(userId: string, role: string, serviceType?: 
     // Create record based on user role
     if (role === 'pet_owner') {
       // Insert into pet_owners table
-      await supabase.from('pet_owners').insert({ id: userId });
+      console.log(`Inserting into pet_owners with id: ${userId}`);
+      const { data: petOwnerData, error: petOwnerError } = await supabase.from('pet_owners').insert({ id: userId }).select();
+      
+      if (petOwnerError) {
+        console.error(`Error inserting into pet_owners:`, petOwnerError);
+        throw petOwnerError;
+      }
+      
+      console.log(`Insert pet_owners result:`, petOwnerData);
     } else if (role === 'veterinarian') {
       // Insert into veterinarians table
-      await supabase.from('veterinarians').insert({ id: userId });
+      console.log(`Inserting into veterinarians with id: ${userId}`);
+      const { data: vetData, error: vetError } = await supabase.from('veterinarians').insert({ id: userId }).select();
+      
+      if (vetError) {
+        console.error(`Error inserting into veterinarians:`, vetError);
+        throw vetError;
+      }
+      
+      console.log(`Insert veterinarians result:`, vetData);
     } else if (serviceType === 'pet_grooming') {
       // Insert into pet_grooming table for service providers
-      await supabase.from('pet_grooming').insert({ 
+      console.log(`Inserting into pet_grooming with id: ${userId}, service_provider_id: ${userId}`);
+      const { data: groomingData, error: groomingError } = await supabase.from('pet_grooming').insert({ 
         id: userId, 
         service_provider_id: userId 
-      });
+      }).select();
+      
+      if (groomingError) {
+        console.error(`Error inserting into pet_grooming:`, groomingError);
+        throw groomingError;
+      }
+      
+      console.log(`Insert pet_grooming result:`, groomingData);
       
       // Also insert into service_providers table
-      await supabase.from('service_providers').insert({
+      console.log(`Inserting into service_providers with id: ${userId}, provider_type: pet_grooming`);
+      const { data: providerData, error: providerError } = await supabase.from('service_providers').insert({
         id: userId,
         provider_type: 'pet_grooming'
-      });
+      }).select();
+      
+      if (providerError) {
+        console.error(`Error inserting into service_providers:`, providerError);
+        throw providerError;
+      }
+      
+      console.log(`Insert service_providers result:`, providerData);
     }
 
     console.log(`Successfully created ${role} record for user ${userId}`);
