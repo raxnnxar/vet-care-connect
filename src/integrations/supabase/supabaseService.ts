@@ -6,6 +6,13 @@
  */
 import { supabase, isSupabaseConfigured } from './client';
 
+// Define types for the RPC function parameters
+type CreatePetOwnerParams = { owner_id: string };
+type CreateServiceProviderParams = { provider_id: string };
+type CreateVeterinarianParams = { vet_id: string };
+type CreatePetGroomingParams = { groomer_id: string };
+type UpdateProviderTypeParams = { provider_id: string; provider_type_val: string };
+
 /**
  * Supabase service that integrates with the client
  */
@@ -68,7 +75,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_pet_owner', { owner_id: ownerId } as any);
+    return await supabase.rpc<any>('create_pet_owner', { owner_id: ownerId } as CreatePetOwnerParams);
   },
   
   async createServiceProvider(providerId: string) {
@@ -77,7 +84,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_service_provider', { provider_id: providerId } as any);
+    return await supabase.rpc<any>('create_service_provider', { provider_id: providerId } as CreateServiceProviderParams);
   },
   
   async createVeterinarian(vetId: string) {
@@ -86,7 +93,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_veterinarian', { vet_id: vetId } as any);
+    return await supabase.rpc<any>('create_veterinarian', { vet_id: vetId } as CreateVeterinarianParams);
   },
   
   async createPetGrooming(groomerId: string) {
@@ -95,7 +102,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_pet_grooming', { groomer_id: groomerId } as any);
+    return await supabase.rpc<any>('create_pet_grooming', { groomer_id: groomerId } as CreatePetGroomingParams);
   },
   
   async updateProviderType(providerId: string, providerType: string) {
@@ -104,10 +111,10 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('update_provider_type', { 
+    return await supabase.rpc<any>('update_provider_type', { 
       provider_id: providerId, 
       provider_type_val: providerType 
-    } as any);
+    } as UpdateProviderTypeParams);
   },
   
   // Auth methods 
