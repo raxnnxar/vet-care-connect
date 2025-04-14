@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Stethoscope, Scissors } from 'lucide-react';
@@ -38,7 +37,6 @@ const PostSignupServiceTypeScreen: React.FC = () => {
       return;
     }
     
-    // Additional validation with better error messages
     if (!user || !user.id) {
       console.error("Missing user data:", user);
       toast.error('No se encontró información del usuario. Por favor inicie sesión nuevamente.');
@@ -48,12 +46,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
     setIsLoading(true);
     
     try {
-      console.log("Dispatching updateUserServiceType with:", { 
-        userId: user.id, 
-        serviceType: selectedServiceType
-      });
-      
-      // Update the user's service type in the database
+      // Update the provider type
       const resultAction = await dispatch(updateUserServiceType({
         userId: user.id,
         serviceType: selectedServiceType
