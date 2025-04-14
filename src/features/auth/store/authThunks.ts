@@ -14,6 +14,7 @@ import {
 import { User, LoginCredentials, SignupData, ResetPasswordData } from '../types';
 import { UserRoleType } from '@/core/constants/app.constants';
 import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 /**
  * Login a user with email and password
@@ -64,33 +65,32 @@ export const signup = (userData: SignupData) => async (dispatch: AppDispatch) =>
 /**
  * Update user's role
  */
-export const updateUserRole = ({ userId, role }: { userId: string; role: UserRoleType }) => async (dispatch: AppDispatch) => {
-  dispatch(authActions.authRequestStarted());
-  
-  try {
-    console.log(`Calling apiUpdateUserRole with:`, { userId, role });
-    
-    const { data, error } = await apiUpdateUserRole({ userId, role });
-    
-    if (error) {
-      console.error(`Error in apiUpdateUserRole:`, error);
-      throw new Error(error.message || 'Update role failed');
+export const updateUserRole = createAsyncThunk(
+  'auth/updateUserRole',
+  async ({ userId, role }: { userId: string; role: UserRoleType }, { rejectWithValue }) => {
+    try {
+      console.log(`Calling apiUpdateUserRole with:`, { userId, role });
+      
+      const { data, error } = await apiUpdateUserRole({ userId, role });
+      
+      if (error) {
+        console.error(`Error in apiUpdateUserRole:`, error);
+        return rejectWithValue(error.message || 'Update role failed');
+      }
+      
+      if (!data) {
+        console.error(`No data returned from apiUpdateUserRole`);
+        return rejectWithValue('Update role returned no user data');
+      }
+      
+      console.log(`Successfully updated role:`, data);
+      return data;
+    } catch (err) {
+      console.error(`Error in updateUserRole thunk:`, err);
+      return rejectWithValue(err instanceof Error ? err.message : 'An unknown error occurred');
     }
-    
-    if (!data) {
-      console.error(`No data returned from apiUpdateUserRole`);
-      throw new Error('Update role returned no user data');
-    }
-    
-    console.log(`Successfully updated role:`, data);
-    dispatch(authActions.profileUpdateSuccess(data));
-    return data;
-  } catch (err) {
-    console.error(`Error in updateUserRole thunk:`, err);
-    dispatch(authActions.authFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
-    throw err; // Re-throw to allow proper error handling with unwrap()
   }
-};
+);
 
 /**
  * Update user's service type

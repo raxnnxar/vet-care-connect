@@ -39,11 +39,12 @@ const PostSignupRoleScreen: React.FC = () => {
       const result = await dispatch(updateUserRole({
         userId: user.id,
         role: selectedRole
-      })).unwrap(); // Use .unwrap() to properly handle Promise result
+      }));
       
+      // Check if the operation was successful (no error thrown)
       console.log('updateUserRole result:', result);
       
-      if (result) {
+      if (result && result.payload) {
         toast.success('Rol seleccionado con éxito');
         
         // If veterinarian, proceed to service type selection
@@ -54,7 +55,7 @@ const PostSignupRoleScreen: React.FC = () => {
           navigate('/owner');
         }
       } else {
-        console.error('No result returned from updateUserRole');
+        console.error('Operation failed or returned no data:', result);
         toast.error('Hubo un problema al seleccionar el rol');
       }
     } catch (error) {
