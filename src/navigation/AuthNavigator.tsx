@@ -4,8 +4,6 @@ import { Routes, Route } from 'react-router-dom';
 import { SCREENS } from './navigationConfig';
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
 import SignupScreen from '../features/auth/screens/SignupScreen';
-import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
-import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
 
 // Placeholder screen components
 const LoginScreen = () => (
@@ -32,8 +30,7 @@ const AuthNavigator = () => {
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/signup" element={<SignupScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
-        <Route path="/post-signup-role" element={<PostSignupRoleScreen />} />
-        <Route path="/post-signup-service-type" element={<PostSignupServiceTypeScreen />} />
+        {/* Post-signup routes are now handled in AppNavigator */}
       </Routes>
     </div>
   );
