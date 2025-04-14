@@ -69,6 +69,7 @@ const PostSignupRoleScreen: React.FC = () => {
         
         // If service provider, proceed to service type selection
         if (selectedRole === USER_ROLES.VETERINARIAN) {
+          // Navigate to the service type selection screen
           navigate('/post-signup-service-type');
         } else {
           // If pet owner, navigate to the owner dashboard
