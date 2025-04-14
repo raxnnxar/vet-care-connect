@@ -1,3 +1,4 @@
+
 /**
  * Authentication API service
  * 
@@ -14,6 +15,11 @@ const notConfiguredError = <T>(): ApiResponse<T> => ({
   data: null,
   error: new Error('Supabase is not configured. Please set up your Supabase connection first.')
 });
+
+// Define types for RPC parameters to avoid TypeScript errors
+interface RpcParams {
+  [key: string]: any;
+}
 
 /**
  * Log in with email and password
@@ -128,13 +134,13 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
     // 2. Create the role-specific record based on the selected role
     if (role === 'pet_owner') {
       console.log(`Creating pet_owner record for user ${userId}`);
-      const params = { owner_id: userId };
+      const params: RpcParams = { owner_id: userId };
       console.log("RPC params:", params);
       
       const { error: ownerError } = await supabase.rpc(
         'create_pet_owner',
-        params as any
-      ) as any;
+        params
+      );
         
       if (ownerError) {
         console.error(`Error inserting into pet_owners:`, ownerError);
@@ -145,13 +151,13 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
     }
     else if (role === 'veterinarian') {
       console.log(`Creating service_provider record for user ${userId}`);
-      const params = { provider_id: userId };
+      const params: RpcParams = { provider_id: userId };
       console.log("RPC params:", params);
       
       const { error: providerError } = await supabase.rpc(
         'create_service_provider',
-        params as any
-      ) as any;
+        params
+      );
         
       if (providerError) {
         console.error(`Error inserting into service_providers:`, providerError);
@@ -218,7 +224,7 @@ export const updateUserServiceType = async ({
     
     // 2. Update the provider_type in the service_providers table
     console.log(`Updating service_provider type to ${serviceType} for user ${userId}`);
-    const updateParams = {
+    const updateParams: RpcParams = {
       provider_id: userId,
       provider_type_val: serviceType
     };
@@ -226,8 +232,8 @@ export const updateUserServiceType = async ({
     
     const { error: providerError } = await supabase.rpc(
       'update_provider_type',
-      updateParams as any
-    ) as any;
+      updateParams
+    );
       
     if (providerError) {
       console.error(`Error updating service_providers:`, providerError);
@@ -239,13 +245,13 @@ export const updateUserServiceType = async ({
     // 3. Create the specific service type record
     if (serviceType === 'veterinarian') {
       console.log(`Creating veterinarians record for user ${userId}`);
-      const vetParams = { vet_id: userId };
+      const vetParams: RpcParams = { vet_id: userId };
       console.log("Veterinarian RPC params:", vetParams);
       
       const { error: vetError } = await supabase.rpc(
         'create_veterinarian',
-        vetParams as any
-      ) as any;
+        vetParams
+      );
         
       if (vetError) {
         console.error(`Error inserting into veterinarians:`, vetError);
@@ -256,13 +262,13 @@ export const updateUserServiceType = async ({
     }
     else if (serviceType === 'grooming') {
       console.log(`Creating pet_grooming record for user ${userId}`);
-      const groomingParams = { groomer_id: userId };
+      const groomingParams: RpcParams = { groomer_id: userId };
       console.log("Grooming RPC params:", groomingParams);
       
       const { error: groomingError } = await supabase.rpc(
         'create_pet_grooming',
-        groomingParams as any
-      ) as any;
+        groomingParams
+      );
         
       if (groomingError) {
         console.error(`Error inserting into pet_grooming:`, groomingError);

@@ -6,6 +6,11 @@
  */
 import { supabase, isSupabaseConfigured } from './client';
 
+// Define types for RPC parameters to avoid TypeScript errors
+interface RpcParams {
+  [key: string]: any;
+}
+
 /**
  * Supabase service that integrates with the client
  */
@@ -69,7 +74,8 @@ export const supabaseService = {
     }
     
     console.log("Creating pet owner with ID:", ownerId);
-    return await supabase.rpc('create_pet_owner', { owner_id: ownerId } as any) as any;
+    const params: RpcParams = { owner_id: ownerId };
+    return await supabase.rpc('create_pet_owner', params);
   },
   
   async createServiceProvider(providerId: string) {
@@ -79,7 +85,8 @@ export const supabaseService = {
     }
     
     console.log("Creating service provider with ID:", providerId);
-    return await supabase.rpc('create_service_provider', { provider_id: providerId } as any) as any;
+    const params: RpcParams = { provider_id: providerId };
+    return await supabase.rpc('create_service_provider', params);
   },
   
   async createVeterinarian(vetId: string) {
@@ -89,7 +96,8 @@ export const supabaseService = {
     }
     
     console.log("Creating veterinarian with ID:", vetId);
-    return await supabase.rpc('create_veterinarian', { vet_id: vetId } as any) as any;
+    const params: RpcParams = { vet_id: vetId };
+    return await supabase.rpc('create_veterinarian', params);
   },
   
   async createPetGrooming(groomerId: string) {
@@ -99,7 +107,8 @@ export const supabaseService = {
     }
     
     console.log("Creating pet grooming with ID:", groomerId);
-    return await supabase.rpc('create_pet_grooming', { groomer_id: groomerId } as any) as any;
+    const params: RpcParams = { groomer_id: groomerId };
+    return await supabase.rpc('create_pet_grooming', params);
   },
   
   async updateProviderType(providerId: string, providerType: string) {
@@ -109,10 +118,11 @@ export const supabaseService = {
     }
     
     console.log("Updating provider type:", { providerId, providerType });
-    return await supabase.rpc('update_provider_type', { 
+    const params: RpcParams = { 
       provider_id: providerId, 
       provider_type_val: providerType 
-    } as any) as any;
+    };
+    return await supabase.rpc('update_provider_type', params);
   },
   
   // Auth methods 
