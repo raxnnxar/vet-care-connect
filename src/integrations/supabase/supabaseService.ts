@@ -63,8 +63,11 @@ export const supabaseService = {
     }
     
     console.log("Creating pet owner with ID:", ownerId);
+    console.log("Params being sent:", { owner_id: ownerId });
     const params: RpcParams = { owner_id: ownerId };
-    return await supabase.rpc('create_pet_owner', params);
+    const result = await supabase.rpc('create_pet_owner', params);
+    console.log("Create pet owner result:", result);
+    return result;
   },
   
   async createServiceProvider(providerId: string) {
@@ -74,8 +77,11 @@ export const supabaseService = {
     }
     
     console.log("Creating service provider with ID:", providerId);
+    console.log("Params being sent:", { provider_id: providerId });
     const params: RpcParams = { provider_id: providerId };
-    return await supabase.rpc('create_service_provider', params);
+    const result = await supabase.rpc('create_service_provider', params);
+    console.log("Create service provider result:", result);
+    return result;
   },
   
   async createVeterinarian(vetId: string) {
@@ -85,8 +91,11 @@ export const supabaseService = {
     }
     
     console.log("Creating veterinarian with ID:", vetId);
+    console.log("Params being sent:", { vet_id: vetId });
     const params: RpcParams = { vet_id: vetId };
-    return await supabase.rpc('create_veterinarian', params);
+    const result = await supabase.rpc('create_veterinarian', params);
+    console.log("Create veterinarian result:", result);
+    return result;
   },
   
   async createPetGrooming(groomerId: string) {
@@ -96,8 +105,11 @@ export const supabaseService = {
     }
     
     console.log("Creating pet grooming with ID:", groomerId);
+    console.log("Params being sent:", { groomer_id: groomerId });
     const params: RpcParams = { groomer_id: groomerId };
-    return await supabase.rpc('create_pet_grooming', params);
+    const result = await supabase.rpc('create_pet_grooming', params);
+    console.log("Create pet grooming result:", result);
+    return result;
   },
   
   async updateProviderType(providerId: string, providerType: string) {
@@ -107,11 +119,14 @@ export const supabaseService = {
     }
     
     console.log("Updating provider type:", { providerId, providerType });
+    console.log("Params being sent:", { provider_id: providerId, provider_type_val: providerType });
     const params: RpcParams = { 
       provider_id: providerId, 
       provider_type_val: providerType 
     };
-    return await supabase.rpc('update_provider_type', params);
+    const result = await supabase.rpc('update_provider_type', params);
+    console.log("Update provider type result:", result);
+    return result;
   },
   
   // Auth methods
