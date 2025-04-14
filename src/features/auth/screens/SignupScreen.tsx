@@ -93,14 +93,13 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         return;
       }
 
-      console.log('Signing up with role:', role, 'serviceType:', serviceType || 'none');
+      console.log('Signing up with role:', role);
       
       const signupData = {
         email: data.email,
         password: data.password,
         displayName: data.displayName,
-        role: role,
-        serviceType: serviceType
+        role: role
       };
 
       const result = await dispatch(signup(signupData));
