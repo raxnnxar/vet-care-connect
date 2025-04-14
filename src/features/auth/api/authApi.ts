@@ -141,7 +141,7 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
       console.log(`Creating pet_owner record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: ownerData, error: ownerError } = await supabase.rpc<RpcSuccessResponse>('create_pet_owner', {
+      const { data: ownerData, error: ownerError } = await supabase.rpc<RpcSuccessResponse, CreatePetOwnerParams>('create_pet_owner', {
         owner_id: userId
       });
         
@@ -158,7 +158,7 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
       console.log(`Creating service_providers record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: providerData, error: providerError } = await supabase.rpc<RpcSuccessResponse>('create_service_provider', {
+      const { data: providerData, error: providerError } = await supabase.rpc<RpcSuccessResponse, CreateServiceProviderParams>('create_service_provider', {
         provider_id: userId
       });
         
@@ -241,7 +241,7 @@ export const updateUserServiceType = async ({
       console.log(`No service provider record found, creating one for ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: providerData, error: providerError } = await supabase.rpc<RpcSuccessResponse>('create_service_provider', {
+      const { data: providerData, error: providerError } = await supabase.rpc<RpcSuccessResponse, CreateServiceProviderParams>('create_service_provider', {
         provider_id: userId
       });
       
@@ -254,7 +254,7 @@ export const updateUserServiceType = async ({
     }
     
     // 3. Update the provider_type in the service_providers table
-    const { data: providerData, error: providerError } = await supabase.rpc<RpcSuccessResponse>('update_provider_type', {
+    const { data: providerData, error: providerError } = await supabase.rpc<RpcSuccessResponse, UpdateProviderTypeParams>('update_provider_type', {
       provider_id: userId,
       provider_type_val: serviceType
     });
@@ -271,7 +271,7 @@ export const updateUserServiceType = async ({
       console.log(`Creating veterinarians record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: vetData, error: vetError } = await supabase.rpc<RpcSuccessResponse>('create_veterinarian', {
+      const { data: vetData, error: vetError } = await supabase.rpc<RpcSuccessResponse, CreateVeterinarianParams>('create_veterinarian', {
         vet_id: userId
       });
         
@@ -286,7 +286,7 @@ export const updateUserServiceType = async ({
       console.log(`Creating pet_grooming record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: groomingData, error: groomingError } = await supabase.rpc<RpcSuccessResponse>('create_pet_grooming', {
+      const { data: groomingData, error: groomingError } = await supabase.rpc<RpcSuccessResponse, CreatePetGroomingParams>('create_pet_grooming', {
         groomer_id: userId
       });
         

@@ -78,7 +78,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc<RpcSuccessResponse>('create_pet_owner', { 
+    return await supabase.rpc<RpcSuccessResponse, CreatePetOwnerParams>('create_pet_owner', { 
       owner_id: ownerId 
     });
   },
@@ -89,7 +89,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc<RpcSuccessResponse>('create_service_provider', { 
+    return await supabase.rpc<RpcSuccessResponse, CreateServiceProviderParams>('create_service_provider', { 
       provider_id: providerId 
     });
   },
@@ -100,7 +100,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc<RpcSuccessResponse>('create_veterinarian', { 
+    return await supabase.rpc<RpcSuccessResponse, CreateVeterinarianParams>('create_veterinarian', { 
       vet_id: vetId 
     });
   },
@@ -111,7 +111,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc<RpcSuccessResponse>('create_pet_grooming', { 
+    return await supabase.rpc<RpcSuccessResponse, CreatePetGroomingParams>('create_pet_grooming', { 
       groomer_id: groomerId 
     });
   },
@@ -122,7 +122,7 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc<RpcSuccessResponse>('update_provider_type', { 
+    return await supabase.rpc<RpcSuccessResponse, UpdateProviderTypeParams>('update_provider_type', { 
       provider_id: providerId, 
       provider_type_val: providerType 
     });
