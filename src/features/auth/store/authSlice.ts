@@ -42,6 +42,10 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.error = null;
     },
+    // Add the missing clearErrors action
+    clearErrors(state) {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
