@@ -1,94 +1,90 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabaseService } from '../integrations/supabase/supabaseService';
+import { useSelector } from 'react-redux';
+import { supabase } from '@/integrations/supabase/client';
 
+// Define types for user roles
 type UserRole = 'pet_owner' | 'service_provider' | null;
-type ProviderType = 'veterinarian' | 'pet_grooming' | null;
+type ProviderType = 'veterinarian' | 'grooming' | null;
 
 interface UserContextType {
-  user: any | null;
   userRole: UserRole;
   providerType: ProviderType;
   isLoading: boolean;
-  error: Error | null;
-  refreshUser: () => Promise<void>;
+  error: string | null;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType>({
+  userRole: null,
+  providerType: null,
+  isLoading: false,
+  error: null,
+});
+
+export const useUser = () => useContext(UserContext);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<any | null>(null);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [providerType, setProviderType] = useState<ProviderType>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchUserData = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabaseService.getCurrentUserWithProfile();
-      
-      if (error) throw error;
-      
-      if (data) {
-        setUser(data.user);
-        setUserRole(data.profile?.role as UserRole || null);
-        setProviderType(data.profile?.provider_type as ProviderType || null);
-      } else {
-        setUser(null);
-        setUserRole(null);
-        setProviderType(null);
-      }
-    } catch (err) {
-      console.error('Error fetching user data:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useSelector((state: any) => state.auth);
 
   useEffect(() => {
-    fetchUserData();
-    
-    // Set up auth state change listener
-    const { data: authListener } = supabaseService.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          await fetchUserData();
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
+    const fetchUserRole = async () => {
+      if (!user || !user.id) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Check if user is a pet owner
+        const { data: petOwnerData, error: petOwnerError } = await supabase
+          .from('pet_owners')
+          .select('id')
+          .eq('id', user.id)
+          .single();
+        
+        if (petOwnerData) {
+          setUserRole('pet_owner');
+          setProviderType(null);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Check if user is a service provider
+        const { data: providerData, error: providerError } = await supabase
+          .from('service_providers')
+          .select('id, provider_type')
+          .eq('id', user.id)
+          .single();
+        
+        if (providerData) {
+          setUserRole('service_provider');
+          setProviderType(providerData.provider_type as ProviderType);
+        } else {
           setUserRole(null);
           setProviderType(null);
         }
+      } catch (err) {
+        console.error('Error fetching user role:', err);
+        setError('Failed to fetch user role information');
+      } finally {
+        setIsLoading(false);
       }
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
     };
-  }, []);
 
-  const refreshUser = async () => {
-    await fetchUserData();
-  };
+    if (user?.id) {
+      fetchUserRole();
+    } else {
+      // Reset state when user logs out
+      setUserRole(null);
+      setProviderType(null);
+    }
+  }, [user?.id]);
 
   return (
-    <UserContext.Provider value={{ 
-      user, 
-      userRole, 
-      providerType,
-      isLoading, 
-      error, 
-      refreshUser 
-    }}>
+    <UserContext.Provider value={{ userRole, providerType, isLoading, error }}>
       {children}
     </UserContext.Provider>
   );
-};
-
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
-  }
-  return context;
 };
