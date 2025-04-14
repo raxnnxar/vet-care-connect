@@ -1,7 +1,8 @@
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../types';
 import { assignUserRole, updateProviderType } from './authThunks';
+import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
+import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 
 interface AuthState {
   user: User | null;
@@ -42,14 +43,12 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.error = null;
     },
-    // Add the missing clearErrors action
     clearErrors(state) {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Handle assignUserRole async thunk
       .addCase(assignUserRole.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -58,7 +57,7 @@ const authSlice = createSlice({
         if (state.user) {
           state.user = {
             ...state.user,
-            role: action.payload.role
+            role: action.payload.role as UserRoleType
           };
         }
         state.isLoading = false;
@@ -69,7 +68,6 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
       
-      // Handle updateProviderType async thunk
       .addCase(updateProviderType.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -78,7 +76,7 @@ const authSlice = createSlice({
         if (state.user) {
           state.user = {
             ...state.user,
-            serviceType: action.payload.providerType
+            serviceType: action.payload.providerType as ServiceTypeType
           };
         }
         state.isLoading = false;

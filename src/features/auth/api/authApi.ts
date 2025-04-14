@@ -1,7 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { User, LoginCredentials, SignupData } from '../types';
-import { RpcParams } from '@/integrations/supabase/types';
 
 // Authentication API interface
 interface AuthResponse {

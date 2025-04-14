@@ -1,11 +1,14 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Stethoscope, Scissors } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'sonner';
+import { AppDispatch } from '@/state/store';
+import { updateProviderType } from '../store/authThunks';
 
-// Define service type constants
+// If this file doesn't exist or is incomplete, let's make sure it has the proper type definition
 export const SERVICE_TYPES = {
   VETERINARIAN: 'veterinarian',
   GROOMING: 'grooming',
@@ -13,36 +16,62 @@ export const SERVICE_TYPES = {
 
 export type ServiceTypeType = (typeof SERVICE_TYPES)[keyof typeof SERVICE_TYPES];
 
-interface ServiceTypeSelectionScreenProps {
-  onServiceTypeSelected?: (serviceType: ServiceTypeType) => void;
-  onBack?: () => void;
-}
-
-const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({ 
-  onServiceTypeSelected, 
-  onBack 
-}) => {
+const PostSignupServiceTypeScreen: React.FC = () => {
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceTypeType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: any) => state.auth);
   
   // Define color variables to match the role selection screen
   const brandColor = "#79d0b8"; // Teal color for the brand
-  const accentColor = "#FF8A65"; // Coral accent for warmth
+  
+  useEffect(() => {
+    // Check if user exists and has necessary data
+    if (!user || !user.id) {
+      console.error("Missing user data in PostSignupServiceTypeScreen:", user);
+      toast.warning('Información de usuario incompleta. Por favor, inicia sesión nuevamente si el problema persiste.');
+    }
+  }, [user]);
   
   const handleBackClick = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      navigate('/role-selection');
-    }
+    navigate('/post-signup-role');
   };
   
-  const handleContinue = () => {
-    if (selectedServiceType && onServiceTypeSelected) {
-      onServiceTypeSelected(selectedServiceType);
-    } else if (selectedServiceType) {
-      // Default navigation if no callback provided
-      navigate('/signup');
+  const handleContinue = async () => {
+    if (!selectedServiceType) {
+      toast.error('Por favor, selecciona un tipo de servicio');
+      return;
+    }
+    
+    if (!user || !user.id) {
+      console.error("Missing user data:", user);
+      toast.error('No se encontró información del usuario. Por favor inicie sesión nuevamente.');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Update the provider type
+      const resultAction = await dispatch(updateProviderType({
+        providerId: user.id,
+        providerType: selectedServiceType
+      }));
+      
+      if (updateProviderType.fulfilled.match(resultAction)) {
+        console.log("Service type updated successfully:", resultAction.payload);
+        toast.success('Tipo de servicio seleccionado con éxito');
+        navigate('/vet'); // Navigate to the vet dashboard
+      } else {
+        console.error("Service type update failed:", resultAction.error);
+        toast.error('Hubo un problema al seleccionar el tipo de servicio. Por favor intenta de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error updating service type:', error);
+      toast.error('Error al actualizar el tipo de servicio. Por favor intenta de nuevo.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -162,20 +191,6 @@ const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({
                 </div>
               </div>
             </label>
-
-            {/* Coming Soon Option (Disabled) - with better spacing and no descriptive text */}
-            <div className="relative flex flex-col p-6 rounded-xl bg-[#F1F5F9] border border-white/60 opacity-70">
-              <div className="flex items-center">
-                <div className="p-3 rounded-lg mr-6 bg-gray-100 text-gray-400">
-                  <div className="w-6 h-6 flex items-center justify-center">
-                    <span className="text-xl font-bold">+</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <span className="font-semibold text-gray-500 text-lg">Más servicios próximamente</span>
-                </div>
-              </div>
-            </div>
           </RadioGroup>
         </div>
       </div>
@@ -184,23 +199,33 @@ const ServiceTypeSelectionScreen: React.FC<ServiceTypeSelectionScreenProps> = ({
       <div className="z-10 w-full max-w-xs mx-auto px-6 mb-10 mt-auto animate-fade-up" style={{ animationDelay: '300ms' }}>
         <Button 
           onClick={handleContinue}
-          disabled={!selectedServiceType}
+          disabled={!selectedServiceType || isLoading}
           className="w-full py-6 rounded-full transition-all group"
           style={{ 
             backgroundColor: selectedServiceType ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
             color: selectedServiceType ? '#1F2937' : 'rgba(0, 0, 0, 0.6)',
-            opacity: selectedServiceType ? 1 : 0.85,
+            opacity: selectedServiceType && !isLoading ? 1 : 0.85,
             boxShadow: selectedServiceType ? "0 10px 25px -5px rgba(0,0,0,0.12)" : "none",
             fontWeight: selectedServiceType ? 600 : 500,
           }}
         >
-          <span className={`text-xl ${!selectedServiceType ? 'opacity-70' : ''}`}>
-            Continuar
-          </span>
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Procesando...
+            </span>
+          ) : (
+            <span className={`text-xl ${!selectedServiceType ? 'opacity-70' : ''}`}>
+              Continuar
+            </span>
+          )}
         </Button>
       </div>
     </div>
   );
 };
 
-export default ServiceTypeSelectionScreen;
+export default PostSignupServiceTypeScreen;
