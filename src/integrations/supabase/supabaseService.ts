@@ -1,3 +1,4 @@
+
 /**
  * Supabase service wrapper
  * 
@@ -58,6 +59,55 @@ export const supabaseService = {
     
     // Implementation will be added when Supabase is configured
     return '';
+  },
+  
+  // Database helper functions that bypass RLS with stored procedures
+  async createPetOwner(ownerId: string) {
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase not configured: createPetOwner');
+      return { data: null, error: new Error('Supabase not configured') };
+    }
+    
+    return await supabase.rpc('create_pet_owner', { owner_id: ownerId });
+  },
+  
+  async createServiceProvider(providerId: string) {
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase not configured: createServiceProvider');
+      return { data: null, error: new Error('Supabase not configured') };
+    }
+    
+    return await supabase.rpc('create_service_provider', { provider_id: providerId });
+  },
+  
+  async createVeterinarian(vetId: string) {
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase not configured: createVeterinarian');
+      return { data: null, error: new Error('Supabase not configured') };
+    }
+    
+    return await supabase.rpc('create_veterinarian', { vet_id: vetId });
+  },
+  
+  async createPetGrooming(groomerId: string) {
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase not configured: createPetGrooming');
+      return { data: null, error: new Error('Supabase not configured') };
+    }
+    
+    return await supabase.rpc('create_pet_grooming', { groomer_id: groomerId });
+  },
+  
+  async updateProviderType(providerId: string, providerType: string) {
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase not configured: updateProviderType');
+      return { data: null, error: new Error('Supabase not configured') };
+    }
+    
+    return await supabase.rpc('update_provider_type', { 
+      provider_id: providerId, 
+      provider_type_val: providerType 
+    });
   },
   
   // Auth methods 

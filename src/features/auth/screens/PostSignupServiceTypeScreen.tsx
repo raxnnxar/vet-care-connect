@@ -25,7 +25,12 @@ const PostSignupServiceTypeScreen: React.FC = () => {
   };
   
   const handleContinue = async () => {
-    if (!selectedServiceType || !user) {
+    if (!selectedServiceType) {
+      toast.error('Por favor selecciona un tipo de servicio');
+      return;
+    }
+    
+    if (!user || !user.id) {
       console.error("Missing required data:", { selectedServiceType, userId: user?.id });
       toast.error('Datos incompletos para actualizar el tipo de servicio');
       return;
@@ -56,6 +61,9 @@ const PostSignupServiceTypeScreen: React.FC = () => {
       toast.error('Error al actualizar el tipo de servicio');
     }
   };
+
+  // Let's debug user data availability
+  console.log("Current auth state:", { user, isLoading, error });
 
   return (
     <div className="relative flex flex-col h-screen overflow-hidden">
