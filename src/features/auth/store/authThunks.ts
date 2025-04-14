@@ -92,6 +92,19 @@ export const assignUserRole = createAsyncThunk(
     try {
       console.log(`Assigning role ${role} to user ${userId}`);
       
+      // First, update the profiles table to set the correct role
+      const profileUpdate = await supabase
+        .from('profiles')
+        .update({ role: role })
+        .eq('id', userId);
+      
+      console.log('Profile update result:', profileUpdate);
+      
+      if (profileUpdate.error) {
+        console.error('Error updating profile:', profileUpdate.error);
+        return rejectWithValue(profileUpdate.error.message);
+      }
+      
       if (role === 'pet_owner') {
         // Try the RPC function first
         const { data, error } = await supabaseService.createPetOwner(userId);
@@ -112,6 +125,9 @@ export const assignUserRole = createAsyncThunk(
         
         return { role: 'pet_owner' };
       } else if (role === 'service_provider') {
+        // For service providers, we'll just create the entry in the service_providers table
+        // The specific type (veterinarian or grooming) will be set in the next screen
+        
         // Try the RPC function first
         const { data, error } = await supabaseService.createServiceProvider(userId);
         console.log('Service provider creation result:', { data, error });
@@ -119,33 +135,19 @@ export const assignUserRole = createAsyncThunk(
         if (error) {
           console.error('Error creating service provider with RPC, trying direct insert:', error);
           
-          // Try with 'veterinarian' first
-          let insertResult = await supabase
+          // Try with 'veterinarian' as a temporary value
+          const insertResult = await supabase
             .from('service_providers')
             .insert({ 
               id: userId,
-              provider_type: 'veterinarian' 
+              provider_type: 'veterinarian' // Temporary value, will be updated in next screen
             });
           
-          console.log('Direct insert result with veterinarian:', insertResult);
+          console.log('Direct insert result:', insertResult);
           
-          // If that fails, try with 'grooming'
           if (insertResult.error) {
-            console.error('Direct insert with veterinarian failed, trying grooming:', insertResult.error);
-            
-            insertResult = await supabase
-              .from('service_providers')
-              .insert({ 
-                id: userId,
-                provider_type: 'grooming' 
-              });
-            
-            console.log('Direct insert result with grooming:', insertResult);
-            
-            if (insertResult.error) {
-              console.error('All direct insert attempts failed:', insertResult.error);
-              return rejectWithValue(insertResult.error.message);
-            }
+            console.error('Direct insert failed:', insertResult.error);
+            return rejectWithValue(insertResult.error.message);
           }
         }
         
@@ -165,21 +167,37 @@ export const updateProviderType = createAsyncThunk(
   'auth/updateProviderType',
   async ({ providerId, providerType }: { providerId: string; providerType: string }, { rejectWithValue }) => {
     try {
+      console.log(`Updating provider type to ${providerType} for user ${providerId}`);
+      
+      // First update the provider_type in the service_providers table
       const { data, error } = await supabaseService.updateProviderType(providerId, providerType);
+      console.log('Update provider type result:', { data, error });
 
       if (error) {
+        console.error('Error updating provider type:', error);
         return rejectWithValue(error.message);
       }
 
-      // Create the specific provider type record
+      // Then create the specific provider type record
       if (providerType === 'veterinarian') {
-        await supabaseService.createVeterinarian(providerId);
+        const vetResult = await supabaseService.createVeterinarian(providerId);
+        console.log('Create veterinarian result:', vetResult);
+        
+        if (vetResult.error) {
+          console.error('Error creating veterinarian record:', vetResult.error);
+        }
       } else if (providerType === 'grooming') {
-        await supabaseService.createPetGrooming(providerId);
+        const groomingResult = await supabaseService.createPetGrooming(providerId);
+        console.log('Create pet grooming result:', groomingResult);
+        
+        if (groomingResult.error) {
+          console.error('Error creating pet grooming record:', groomingResult.error);
+        }
       }
 
       return { providerType };
     } catch (error) {
+      console.error('Error in updateProviderType:', error);
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
     }
   }
