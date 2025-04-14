@@ -1,7 +1,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../types';
-import { updateUserRole, updateUserServiceType } from './authThunks';
+import { assignUserRole, updateProviderType } from './authThunks';
 
 interface AuthState {
   user: User | null;
@@ -49,32 +49,32 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Handle updateUserRole async thunk
-      .addCase(updateUserRole.pending, (state) => {
+      // Handle assignUserRole async thunk
+      .addCase(assignUserRole.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(updateUserRole.fulfilled, (state, action) => {
+      .addCase(assignUserRole.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(updateUserRole.rejected, (state, action) => {
+      .addCase(assignUserRole.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
       
-      // Handle updateUserServiceType async thunk
-      .addCase(updateUserServiceType.pending, (state) => {
+      // Handle updateProviderType async thunk
+      .addCase(updateProviderType.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(updateUserServiceType.fulfilled, (state, action) => {
+      .addCase(updateProviderType.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(updateUserServiceType.rejected, (state, action) => {
+      .addCase(updateProviderType.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });

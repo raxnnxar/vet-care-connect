@@ -5,11 +5,6 @@
  */
 import { supabase, isSupabaseConfigured } from './client';
 
-// Define types for RPC parameters to avoid TypeScript errors
-interface RpcParams {
-  [key: string]: any;
-}
-
 /**
  * Supabase service that integrates with the client
  */
@@ -64,8 +59,7 @@ export const supabaseService = {
     
     console.log("Creating pet owner with ID:", ownerId);
     console.log("Params being sent:", { owner_id: ownerId });
-    const params: RpcParams = { owner_id: ownerId };
-    const result = await supabase.rpc('create_pet_owner', params);
+    const result = await supabase.rpc('create_pet_owner', { owner_id: ownerId });
     console.log("Create pet owner result:", result);
     return result;
   },
@@ -78,8 +72,7 @@ export const supabaseService = {
     
     console.log("Creating service provider with ID:", providerId);
     console.log("Params being sent:", { provider_id: providerId });
-    const params: RpcParams = { provider_id: providerId };
-    const result = await supabase.rpc('create_service_provider', params);
+    const result = await supabase.rpc('create_service_provider', { provider_id: providerId });
     console.log("Create service provider result:", result);
     return result;
   },
@@ -92,8 +85,7 @@ export const supabaseService = {
     
     console.log("Creating veterinarian with ID:", vetId);
     console.log("Params being sent:", { vet_id: vetId });
-    const params: RpcParams = { vet_id: vetId };
-    const result = await supabase.rpc('create_veterinarian', params);
+    const result = await supabase.rpc('create_veterinarian', { vet_id: vetId });
     console.log("Create veterinarian result:", result);
     return result;
   },
@@ -106,8 +98,7 @@ export const supabaseService = {
     
     console.log("Creating pet grooming with ID:", groomerId);
     console.log("Params being sent:", { groomer_id: groomerId });
-    const params: RpcParams = { groomer_id: groomerId };
-    const result = await supabase.rpc('create_pet_grooming', params);
+    const result = await supabase.rpc('create_pet_grooming', { groomer_id: groomerId });
     console.log("Create pet grooming result:", result);
     return result;
   },
@@ -120,11 +111,10 @@ export const supabaseService = {
     
     console.log("Updating provider type:", { providerId, providerType });
     console.log("Params being sent:", { provider_id: providerId, provider_type_val: providerType });
-    const params: RpcParams = { 
+    const result = await supabase.rpc('update_provider_type', { 
       provider_id: providerId, 
       provider_type_val: providerType 
-    };
-    const result = await supabase.rpc('update_provider_type', params);
+    });
     console.log("Update provider type result:", result);
     return result;
   },

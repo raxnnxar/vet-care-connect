@@ -2,11 +2,10 @@
 import { useEffect, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
-  login as loginThunk,
-  signup as signupThunk,
-  logout as logoutThunk,
-  checkAuth as checkAuthThunk,
-  updateProfile as updateProfileThunk
+  loginUser as loginThunk,
+  signupUser as signupThunk,
+  logoutUser as logoutThunk,
+  getCurrentUser as checkAuthThunk,
 } from '../store/authThunks';
 import { authActions } from '../store/authSlice';
 import { User, LoginCredentials, SignupData } from '../types';
@@ -37,7 +36,7 @@ export const useAuth = () => {
     logout: useCallback(() => 
       dispatch(logoutThunk()), [dispatch]),
     updateProfile: useCallback((userData: Partial<User>) => 
-      dispatch(updateProfileThunk(userData)), [dispatch]),
+      dispatch(authActions.profileUpdateSuccess(userData as User)), [dispatch]),
     clearErrors: useCallback(() => 
       dispatch(authActions.clearErrors()), [dispatch]),
   };

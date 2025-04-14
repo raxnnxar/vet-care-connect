@@ -25,7 +25,7 @@ const AppNavigator = () => {
       }
 
       // If user is a service provider but doesn't have a service type, redirect to service type selection
-      if (user.role === USER_ROLES.VETERINARIAN && !user.serviceType && 
+      if (user.role === 'service_provider' && !user.serviceType && 
           !location.pathname.includes('/post-signup-service-type')) {
         console.log('Service provider has no service type, redirecting to service type selection');
         navigate('/post-signup-service-type');
@@ -33,11 +33,11 @@ const AppNavigator = () => {
       }
 
       // If user has complete profile, navigate to the appropriate dashboard
-      if (user.role && (user.role !== USER_ROLES.VETERINARIAN || user.serviceType)) {
-        if (user.role === USER_ROLES.PET_OWNER) {
+      if (user.role && (user.role !== 'service_provider' || user.serviceType)) {
+        if (user.role === 'pet_owner') {
           console.log('Navigating to pet owner dashboard');
           navigate('/owner');
-        } else if (user.role === USER_ROLES.VETERINARIAN) {
+        } else if (user.role === 'service_provider') {
           console.log('Navigating to vet dashboard');
           navigate('/vet');
         }
@@ -51,9 +51,9 @@ const AppNavigator = () => {
   }
 
   // Show appropriate navigator based on role
-  if (user.role === USER_ROLES.PET_OWNER) {
+  if (user.role === 'pet_owner') {
     return <OwnerNavigator />;
-  } else if (user.role === USER_ROLES.VETERINARIAN) {
+  } else if (user.role === 'service_provider') {
     return <VetNavigator />;
   }
   

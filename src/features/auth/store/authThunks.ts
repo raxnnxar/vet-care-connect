@@ -3,11 +3,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabaseService } from '@/integrations/supabase/supabaseService';
 import { supabase } from '@/integrations/supabase/client';
 
-// Define types for RPC parameters to avoid TypeScript errors
-interface RpcParams {
-  [key: string]: any;
-}
-
 // Login thunk
 export const loginUser = createAsyncThunk(
   'auth/login',
@@ -126,8 +121,7 @@ export const assignUserRole = createAsyncThunk(
       
       if (role === 'pet_owner') {
         // Try the RPC function first
-        const params: RpcParams = { owner_id: userId };
-        const { data, error } = await supabase.rpc('create_pet_owner', params);
+        const { data, error } = await supabase.rpc('create_pet_owner', { owner_id: userId });
         console.log('Pet owner creation result:', { data, error });
         
         if (error) {
@@ -149,8 +143,7 @@ export const assignUserRole = createAsyncThunk(
         // The specific type (veterinarian or grooming) will be set in the next screen
         
         // Try the RPC function first
-        const params: RpcParams = { provider_id: userId };
-        const { data, error } = await supabase.rpc('create_service_provider', params);
+        const { data, error } = await supabase.rpc('create_service_provider', { provider_id: userId });
         console.log('Service provider creation result:', { data, error });
         
         if (error) {
@@ -203,11 +196,10 @@ export const updateProviderType = createAsyncThunk(
       console.log('User metadata update result:', userData);
       
       // Then update the provider_type in the service_providers table
-      const params: RpcParams = { 
+      const { data, error } = await supabase.rpc('update_provider_type', { 
         provider_id: providerId, 
         provider_type_val: providerType 
-      };
-      const { data, error } = await supabase.rpc('update_provider_type', params);
+      });
       console.log('Update provider type result:', { data, error });
 
       if (error) {
@@ -217,16 +209,14 @@ export const updateProviderType = createAsyncThunk(
 
       // Then create the specific provider type record
       if (providerType === 'veterinarian') {
-        const vetParams: RpcParams = { vet_id: providerId };
-        const vetResult = await supabase.rpc('create_veterinarian', vetParams);
+        const vetResult = await supabase.rpc('create_veterinarian', { vet_id: providerId });
         console.log('Create veterinarian result:', vetResult);
         
         if (vetResult.error) {
           console.error('Error creating veterinarian record:', vetResult.error);
         }
       } else if (providerType === 'grooming') {
-        const groomerParams: RpcParams = { groomer_id: providerId };
-        const groomingResult = await supabase.rpc('create_pet_grooming', groomerParams);
+        const groomingResult = await supabase.rpc('create_pet_grooming', { groomer_id: providerId });
         console.log('Create pet grooming result:', groomingResult);
         
         if (groomingResult.error) {
