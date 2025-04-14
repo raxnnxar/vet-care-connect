@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Stethoscope, Scissors } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
@@ -12,13 +12,19 @@ import { SERVICE_TYPES, ServiceTypeType } from './ServiceTypeSelectionScreen';
 
 const PostSignupServiceTypeScreen: React.FC = () => {
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceTypeType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { user, isLoading, error } = useSelector((state: RootState) => state.auth);
+  const { user, isLoading: authLoading, error } = useSelector((state: RootState) => state.auth);
   
   // Define color variables to match the role selection screen
   const brandColor = "#79d0b8"; // Teal color for the brand
   const accentColor = "#FF8A65"; // Coral accent for warmth
+  
+  // Log user data for debugging on component mount
+  useEffect(() => {
+    console.log("PostSignupServiceTypeScreen - Current auth state:", { user, isLoading: authLoading, error });
+  }, [user, authLoading, error]);
   
   const handleBackClick = () => {
     navigate('/post-signup-role');
@@ -35,6 +41,8 @@ const PostSignupServiceTypeScreen: React.FC = () => {
       toast.error('Datos incompletos para actualizar el tipo de servicio');
       return;
     }
+    
+    setIsLoading(true);
     
     try {
       console.log("Dispatching updateUserServiceType with:", { 
@@ -59,6 +67,8 @@ const PostSignupServiceTypeScreen: React.FC = () => {
     } catch (error) {
       console.error('Error updating service type:', error);
       toast.error('Error al actualizar el tipo de servicio');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -189,7 +199,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
       <div className="z-10 w-full max-w-xs mx-auto px-6 mb-10 mt-auto animate-fade-up" style={{ animationDelay: '300ms' }}>
         <Button 
           onClick={handleContinue}
-          disabled={!selectedServiceType}
+          disabled={!selectedServiceType || isLoading}
           className="w-full py-6 rounded-full transition-all group"
           style={{ 
             backgroundColor: selectedServiceType ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
@@ -199,9 +209,19 @@ const PostSignupServiceTypeScreen: React.FC = () => {
             fontWeight: selectedServiceType ? 600 : 500,
           }}
         >
-          <span className={`text-xl ${!selectedServiceType ? 'opacity-70' : ''}`}>
-            Continuar
-          </span>
+          {isLoading ? (
+            <span className="flex items-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Procesando...
+            </span>
+          ) : (
+            <span className={`text-xl ${!selectedServiceType ? 'opacity-70' : ''}`}>
+              Continuar
+            </span>
+          )}
         </Button>
       </div>
     </div>
