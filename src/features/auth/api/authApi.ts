@@ -60,14 +60,15 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
   }
 
   try {
-    // Sign up the user
+    // Sign up the user with role and serviceType in metadata
     const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
       options: {
         data: {
           displayName: userData.displayName,
-          role: userData.role
+          role: userData.role,
+          serviceType: userData.serviceType || null
         }
       }
     });
@@ -76,7 +77,7 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
     
     if (data.user) {
       // After successful signup, create the appropriate role-specific record
-      await createUserRoleRecord(data.user.id, userData.role);
+      await createUserRoleRecord(data.user.id, userData.role, userData.serviceType);
     }
     
     return {
@@ -86,6 +87,7 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
           email: data.user.email || '',
           displayName: userData.displayName,
           role: userData.role,
+          serviceType: userData.serviceType
         } as User,
         token: data.session?.access_token || ''
       } : null,
@@ -102,13 +104,15 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
 /**
  * Create role-specific record for the user
  */
-async function createUserRoleRecord(userId: string, role: string) {
+async function createUserRoleRecord(userId: string, role: string, serviceType?: string) {
   if (!isSupabaseConfigured) {
     console.warn('Supabase not configured: createUserRoleRecord attempt');
     return;
   }
 
   try {
+    console.log(`Creating ${role} record for user ${userId}${serviceType ? ` with service type ${serviceType}` : ''}`);
+    
     // Create record based on user role
     if (role === 'pet_owner') {
       // Insert into pet_owners table
@@ -116,9 +120,21 @@ async function createUserRoleRecord(userId: string, role: string) {
     } else if (role === 'veterinarian') {
       // Insert into veterinarians table
       await supabase.from('veterinarians').insert({ id: userId });
+    } else if (serviceType === 'pet_grooming') {
+      // Insert into pet_grooming table for service providers
+      await supabase.from('pet_grooming').insert({ 
+        id: userId, 
+        service_provider_id: userId 
+      });
+      
+      // Also insert into service_providers table
+      await supabase.from('service_providers').insert({
+        id: userId,
+        provider_type: 'pet_grooming'
+      });
     }
 
-    console.log(`Created ${role} record for user ${userId}`);
+    console.log(`Successfully created ${role} record for user ${userId}`);
   } catch (error) {
     console.error(`Failed to create ${role} record:`, error);
     throw error;

@@ -11,6 +11,7 @@ export interface User {
   email: string;
   displayName: string;
   role: UserRoleType;
+  serviceType?: string;
   profileImage?: string;
   phone?: string;
 }
@@ -31,6 +32,7 @@ export interface SignupData {
   password: string;
   displayName: string;
   role: UserRoleType;
+  serviceType?: string;
 }
 
 export interface AuthResponse {
