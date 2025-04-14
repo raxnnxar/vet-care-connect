@@ -2,7 +2,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
-import VettLogo from '@/ui/atoms/VettLogo';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -23,40 +22,43 @@ const WelcomeScreen: React.FC = () => {
       />
       
       {/* Content area with proper z-index */}
-      <div className="flex flex-col items-center justify-center flex-1 z-10">
-        <div className="flex flex-col items-center max-w-md px-6 py-10">
-          {/* Logo with animation */}
-          <div className="animate-fade-in" style={{ animationDelay: "200ms" }}>
-            <VettLogo width={180} height={180} />
-          </div>
+      <div className="flex flex-col items-center justify-center flex-1 z-10 px-6">
+        {/* Logo */}
+        <div className="animate-fade-in mb-16" style={{ animationDelay: "200ms" }}>
+          <img 
+            src="/lovable-uploads/053f0f17-f20a-466e-b7fe-5f6b4edbd41b.png" 
+            alt="Vett Logo" 
+            className="w-64 h-64"
+          />
+        </div>
+        
+        {/* Tagline content */}
+        <div className="text-center mb-20">
+          <p className="text-white text-2xl animate-fade-in" style={{ animationDelay: "400ms" }}>
+            Todo para tu mascota en
+          </p>
+          <p className="text-white text-2xl animate-fade-in" style={{ animationDelay: "400ms" }}>
+            un solo lugar
+          </p>
+        </div>
+        
+        {/* Buttons with animations */}
+        <div className="w-full max-w-xs space-y-4 animate-fade-up" style={{ animationDelay: "600ms" }}>
+          <Button 
+            onClick={handleGetStarted}
+            className="w-full py-6 bg-white text-gray-800 hover:bg-gray-100 rounded-full text-xl font-semibold flex items-center justify-center"
+          >
+            <span className="mr-2">⦿</span>
+            Empezar
+          </Button>
           
-          {/* Text content */}
-          <div className="text-center mt-8 mb-12">
-            <h1 className="text-white text-4xl font-bold mb-4 animate-fade-in" style={{ animationDelay: "400ms" }}>
-              Vett
-            </h1>
-            <p className="text-white text-xl animate-fade-in" style={{ animationDelay: "600ms" }}>
-              Conectando dueños de mascotas con atención veterinaria
-            </p>
-          </div>
-          
-          {/* Buttons with animations */}
-          <div className="w-full space-y-4 animate-fade-up" style={{ animationDelay: "800ms" }}>
-            <Button 
-              onClick={handleGetStarted}
-              className="w-full py-6 bg-white text-gray-800 hover:bg-gray-100 rounded-full text-xl font-semibold"
-            >
-              Empezar
-            </Button>
-            
-            <Button 
-              onClick={handleLogin}
-              variant="outline" 
-              className="w-full py-6 text-white border-white hover:bg-white/10 rounded-full text-xl font-semibold"
-            >
-              Ya tengo una cuenta
-            </Button>
-          </div>
+          <Button 
+            onClick={handleLogin}
+            variant="ghost"
+            className="w-full py-3 text-white hover:bg-white/10 rounded-full text-lg"
+          >
+            Ya tengo una cuenta
+          </Button>
         </div>
       </div>
     </div>

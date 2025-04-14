@@ -68,16 +68,27 @@ export const updateUserRole = ({ userId, role }: { userId: string; role: UserRol
   dispatch(authActions.authRequestStarted());
   
   try {
+    console.log(`Calling apiUpdateUserRole with:`, { userId, role });
+    
     const { data, error } = await apiUpdateUserRole({ userId, role });
     
-    if (error) throw new Error(error.message || 'Update role failed');
-    if (!data) throw new Error('Update role returned no user data');
+    if (error) {
+      console.error(`Error in apiUpdateUserRole:`, error);
+      throw new Error(error.message || 'Update role failed');
+    }
     
+    if (!data) {
+      console.error(`No data returned from apiUpdateUserRole`);
+      throw new Error('Update role returned no user data');
+    }
+    
+    console.log(`Successfully updated role:`, data);
     dispatch(authActions.profileUpdateSuccess(data));
     return data;
   } catch (err) {
+    console.error(`Error in updateUserRole thunk:`, err);
     dispatch(authActions.authFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
-    return null;
+    throw err; // Re-throw to allow proper error handling with unwrap()
   }
 };
 

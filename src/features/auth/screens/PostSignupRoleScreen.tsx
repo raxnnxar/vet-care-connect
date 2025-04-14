@@ -12,6 +12,7 @@ import { updateUserRole } from '../store/authThunks';
 
 const PostSignupRoleScreen: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRoleType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: any) => state.auth);
@@ -21,16 +22,26 @@ const PostSignupRoleScreen: React.FC = () => {
   const accentColor = "#FF8A65"; // Coral accent for warmth
   const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
   
-  // Handle role selection and database update
+  // Handle role selection and database update with improved error handling
   const handleContinue = async () => {
-    if (!selectedRole || !user) return;
+    if (!selectedRole || !user) {
+      console.error('Missing required data:', { selectedRole, userId: user?.id });
+      toast.error('Información incompleta para continuar');
+      return;
+    }
+    
+    setIsLoading(true);
     
     try {
+      console.log('Starting updateUserRole with:', { userId: user.id, role: selectedRole });
+      
       // First, update the user's role in the database
       const result = await dispatch(updateUserRole({
         userId: user.id,
         role: selectedRole
-      }));
+      })).unwrap(); // Use .unwrap() to properly handle Promise result
+      
+      console.log('updateUserRole result:', result);
       
       if (result) {
         toast.success('Rol seleccionado con éxito');
@@ -43,11 +54,14 @@ const PostSignupRoleScreen: React.FC = () => {
           navigate('/owner');
         }
       } else {
+        console.error('No result returned from updateUserRole');
         toast.error('Hubo un problema al seleccionar el rol');
       }
     } catch (error) {
       console.error('Error updating role:', error);
       toast.error('Error al actualizar el rol');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -164,7 +178,7 @@ const PostSignupRoleScreen: React.FC = () => {
       <div className="flex flex-col items-center mt-auto mb-14 z-10 w-full max-w-xs mx-auto px-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
         <Button 
           onClick={handleContinue}
-          disabled={!selectedRole}
+          disabled={!selectedRole || isLoading}
           className="w-full py-7 rounded-full transition-all group"
           style={{ 
             backgroundColor: selectedRole ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
@@ -174,9 +188,19 @@ const PostSignupRoleScreen: React.FC = () => {
             fontWeight: selectedRole ? 600 : 500,
           }}
         >
-          <span className={`text-xl ${!selectedRole ? 'opacity-70' : ''}`}>
-            Continuar
-          </span>
+          {isLoading ? (
+            <span className="flex items-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Procesando...
+            </span>
+          ) : (
+            <span className={`text-xl ${!selectedRole ? 'opacity-70' : ''}`}>
+              Continuar
+            </span>
+          )}
         </Button>
       </div>
     </div>

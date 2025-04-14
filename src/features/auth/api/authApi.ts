@@ -112,7 +112,12 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
       data: { role }
     });
     
-    if (userError) throw userError;
+    if (userError) {
+      console.error(`Error updating user metadata:`, userError);
+      throw userError;
+    }
+    
+    console.log(`Successfully updated user metadata:`, userData);
     
     // 2. Create the role-specific record
     if (role === 'pet_owner') {
