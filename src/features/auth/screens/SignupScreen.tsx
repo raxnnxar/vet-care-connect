@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
@@ -39,15 +38,7 @@ const signupFormSchema = z.object({
 
 type SignupFormValues = z.infer<typeof signupFormSchema>;
 
-interface SignupScreenProps {
-  onBack?: () => void;
-  onRegisterComplete?: () => void;
-}
-
-const SignupScreen: React.FC<SignupScreenProps> = ({ 
-  onBack,
-  onRegisterComplete,
-}) => {
+const SignupScreen: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -65,11 +56,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
   });
 
   const handleBackClick = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      navigate('/');
-    }
+    navigate('/');
   };
 
   const onSubmit = async (data: SignupFormValues) => {
@@ -92,12 +79,8 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
       
       if (result) {
         toast.success('¡Cuenta creada con éxito!');
-        if (onRegisterComplete) {
-          onRegisterComplete();
-        } else {
-          // Redirect to post-signup role selection
-          navigate('/post-signup-role');
-        }
+        // Redirect to post-signup role selection
+        navigate('/post-signup-role');
       } else {
         toast.error('Hubo un problema al crear tu cuenta. Intenta nuevamente.');
       }

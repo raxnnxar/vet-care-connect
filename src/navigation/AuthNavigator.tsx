@@ -3,8 +3,6 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { SCREENS } from './navigationConfig';
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
-import RoleSelectionScreen from '../features/auth/screens/RoleSelectionScreen';
-import ServiceTypeSelectionScreen from '../features/auth/screens/ServiceTypeSelectionScreen';
 import SignupScreen from '../features/auth/screens/SignupScreen';
 import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
 import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
@@ -34,8 +32,6 @@ const AuthNavigator = () => {
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/signup" element={<SignupScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
-        <Route path="/role-selection" element={<RoleSelectionScreen />} />
-        <Route path="/service-type-selection" element={<ServiceTypeSelectionScreen />} />
         <Route path="/post-signup-role" element={<PostSignupRoleScreen />} />
         <Route path="/post-signup-service-type" element={<PostSignupServiceTypeScreen />} />
       </Routes>
