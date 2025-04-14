@@ -1,16 +1,21 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabaseService } from '@/integrations/supabase/supabaseService';
+import { supabase } from '@/integrations/supabase/client';
 
-export const login = createAsyncThunk(
+// Login thunk
+export const loginUser = createAsyncThunk(
   'auth/login',
-  async (credentials: { email: string; password: string }, { rejectWithValue }) => {
+  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const { data, error } = await supabaseService.auth.signInWithPassword(credentials);
-      
+      const { data, error } = await supabaseService.auth.signInWithPassword({
+        email,
+        password,
+      });
+
       if (error) {
         return rejectWithValue(error.message);
       }
-      
+
       return data;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
@@ -18,24 +23,25 @@ export const login = createAsyncThunk(
   }
 );
 
-export const signup = createAsyncThunk(
+// Signup thunk
+export const signupUser = createAsyncThunk(
   'auth/signup',
-  async ({ signupData, role, providerType }: { 
-    signupData: any, 
-    role?: string | null, 
-    providerType?: string | null 
-  }, { rejectWithValue }) => {
+  async ({ email, password, name }: { email: string; password: string; name: string }, { rejectWithValue }) => {
     try {
-      const { data, error } = await supabaseService.auth.signUp(
-        signupData,
-        role,
-        providerType
-      );
-      
+      const { data, error } = await supabaseService.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
+      });
+
       if (error) {
         return rejectWithValue(error.message);
       }
-      
+
       return data;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
@@ -43,16 +49,17 @@ export const signup = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk(
+// Logout thunk
+export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
       const { error } = await supabaseService.auth.signOut();
-      
+
       if (error) {
         return rejectWithValue(error.message);
       }
-      
+
       return null;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
@@ -60,16 +67,17 @@ export const logout = createAsyncThunk(
   }
 );
 
+// Get current user thunk
 export const getCurrentUser = createAsyncThunk(
   'auth/getCurrentUser',
   async (_, { rejectWithValue }) => {
     try {
       const { data, error } = await supabaseService.auth.getUser();
-      
+
       if (error) {
         return rejectWithValue(error.message);
       }
-      
+
       return data;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
@@ -77,93 +85,80 @@ export const getCurrentUser = createAsyncThunk(
   }
 );
 
-export const resetPassword = createAsyncThunk(
-  'auth/resetPassword',
-  async (email: string, { rejectWithValue }) => {
-    try {
-      const { data, error } = await supabaseService.auth.resetPasswordForEmail(email);
-      
-      if (error) {
-        return rejectWithValue(error.message);
-      }
-      
-      return data;
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
-    }
-  }
-);
-
-// Add a new thunk to handle role assignment
+// Update user role thunk
 export const assignUserRole = createAsyncThunk(
   'auth/assignUserRole',
-  async ({ userId, role, serviceType }: { 
-    userId: string, 
-    role: string,
-    serviceType?: string 
-  }, { rejectWithValue }) => {
+  async ({ userId, role }: { userId: string; role: string }, { rejectWithValue }) => {
     try {
-      let result;
+      console.log(`Assigning role ${role} to user ${userId}`);
       
       if (role === 'pet_owner') {
-        // Create pet owner record
-        result = await supabaseService.createPetOwner(userId);
+        // Try the RPC function first
+        const { data, error } = await supabaseService.createPetOwner(userId);
+        console.log('Pet owner creation result:', { data, error });
+        
+        if (error) {
+          console.error('Error creating pet owner with RPC, trying direct insert:', error);
+          // Try direct insertion as fallback
+          const insertResult = await supabase
+            .from('pet_owners')
+            .insert({ id: userId });
+          
+          if (insertResult.error) {
+            console.error('Direct insert failed:', insertResult.error);
+            return rejectWithValue(insertResult.error.message);
+          }
+        }
+        
+        return { role: 'pet_owner' };
       } else if (role === 'service_provider') {
-        // Create service provider record
-        result = await supabaseService.createServiceProvider(userId);
+        // Try the RPC function first
+        const { data, error } = await supabaseService.createServiceProvider(userId);
+        console.log('Service provider creation result:', { data, error });
         
-        // If service type is provided, create the specific provider type
-        if (serviceType === 'veterinarian') {
-          await supabaseService.createVeterinarian(userId);
-        } else if (serviceType === 'grooming') {
-          await supabaseService.createPetGrooming(userId);
+        if (error) {
+          console.error('Error creating service provider with RPC, trying direct insert:', error);
+          // Try direct insertion as fallback
+          const insertResult = await supabase
+            .from('service_providers')
+            .insert({ id: userId });
+          
+          if (insertResult.error) {
+            console.error('Direct insert failed:', insertResult.error);
+            return rejectWithValue(insertResult.error.message);
+          }
         }
         
-        // Update provider type
-        if (serviceType) {
-          await supabaseService.updateProviderType(userId, serviceType);
-        }
+        return { role: 'service_provider' };
       }
       
-      if (result?.error) {
-        return rejectWithValue(result.error.message);
-      }
-      
-      return { userId, role, serviceType };
+      return rejectWithValue('Invalid role specified');
     } catch (error) {
+      console.error('Error in assignUserRole:', error);
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
     }
   }
 );
 
-// Add a thunk to update service provider type
-export const updateUserServiceType = createAsyncThunk(
-  'auth/updateUserServiceType',
-  async ({ userId, serviceType }: {
-    userId: string,
-    serviceType: string
-  }, { rejectWithValue }) => {
+// Update provider type thunk
+export const updateProviderType = createAsyncThunk(
+  'auth/updateProviderType',
+  async ({ providerId, providerType }: { providerId: string; providerType: string }, { rejectWithValue }) => {
     try {
+      const { data, error } = await supabaseService.updateProviderType(providerId, providerType);
+
+      if (error) {
+        return rejectWithValue(error.message);
+      }
+
       // Create the specific provider type record
-      let typeResult;
-      if (serviceType === 'veterinarian') {
-        typeResult = await supabaseService.createVeterinarian(userId);
-      } else if (serviceType === 'grooming') {
-        typeResult = await supabaseService.createPetGrooming(userId);
+      if (providerType === 'veterinarian') {
+        await supabaseService.createVeterinarian(providerId);
+      } else if (providerType === 'grooming') {
+        await supabaseService.createPetGrooming(providerId);
       }
-      
-      if (typeResult?.error) {
-        return rejectWithValue(typeResult.error.message);
-      }
-      
-      // Update the provider type in the service_providers table
-      const updateResult = await supabaseService.updateProviderType(userId, serviceType);
-      
-      if (updateResult?.error) {
-        return rejectWithValue(updateResult.error.message);
-      }
-      
-      return { userId, serviceType };
+
+      return { providerType };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
     }
