@@ -1,6 +1,12 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabaseService } from '@/integrations/supabase/supabaseService';
 import { supabase } from '@/integrations/supabase/client';
+
+// Define types for RPC parameters to avoid TypeScript errors
+interface RpcParams {
+  [key: string]: any;
+}
 
 // Login thunk
 export const loginUser = createAsyncThunk(
@@ -92,7 +98,20 @@ export const assignUserRole = createAsyncThunk(
     try {
       console.log(`Assigning role ${role} to user ${userId}`);
       
-      // First, update the profiles table to set the correct role
+      // CRITICAL FIX: First update the user metadata to include the role
+      // This ensures the session has the right role information
+      const { data: userData, error: userError } = await supabase.auth.updateUser({
+        data: { role }
+      });
+      
+      if (userError) {
+        console.error('Error updating user metadata:', userError);
+        return rejectWithValue(userError.message);
+      }
+      
+      console.log('User metadata update result:', userData);
+      
+      // Then, update the profiles table to set the correct role
       const profileUpdate = await supabase
         .from('profiles')
         .update({ role: role })
@@ -107,7 +126,8 @@ export const assignUserRole = createAsyncThunk(
       
       if (role === 'pet_owner') {
         // Try the RPC function first
-        const { data, error } = await supabaseService.createPetOwner(userId);
+        const params: RpcParams = { owner_id: userId };
+        const { data, error } = await supabase.rpc('create_pet_owner', params);
         console.log('Pet owner creation result:', { data, error });
         
         if (error) {
@@ -129,7 +149,8 @@ export const assignUserRole = createAsyncThunk(
         // The specific type (veterinarian or grooming) will be set in the next screen
         
         // Try the RPC function first
-        const { data, error } = await supabaseService.createServiceProvider(userId);
+        const params: RpcParams = { provider_id: userId };
+        const { data, error } = await supabase.rpc('create_service_provider', params);
         console.log('Service provider creation result:', { data, error });
         
         if (error) {
@@ -169,8 +190,24 @@ export const updateProviderType = createAsyncThunk(
     try {
       console.log(`Updating provider type to ${providerType} for user ${providerId}`);
       
-      // First update the provider_type in the service_providers table
-      const { data, error } = await supabaseService.updateProviderType(providerId, providerType);
+      // CRITICAL FIX: First update the user metadata to include the service type
+      const { data: userData, error: userError } = await supabase.auth.updateUser({
+        data: { serviceType: providerType }
+      });
+      
+      if (userError) {
+        console.error('Error updating user metadata:', userError);
+        return rejectWithValue(userError.message);
+      }
+      
+      console.log('User metadata update result:', userData);
+      
+      // Then update the provider_type in the service_providers table
+      const params: RpcParams = { 
+        provider_id: providerId, 
+        provider_type_val: providerType 
+      };
+      const { data, error } = await supabase.rpc('update_provider_type', params);
       console.log('Update provider type result:', { data, error });
 
       if (error) {
@@ -180,14 +217,16 @@ export const updateProviderType = createAsyncThunk(
 
       // Then create the specific provider type record
       if (providerType === 'veterinarian') {
-        const vetResult = await supabaseService.createVeterinarian(providerId);
+        const vetParams: RpcParams = { vet_id: providerId };
+        const vetResult = await supabase.rpc('create_veterinarian', vetParams);
         console.log('Create veterinarian result:', vetResult);
         
         if (vetResult.error) {
           console.error('Error creating veterinarian record:', vetResult.error);
         }
       } else if (providerType === 'grooming') {
-        const groomingResult = await supabaseService.createPetGrooming(providerId);
+        const groomerParams: RpcParams = { groomer_id: providerId };
+        const groomingResult = await supabase.rpc('create_pet_grooming', groomerParams);
         console.log('Create pet grooming result:', groomingResult);
         
         if (groomingResult.error) {

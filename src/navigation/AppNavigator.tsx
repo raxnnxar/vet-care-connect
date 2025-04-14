@@ -14,8 +14,12 @@ const AppNavigator = () => {
 
   useEffect(() => {
     if (user) {
+      console.log('Current user state in AppNavigator:', user);
+      console.log('Current path:', location.pathname);
+      
       // If user is authenticated but doesn't have a role yet, redirect to role selection
       if (!user.role && !location.pathname.includes('/post-signup-')) {
+        console.log('User has no role, redirecting to role selection');
         navigate('/post-signup-role');
         return;
       }
@@ -23,6 +27,7 @@ const AppNavigator = () => {
       // If user is a service provider but doesn't have a service type, redirect to service type selection
       if (user.role === USER_ROLES.VETERINARIAN && !user.serviceType && 
           !location.pathname.includes('/post-signup-service-type')) {
+        console.log('Service provider has no service type, redirecting to service type selection');
         navigate('/post-signup-service-type');
         return;
       }
@@ -30,8 +35,10 @@ const AppNavigator = () => {
       // If user has complete profile, navigate to the appropriate dashboard
       if (user.role && (user.role !== USER_ROLES.VETERINARIAN || user.serviceType)) {
         if (user.role === USER_ROLES.PET_OWNER) {
+          console.log('Navigating to pet owner dashboard');
           navigate('/owner');
         } else if (user.role === USER_ROLES.VETERINARIAN) {
+          console.log('Navigating to vet dashboard');
           navigate('/vet');
         }
       }

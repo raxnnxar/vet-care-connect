@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Stethoscope, Scissors } from 'lucide-react';
@@ -6,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { AppDispatch } from '@/state/store';
-import { updateUserServiceType } from '../store/authThunks';
+import { updateProviderType } from '../store/authThunks';
 import { SERVICE_TYPES, ServiceTypeType } from './ServiceTypeSelectionScreen';
 
 const PostSignupServiceTypeScreen: React.FC = () => {
@@ -47,12 +48,12 @@ const PostSignupServiceTypeScreen: React.FC = () => {
     
     try {
       // Update the provider type
-      const resultAction = await dispatch(updateUserServiceType({
-        userId: user.id,
-        serviceType: selectedServiceType
+      const resultAction = await dispatch(updateProviderType({
+        providerId: user.id,
+        providerType: selectedServiceType
       }));
       
-      if (updateUserServiceType.fulfilled.match(resultAction)) {
+      if (updateProviderType.fulfilled.match(resultAction)) {
         console.log("Service type updated successfully:", resultAction.payload);
         toast.success('Tipo de servicio seleccionado con éxito');
         navigate('/vet'); // Navigate to the vet dashboard

@@ -276,7 +276,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_pet_grooming: {
+        Args: { groomer_id: string }
+        Returns: undefined
+      }
+      create_pet_owner: {
+        Args: { owner_id: string }
+        Returns: undefined
+      }
+      create_service_provider: {
+        Args: { provider_id: string }
+        Returns: undefined
+      }
+      create_veterinarian: {
+        Args: { vet_id: string }
+        Returns: undefined
+      }
+      update_provider_type: {
+        Args: { provider_id: string; provider_type_val: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
