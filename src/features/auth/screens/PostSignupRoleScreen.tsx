@@ -45,16 +45,23 @@ const PostSignupRoleScreen: React.FC = () => {
     setIsLoading(true);
     
     try {
+      const roleToAssign = selectedRole === USER_ROLES.PET_OWNER ? 'pet_owner' : 'service_provider';
+      
       console.log('Starting assignUserRole with:', { 
         userId: user.id, 
-        role: selectedRole === USER_ROLES.PET_OWNER ? 'pet_owner' : 'service_provider' 
+        role: roleToAssign,
+        selectedRole,
+        userRolesEnum: USER_ROLES
       });
       
       // Update the user's role in the database using the new function
       const resultAction = await dispatch(assignUserRole({
         userId: user.id,
-        role: selectedRole === USER_ROLES.PET_OWNER ? 'pet_owner' : 'service_provider'
+        role: roleToAssign
       }));
+      
+      console.log('Result action type:', resultAction.type);
+      console.log('Full result action:', JSON.stringify(resultAction, null, 2));
       
       if (assignUserRole.fulfilled.match(resultAction)) {
         console.log('Role selection successful:', resultAction.payload);
@@ -69,10 +76,12 @@ const PostSignupRoleScreen: React.FC = () => {
         }
       } else {
         console.error('Role selection failed:', resultAction.error);
+        console.error('Error details:', resultAction.payload);
         toast.error('Hubo un problema al seleccionar el rol. Por favor intenta de nuevo.');
       }
     } catch (error) {
       console.error('Error in role selection:', error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace available');
       toast.error('Error al actualizar el rol. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
@@ -113,6 +122,7 @@ const PostSignupRoleScreen: React.FC = () => {
           <RadioGroup 
             value={selectedRole || ''} 
             onValueChange={(value) => {
+              console.log('Selected role value:', value);
               setSelectedRole(value as UserRoleType);
               // Add animation effect when selecting a role
               const targetEl = document.getElementById(`role-${value}`);
