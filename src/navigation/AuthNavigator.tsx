@@ -6,6 +6,8 @@ import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
 import RoleSelectionScreen from '../features/auth/screens/RoleSelectionScreen';
 import ServiceTypeSelectionScreen from '../features/auth/screens/ServiceTypeSelectionScreen';
 import SignupScreen from '../features/auth/screens/SignupScreen';
+import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
+import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
 
 // Placeholder screen components
 const LoginScreen = () => (
@@ -34,6 +36,8 @@ const AuthNavigator = () => {
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/role-selection" element={<RoleSelectionScreen />} />
         <Route path="/service-type-selection" element={<ServiceTypeSelectionScreen />} />
+        <Route path="/post-signup-role" element={<PostSignupRoleScreen />} />
+        <Route path="/post-signup-service-type" element={<PostSignupServiceTypeScreen />} />
       </Routes>
     </div>
   );

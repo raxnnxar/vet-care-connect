@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -17,8 +17,6 @@ import {
 } from '@/ui/molecules/form';
 import { toast } from 'sonner';
 import { isSupabaseConfigured } from '@/integrations/supabase/client';
-import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
-import { ServiceTypeType } from './ServiceTypeSelectionScreen';
 import { useDispatch } from 'react-redux';
 import { signup } from '../store/authThunks';
 import { AppDispatch } from '@/state/store';
@@ -51,15 +49,10 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
   onRegisterComplete,
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  
-  const state = location.state as { role?: UserRoleType; serviceType?: ServiceTypeType } | undefined;
-  const role = state?.role || USER_ROLES.PET_OWNER;
-  const serviceType = state?.serviceType;
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupFormSchema),
@@ -75,11 +68,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     if (onBack) {
       onBack();
     } else {
-      if (role === USER_ROLES.VETERINARIAN && serviceType) {
-        navigate('/service-type-selection', { state: { role } });
-      } else {
-        navigate('/role-selection');
-      }
+      navigate('/');
     }
   };
 
@@ -92,14 +81,11 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         setIsLoading(false);
         return;
       }
-
-      console.log('Signing up with role:', role);
       
       const signupData = {
         email: data.email,
         password: data.password,
-        displayName: data.displayName,
-        role: role
+        displayName: data.displayName
       };
 
       const result = await dispatch(signup(signupData));
@@ -109,7 +95,8 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         if (onRegisterComplete) {
           onRegisterComplete();
         } else {
-          navigate(role === USER_ROLES.PET_OWNER ? '/owner' : '/vet');
+          // Redirect to post-signup role selection
+          navigate('/post-signup-role');
         }
       } else {
         toast.error('Hubo un problema al crear tu cuenta. Intenta nuevamente.');
@@ -162,9 +149,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
             Crear cuenta
           </h1>
           <p className="text-white text-lg opacity-90">
-            {role === USER_ROLES.PET_OWNER 
-              ? 'Crea tu cuenta como dueño de mascota' 
-              : 'Crea tu cuenta como proveedor de servicios'}
+            Ingresa tus datos para crear una cuenta
           </p>
         </div>
         

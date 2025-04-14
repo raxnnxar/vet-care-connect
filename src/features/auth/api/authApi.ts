@@ -1,4 +1,3 @@
-
 /**
  * Authentication API service
  * 
@@ -7,6 +6,8 @@
 import { ApiResponse } from '../../../core/api/apiClient';
 import { User, LoginCredentials, SignupData, AuthResponse } from '../types';
 import { supabase, isSupabaseConfigured } from '../../../integrations/supabase/client';
+import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
+import { UserRoleType } from '@/core/constants/app.constants';
 
 // Helper for returning a consistent error response when Supabase is not configured
 const notConfiguredError = <T>(): ApiResponse<T> => ({
@@ -36,7 +37,8 @@ export const login = async (credentials: LoginCredentials): Promise<ApiResponse<
           id: data.user.id,
           email: data.user.email || '',
           displayName: data.user.user_metadata?.displayName || '',
-          role: data.user.user_metadata?.role || 'pet_owner',
+          role: data.user.user_metadata?.role,
+          serviceType: data.user.user_metadata?.serviceType,
         } as User,
         token: data.session?.access_token || ''
       } : null,
@@ -52,6 +54,7 @@ export const login = async (credentials: LoginCredentials): Promise<ApiResponse<
 
 /**
  * Register a new user
+ * This new implementation only handles basic signup without role
  */
 export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResponse>> => {
   if (!isSupabaseConfigured) {
@@ -60,24 +63,18 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
   }
 
   try {
-    // Sign up the user
+    // Sign up the user with basic info only - no role yet
     const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
       options: {
         data: {
-          displayName: userData.displayName,
-          role: userData.role
+          displayName: userData.displayName
         }
       }
     });
     
     if (error) throw error;
-    
-    if (data.user) {
-      // After successful signup, create the appropriate role-specific record
-      await createUserRoleRecord(data.user.id, userData.role);
-    }
     
     return {
       data: data.user ? {
@@ -85,7 +82,6 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
           id: data.user.id,
           email: data.user.email || '',
           displayName: userData.displayName,
-          role: userData.role,
         } as User,
         token: data.session?.access_token || ''
       } : null,
@@ -100,30 +96,165 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
 };
 
 /**
- * Create role-specific record for the user
+ * Update user's role and create the appropriate role record
  */
-async function createUserRoleRecord(userId: string, role: string) {
+export const updateUserRole = async ({ userId, role }: { userId: string; role: UserRoleType }): Promise<ApiResponse<User>> => {
   if (!isSupabaseConfigured) {
-    console.warn('Supabase not configured: createUserRoleRecord attempt');
-    return;
+    console.warn('Supabase not configured: updateUserRole attempt');
+    return notConfiguredError();
   }
 
   try {
-    // Create record based on user role
+    console.log(`Updating role for user ${userId} to ${role}`);
+    
+    // 1. Update the user metadata to include the role
+    const { data: userData, error: userError } = await supabase.auth.updateUser({
+      data: { role }
+    });
+    
+    if (userError) throw userError;
+    
+    // 2. Create the role-specific record
     if (role === 'pet_owner') {
-      // Insert into pet_owners table
-      await supabase.from('pet_owners').insert({ id: userId });
-    } else if (role === 'veterinarian') {
-      // Insert into veterinarians table
-      await supabase.from('veterinarians').insert({ id: userId });
+      console.log(`Creating pet_owner record for user ${userId}`);
+      const { data: ownerData, error: ownerError } = await supabase
+        .from('pet_owners')
+        .insert({ id: userId })
+        .select();
+        
+      if (ownerError) {
+        console.error(`Error inserting into pet_owners:`, ownerError);
+        throw ownerError;
+      }
+      
+      console.log(`Successfully inserted into pet_owners:`, ownerData);
     }
-
-    console.log(`Created ${role} record for user ${userId}`);
+    
+    // For veterinarians, we create a service_providers record
+    // The specific veterinarian/grooming table will be created when service type is selected
+    else if (role === 'veterinarian') {
+      console.log(`Creating service_providers record for user ${userId}`);
+      const { data: providerData, error: providerError } = await supabase
+        .from('service_providers')
+        .insert({ 
+          id: userId,
+          provider_type: null // This will be updated when the service type is selected
+        })
+        .select();
+        
+      if (providerError) {
+        console.error(`Error inserting into service_providers:`, providerError);
+        throw providerError;
+      }
+      
+      console.log(`Successfully inserted into service_providers:`, providerData);
+    }
+    
+    return {
+      data: userData.user ? {
+        id: userData.user.id,
+        email: userData.user.email || '',
+        displayName: userData.user.user_metadata?.displayName || '',
+        role: role,
+      } as User : null,
+      error: null
+    };
   } catch (error) {
-    console.error(`Failed to create ${role} record:`, error);
-    throw error;
+    console.error(`Error in updateUserRole:`, error);
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error('Unknown error updating user role')
+    };
   }
-}
+};
+
+/**
+ * Update user's service type and create the appropriate service type record
+ */
+export const updateUserServiceType = async ({ 
+  userId, 
+  serviceType 
+}: { 
+  userId: string; 
+  serviceType: ServiceTypeType 
+}): Promise<ApiResponse<User>> => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: updateUserServiceType attempt');
+    return notConfiguredError();
+  }
+
+  try {
+    console.log(`Updating service type for user ${userId} to ${serviceType}`);
+    
+    // 1. Update the user metadata to include the service type
+    const { data: userData, error: userError } = await supabase.auth.updateUser({
+      data: { serviceType }
+    });
+    
+    if (userError) throw userError;
+    
+    // 2. Update the provider_type in the service_providers table
+    const { data: providerData, error: providerError } = await supabase
+      .from('service_providers')
+      .update({ provider_type: serviceType })
+      .eq('id', userId)
+      .select();
+      
+    if (providerError) {
+      console.error(`Error updating service_providers:`, providerError);
+      throw providerError;
+    }
+    
+    console.log(`Successfully updated service_providers:`, providerData);
+    
+    // 3. Create the specific service type record
+    if (serviceType === 'veterinarian') {
+      console.log(`Creating veterinarians record for user ${userId}`);
+      const { data: vetData, error: vetError } = await supabase
+        .from('veterinarians')
+        .insert({ id: userId })
+        .select();
+        
+      if (vetError) {
+        console.error(`Error inserting into veterinarians:`, vetError);
+        throw vetError;
+      }
+      
+      console.log(`Successfully inserted into veterinarians:`, vetData);
+    }
+    else if (serviceType === 'grooming') {
+      console.log(`Creating pet_grooming record for user ${userId}`);
+      const { data: groomingData, error: groomingError } = await supabase
+        .from('pet_grooming')
+        .insert({ id: userId, service_provider_id: userId })
+        .select();
+        
+      if (groomingError) {
+        console.error(`Error inserting into pet_grooming:`, groomingError);
+        throw groomingError;
+      }
+      
+      console.log(`Successfully inserted into pet_grooming:`, groomingData);
+    }
+    
+    return {
+      data: userData.user ? {
+        id: userData.user.id,
+        email: userData.user.email || '',
+        displayName: userData.user.user_metadata?.displayName || '',
+        role: userData.user.user_metadata?.role,
+        serviceType: serviceType
+      } as User : null,
+      error: null
+    };
+  } catch (error) {
+    console.error(`Error in updateUserServiceType:`, error);
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error('Unknown error updating user service type')
+    };
+  }
+};
 
 /**
  * Log out the current user

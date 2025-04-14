@@ -7,9 +7,13 @@ import {
   getCurrentUser,
   updateUserProfile,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  updateUserRole as apiUpdateUserRole,
+  updateUserServiceType as apiUpdateUserServiceType
 } from '../api/authApi';
 import { User, LoginCredentials, SignupData, ResetPasswordData } from '../types';
+import { UserRoleType } from '@/core/constants/app.constants';
+import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 
 /**
  * Login a user with email and password
@@ -35,7 +39,7 @@ export const login = (credentials: LoginCredentials) => async (dispatch: AppDisp
 };
 
 /**
- * Register a new user
+ * Register a new user - simplified to not include role yet
  */
 export const signup = (userData: SignupData) => async (dispatch: AppDispatch) => {
   dispatch(authActions.authRequestStarted());
@@ -51,6 +55,52 @@ export const signup = (userData: SignupData) => async (dispatch: AppDispatch) =>
     
     dispatch(authActions.authSuccess(data.user));
     return data.user;
+  } catch (err) {
+    dispatch(authActions.authFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+    return null;
+  }
+};
+
+/**
+ * Update user's role
+ */
+export const updateUserRole = ({ userId, role }: { userId: string; role: UserRoleType }) => async (dispatch: AppDispatch) => {
+  dispatch(authActions.authRequestStarted());
+  
+  try {
+    const { data, error } = await apiUpdateUserRole({ userId, role });
+    
+    if (error) throw new Error(error.message || 'Update role failed');
+    if (!data) throw new Error('Update role returned no user data');
+    
+    dispatch(authActions.profileUpdateSuccess(data));
+    return data;
+  } catch (err) {
+    dispatch(authActions.authFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+    return null;
+  }
+};
+
+/**
+ * Update user's service type
+ */
+export const updateUserServiceType = ({ 
+  userId, 
+  serviceType 
+}: { 
+  userId: string; 
+  serviceType: ServiceTypeType 
+}) => async (dispatch: AppDispatch) => {
+  dispatch(authActions.authRequestStarted());
+  
+  try {
+    const { data, error } = await apiUpdateUserServiceType({ userId, serviceType });
+    
+    if (error) throw new Error(error.message || 'Update service type failed');
+    if (!data) throw new Error('Update service type returned no user data');
+    
+    dispatch(authActions.profileUpdateSuccess(data));
+    return data;
   } catch (err) {
     dispatch(authActions.authFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
     return null;

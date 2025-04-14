@@ -5,14 +5,16 @@
  * These types define the shape of authentication data in the application
  */
 import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
+import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 
 export interface User {
   id: string;
   email: string;
   displayName: string;
-  role: UserRoleType;
+  role?: UserRoleType;
   profileImage?: string;
   phone?: string;
+  serviceType?: ServiceTypeType;
 }
 
 export interface AuthState {
@@ -30,7 +32,6 @@ export interface SignupData {
   email: string;
   password: string;
   displayName: string;
-  role: UserRoleType;
 }
 
 export interface AuthResponse {
