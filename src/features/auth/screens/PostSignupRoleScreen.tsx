@@ -20,7 +20,6 @@ const PostSignupRoleScreen: React.FC = () => {
   // Define the colors
   const brandColor = "#79d0b8"; // Teal color for the brand
   const accentColor = "#FF8A65"; // Coral accent for warmth
-  const accentTeal = "#4DA6A8"; // Deep teal blue for better contrast
   
   // Handle role selection and database update with improved error handling
   const handleContinue = async () => {
@@ -35,19 +34,16 @@ const PostSignupRoleScreen: React.FC = () => {
     try {
       console.log('Starting updateUserRole with:', { userId: user.id, role: selectedRole });
       
-      // First, update the user's role in the database
-      const result = await dispatch(updateUserRole({
+      // Update the user's role in the database
+      const resultAction = await dispatch(updateUserRole({
         userId: user.id,
         role: selectedRole
       }));
       
-      // Check if the operation was successful (no error thrown)
-      console.log('updateUserRole result:', result);
-      
-      if (result && result.payload) {
+      if (updateUserRole.fulfilled.match(resultAction)) {
         toast.success('Rol seleccionado con éxito');
         
-        // If veterinarian, proceed to service type selection
+        // If veterinarian (service provider), proceed to service type selection
         if (selectedRole === USER_ROLES.VETERINARIAN) {
           navigate('/post-signup-service-type');
         } else {
@@ -55,7 +51,7 @@ const PostSignupRoleScreen: React.FC = () => {
           navigate('/owner');
         }
       } else {
-        console.error('Operation failed or returned no data:', result);
+        console.error('Operation failed:', resultAction);
         toast.error('Hubo un problema al seleccionar el rol');
       }
     } catch (error) {
@@ -95,7 +91,7 @@ const PostSignupRoleScreen: React.FC = () => {
           </p>
         </div>
         
-        {/* Role selection with enhanced visual appeal - moved down slightly */}
+        {/* Role selection with enhanced visual appeal */}
         <div className="flex flex-col gap-6 items-center w-full max-w-md mx-auto mt-8 z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <RadioGroup 
             value={selectedRole || ''} 

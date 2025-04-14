@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Stethoscope, Scissors } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
-import { AppDispatch, RootState } from '@/state/store';
+import { AppDispatch } from '@/state/store';
 import { updateUserServiceType } from '../store/authThunks';
 import { SERVICE_TYPES, ServiceTypeType } from './ServiceTypeSelectionScreen';
 
@@ -15,22 +15,10 @@ const PostSignupServiceTypeScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { user, isLoading: authLoading, error } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: any) => state.auth);
   
   // Define color variables to match the role selection screen
   const brandColor = "#79d0b8"; // Teal color for the brand
-  const accentColor = "#FF8A65"; // Coral accent for warmth
-  
-  // Enhanced logging for debugging user data on component mount
-  useEffect(() => {
-    console.log("PostSignupServiceTypeScreen - Current auth state:", { 
-      user, 
-      userId: user?.id, 
-      isLoading: authLoading, 
-      error,
-      state: JSON.stringify(user)
-    });
-  }, [user, authLoading, error]);
   
   const handleBackClick = () => {
     navigate('/post-signup-role');
@@ -60,8 +48,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
     try {
       console.log("Dispatching updateUserServiceType with:", { 
         userId: user.id, 
-        serviceType: selectedServiceType,
-        completeUser: JSON.stringify(user)
+        serviceType: selectedServiceType
       });
       
       // Update the user's service type in the database
@@ -74,10 +61,9 @@ const PostSignupServiceTypeScreen: React.FC = () => {
         console.log("Service type updated successfully:", resultAction.payload);
         toast.success('Tipo de servicio seleccionado con éxito');
         navigate('/vet'); // Navigate to the vet dashboard
-      } else if (updateUserServiceType.rejected.match(resultAction)) {
+      } else {
         console.error("Service type update failed:", resultAction);
-        const errorMessage = resultAction.payload || 'Hubo un problema al seleccionar el tipo de servicio';
-        toast.error(`Error: ${errorMessage}`);
+        toast.error('Hubo un problema al seleccionar el tipo de servicio');
       }
     } catch (error) {
       console.error('Error updating service type:', error);
@@ -236,18 +222,6 @@ const PostSignupServiceTypeScreen: React.FC = () => {
           )}
         </Button>
       </div>
-      
-      {/* Debug info in development mode */}
-      {process.env.NODE_ENV === 'development' && user && (
-        <div className="fixed bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 z-50">
-          <details>
-            <summary className="cursor-pointer">Debug Info</summary>
-            <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
-              {JSON.stringify({ userId: user.id, role: user.role, serviceType: user.serviceType }, null, 2)}
-            </pre>
-          </details>
-        </div>
-      )}
     </div>
   );
 };
