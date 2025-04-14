@@ -1,3 +1,4 @@
+
 /**
  * Authentication API service
  * 
@@ -59,6 +60,7 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
   }
 
   try {
+    // Sign up the user
     const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
@@ -70,6 +72,13 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
       }
     });
     
+    if (error) throw error;
+    
+    if (data.user) {
+      // After successful signup, create the appropriate role-specific record
+      await createUserRoleRecord(data.user.id, userData.role);
+    }
+    
     return {
       data: data.user ? {
         user: {
@@ -80,7 +89,7 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
         } as User,
         token: data.session?.access_token || ''
       } : null,
-      error: error ? new Error(error.message) : null
+      error: null
     };
   } catch (error) {
     return {
@@ -89,6 +98,32 @@ export const signup = async (userData: SignupData): Promise<ApiResponse<AuthResp
     };
   }
 };
+
+/**
+ * Create role-specific record for the user
+ */
+async function createUserRoleRecord(userId: string, role: string) {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured: createUserRoleRecord attempt');
+    return;
+  }
+
+  try {
+    // Create record based on user role
+    if (role === 'pet_owner') {
+      // Insert into pet_owners table
+      await supabase.from('pet_owners').insert({ id: userId });
+    } else if (role === 'veterinarian') {
+      // Insert into veterinarians table
+      await supabase.from('veterinarians').insert({ id: userId });
+    }
+
+    console.log(`Created ${role} record for user ${userId}`);
+  } catch (error) {
+    console.error(`Failed to create ${role} record:`, error);
+    throw error;
+  }
+}
 
 /**
  * Log out the current user

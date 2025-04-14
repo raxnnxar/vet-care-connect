@@ -93,14 +93,16 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         return;
       }
 
+      console.log('Signing up with role:', role);
+      
       const signupData = {
         email: data.email,
         password: data.password,
         displayName: data.displayName,
-        role: role as UserRoleType
+        role: role
       };
 
-      const result = await dispatch(signup(signupData) as any);
+      const result = await dispatch(signup(signupData));
       
       if (result) {
         toast.success('¡Cuenta creada con éxito!');
