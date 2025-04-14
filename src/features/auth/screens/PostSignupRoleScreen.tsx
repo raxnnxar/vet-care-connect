@@ -37,36 +37,43 @@ const PostSignupRoleScreen: React.FC = () => {
     }
     
     if (!user || !user.id) {
-      console.error("Missing user data:", user);
-      toast.error('No se encontró información del usuario. Por favor inicie sesión nuevamente.');
+      console.error('Missing user data:', { user });
+      toast.error('Información de usuario no disponible. Por favor, inicia sesión de nuevo.');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      // Dispatch the new assignUserRole action
+      console.log('Starting assignUserRole with:', { 
+        userId: user.id, 
+        role: selectedRole === USER_ROLES.PET_OWNER ? 'pet_owner' : 'service_provider' 
+      });
+      
+      // Update the user's role in the database using the new function
       const resultAction = await dispatch(assignUserRole({
         userId: user.id,
         role: selectedRole === USER_ROLES.PET_OWNER ? 'pet_owner' : 'service_provider'
       }));
       
       if (assignUserRole.fulfilled.match(resultAction)) {
+        console.log('Role selection successful:', resultAction.payload);
         toast.success('Rol seleccionado con éxito');
         
-        // Navigate based on role
-        if (selectedRole === USER_ROLES.PET_OWNER) {
-          navigate('/owner');
-        } else {
+        // If service provider, proceed to service type selection
+        if (selectedRole === USER_ROLES.VETERINARIAN) {
           navigate('/post-signup-service-type');
+        } else {
+          // If pet owner, navigate to the owner dashboard
+          navigate('/owner');
         }
       } else {
-        console.error("Role assignment failed:", resultAction.error);
+        console.error('Role selection failed:', resultAction.error);
         toast.error('Hubo un problema al seleccionar el rol. Por favor intenta de nuevo.');
       }
     } catch (error) {
-      console.error('Error assigning role:', error);
-      toast.error('Error al asignar el rol. Por favor intenta de nuevo.');
+      console.error('Error in role selection:', error);
+      toast.error('Error al actualizar el rol. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
