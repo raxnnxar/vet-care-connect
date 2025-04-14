@@ -31,7 +31,7 @@ export const useAuth = () => {
     // Actions
     login: useCallback((credentials: LoginCredentials) => 
       dispatch(loginThunk(credentials)), [dispatch]),
-    signup: useCallback((userData: SignupData) => 
+    signup: useCallback((userData: { email: string; password: string; name: string }) => 
       dispatch(signupThunk(userData)), [dispatch]),
     logout: useCallback(() => 
       dispatch(logoutThunk()), [dispatch]),

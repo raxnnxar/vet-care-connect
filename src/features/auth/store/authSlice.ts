@@ -55,7 +55,12 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(assignUserRole.fulfilled, (state, action) => {
-        state.user = action.payload;
+        if (state.user) {
+          state.user = {
+            ...state.user,
+            role: action.payload.role
+          };
+        }
         state.isLoading = false;
         state.error = null;
       })
@@ -70,7 +75,12 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(updateProviderType.fulfilled, (state, action) => {
-        state.user = action.payload;
+        if (state.user) {
+          state.user = {
+            ...state.user,
+            serviceType: action.payload.providerType
+          };
+        }
         state.isLoading = false;
         state.error = null;
       })

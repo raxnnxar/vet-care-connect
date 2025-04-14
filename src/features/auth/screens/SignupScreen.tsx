@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
@@ -17,7 +18,7 @@ import {
 import { toast } from 'sonner';
 import { isSupabaseConfigured } from '@/integrations/supabase/client';
 import { useDispatch } from 'react-redux';
-import { signup } from '../store/authThunks';
+import { signupUser } from '../store/authThunks';
 import { AppDispatch } from '@/state/store';
 
 const signupFormSchema = z.object({
@@ -72,10 +73,10 @@ const SignupScreen: React.FC = () => {
       const signupData = {
         email: data.email,
         password: data.password,
-        displayName: data.displayName
+        name: data.displayName
       };
 
-      const result = await dispatch(signup(signupData));
+      const result = await dispatch(signupUser(signupData));
       
       if (result) {
         toast.success('¡Cuenta creada con éxito!');
