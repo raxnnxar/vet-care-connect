@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Stethoscope, Scissors } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
@@ -20,26 +20,28 @@ const PostSignupServiceTypeScreen: React.FC = () => {
   // Define color variables to match the role selection screen
   const brandColor = "#79d0b8"; // Teal color for the brand
   
+  useEffect(() => {
+    // Check if user exists and has necessary data
+    if (!user || !user.id) {
+      console.error("Missing user data in PostSignupServiceTypeScreen:", user);
+      toast.warning('Información de usuario incompleta. Por favor, inicia sesión nuevamente si el problema persiste.');
+    }
+  }, [user]);
+  
   const handleBackClick = () => {
     navigate('/post-signup-role');
   };
   
   const handleContinue = async () => {
     if (!selectedServiceType) {
-      toast.error('Por favor selecciona un tipo de servicio');
+      toast.error('Por favor, selecciona un tipo de servicio');
       return;
     }
     
     // Additional validation with better error messages
-    if (!user) {
-      console.error("Missing user data");
+    if (!user || !user.id) {
+      console.error("Missing user data:", user);
       toast.error('No se encontró información del usuario. Por favor inicie sesión nuevamente.');
-      return;
-    }
-    
-    if (!user.id) {
-      console.error("Missing user ID:", user);
-      toast.error('No se encontró ID de usuario. Por favor inicie sesión nuevamente.');
       return;
     }
     
@@ -62,12 +64,12 @@ const PostSignupServiceTypeScreen: React.FC = () => {
         toast.success('Tipo de servicio seleccionado con éxito');
         navigate('/vet'); // Navigate to the vet dashboard
       } else {
-        console.error("Service type update failed:", resultAction);
-        toast.error('Hubo un problema al seleccionar el tipo de servicio');
+        console.error("Service type update failed:", resultAction.error);
+        toast.error('Hubo un problema al seleccionar el tipo de servicio. Por favor intenta de nuevo.');
       }
     } catch (error) {
       console.error('Error updating service type:', error);
-      toast.error('Error al actualizar el tipo de servicio');
+      toast.error('Error al actualizar el tipo de servicio. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }

@@ -125,36 +125,43 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
     
     console.log(`Successfully updated user metadata:`, userData);
     
-    // 2. Create the role-specific record
+    // 2. Create the role-specific record based on the selected role
     if (role === 'pet_owner') {
       console.log(`Creating pet_owner record for user ${userId}`);
+      const params = { owner_id: userId };
+      console.log("RPC params:", params);
       
-      // Turn off RLS temporarily for this operation by using rpc
-      const { error: ownerError } = await supabase.rpc('create_pet_owner', {
-        owner_id: userId
-      } as any) as any;
+      const { error: ownerError } = await supabase.rpc(
+        'create_pet_owner',
+        params as any
+      ) as any;
         
       if (ownerError) {
         console.error(`Error inserting into pet_owners:`, ownerError);
         throw ownerError;
       }
-    }
-    
-    // For veterinarians, we create a service_providers record
-    else if (role === 'veterinarian') {
-      console.log(`Creating service_providers record for user ${userId}`);
       
-      // Turn off RLS temporarily for this operation by using rpc
-      const { error: providerError } = await supabase.rpc('create_service_provider', {
-        provider_id: userId
-      } as any) as any;
+      console.log(`Successfully created pet_owner record`);
+    }
+    else if (role === 'veterinarian') {
+      console.log(`Creating service_provider record for user ${userId}`);
+      const params = { provider_id: userId };
+      console.log("RPC params:", params);
+      
+      const { error: providerError } = await supabase.rpc(
+        'create_service_provider',
+        params as any
+      ) as any;
         
       if (providerError) {
         console.error(`Error inserting into service_providers:`, providerError);
         throw providerError;
       }
+      
+      console.log(`Successfully created service_provider record`);
     }
     
+    // Return the updated user data
     return {
       data: userData.user ? {
         id: userData.user.id,
@@ -209,56 +216,36 @@ export const updateUserServiceType = async ({
     
     console.log(`Successfully updated user metadata:`, userData);
     
-    // 2. First, check if service_provider record exists
-    const { data: existingProvider, error: checkError } = await supabase
-      .from('service_providers')
-      .select('*')
-      .eq('id', userId)
-      .single();
-      
-    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found" error
-      console.error(`Error checking service_providers:`, checkError);
-      throw checkError;
-    }
-    
-    // If service_provider record doesn't exist, create it
-    if (!existingProvider) {
-      console.log(`No service provider record found, creating one for ${userId}`);
-      
-      // Turn off RLS temporarily for this operation by using rpc
-      const { error: providerError } = await supabase.rpc('create_service_provider', {
-        provider_id: userId
-      } as any) as any;
-      
-      if (providerError) {
-        console.error(`Error creating service_providers record:`, providerError);
-        throw providerError;
-      }
-      
-      console.log(`Successfully created service_providers record`);
-    }
-    
-    // 3. Update the provider_type in the service_providers table
-    const { error: providerError } = await supabase.rpc('update_provider_type', {
+    // 2. Update the provider_type in the service_providers table
+    console.log(`Updating service_provider type to ${serviceType} for user ${userId}`);
+    const updateParams = {
       provider_id: userId,
       provider_type_val: serviceType
-    } as any) as any;
+    };
+    console.log("RPC update params:", updateParams);
+    
+    const { error: providerError } = await supabase.rpc(
+      'update_provider_type',
+      updateParams as any
+    ) as any;
       
     if (providerError) {
       console.error(`Error updating service_providers:`, providerError);
       throw providerError;
     }
     
-    console.log(`Successfully updated service_providers`);
+    console.log(`Successfully updated service_providers type`);
     
-    // 4. Create the specific service type record
+    // 3. Create the specific service type record
     if (serviceType === 'veterinarian') {
       console.log(`Creating veterinarians record for user ${userId}`);
+      const vetParams = { vet_id: userId };
+      console.log("Veterinarian RPC params:", vetParams);
       
-      // Turn off RLS temporarily for this operation by using rpc
-      const { error: vetError } = await supabase.rpc('create_veterinarian', {
-        vet_id: userId
-      } as any) as any;
+      const { error: vetError } = await supabase.rpc(
+        'create_veterinarian',
+        vetParams as any
+      ) as any;
         
       if (vetError) {
         console.error(`Error inserting into veterinarians:`, vetError);
@@ -269,11 +256,13 @@ export const updateUserServiceType = async ({
     }
     else if (serviceType === 'grooming') {
       console.log(`Creating pet_grooming record for user ${userId}`);
+      const groomingParams = { groomer_id: userId };
+      console.log("Grooming RPC params:", groomingParams);
       
-      // Turn off RLS temporarily for this operation by using rpc
-      const { error: groomingError } = await supabase.rpc('create_pet_grooming', {
-        groomer_id: userId
-      } as any) as any;
+      const { error: groomingError } = await supabase.rpc(
+        'create_pet_grooming',
+        groomingParams as any
+      ) as any;
         
       if (groomingError) {
         console.error(`Error inserting into pet_grooming:`, groomingError);

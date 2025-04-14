@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/ui/atoms/button';
-import { ArrowLeft, Users, Briefcase } from 'lucide-react';
+import { Users, Briefcase } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
 import { useNavigate } from 'react-router-dom';
 import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
@@ -21,11 +20,25 @@ const PostSignupRoleScreen: React.FC = () => {
   const brandColor = "#79d0b8"; // Teal color for the brand
   const accentColor = "#FF8A65"; // Coral accent for warmth
   
+  useEffect(() => {
+    // Check if user exists and has necessary data
+    if (!user || !user.id) {
+      console.error("Missing user data in PostSignupRoleScreen:", user);
+      // Keep the user on this page, but show a warning
+      toast.warning('Información de usuario incompleta. Por favor, inicia sesión nuevamente si el problema persiste.');
+    }
+  }, [user]);
+  
   // Handle role selection and database update with improved error handling
   const handleContinue = async () => {
-    if (!selectedRole || !user) {
-      console.error('Missing required data:', { selectedRole, userId: user?.id });
-      toast.error('Información incompleta para continuar');
+    if (!selectedRole) {
+      toast.error('Por favor, selecciona un rol para continuar');
+      return;
+    }
+    
+    if (!user || !user.id) {
+      console.error('Missing user data:', { user });
+      toast.error('Información de usuario no disponible. Por favor, inicia sesión de nuevo.');
       return;
     }
     
@@ -41,9 +54,10 @@ const PostSignupRoleScreen: React.FC = () => {
       }));
       
       if (updateUserRole.fulfilled.match(resultAction)) {
+        console.log('Role selection successful:', resultAction.payload);
         toast.success('Rol seleccionado con éxito');
         
-        // If veterinarian (service provider), proceed to service type selection
+        // If service provider, proceed to service type selection
         if (selectedRole === USER_ROLES.VETERINARIAN) {
           navigate('/post-signup-service-type');
         } else {
@@ -51,12 +65,12 @@ const PostSignupRoleScreen: React.FC = () => {
           navigate('/owner');
         }
       } else {
-        console.error('Operation failed:', resultAction);
-        toast.error('Hubo un problema al seleccionar el rol');
+        console.error('Role selection failed:', resultAction.error);
+        toast.error('Hubo un problema al seleccionar el rol. Por favor intenta de nuevo.');
       }
     } catch (error) {
-      console.error('Error updating role:', error);
-      toast.error('Error al actualizar el rol');
+      console.error('Error in role selection:', error);
+      toast.error('Error al actualizar el rol. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
