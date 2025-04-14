@@ -78,7 +78,9 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_pet_owner', { owner_id: ownerId }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
+    return await supabase.rpc<RpcSuccessResponse, CreatePetOwnerParams>('create_pet_owner', { 
+      owner_id: ownerId 
+    });
   },
   
   async createServiceProvider(providerId: string) {
@@ -87,7 +89,9 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_service_provider', { provider_id: providerId }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
+    return await supabase.rpc<RpcSuccessResponse, CreateServiceProviderParams>('create_service_provider', { 
+      provider_id: providerId 
+    });
   },
   
   async createVeterinarian(vetId: string) {
@@ -96,7 +100,9 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_veterinarian', { vet_id: vetId }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
+    return await supabase.rpc<RpcSuccessResponse, CreateVeterinarianParams>('create_veterinarian', { 
+      vet_id: vetId 
+    });
   },
   
   async createPetGrooming(groomerId: string) {
@@ -105,7 +111,9 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('create_pet_grooming', { groomer_id: groomerId }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
+    return await supabase.rpc<RpcSuccessResponse, CreatePetGroomingParams>('create_pet_grooming', { 
+      groomer_id: groomerId 
+    });
   },
   
   async updateProviderType(providerId: string, providerType: string) {
@@ -114,10 +122,10 @@ export const supabaseService = {
       return { data: null, error: new Error('Supabase not configured') };
     }
     
-    return await supabase.rpc('update_provider_type', { 
+    return await supabase.rpc<RpcSuccessResponse, UpdateProviderTypeParams>('update_provider_type', { 
       provider_id: providerId, 
       provider_type_val: providerType 
-    }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
+    });
   },
   
   // Auth methods 
