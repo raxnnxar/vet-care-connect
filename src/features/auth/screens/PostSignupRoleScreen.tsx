@@ -7,7 +7,7 @@ import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { AppDispatch } from '@/state/store';
-import { updateUserRole } from '../store/authThunks';
+import { assignUserRole } from '../store/authThunks';
 
 const PostSignupRoleScreen: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRoleType | null>(null);
@@ -37,40 +37,36 @@ const PostSignupRoleScreen: React.FC = () => {
     }
     
     if (!user || !user.id) {
-      console.error('Missing user data:', { user });
-      toast.error('Información de usuario no disponible. Por favor, inicia sesión de nuevo.');
+      console.error("Missing user data:", user);
+      toast.error('No se encontró información del usuario. Por favor inicie sesión nuevamente.');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      console.log('Starting updateUserRole with:', { userId: user.id, role: selectedRole });
-      
-      // Update the user's role in the database
-      const resultAction = await dispatch(updateUserRole({
+      // Dispatch the new assignUserRole action
+      const resultAction = await dispatch(assignUserRole({
         userId: user.id,
-        role: selectedRole
+        role: selectedRole === USER_ROLES.PET_OWNER ? 'pet_owner' : 'service_provider'
       }));
       
-      if (updateUserRole.fulfilled.match(resultAction)) {
-        console.log('Role selection successful:', resultAction.payload);
+      if (assignUserRole.fulfilled.match(resultAction)) {
         toast.success('Rol seleccionado con éxito');
         
-        // If service provider, proceed to service type selection
-        if (selectedRole === USER_ROLES.VETERINARIAN) {
-          navigate('/post-signup-service-type');
-        } else {
-          // If pet owner, navigate to the owner dashboard
+        // Navigate based on role
+        if (selectedRole === USER_ROLES.PET_OWNER) {
           navigate('/owner');
+        } else {
+          navigate('/post-signup-service-type');
         }
       } else {
-        console.error('Role selection failed:', resultAction.error);
+        console.error("Role assignment failed:", resultAction.error);
         toast.error('Hubo un problema al seleccionar el rol. Por favor intenta de nuevo.');
       }
     } catch (error) {
-      console.error('Error in role selection:', error);
-      toast.error('Error al actualizar el rol. Por favor intenta de nuevo.');
+      console.error('Error assigning role:', error);
+      toast.error('Error al asignar el rol. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
