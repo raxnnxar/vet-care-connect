@@ -5,12 +5,16 @@ interface VettLogoProps {
   className?: string;
   color?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  width?: number;  // Add width prop
+  height?: number; // Add height prop
 }
 
 export const VettLogo: React.FC<VettLogoProps> = ({ 
   className = "", 
   color = "#FFFFFF",
-  size = "lg" 
+  size = "lg",
+  width,   // Include in destructuring
+  height   // Include in destructuring
 }) => {
   const sizeClasses = {
     sm: "text-3xl",
@@ -34,7 +38,9 @@ export const VettLogo: React.FC<VettLogoProps> = ({
         <img 
           src="/lovable-uploads/053f0f17-f20a-466e-b7fe-5f6b4edbd41b.png" 
           alt="Vett Logo" 
-          className={`${iconSizes[size]}`}
+          className={`${width ? '' : iconSizes[size]}`} // Use custom width if provided
+          width={width}   // Add width prop
+          height={height} // Add height prop
           style={{
             filter: color === "#FFFFFF" ? "brightness(0) invert(1)" : "none",
             transform: "translateY(-1px)" // Fine-tune vertical alignment with text
