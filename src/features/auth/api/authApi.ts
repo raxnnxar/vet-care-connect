@@ -1,3 +1,4 @@
+
 /**
  * Authentication API service
  * 
@@ -126,7 +127,7 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
       // Turn off RLS temporarily for this operation by using rpc
       const { data: ownerData, error: ownerError } = await supabase.rpc('create_pet_owner', {
         owner_id: userId
-      });
+      } as any);
         
       if (ownerError) {
         console.error(`Error inserting into pet_owners:`, ownerError);
@@ -143,7 +144,7 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
       // Turn off RLS temporarily for this operation by using rpc
       const { data: providerData, error: providerError } = await supabase.rpc('create_service_provider', {
         provider_id: userId
-      });
+      } as any);
         
       if (providerError) {
         console.error(`Error inserting into service_providers:`, providerError);
@@ -220,7 +221,7 @@ export const updateUserServiceType = async ({
       // Turn off RLS temporarily for this operation by using rpc
       const { data: providerData, error: providerError } = await supabase.rpc('create_service_provider', {
         provider_id: userId
-      });
+      } as any);
       
       if (providerError) {
         console.error(`Error creating service_providers record:`, providerError);
@@ -234,7 +235,7 @@ export const updateUserServiceType = async ({
     const { data: providerData, error: providerError } = await supabase.rpc('update_provider_type', {
       provider_id: userId,
       provider_type_val: serviceType
-    });
+    } as any);
       
     if (providerError) {
       console.error(`Error updating service_providers:`, providerError);
@@ -250,7 +251,7 @@ export const updateUserServiceType = async ({
       // Turn off RLS temporarily for this operation by using rpc
       const { data: vetData, error: vetError } = await supabase.rpc('create_veterinarian', {
         vet_id: userId
-      });
+      } as any);
         
       if (vetError) {
         console.error(`Error inserting into veterinarians:`, vetError);
@@ -265,7 +266,7 @@ export const updateUserServiceType = async ({
       // Turn off RLS temporarily for this operation by using rpc
       const { data: groomingData, error: groomingError } = await supabase.rpc('create_pet_grooming', {
         groomer_id: userId
-      });
+      } as any);
         
       if (groomingError) {
         console.error(`Error inserting into pet_grooming:`, groomingError);

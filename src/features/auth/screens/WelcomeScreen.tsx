@@ -27,7 +27,6 @@ const WelcomeScreen: React.FC = () => {
         {/* Logo with Vett text next to it */}
         <div className="animate-fade-in mb-16 flex items-center" style={{ animationDelay: "200ms" }}>
           <VettLogo size="2xl" />
-          <h1 className="text-white text-4xl font-bold ml-3 tracking-wide">Vett</h1>
         </div>
         
         {/* Tagline content */}
