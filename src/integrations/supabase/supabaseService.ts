@@ -15,36 +15,14 @@ interface RpcParams {
  */
 export const supabaseService = {
   // Basic methods for user profile management
-  async getUserProfile(userId: string) {
+  async getUserProfile() {
     if (!isSupabaseConfigured) {
       console.warn('Supabase not configured: getUserProfile');
-      return { data: null, error: new Error('Supabase not configured') };
+      return null;
     }
     
-    // First check if user is a pet owner
-    let { data: petOwnerData, error: petOwnerError } = await supabase
-      .from('pet_owners')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (petOwnerData) {
-      return { data: { ...petOwnerData, role: 'pet_owner' }, error: null };
-    }
-    
-    // If not a pet owner, check if user is a service provider
-    let { data: serviceProviderData, error: serviceProviderError } = await supabase
-      .from('service_providers')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (serviceProviderData) {
-      return { data: { ...serviceProviderData, role: 'service_provider' }, error: null };
-    }
-    
-    // User not found in either table
-    return { data: null, error: new Error('User profile not found') };
+    // Implementation will be added when Supabase is configured
+    return null;
   },
   
   async updateUserProfile() {
@@ -60,31 +38,11 @@ export const supabaseService = {
   async getCurrentUserWithProfile() {
     if (!isSupabaseConfigured) {
       console.warn('Supabase not configured: getCurrentUserWithProfile');
-      return { data: null, error: new Error('Supabase not configured') };
+      return null;
     }
     
-    // Get current user
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    
-    if (userError || !userData.user) {
-      return { data: null, error: userError || new Error('No user logged in') };
-    }
-    
-    // Get user profile with role
-    const { data: profileData, error: profileError } = await this.getUserProfile(userData.user.id);
-    
-    if (profileError) {
-      return { data: null, error: profileError };
-    }
-    
-    // Return combined user and profile data
-    return { 
-      data: { 
-        user: userData.user, 
-        profile: profileData 
-      }, 
-      error: null 
-    };
+    // Implementation will be added when Supabase is configured
+    return null;
   },
   
   async uploadFile() {
@@ -97,17 +55,7 @@ export const supabaseService = {
     return null;
   },
   
-  getPublicUrl() {
-    if (!isSupabaseConfigured) {
-      console.warn('Supabase not configured: getPublicUrl');
-      return '';
-    }
-    
-    // Implementation will be added when Supabase is configured
-    return '';
-  },
-  
-  // Database helper functions that bypass RLS with stored procedures
+  // User role management methods
   async createPetOwner(ownerId: string) {
     if (!isSupabaseConfigured) {
       console.warn('Supabase not configured: createPetOwner');
@@ -166,51 +114,7 @@ export const supabaseService = {
     return await supabase.rpc('update_provider_type', params);
   },
   
-  async createUserWithRole(userId: string, role: 'pet_owner' | 'service_provider', providerType?: string) {
-    if (!isSupabaseConfigured) {
-      console.warn('Supabase not configured: createUserWithRole');
-      return { data: null, error: new Error('Supabase not configured') };
-    }
-    
-    try {
-      let result;
-      
-      if (role === 'pet_owner') {
-        // Create pet owner
-        const params: RpcParams = { owner_id: userId };
-        result = await supabase.rpc('create_pet_owner', params);
-      } else if (role === 'service_provider') {
-        // Create service provider
-        const params: RpcParams = { provider_id: userId };
-        result = await supabase.rpc('create_service_provider', params);
-        
-        // If provider type is specified, update it
-        if (providerType && (providerType === 'veterinarian' || providerType === 'pet_grooming')) {
-          const typeParams: RpcParams = { 
-            provider_id: userId, 
-            provider_type_val: providerType 
-          };
-          await supabase.rpc('update_provider_type', typeParams);
-          
-          // Create specific provider type record
-          if (providerType === 'veterinarian') {
-            const vetParams: RpcParams = { vet_id: userId };
-            await supabase.rpc('create_veterinarian', vetParams);
-          } else if (providerType === 'pet_grooming') {
-            const groomerParams: RpcParams = { groomer_id: userId };
-            await supabase.rpc('create_pet_grooming', groomerParams);
-          }
-        }
-      }
-      
-      return result || { data: null, error: new Error('Invalid role specified') };
-    } catch (error) {
-      console.error('Error creating user with role:', error);
-      return { data: null, error };
-    }
-  },
-  
-  // Auth methods 
+  // Auth methods
   auth: {
     async signInWithPassword(credentials) {
       if (!isSupabaseConfigured) {
@@ -220,42 +124,45 @@ export const supabaseService = {
       return await supabase.auth.signInWithPassword(credentials);
     },
     
-    async signUp(signUpData, userRole, providerType) {
+    async signUp(signUpData, role = null, providerType = null) {
       if (!isSupabaseConfigured) {
         console.warn('Supabase not configured: signUp');
         return { data: null, error: new Error('Supabase not configured') };
       }
       
-      try {
-        // First create the auth user
-        const { data, error } = await supabase.auth.signUp(signUpData);
+      // First create the user account
+      const { data, error } = await supabase.auth.signUp(signUpData);
+      
+      if (error || !data.user) {
+        return { data, error };
+      }
+      
+      // If role is specified, create the appropriate role record
+      if (role === 'pet_owner') {
+        await supabaseService.createPetOwner(data.user.id);
+      } else if (role === 'service_provider') {
+        await supabaseService.createServiceProvider(data.user.id);
         
-        if (error) throw error;
-        
-        if (data?.user) {
-          // Then create the appropriate role-based profile
-          const roleResult = await supabaseService.createUserWithRole(
-            data.user.id, 
-            userRole, 
-            providerType
-          );
-          
-          if (roleResult.error) throw roleResult.error;
-          
-          return { data: { auth: data, profile: roleResult.data }, error: null };
+        // If provider type is specified, create the specific provider type
+        if (providerType === 'veterinarian') {
+          await supabaseService.createVeterinarian(data.user.id);
+        } else if (providerType === 'grooming') {
+          await supabaseService.createPetGrooming(data.user.id);
         }
         
-        return { data, error: null };
-      } catch (error) {
-        console.error('Error during sign up:', error);
-        return { data: null, error };
+        // Update provider type in the database
+        if (providerType) {
+          await supabaseService.updateProviderType(data.user.id, providerType);
+        }
       }
+      
+      return { data, error };
     },
     
     async signOut() {
       if (!isSupabaseConfigured) {
         console.warn('Supabase not configured: signOut');
-        return { data: null, error: null };
+        return { error: new Error('Supabase not configured') };
       }
       return await supabase.auth.signOut();
     },
@@ -279,13 +186,9 @@ export const supabaseService = {
     onAuthStateChange(callback) {
       if (!isSupabaseConfigured) {
         console.warn('Supabase not configured: onAuthStateChange');
-        // Return a dummy subscription with unsubscribe method
-        return { data: { subscription: { unsubscribe: () => {} } } };
+        return { data: null, unsubscribe: () => {} };
       }
       return supabase.auth.onAuthStateChange(callback);
     }
   }
 };
-
-// Export the Supabase client
-export { supabase };
