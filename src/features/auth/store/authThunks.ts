@@ -118,19 +118,34 @@ export const assignUserRole = createAsyncThunk(
         
         if (error) {
           console.error('Error creating service provider with RPC, trying direct insert:', error);
-          // Try direct insertion as fallback with a default provider_type
-          const insertResult = await supabase
+          
+          // Try with 'veterinarian' first
+          let insertResult = await supabase
             .from('service_providers')
             .insert({ 
               id: userId,
-              provider_type: 'pending' // Add a default provider_type to satisfy the not-null constraint
+              provider_type: 'veterinarian' 
             });
           
-          console.log('Direct insert result:', insertResult);
+          console.log('Direct insert result with veterinarian:', insertResult);
           
+          // If that fails, try with 'grooming'
           if (insertResult.error) {
-            console.error('Direct insert failed:', insertResult.error);
-            return rejectWithValue(insertResult.error.message);
+            console.error('Direct insert with veterinarian failed, trying grooming:', insertResult.error);
+            
+            insertResult = await supabase
+              .from('service_providers')
+              .insert({ 
+                id: userId,
+                provider_type: 'grooming' 
+              });
+            
+            console.log('Direct insert result with grooming:', insertResult);
+            
+            if (insertResult.error) {
+              console.error('All direct insert attempts failed:', insertResult.error);
+              return rejectWithValue(insertResult.error.message);
+            }
           }
         }
         
