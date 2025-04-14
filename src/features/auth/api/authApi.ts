@@ -141,9 +141,9 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
       console.log(`Creating pet_owner record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: ownerData, error: ownerError } = await supabase.rpc<CreatePetOwnerParams, RpcSuccessResponse>('create_pet_owner', {
+      const { data: ownerData, error: ownerError } = await supabase.rpc('create_pet_owner', {
         owner_id: userId
-      });
+      }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
         
       if (ownerError) {
         console.error(`Error inserting into pet_owners:`, ownerError);
@@ -158,9 +158,9 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: U
       console.log(`Creating service_providers record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: providerData, error: providerError } = await supabase.rpc<CreateServiceProviderParams, RpcSuccessResponse>('create_service_provider', {
+      const { data: providerData, error: providerError } = await supabase.rpc('create_service_provider', {
         provider_id: userId
-      });
+      }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
         
       if (providerError) {
         console.error(`Error inserting into service_providers:`, providerError);
@@ -241,9 +241,9 @@ export const updateUserServiceType = async ({
       console.log(`No service provider record found, creating one for ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: providerData, error: providerError } = await supabase.rpc<CreateServiceProviderParams, RpcSuccessResponse>('create_service_provider', {
+      const { data: providerData, error: providerError } = await supabase.rpc('create_service_provider', {
         provider_id: userId
-      });
+      }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
       
       if (providerError) {
         console.error(`Error creating service_providers record:`, providerError);
@@ -254,10 +254,10 @@ export const updateUserServiceType = async ({
     }
     
     // 3. Update the provider_type in the service_providers table
-    const { data: providerData, error: providerError } = await supabase.rpc<UpdateProviderTypeParams, RpcSuccessResponse>('update_provider_type', {
+    const { data: providerData, error: providerError } = await supabase.rpc('update_provider_type', {
       provider_id: userId,
       provider_type_val: serviceType
-    });
+    }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
       
     if (providerError) {
       console.error(`Error updating service_providers:`, providerError);
@@ -271,9 +271,9 @@ export const updateUserServiceType = async ({
       console.log(`Creating veterinarians record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: vetData, error: vetError } = await supabase.rpc<CreateVeterinarianParams, RpcSuccessResponse>('create_veterinarian', {
+      const { data: vetData, error: vetError } = await supabase.rpc('create_veterinarian', {
         vet_id: userId
-      });
+      }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
         
       if (vetError) {
         console.error(`Error inserting into veterinarians:`, vetError);
@@ -286,9 +286,9 @@ export const updateUserServiceType = async ({
       console.log(`Creating pet_grooming record for user ${userId}`);
       
       // Turn off RLS temporarily for this operation by using rpc
-      const { data: groomingData, error: groomingError } = await supabase.rpc<CreatePetGroomingParams, RpcSuccessResponse>('create_pet_grooming', {
+      const { data: groomingData, error: groomingError } = await supabase.rpc('create_pet_grooming', {
         groomer_id: userId
-      });
+      }) as unknown as { data: RpcSuccessResponse | null, error: Error | null };
         
       if (groomingError) {
         console.error(`Error inserting into pet_grooming:`, groomingError);

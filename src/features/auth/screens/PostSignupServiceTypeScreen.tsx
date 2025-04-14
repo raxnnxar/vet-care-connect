@@ -21,9 +21,15 @@ const PostSignupServiceTypeScreen: React.FC = () => {
   const brandColor = "#79d0b8"; // Teal color for the brand
   const accentColor = "#FF8A65"; // Coral accent for warmth
   
-  // Log user data for debugging on component mount
+  // Enhanced logging for debugging user data on component mount
   useEffect(() => {
-    console.log("PostSignupServiceTypeScreen - Current auth state:", { user, isLoading: authLoading, error });
+    console.log("PostSignupServiceTypeScreen - Current auth state:", { 
+      user, 
+      userId: user?.id, 
+      isLoading: authLoading, 
+      error,
+      state: JSON.stringify(user)
+    });
   }, [user, authLoading, error]);
   
   const handleBackClick = () => {
@@ -36,9 +42,16 @@ const PostSignupServiceTypeScreen: React.FC = () => {
       return;
     }
     
-    if (!user || !user.id) {
-      console.error("Missing required data:", { selectedServiceType, userId: user?.id });
-      toast.error('Datos incompletos para actualizar el tipo de servicio');
+    // Additional validation with better error messages
+    if (!user) {
+      console.error("Missing user data");
+      toast.error('No se encontró información del usuario. Por favor inicie sesión nuevamente.');
+      return;
+    }
+    
+    if (!user.id) {
+      console.error("Missing user ID:", user);
+      toast.error('No se encontró ID de usuario. Por favor inicie sesión nuevamente.');
       return;
     }
     
@@ -47,7 +60,8 @@ const PostSignupServiceTypeScreen: React.FC = () => {
     try {
       console.log("Dispatching updateUserServiceType with:", { 
         userId: user.id, 
-        serviceType: selectedServiceType 
+        serviceType: selectedServiceType,
+        completeUser: JSON.stringify(user)
       });
       
       // Update the user's service type in the database
@@ -61,8 +75,9 @@ const PostSignupServiceTypeScreen: React.FC = () => {
         toast.success('Tipo de servicio seleccionado con éxito');
         navigate('/vet'); // Navigate to the vet dashboard
       } else if (updateUserServiceType.rejected.match(resultAction)) {
-        console.error("Service type update failed:", resultAction.payload);
-        toast.error(`Hubo un problema al seleccionar el tipo de servicio: ${resultAction.payload}`);
+        console.error("Service type update failed:", resultAction);
+        const errorMessage = resultAction.payload || 'Hubo un problema al seleccionar el tipo de servicio';
+        toast.error(`Error: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Error updating service type:', error);
@@ -71,9 +86,6 @@ const PostSignupServiceTypeScreen: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  // Let's debug user data availability
-  console.log("Current auth state:", { user, isLoading, error });
 
   return (
     <div className="relative flex flex-col h-screen overflow-hidden">
@@ -204,14 +216,14 @@ const PostSignupServiceTypeScreen: React.FC = () => {
           style={{ 
             backgroundColor: selectedServiceType ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
             color: selectedServiceType ? '#1F2937' : 'rgba(0, 0, 0, 0.6)',
-            opacity: selectedServiceType ? 1 : 0.85,
+            opacity: selectedServiceType && !isLoading ? 1 : 0.85,
             boxShadow: selectedServiceType ? "0 10px 25px -5px rgba(0,0,0,0.12)" : "none",
             fontWeight: selectedServiceType ? 600 : 500,
           }}
         >
           {isLoading ? (
-            <span className="flex items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -224,6 +236,18 @@ const PostSignupServiceTypeScreen: React.FC = () => {
           )}
         </Button>
       </div>
+      
+      {/* Debug info in development mode */}
+      {process.env.NODE_ENV === 'development' && user && (
+        <div className="fixed bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 z-50">
+          <details>
+            <summary className="cursor-pointer">Debug Info</summary>
+            <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
+              {JSON.stringify({ userId: user.id, role: user.role, serviceType: user.serviceType }, null, 2)}
+            </pre>
+          </details>
+        </div>
+      )}
     </div>
   );
 };
