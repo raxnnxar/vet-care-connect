@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
+import VettLogo from '@/ui/atoms/VettLogo';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -23,13 +24,9 @@ const WelcomeScreen: React.FC = () => {
       
       {/* Content area with proper z-index */}
       <div className="flex flex-col items-center justify-center flex-1 z-10 px-6">
-        {/* Logo */}
+        {/* Logo with Vett text next to it */}
         <div className="animate-fade-in mb-16" style={{ animationDelay: "200ms" }}>
-          <img 
-            src="/lovable-uploads/053f0f17-f20a-466e-b7fe-5f6b4edbd41b.png" 
-            alt="Vett Logo" 
-            className="w-64 h-64"
-          />
+          <VettLogo size="2xl" />
         </div>
         
         {/* Tagline content */}
@@ -48,7 +45,6 @@ const WelcomeScreen: React.FC = () => {
             onClick={handleGetStarted}
             className="w-full py-6 bg-white text-gray-800 hover:bg-gray-100 rounded-full text-xl font-semibold flex items-center justify-center"
           >
-            <span className="mr-2">⦿</span>
             Empezar
           </Button>
           

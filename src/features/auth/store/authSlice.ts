@@ -62,9 +62,22 @@ const authSlice = createSlice({
       .addCase(updateUserRole.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      })
+      
+      // Handle updateUserServiceType async thunk
+      .addCase(updateUserServiceType.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUserServiceType.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(updateUserServiceType.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       });
-
-    // You might want to do the same for updateUserServiceType if needed
   }
 });
 

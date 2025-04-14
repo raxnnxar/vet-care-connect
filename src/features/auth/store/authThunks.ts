@@ -95,28 +95,32 @@ export const updateUserRole = createAsyncThunk(
 /**
  * Update user's service type
  */
-export const updateUserServiceType = ({ 
-  userId, 
-  serviceType 
-}: { 
-  userId: string; 
-  serviceType: ServiceTypeType 
-}) => async (dispatch: AppDispatch) => {
-  dispatch(authActions.authRequestStarted());
-  
-  try {
-    const { data, error } = await apiUpdateUserServiceType({ userId, serviceType });
-    
-    if (error) throw new Error(error.message || 'Update service type failed');
-    if (!data) throw new Error('Update service type returned no user data');
-    
-    dispatch(authActions.profileUpdateSuccess(data));
-    return data;
-  } catch (err) {
-    dispatch(authActions.authFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
-    return null;
+export const updateUserServiceType = createAsyncThunk(
+  'auth/updateUserServiceType',
+  async ({ userId, serviceType }: { userId: string; serviceType: ServiceTypeType }, { rejectWithValue }) => {
+    try {
+      console.log(`Calling apiUpdateUserServiceType with:`, { userId, serviceType });
+      
+      const { data, error } = await apiUpdateUserServiceType({ userId, serviceType });
+      
+      if (error) {
+        console.error(`Error in apiUpdateUserServiceType:`, error);
+        return rejectWithValue(error.message || 'Update service type failed');
+      }
+      
+      if (!data) {
+        console.error(`No data returned from apiUpdateUserServiceType`);
+        return rejectWithValue('Update service type returned no user data');
+      }
+      
+      console.log(`Successfully updated service type:`, data);
+      return data;
+    } catch (err) {
+      console.error(`Error in updateUserServiceType thunk:`, err);
+      return rejectWithValue(err instanceof Error ? err.message : 'An unknown error occurred');
+    }
   }
-};
+);
 
 /**
  * Logout the current user

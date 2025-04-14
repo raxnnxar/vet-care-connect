@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
-import { AppDispatch } from '@/state/store';
+import { AppDispatch, RootState } from '@/state/store';
 import { updateUserServiceType } from '../store/authThunks';
 import { SERVICE_TYPES, ServiceTypeType } from './ServiceTypeSelectionScreen';
 
@@ -14,7 +14,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceTypeType | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: any) => state.auth);
+  const { user, isLoading, error } = useSelector((state: RootState) => state.auth);
   
   // Define color variables to match the role selection screen
   const brandColor = "#79d0b8"; // Teal color for the brand
@@ -25,20 +25,31 @@ const PostSignupServiceTypeScreen: React.FC = () => {
   };
   
   const handleContinue = async () => {
-    if (!selectedServiceType || !user) return;
+    if (!selectedServiceType || !user) {
+      console.error("Missing required data:", { selectedServiceType, userId: user?.id });
+      toast.error('Datos incompletos para actualizar el tipo de servicio');
+      return;
+    }
     
     try {
+      console.log("Dispatching updateUserServiceType with:", { 
+        userId: user.id, 
+        serviceType: selectedServiceType 
+      });
+      
       // Update the user's service type in the database
-      const result = await dispatch(updateUserServiceType({
+      const resultAction = await dispatch(updateUserServiceType({
         userId: user.id,
         serviceType: selectedServiceType
       }));
       
-      if (result) {
+      if (updateUserServiceType.fulfilled.match(resultAction)) {
+        console.log("Service type updated successfully:", resultAction.payload);
         toast.success('Tipo de servicio seleccionado con éxito');
         navigate('/vet'); // Navigate to the vet dashboard
-      } else {
-        toast.error('Hubo un problema al seleccionar el tipo de servicio');
+      } else if (updateUserServiceType.rejected.match(resultAction)) {
+        console.error("Service type update failed:", resultAction.payload);
+        toast.error(`Hubo un problema al seleccionar el tipo de servicio: ${resultAction.payload}`);
       }
     } catch (error) {
       console.error('Error updating service type:', error);
