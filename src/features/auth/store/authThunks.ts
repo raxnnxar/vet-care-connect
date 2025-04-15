@@ -1,3 +1,4 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { User } from '../types';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +14,7 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(authActions.authRequestStarted());
-      const { data, error } = await supabaseService.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -50,7 +51,7 @@ export const signupUser = createAsyncThunk(
   async ({ email, password, name }: { email: string; password: string; name: string }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(authActions.authRequestStarted());
-      const { data, error } = await supabaseService.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -91,7 +92,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       dispatch(authActions.authRequestStarted());
-      const { error } = await supabaseService.auth.signOut();
+      const { error } = await supabase.auth.signOut();
 
       if (error) {
         dispatch(authActions.authFailed(error.message));
@@ -113,7 +114,7 @@ export const getCurrentUser = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       dispatch(authActions.authRequestStarted());
-      const { data, error } = await supabaseService.auth.getUser();
+      const { data, error } = await supabase.auth.getUser();
 
       if (error) {
         dispatch(authActions.authFailed(error.message));
