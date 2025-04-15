@@ -8,6 +8,7 @@ import VetNavigator from './VetNavigator';
 import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
 import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
 import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
+import ProfileSetupScreen from '../features/auth/screens/ProfileSetupScreen';
 
 const AppNavigator = () => {
   const { user } = useSelector((state: any) => state.auth);
@@ -20,7 +21,7 @@ const AppNavigator = () => {
       console.log('Current path:', location.pathname);
       
       // Handle post-signup flows separately from main navigation
-      if (location.pathname.includes('/post-signup-')) {
+      if (location.pathname.includes('/post-signup-') || location.pathname.includes('/profile-setup')) {
         return; // Let the Routes component handle these paths
       }
       
@@ -28,6 +29,13 @@ const AppNavigator = () => {
       if (!user.role) {
         console.log('User has no role, redirecting to role selection');
         navigate('/post-signup-role');
+        return;
+      }
+
+      // If user is a pet owner without a phone number, redirect to profile setup
+      if (user.role === USER_ROLES.PET_OWNER && !user.phone) {
+        console.log('Pet owner has no phone, redirecting to profile setup');
+        navigate('/profile-setup');
         return;
       }
 
@@ -57,6 +65,7 @@ const AppNavigator = () => {
       {/* Post-signup flow routes */}
       <Route path="/post-signup-role" element={<PostSignupRoleScreen />} />
       <Route path="/post-signup-service-type" element={<PostSignupServiceTypeScreen />} />
+      <Route path="/profile-setup" element={<ProfileSetupScreen />} />
 
       {/* Main navigators based on user role */}
       <Route path="/owner/*" element={<OwnerNavigator />} />

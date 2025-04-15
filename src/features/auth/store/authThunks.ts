@@ -1,8 +1,8 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { supabaseService } from '@/integrations/supabase/supabaseService';
+import { User } from '../types';
 import { supabase } from '@/integrations/supabase/client';
-import { authApi } from '../api/authApi';
+import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
+import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 import { authActions } from './authSlice';
 
 // Login thunk
@@ -179,6 +179,47 @@ export const updateProviderType = createAsyncThunk(
     } catch (error) {
       console.error('Error in updateProviderType:', error);
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
+    }
+  }
+);
+
+// Add the updateProfile function
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async ({ phone, profileImage }: { phone: string, profileImage?: string | null }, { rejectWithValue, getState }: any) => {
+    try {
+      const state = getState();
+      const user = state.auth.user;
+      
+      if (!user || !user.id) {
+        return rejectWithValue('No authenticated user found');
+      }
+      
+      // Update the user profile in Supabase (or your backend)
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ 
+          phone_number: phone,
+          // In a real app with proper storage setup, you would upload the image to storage
+          // and then save the URL. For now, we'll just update the phone number.
+        })
+        .eq('id', user.id)
+        .select();
+      
+      if (error) {
+        console.error('Error updating profile:', error);
+        return rejectWithValue(error.message);
+      }
+      
+      // Return the updated user data
+      return {
+        ...user,
+        phone,
+        // The real image URL would come from Supabase storage in a production app
+        profileImage: profileImage || user.profileImage
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
     }
   }
 );

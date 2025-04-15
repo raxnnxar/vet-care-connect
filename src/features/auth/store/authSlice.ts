@@ -1,6 +1,7 @@
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../types';
-import { assignUserRole, updateProviderType } from './authThunks';
+import { assignUserRole, updateProviderType, updateProfile } from './authThunks';
 import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
 import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 
@@ -49,6 +50,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Role assignment cases
       .addCase(assignUserRole.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -68,6 +70,7 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
       
+      // Provider type cases
       .addCase(updateProviderType.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -83,6 +86,27 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(updateProviderType.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      
+      // Profile update cases
+      .addCase(updateProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user = {
+            ...state.user,
+            phone: action.payload.phone,
+            profileImage: action.payload.profileImage
+          };
+        }
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });
