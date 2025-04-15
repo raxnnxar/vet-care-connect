@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Camera, Plus, Info, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Plus, Info, Loader2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/ui/atoms/button';
@@ -22,7 +22,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from '@/ui/molecules/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/molecules/tooltip';
@@ -184,31 +183,27 @@ const ProfileSetupScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 md:px-8">
-      <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-8">
-        <h1 className="text-2xl font-semibold text-center mb-8">Completa tu Perfil</h1>
+    <div className="min-h-screen bg-background py-6 px-4 md:px-6">
+      <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-6">
+        <h1 className="text-2xl font-semibold text-center mb-6">Completa tu Perfil</h1>
         
-        <div className="flex flex-col items-center mb-8">
-          <div 
-            className="relative mb-4 group cursor-pointer"
-            onClick={triggerFileInput}
-          >
-            <div className={`h-32 w-32 rounded-full overflow-hidden border-4 ${profileImage ? 'border-primary' : 'border-gray-200'} transition-all hover:border-primary`}>
-              <Avatar className="h-full w-full">
-                <AvatarImage src={profileImage || undefined} alt="Foto de perfil" className="object-cover" />
-                <AvatarFallback className="bg-primary/20 text-primary text-3xl">
-                  {user?.displayName ? getInitials(user.displayName) : 'U'}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative mb-4">
+            <Avatar className="h-28 w-28 border-4 border-primary/30">
+              <AvatarImage src={profileImage || undefined} alt="Foto de perfil" className="object-cover" />
+              <AvatarFallback className="bg-primary/20 text-primary text-3xl">
+                {user?.displayName ? getInitials(user.displayName) : 'U'}
+              </AvatarFallback>
+            </Avatar>
             
-            <div className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-3 shadow-md hover:bg-primary/90 transition-colors">
-              <Camera className="h-5 w-5" />
-            </div>
-            
-            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-full flex items-center justify-center transition-opacity">
-              <p className="text-white font-medium">Cambiar foto</p>
-            </div>
+            <button
+              type="button"
+              onClick={triggerFileInput}
+              className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-2 shadow-md hover:bg-primary/90 transition-colors"
+              aria-label="Cambiar foto de perfil"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
             
             <input 
               ref={fileInputRef}
@@ -230,7 +225,7 @@ const ProfileSetupScreen = () => {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="phone"
@@ -265,70 +260,10 @@ const ProfileSetupScreen = () => {
             />
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-base font-medium">Mis Mascotas</Label>
-                <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      type="button" 
-                      className="bg-accent1 hover:bg-accent1/90 text-white"
-                      size="default"
-                    >
-                      <Plus className="mr-1.5 h-5 w-5" />
-                      Agregar Mascota
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Agregar Nueva Mascota</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="petName">Nombre *</Label>
-                        <Input 
-                          id="petName"
-                          {...form.register('petName')}
-                          placeholder="Nombre de tu mascota"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="petSpecies">Especie *</Label>
-                        <Input 
-                          id="petSpecies"
-                          {...form.register('petSpecies')}
-                          placeholder="Ej: Perro, Gato, etc."
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="petBreed">Raza</Label>
-                        <Input 
-                          id="petBreed"
-                          {...form.register('petBreed')}
-                          placeholder="Opcional"
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button 
-                        type="button" 
-                        onClick={() => {
-                          const petData = {
-                            petName: form.getValues('petName'),
-                            petSpecies: form.getValues('petSpecies'),
-                            petBreed: form.getValues('petBreed'),
-                          };
-                          handleAddPet(petData);
-                        }}
-                      >
-                        Guardar
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
+              <h2 className="text-base font-medium mb-3">Mis Mascotas</h2>
 
-              {pets.length === 0 ? (
-                <div className="flex justify-center mt-4 mb-2">
+              <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
+                {pets.length === 0 ? (
                   <Button 
                     type="button"
                     variant="outline"
@@ -340,26 +275,86 @@ const ProfileSetupScreen = () => {
                       Agrega tu primera mascota
                     </span>
                   </Button>
-                </div>
-              ) : (
-                <ul className="space-y-3 mt-4">
-                  {pets.map((pet) => (
-                    <li key={pet.id} className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                      <div>
-                        <p className="font-medium">{pet.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {pet.species} {pet.breed ? `· ${pet.breed}` : ''}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                ) : (
+                  <div className="space-y-4">
+                    <ul className="space-y-3">
+                      {pets.map((pet) => (
+                        <li key={pet.id} className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                          <div>
+                            <p className="font-medium">{pet.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {pet.species} {pet.breed ? `· ${pet.breed}` : ''}
+                            </p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      className="border-dashed border-gray-300 flex h-auto py-4 px-4 items-center gap-2 w-full"
+                      onClick={() => setIsPetDialogOpen(true)}
+                    >
+                      <Plus className="h-5 w-5 text-accent1" />
+                      <span className="text-muted-foreground">
+                        Agregar otra mascota
+                      </span>
+                    </Button>
+                  </div>
+                )}
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Agregar Nueva Mascota</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="petName">Nombre *</Label>
+                      <Input 
+                        id="petName"
+                        {...form.register('petName')}
+                        placeholder="Nombre de tu mascota"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="petSpecies">Especie *</Label>
+                      <Input 
+                        id="petSpecies"
+                        {...form.register('petSpecies')}
+                        placeholder="Ej: Perro, Gato, etc."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="petBreed">Raza</Label>
+                      <Input 
+                        id="petBreed"
+                        {...form.register('petBreed')}
+                        placeholder="Opcional"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button 
+                      type="button" 
+                      onClick={() => {
+                        const petData = {
+                          petName: form.getValues('petName'),
+                          petSpecies: form.getValues('petSpecies'),
+                          petBreed: form.getValues('petBreed'),
+                        };
+                        handleAddPet(petData);
+                      }}
+                    >
+                      Guardar
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <Button 
               type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-base font-medium mt-6"
+              className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium mt-8"
               disabled={isSubmitting || isUploading}
             >
               {isSubmitting ? (
