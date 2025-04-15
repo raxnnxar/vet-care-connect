@@ -1,9 +1,12 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { User } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
 import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 import { authActions } from './authSlice';
+import { authApi } from '../api/authApi';
+import { supabaseService } from '@/integrations/supabase/supabaseService';
 
 // Login thunk
 export const loginUser = createAsyncThunk(
@@ -195,11 +198,11 @@ export const updateProfile = createAsyncThunk(
         return rejectWithValue('No authenticated user found');
       }
       
-      // Update the user profile in Supabase (or your backend)
+      // Update the user profile in Supabase
       const { data, error } = await supabase
         .from('profiles')
         .update({ 
-          phone_number: phone,
+          phone: phone, // Changed from phone_number to phone to match the profiles table schema
           // In a real app with proper storage setup, you would upload the image to storage
           // and then save the URL. For now, we'll just update the phone number.
         })
