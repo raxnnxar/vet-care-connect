@@ -106,16 +106,19 @@ export type Database = {
           address: string | null
           id: string
           phone_number: string | null
+          profile_picture_url: string | null
         }
         Insert: {
           address?: string | null
           id: string
           phone_number?: string | null
+          profile_picture_url?: string | null
         }
         Update: {
           address?: string | null
           id?: string
           phone_number?: string | null
+          profile_picture_url?: string | null
         }
         Relationships: [
           {

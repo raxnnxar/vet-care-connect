@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { User } from '../types';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,7 +5,7 @@ import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
 import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 import { authActions } from './authSlice';
 import { authApi } from '../api/authApi';
-import { supabaseService } from '@/integrations/supabase/supabaseService';
+import { profileService } from '../api/profileService';
 
 // Login thunk
 export const loginUser = createAsyncThunk(
@@ -198,27 +197,20 @@ export const updateProfile = createAsyncThunk(
         return rejectWithValue('No authenticated user found');
       }
       
-      // Update the user profile in Supabase
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ 
-          phone: phone, // Changed from phone_number to phone to match the profiles table schema
-          // In a real app with proper storage setup, you would upload the image to storage
-          // and then save the URL. For now, we'll just update the phone number.
-        })
-        .eq('id', user.id)
-        .select();
+      // Update the pet owner profile in Supabase using our profileService
+      const success = await profileService.updatePetOwnerProfile(user.id, {
+        phoneNumber: phone,
+        profilePictureUrl: profileImage
+      });
       
-      if (error) {
-        console.error('Error updating profile:', error);
-        return rejectWithValue(error.message);
+      if (!success) {
+        return rejectWithValue('Failed to update profile');
       }
       
       // Return the updated user data
       return {
         ...user,
         phone,
-        // The real image URL would come from Supabase storage in a production app
         profileImage: profileImage || user.profileImage
       };
     } catch (error: any) {
