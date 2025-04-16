@@ -4,6 +4,7 @@ import { petsActions } from './petsSlice';
 import { petsApi } from '../api/petsApi';
 import { CreatePetData, UpdatePetData, PetFilters } from '../types';
 import { QueryOptions } from '../../../core/api/apiClient';
+import { toast } from 'sonner';
 
 /**
  * Fetch all pets with optional filtering
@@ -53,12 +54,23 @@ export const addPet = (petData: CreatePetData) => async (dispatch: AppDispatch) 
   try {
     const { data, error } = await petsApi.createPet(petData);
     
-    if (error) throw new Error(error.message || 'Failed to add pet');
+    if (error) {
+      console.error('Error adding pet:', error);
+      throw new Error(error.message || 'Failed to add pet');
+    }
+    
     if (!data) throw new Error('Pet creation returned no data');
     
     dispatch(petsActions.addPetSuccess(data));
+    toast.success('Mascota agregada exitosamente');
+    
+    return data;
   } catch (err) {
-    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+    const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+    console.error('Error adding pet:', err);
+    toast.error(`Error al agregar mascota: ${errorMessage}`);
+    dispatch(petsActions.requestFailed(errorMessage));
+    throw err;
   }
 };
 
@@ -75,7 +87,9 @@ export const modifyPet = (id: string, petData: UpdatePetData) => async (dispatch
     if (!data) throw new Error('Pet update returned no data');
     
     dispatch(petsActions.updatePetSuccess(data));
+    toast.success('Mascota actualizada exitosamente');
   } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Error al actualizar mascota');
     dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
   }
 };
@@ -92,7 +106,9 @@ export const removePet = (id: string) => async (dispatch: AppDispatch) => {
     if (error) throw new Error(error.message || 'Failed to delete pet');
     
     dispatch(petsActions.deletePetSuccess(id));
+    toast.success('Mascota eliminada exitosamente');
   } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Error al eliminar mascota');
     dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
   }
 };
@@ -111,5 +127,29 @@ export const fetchPetsByOwner = (ownerId: string) => async (dispatch: AppDispatc
     dispatch(petsActions.fetchPetsSuccess(data || []));
   } catch (err) {
     dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+  }
+};
+
+/**
+ * Upload pet profile picture
+ */
+export const uploadPetProfilePicture = (petId: string, file: File) => async (dispatch: AppDispatch) => {
+  dispatch(petsActions.requestStarted());
+  
+  try {
+    const { data, error } = await petsApi.uploadPetProfilePicture(petId, file);
+    
+    if (error) throw new Error(error.message || 'Failed to upload pet profile picture');
+    if (!data) throw new Error('Photo upload returned no data');
+    
+    // Update pet with new profile picture URL in the store
+    dispatch(petsActions.updatePetProfilePictureSuccess({ id: petId, url: data.publicUrl }));
+    toast.success('Foto de perfil actualizada exitosamente');
+    
+    return data.publicUrl;
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Error al subir la foto');
+    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+    throw err;
   }
 };

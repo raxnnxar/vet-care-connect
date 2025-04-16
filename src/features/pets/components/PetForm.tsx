@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload } from 'lucide-react';
@@ -212,12 +211,19 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
     }
     
     try {
+      console.log('Submitting pet data:', transformedData);
       const result = await onSubmit(transformedData);
+      console.log('Pet creation result:', result);
       
       if (result && result.id) {
         setNewPetId(result.id);
         setNewPetName(data.name);
-        setShowPhotoUploadDialog(true);
+        
+        // Ensure the photo upload dialog appears
+        setTimeout(() => {
+          setShowPhotoUploadDialog(true);
+        }, 100);
+        
         return result;
       }
       

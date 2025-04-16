@@ -1,8 +1,10 @@
 
-import { Pet, CreatePetData, UpdatePetData, PetFilters } from '../types';
+import { Pet, CreatePetData, UpdatePetData, PetFilters, PetMedicalHistory } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryOptions } from '../../../core/api/apiClient';
 import { IPetsApi } from './petsApiInterface';
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * API service for pet-related operations with Supabase
@@ -41,7 +43,7 @@ export const petsApi: IPetsApi = {
     try {
       const { data, error } = await supabase
         .from('pets')
-        .select('*')
+        .select('*, pet_medical_history(*)')
         .eq('id', id)
         .single();
       
@@ -57,12 +59,43 @@ export const petsApi: IPetsApi = {
    */
   async createPet(petData: CreatePetData) {
     try {
-      const { data, error } = await supabase
-        .from('pets')
-        .insert(petData)
-        .select();
+      // Extract the medical history if present
+      const { medicalHistory, ...petDetails } = petData;
       
-      return { data: data?.[0] || null, error };
+      // First, insert the pet record
+      const { data: petData, error: petError } = await supabase
+        .from('pets')
+        .insert(petDetails)
+        .select()
+        .single();
+      
+      if (petError || !petData) {
+        console.error('Error creating pet:', petError);
+        return { data: null, error: petError };
+      }
+      
+      // If we have medical history data, insert it as well
+      if (medicalHistory && Object.keys(medicalHistory).some(key => !!medicalHistory[key])) {
+        const medicalHistoryData = {
+          pet_id: petData.id,
+          allergies: medicalHistory.allergies || null,
+          chronic_conditions: medicalHistory.chronic_conditions || null,
+          vaccines_document_url: medicalHistory.vaccines_document_url || null,
+          current_medications: medicalHistory.current_medications || null,
+          previous_surgeries: medicalHistory.previous_surgeries || null,
+        };
+        
+        const { error: medicalHistoryError } = await supabase
+          .from('pet_medical_history')
+          .insert(medicalHistoryData);
+        
+        if (medicalHistoryError) {
+          console.error('Error creating pet medical history:', medicalHistoryError);
+          toast.error('Se guardó la mascota, pero hubo un error al guardar el historial médico');
+        }
+      }
+      
+      return { data: petData, error: null };
     } catch (error) {
       console.error('Error in createPet:', error);
       return { data: null, error: error as Error };
@@ -117,6 +150,49 @@ export const petsApi: IPetsApi = {
       return { data, error };
     } catch (error) {
       console.error('Error in getPetsByOwner:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+
+  /**
+   * Upload a pet profile picture
+   */
+  async uploadPetProfilePicture(petId: string, file: File) {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${petId}/profile.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('pet-profile-pictures')
+        .upload(filePath, file, {
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Error uploading pet profile picture:', error);
+        throw error;
+      }
+
+      // Get the public URL for the uploaded file
+      const { data: publicUrlData } = supabase.storage
+        .from('pet-profile-pictures')
+        .getPublicUrl(filePath);
+
+      // Update the pet record with the profile picture URL
+      const { error: updateError } = await supabase
+        .from('pets')
+        .update({ profile_picture_url: publicUrlData.publicUrl })
+        .eq('id', petId);
+
+      if (updateError) {
+        console.error('Error updating pet profile picture URL:', updateError);
+        throw updateError;
+      }
+
+      return { data: { publicUrl: publicUrlData.publicUrl }, error: null };
+    } catch (error) {
+      console.error('Error in uploadPetProfilePicture:', error);
       return { data: null, error: error as Error };
     }
   }

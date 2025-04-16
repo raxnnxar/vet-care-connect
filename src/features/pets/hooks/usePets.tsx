@@ -1,25 +1,76 @@
 
 import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
-import { 
-  fetchPets, 
-  fetchPetById, 
-  addPet, 
-  modifyPet, 
-  removePet, 
-  fetchPetsByOwner 
+import {
+  fetchPets,
+  fetchPetById,
+  addPet,
+  modifyPet,
+  removePet,
+  fetchPetsByOwner,
+  uploadPetProfilePicture
 } from '../store/petsThunks';
 import { petsActions } from '../store/petsSlice';
-import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
-import { serviceProvider } from '../../../core/services/serviceProvider';
-import { IPetsApi } from '../api/petsApiInterface';
+import { CreatePetData, UpdatePetData, PetFilters } from '../types';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 export const usePets = () => {
   const dispatch = useAppDispatch();
+  const { user } = useAuth();
   const { pets, currentPet, isLoading, error } = useAppSelector(state => state.pets);
   
-  // Get the pets API service from the service provider
-  const petsApiService = serviceProvider.get<IPetsApi>('petsApi');
+  const getAllPets = useCallback((filters?: PetFilters) => {
+    return dispatch(fetchPets(filters));
+  }, [dispatch]);
+  
+  const getPetById = useCallback((id: string) => {
+    return dispatch(fetchPetById(id));
+  }, [dispatch]);
+  
+  const createPet = useCallback(async (petData: CreatePetData) => {
+    // Inject the owner_id if available and not provided
+    if (user?.id && !petData.owner_id) {
+      petData.owner_id = user.id;
+    }
+    
+    try {
+      return await dispatch(addPet(petData)).unwrap();
+    } catch (error) {
+      console.error('Error creating pet:', error);
+      throw error;
+    }
+  }, [dispatch, user]);
+  
+  const updatePet = useCallback((id: string, petData: UpdatePetData) => {
+    return dispatch(modifyPet(id, petData));
+  }, [dispatch]);
+  
+  const deletePet = useCallback((id: string) => {
+    return dispatch(removePet(id));
+  }, [dispatch]);
+  
+  const getPetsByOwner = useCallback((ownerId: string) => {
+    return dispatch(fetchPetsByOwner(ownerId));
+  }, [dispatch]);
+  
+  const getCurrentUserPets = useCallback(() => {
+    if (user?.id) {
+      return dispatch(fetchPetsByOwner(user.id));
+    }
+    return Promise.resolve();
+  }, [dispatch, user]);
+  
+  const uploadProfilePicture = useCallback((petId: string, file: File) => {
+    return dispatch(uploadPetProfilePicture(petId, file));
+  }, [dispatch]);
+  
+  const clearError = useCallback(() => {
+    dispatch(petsActions.clearPetError());
+  }, [dispatch]);
+  
+  const resetState = useCallback(() => {
+    dispatch(petsActions.resetPetState());
+  }, [dispatch]);
   
   return {
     // State
@@ -29,16 +80,15 @@ export const usePets = () => {
     error,
     
     // Actions
-    fetchPets: useCallback((filters?: PetFilters) => dispatch(fetchPets(filters)), [dispatch]),
-    fetchPetById: useCallback((id: string) => dispatch(fetchPetById(id)), [dispatch]),
-    fetchPetsByOwner: useCallback((ownerId: string) => dispatch(fetchPetsByOwner(ownerId)), [dispatch]),
-    addPet: useCallback((petData: CreatePetData) => dispatch(addPet(petData)), [dispatch]),
-    modifyPet: useCallback((id: string, petData: UpdatePetData) => dispatch(modifyPet(id, petData)), [dispatch]),
-    removePet: useCallback((id: string) => dispatch(removePet(id)), [dispatch]),
-    clearErrors: useCallback(() => dispatch(petsActions.clearErrors()), [dispatch]),
-    
-    // Direct API access (useful for components that don't need Redux)
-    api: petsApiService
+    getAllPets,
+    getPetById,
+    createPet,
+    updatePet,
+    deletePet,
+    getPetsByOwner,
+    getCurrentUserPets,
+    uploadProfilePicture,
+    clearError,
+    resetState,
   };
 };
-

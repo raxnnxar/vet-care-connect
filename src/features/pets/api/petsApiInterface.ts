@@ -1,45 +1,61 @@
 
-import { ApiResponse, QueryOptions } from '../../../core/api/apiClient';
-import { Pet, CreatePetData, UpdatePetData } from '../types';
+import { Pet, CreatePetData, UpdatePetData, PetFilters } from '../types';
+import { QueryOptions } from '../../../core/api/apiClient';
 
-/**
- * Interface defining the contract for Pet API operations
- */
 export interface IPetsApi {
   /**
    * Get all pets with optional filtering
-   * @param options Query options for filtering, sorting, and pagination
    */
-  getPets(options?: QueryOptions): Promise<ApiResponse<Pet[]>>;
-
+  getPets(options?: QueryOptions & { filters?: PetFilters }): Promise<{
+    data: Pet[] | null;
+    error: Error | null;
+  }>;
+  
   /**
    * Get a single pet by ID
-   * @param id The pet's unique identifier
    */
-  getPetById(id: string): Promise<ApiResponse<Pet>>;
-
+  getPetById(id: string): Promise<{
+    data: Pet | null;
+    error: Error | null;
+  }>;
+  
   /**
    * Create a new pet
-   * @param petData The data for creating a new pet
    */
-  createPet(petData: CreatePetData): Promise<ApiResponse<Pet>>;
-
+  createPet(petData: CreatePetData): Promise<{
+    data: Pet | null;
+    error: Error | null;
+  }>;
+  
   /**
    * Update an existing pet
-   * @param id The pet's unique identifier
-   * @param petData The data to update on the pet
    */
-  updatePet(id: string, petData: UpdatePetData): Promise<ApiResponse<Pet>>;
-
+  updatePet(id: string, petData: UpdatePetData): Promise<{
+    data: Pet | null;
+    error: Error | null;
+  }>;
+  
   /**
    * Delete a pet
-   * @param id The pet's unique identifier
    */
-  deletePet(id: string): Promise<ApiResponse<Pet>>;
+  deletePet(id: string): Promise<{
+    data: any | null;
+    error: Error | null;
+  }>;
+  
+  /**
+   * Get pets by owner ID
+   */
+  getPetsByOwner(ownerId: string): Promise<{
+    data: Pet[] | null;
+    error: Error | null;
+  }>;
 
   /**
-   * Get pets belonging to a specific owner
-   * @param ownerId The owner's unique identifier
+   * Upload a pet profile picture
    */
-  getPetsByOwner(ownerId: string): Promise<ApiResponse<Pet[]>>;
+  uploadPetProfilePicture(petId: string, file: File): Promise<{
+    data: { publicUrl: string } | null;
+    error: Error | null;
+  }>;
 }
