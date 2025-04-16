@@ -1,7 +1,7 @@
 
-import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { Dog, Cat, Turtle, Bird, Rabbit, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload } from 'lucide-react';
 import { Input } from '@/ui/atoms/input';
 import { Label } from '@/ui/atoms/label';
 import { Textarea } from '@/ui/atoms/textarea';
@@ -15,6 +15,19 @@ import {
 } from '@/ui/molecules/select';
 import { toast } from 'sonner';
 import { PET_CATEGORIES, PET_GENDER } from '@/core/constants/app.constants';
+import { 
+  Accordion, 
+  AccordionContent, 
+  AccordionItem, 
+  AccordionTrigger 
+} from '@/ui/molecules/accordion';
+import { 
+  Collapsible, 
+  CollapsibleContent, 
+  CollapsibleTrigger 
+} from '@/ui/molecules/collapsible';
+import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 // Spanish to English mapping for species
 const speciesMapping = {
@@ -68,6 +81,19 @@ const SpeciesIcon = ({ species }) => {
   }
 };
 
+interface Medication {
+  id: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+}
+
+interface Surgery {
+  id: string;
+  type: string;
+  date: string;
+}
+
 interface PetFormValues {
   name: string;
   species: string;
@@ -77,6 +103,12 @@ interface PetFormValues {
   sex: string;
   temperament: string;
   additionalNotes: string;
+  // Medical history fields
+  allergies?: string;
+  chronicConditions?: string;
+  vaccineDocument?: FileList;
+  medications: Medication[];
+  surgeries: Surgery[];
 }
 
 interface PetFormProps {
@@ -85,7 +117,11 @@ interface PetFormProps {
 }
 
 const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
-  const { register, handleSubmit, control, watch, formState: { errors } } = useForm<PetFormValues>({
+  const [isMedicalHistoryOpen, setIsMedicalHistoryOpen] = useState(false);
+  const [uploadingDocument, setUploadingDocument] = useState(false);
+  const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
+  
+  const { register, handleSubmit, control, watch, formState: { errors }, setValue } = useForm<PetFormValues>({
     defaultValues: {
       name: '',
       species: '',
@@ -95,24 +131,105 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
       sex: '',
       temperament: '',
       additionalNotes: '',
+      allergies: '',
+      chronicConditions: '',
+      medications: [{ id: uuidv4(), name: '', dosage: '', frequency: '' }],
+      surgeries: [{ id: uuidv4(), type: '', date: '' }],
     }
   });
   
+  const { fields: medicationFields, append: appendMedication, remove: removeMedication } = 
+    useFieldArray({ control, name: "medications" });
+    
+  const { fields: surgeryFields, append: appendSurgery, remove: removeSurgery } = 
+    useFieldArray({ control, name: "surgeries" });
+    
   const selectedSpecies = watch('species');
   
-  const processFormData = (data: PetFormValues) => {
-    // Transform form data for database storage
-    const transformedData = {
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    setUploadingDocument(true);
+    
+    try {
+      // For now we'll use a temporary ID since we don't have the pet ID yet
+      const tempId = uuidv4();
+      const filePath = `${tempId}/vaccine_record.${file.name.split('.').pop()}`;
+      
+      // Check if the Storage bucket exists, but for now we'll just simulate it
+      // In a real implementation, this would upload to Supabase
+      
+      // Simulate upload delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // In a real implementation, we would do:
+      // const { data, error } = await supabase.storage
+      //   .from('pet-vaccine-documents')
+      //   .upload(filePath, file);
+      
+      // if (error) throw error;
+      
+      // const { data: publicUrlData } = supabase.storage
+      //   .from('pet-vaccine-documents')
+      //   .getPublicUrl(filePath);
+      
+      // Set a fake URL for now
+      const fakeUrl = `https://storage.example.com/pet-vaccine-documents/${filePath}`;
+      setUploadedDocumentUrl(fakeUrl);
+      
+      toast.success("Documento subido exitosamente");
+    } catch (error) {
+      console.error("Error uploading document:", error);
+      toast.error("Error al subir el documento. Intenta nuevamente.");
+    } finally {
+      setUploadingDocument(false);
+    }
+  };
+  
+  const processFormData = async (data: PetFormValues) => {
+    // Transform basic pet data
+    const transformedData: any = {
       name: data.name,
       species: data.species === 'Otro' ? PET_CATEGORIES.OTHER : speciesMapping[data.species],
       breed: data.species === 'Otro' ? data.customSpecies : '',
-      // For age, ideally we'd calculate a birth date, but for now just storing as a note
-      additional_notes: `Edad: ${data.age} años. ${data.additionalNotes}`,
-      weight: data.weight,
-      sex: genderMapping[data.sex],
-      temperament: data.temperament,
+      additional_notes: data.additionalNotes || '',
+      weight: data.weight || null,
+      sex: data.sex ? genderMapping[data.sex] : null,
+      temperament: data.temperament || '',
     };
     
+    // If age is provided, calculate approximate date of birth
+    if (data.age) {
+      const today = new Date();
+      const birthYear = today.getFullYear() - data.age;
+      const approximateBirthDate = new Date(birthYear, 0, 1); // January 1st of birth year
+      transformedData.date_of_birth = approximateBirthDate.toISOString().split('T')[0];
+    }
+    
+    // Process medical history data if the section was opened
+    if (isMedicalHistoryOpen) {
+      // Prepare medical history object
+      const medicalHistory = {
+        allergies: data.allergies || null,
+        chronic_conditions: data.chronicConditions || null,
+        vaccines_document_url: uploadedDocumentUrl,
+        current_medications: data.medications.filter(m => m.name.trim() !== '').map(med => ({
+          name: med.name,
+          dosage: med.dosage,
+          frequency: med.frequency
+        })),
+        previous_surgeries: data.surgeries.filter(s => s.type.trim() !== '').map(surgery => ({
+          type: surgery.type,
+          date: surgery.date
+        }))
+      };
+      
+      // Add medical history to transformed data
+      transformedData.medicalHistory = medicalHistory;
+    }
+    
+    // Pass the transformed data to the parent component
     onSubmit(transformedData);
   };
   
@@ -299,6 +416,198 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
         />
       </div>
       
+      {/* Medical History Section */}
+      <Collapsible
+        open={isMedicalHistoryOpen}
+        onOpenChange={setIsMedicalHistoryOpen}
+        className="border rounded-md p-2 shadow-sm bg-gray-50"
+      >
+        <CollapsibleTrigger asChild>
+          <Button 
+            type="button" 
+            variant="ghost" 
+            className="flex w-full justify-between items-center p-2 hover:bg-gray-100"
+          >
+            <div className="flex items-center gap-2 text-primary">
+              <Syringe className="h-5 w-5" />
+              <span className="font-medium">Historial Médico</span>
+            </div>
+            {isMedicalHistoryOpen ? (
+              <ChevronDown className="h-5 w-5" />
+            ) : (
+              <ChevronRight className="h-5 w-5" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="p-2 space-y-4 mt-2">
+          {/* Vaccine Record Upload */}
+          <div className="space-y-2">
+            <Label htmlFor="vaccineDocument" className="font-medium text-base">
+              Registro de vacunas
+            </Label>
+            <div className="flex flex-col gap-2">
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
+                <Input
+                  id="vaccineDocument"
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg"
+                  onChange={(e) => handleFileUpload(e.target.files)}
+                  className="hidden"
+                  disabled={uploadingDocument}
+                />
+                <Label 
+                  htmlFor="vaccineDocument" 
+                  className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
+                >
+                  <Upload className="h-8 w-8" />
+                  <span>{uploadingDocument ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}</span>
+                </Label>
+              </div>
+              {uploadedDocumentUrl && (
+                <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
+                  <FilePlus className="h-4 w-4" />
+                  <span className="text-sm">Documento subido exitosamente</span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Current Medications */}
+          <div className="space-y-2">
+            <Label className="font-medium text-base">
+              Medicamentos actuales
+            </Label>
+            <div className="space-y-4">
+              {medicationFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 items-start">
+                  <div className="grid grid-cols-3 gap-2 flex-1">
+                    <Input
+                      {...register(`medications.${index}.name`)}
+                      placeholder="Nombre del medicamento"
+                      className="col-span-1"
+                    />
+                    <Input
+                      {...register(`medications.${index}.dosage`)}
+                      placeholder="Dosis (mg, ml, etc.)"
+                      className="col-span-1"
+                    />
+                    <Input
+                      {...register(`medications.${index}.frequency`)}
+                      placeholder="Frecuencia"
+                      className="col-span-1"
+                    />
+                  </div>
+                  {index > 0 && (
+                    <Button 
+                      type="button" 
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8"
+                      onClick={() => removeMedication(index)}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={() => appendMedication({ 
+                  id: uuidv4(), 
+                  name: '', 
+                  dosage: '', 
+                  frequency: '' 
+                })}
+              >
+                <Plus className="h-4 w-4" />
+                <span>Agregar medicamento</span>
+              </Button>
+            </div>
+          </div>
+          
+          {/* Previous Surgeries */}
+          <div className="space-y-2">
+            <Label className="font-medium text-base">
+              Cirugías previas
+            </Label>
+            <div className="space-y-4">
+              {surgeryFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 items-start">
+                  <div className="grid grid-cols-2 gap-2 flex-1">
+                    <Input
+                      {...register(`surgeries.${index}.type`)}
+                      placeholder="Tipo de cirugía"
+                      className="col-span-1"
+                    />
+                    <Input
+                      {...register(`surgeries.${index}.date`)}
+                      placeholder="Fecha (MM/YYYY)"
+                      className="col-span-1"
+                    />
+                  </div>
+                  {index > 0 && (
+                    <Button 
+                      type="button" 
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8"
+                      onClick={() => removeSurgery(index)}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={() => appendSurgery({ 
+                  id: uuidv4(), 
+                  type: '', 
+                  date: '' 
+                })}
+              >
+                <Plus className="h-4 w-4" />
+                <span>Agregar cirugía</span>
+              </Button>
+            </div>
+          </div>
+          
+          {/* Allergies */}
+          <div className="space-y-2">
+            <Label htmlFor="allergies" className="font-medium text-base">
+              Alergias
+            </Label>
+            <Textarea
+              id="allergies"
+              {...register('allergies')}
+              placeholder="Alergias conocidas del animal"
+              className="min-h-[80px]"
+            />
+          </div>
+          
+          {/* Chronic Conditions */}
+          <div className="space-y-2">
+            <Label htmlFor="chronicConditions" className="font-medium text-base">
+              Condiciones crónicas
+            </Label>
+            <Textarea
+              id="chronicConditions"
+              {...register('chronicConditions')}
+              placeholder="Condiciones médicas crónicas"
+              className="min-h-[80px]"
+            />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+      
       <div className="space-y-2">
         <Label htmlFor="additionalNotes" className="font-medium text-base">
           Notas adicionales
@@ -307,26 +616,16 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
           id="additionalNotes"
           {...register('additionalNotes')}
           placeholder="Información adicional relevante sobre tu mascota"
-          className={`min-h-[100px] ${errors.additionalNotes ? "border-red-500" : ""}`}
+          className="min-h-[100px]"
         />
       </div>
       
       <Button 
         type="submit" 
         className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium mt-2"
-        disabled={isSubmitting}
+        disabled={isSubmitting || uploadingDocument}
       >
         {isSubmitting ? 'Guardando...' : 'Guardar mascota'}
-      </Button>
-      
-      <Button 
-        type="button" 
-        variant="outline"
-        className="w-full border-primary text-primary hover:bg-primary/10 py-4 px-6 text-base font-medium"
-        disabled
-      >
-        Historial Médico
-        <span className="ml-1 bg-gray-200 text-xs px-1 py-0.5 rounded">Próximamente</span>
       </Button>
     </form>
   );

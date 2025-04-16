@@ -78,19 +78,52 @@ export const updateProfile = createAsyncThunk(
         return rejectWithValue(error.message);
       }
       
-      // If we have pets to store, we would do this:
+      // If we have pets to store, process each pet
       if (options.pets && options.pets.length > 0) {
         for (const pet of options.pets) {
-          const { error: petError } = await supabase
+          // Insert the pet data
+          const { data: petData, error: petError } = await supabase
             .from('pets')
             .insert({
-              ...pet,
-              owner_id: userId
-            });
+              name: pet.name,
+              species: pet.species,
+              breed: pet.breed || '',
+              additional_notes: pet.additional_notes || '',
+              weight: pet.weight || null,
+              sex: pet.sex || null,
+              temperament: pet.temperament || '',
+              owner_id: userId,
+              date_of_birth: pet.date_of_birth || null,
+            })
+            .select();
             
           if (petError) {
             console.error('Error adding pet:', petError);
-            // Continue despite errors
+            continue; // Continue despite errors
+          }
+          
+          // If the pet has medical history, store it
+          if (pet.medicalHistory && petData && petData[0]) {
+            const petId = petData[0].id;
+            
+            const { error: medicalHistoryError } = await supabase
+              .from('pet_medical_history')
+              .insert({
+                pet_id: petId,
+                allergies: pet.medicalHistory.allergies || null,
+                chronic_conditions: pet.medicalHistory.chronic_conditions || null,
+                current_medications: pet.medicalHistory.current_medications?.length > 0 
+                  ? pet.medicalHistory.current_medications 
+                  : [],
+                previous_surgeries: pet.medicalHistory.previous_surgeries?.length > 0
+                  ? pet.medicalHistory.previous_surgeries
+                  : [],
+                vaccines_document_url: pet.medicalHistory.vaccines_document_url || null,
+              });
+              
+            if (medicalHistoryError) {
+              console.error('Error adding medical history:', medicalHistoryError);
+            }
           }
         }
       }

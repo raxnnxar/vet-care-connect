@@ -24,6 +24,22 @@ export interface MedicalRecord {
   treatment: string;
   veterinarianId: string;
   notes?: string;
+  allergies?: string;
+  chronic_conditions?: string;
+  vaccines_document_url?: string;
+  current_medications?: Medication[];
+  previous_surgeries?: Surgery[];
+}
+
+export interface Medication {
+  name: string;
+  dosage: string;
+  frequency: string;
+}
+
+export interface Surgery {
+  type: string;
+  date: string;
 }
 
 // Data types for creating and updating pets
