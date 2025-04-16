@@ -47,11 +47,12 @@ interface FormValues {
   phone: string;
 }
 
+// Update the PetData interface to match Pet type from the API
 interface PetData {
   id: string;
   name: string;
   species: string;
-  breed: string;
+  breed?: string; // Make this optional to match Pet type
   profile_picture_url?: string;
 }
 
@@ -90,7 +91,15 @@ const ProfileSetupScreen = () => {
   // Update local pets state when userPets changes
   useEffect(() => {
     if (userPets && userPets.length > 0) {
-      setPets(userPets);
+      // Map the Pet[] to PetData[] to ensure type compatibility
+      const mappedPets: PetData[] = userPets.map(pet => ({
+        id: pet.id,
+        name: pet.name,
+        species: pet.species,
+        breed: pet.breed || '', // Provide default empty string if breed is undefined
+        profile_picture_url: pet.profile_picture_url
+      }));
+      setPets(mappedPets);
     }
   }, [userPets]);
 
