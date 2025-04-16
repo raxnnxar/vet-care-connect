@@ -11,7 +11,7 @@ import {
   uploadPetProfilePicture
 } from '../store/petsThunks';
 import { petsActions } from '../store/petsSlice';
-import { CreatePetData, UpdatePetData, PetFilters } from '../types';
+import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
 import { useAuth } from '../../auth/hooks/useAuth';
 
 export const usePets = () => {
@@ -27,14 +27,16 @@ export const usePets = () => {
     return dispatch(fetchPetById(id));
   }, [dispatch]);
   
-  const createPet = useCallback(async (petData: CreatePetData) => {
+  const createPet = useCallback(async (petData: CreatePetData): Promise<Pet | null> => {
     // Inject the owner_id if available and not provided
     if (user?.id && !petData.owner_id) {
       petData.owner_id = user.id;
     }
     
     try {
-      return await dispatch(addPet(petData)).unwrap();
+      const resultAction = await dispatch(addPet(petData));
+      const pet = resultAction.payload as Pet;
+      return pet;
     } catch (error) {
       console.error('Error creating pet:', error);
       throw error;

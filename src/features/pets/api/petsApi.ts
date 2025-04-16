@@ -63,21 +63,21 @@ export const petsApi: IPetsApi = {
       const { medicalHistory, ...petDetails } = petData;
       
       // First, insert the pet record
-      const { data: petData, error: petError } = await supabase
+      const { data: newPetData, error: petError } = await supabase
         .from('pets')
         .insert(petDetails)
         .select()
         .single();
       
-      if (petError || !petData) {
+      if (petError || !newPetData) {
         console.error('Error creating pet:', petError);
         return { data: null, error: petError };
       }
       
       // If we have medical history data, insert it as well
-      if (medicalHistory && Object.keys(medicalHistory).some(key => !!medicalHistory[key])) {
+      if (medicalHistory && Object.keys(medicalHistory).some(key => !!medicalHistory[key as keyof PetMedicalHistory])) {
         const medicalHistoryData = {
-          pet_id: petData.id,
+          pet_id: newPetData.id,
           allergies: medicalHistory.allergies || null,
           chronic_conditions: medicalHistory.chronic_conditions || null,
           vaccines_document_url: medicalHistory.vaccines_document_url || null,
@@ -95,7 +95,7 @@ export const petsApi: IPetsApi = {
         }
       }
       
-      return { data: petData, error: null };
+      return { data: newPetData, error: null };
     } catch (error) {
       console.error('Error in createPet:', error);
       return { data: null, error: error as Error };

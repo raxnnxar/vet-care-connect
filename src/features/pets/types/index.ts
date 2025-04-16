@@ -18,6 +18,19 @@ export interface Pet {
 }
 
 /**
+ * Medical history for a pet
+ */
+export interface PetMedicalHistory {
+  id?: string;
+  pet_id?: string;
+  allergies?: string;
+  chronic_conditions?: string;
+  vaccines_document_url?: string;
+  current_medications?: Medication[];
+  previous_surgeries?: Surgery[];
+}
+
+/**
  * Data required to create a new pet
  */
 export interface CreatePetData {
@@ -46,17 +59,6 @@ export interface UpdatePetData {
   date_of_birth?: string;
   additional_notes?: string;
   profile_picture_url?: string;
-}
-
-/**
- * Medical history for a pet
- */
-export interface PetMedicalHistory {
-  allergies?: string;
-  chronic_conditions?: string;
-  vaccines_document_url?: string;
-  current_medications?: Medication[];
-  previous_surgeries?: Surgery[];
 }
 
 /**

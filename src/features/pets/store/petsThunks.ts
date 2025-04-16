@@ -1,4 +1,5 @@
 
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AppDispatch } from '../../../state/store';
 import { petsActions } from './petsSlice';
 import { petsApi } from '../api/petsApi';
