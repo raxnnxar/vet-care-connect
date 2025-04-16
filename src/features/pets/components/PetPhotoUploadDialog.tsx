@@ -35,6 +35,12 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
+      // File size validation (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("La imagen no debe superar los 5MB");
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -106,6 +112,7 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
               <button 
                 onClick={clearSelection}
                 className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md"
+                aria-label="Eliminar imagen seleccionada"
               >
                 <X className="h-4 w-4" />
               </button>
