@@ -9,6 +9,9 @@ export interface User {
   email: string;
   displayName?: string;
   role?: string;
+  serviceType?: string;
+  phone?: string;
+  profileImage?: string;
   // Additional user fields as needed
 }
 
@@ -31,4 +34,26 @@ export interface Session {
   expires_in: number;
   refresh_token: string;
   user: User;
+}
+
+// Add new interfaces for the missing functions
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface SignupData {
+  email: string;
+  password: string;
+  name?: string;
+}
+
+export interface AssignRoleParams {
+  userId: string;
+  role: string;
+}
+
+export interface UpdateProviderTypeParams {
+  providerId: string;
+  providerType: string;
 }

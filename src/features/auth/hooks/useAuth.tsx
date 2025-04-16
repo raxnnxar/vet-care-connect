@@ -2,9 +2,9 @@
 import { useEffect, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
-  loginUser as loginThunk,
-  signupUser as signupThunk,
-  logoutUser as logoutThunk,
+  loginUser,
+  signupUser,
+  logoutUser,
   getCurrentUser as checkAuthThunk,
 } from '../store/authThunks';
 import { authActions } from '../store/authSlice';
@@ -30,11 +30,11 @@ export const useAuth = () => {
     
     // Actions
     login: useCallback((credentials: LoginCredentials) => 
-      dispatch(loginThunk(credentials)), [dispatch]),
-    signup: useCallback((userData: { email: string; password: string; name: string }) => 
-      dispatch(signupThunk(userData)), [dispatch]),
+      dispatch(loginUser(credentials)), [dispatch]),
+    signup: useCallback((userData: SignupData) => 
+      dispatch(signupUser(userData)), [dispatch]),
     logout: useCallback(() => 
-      dispatch(logoutThunk()), [dispatch]),
+      dispatch(logoutUser()), [dispatch]),
     updateProfile: useCallback((userData: Partial<User>) => 
       dispatch(authActions.profileUpdateSuccess(userData as User)), [dispatch]),
     clearErrors: useCallback(() => 
