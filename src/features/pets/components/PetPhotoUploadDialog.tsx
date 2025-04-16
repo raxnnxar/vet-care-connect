@@ -52,7 +52,7 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
     try {
       setIsUploading(true);
       
-      // Call the updated uploadProfilePicture function with the proper arguments
+      // Pass petId and file separately as that's how the hook expects them
       const result = await uploadProfilePicture(petId, selectedFile);
       
       if (result) {

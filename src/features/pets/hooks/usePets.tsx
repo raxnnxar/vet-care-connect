@@ -73,7 +73,8 @@ export const usePets = () => {
   
   const uploadProfilePicture = useCallback(async (petId: string, file: File): Promise<string | null> => {
     try {
-      const resultAction = await dispatch(uploadPetProfilePicture(petId, file));
+      // Pass the arguments in the format expected by the thunk
+      const resultAction = await dispatch(uploadPetProfilePicture({ petId, file }));
       
       if (uploadPetProfilePicture.fulfilled.match(resultAction)) {
         const { url } = resultAction.payload;
