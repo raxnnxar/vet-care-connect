@@ -7,27 +7,50 @@ import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { AppDispatch } from '@/state/store';
-import { assignUserRole } from '../store/authThunks';
+import { assignUserRole, checkAuthThunk } from '../store/authThunks';
 
 const PostSignupRoleScreen: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRoleType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const { user } = useSelector((state: any) => state.auth);
   
   // Define the colors
   const brandColor = "#79d0b8"; // Teal color for the brand
   const accentColor = "#FF8A65"; // Coral accent for warmth
   
+  // Ensure we have user data on mount
   useEffect(() => {
-    // Check if user exists and has necessary data
-    if (!user || !user.id) {
-      console.error("Missing user data in PostSignupRoleScreen:", user);
-      // Keep the user on this page, but show a warning
-      toast.warning('Información de usuario incompleta. Por favor, inicia sesión nuevamente si el problema persiste.');
+    const initializeAuth = async () => {
+      if (!user || !user.id) {
+        console.log("No user found in state, checking auth status...");
+        try {
+          await dispatch(checkAuthThunk());
+          setIsInitialized(true);
+        } catch (error) {
+          console.error("Error initializing auth:", error);
+          setIsInitialized(true);
+        }
+      } else {
+        setIsInitialized(true);
+      }
+    };
+    
+    initializeAuth();
+  }, [dispatch, user]);
+  
+  // Check if user exists after initialization
+  useEffect(() => {
+    if (isInitialized) {
+      if (!user || !user.id) {
+        console.error("Missing user data in PostSignupRoleScreen:", user);
+        // Keep the user on this page, but show a warning
+        toast.warning('Información de usuario incompleta. Por favor, inicia sesión nuevamente si el problema persiste.');
+      }
     }
-  }, [user]);
+  }, [user, isInitialized]);
   
   // Handle role selection and database update with improved error handling
   const handleContinue = async () => {
@@ -39,6 +62,7 @@ const PostSignupRoleScreen: React.FC = () => {
     if (!user || !user.id) {
       console.error('Missing user data:', { user });
       toast.error('Información de usuario no disponible. Por favor, inicia sesión de nuevo.');
+      navigate('/login');
       return;
     }
     
@@ -231,5 +255,9 @@ const PostSignupRoleScreen: React.FC = () => {
     </div>
   );
 };
+
+function useAppDispatch() {
+  return useDispatch<AppDispatch>();
+}
 
 export default PostSignupRoleScreen;

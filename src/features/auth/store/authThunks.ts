@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthCredentials, UpdateProfileOptions, AssignRoleParams, UpdateProviderTypeParams, LoginCredentials, SignupData } from '../types';
 import { supabase } from '@/integrations/supabase/client';
+import { authActions } from './authSlice';
 
 export const signIn = createAsyncThunk(
   'auth/signIn',
@@ -275,7 +276,7 @@ export const updateProviderType = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async (credentials: LoginCredentials, { rejectWithValue }) => {
+  async (credentials: LoginCredentials, { rejectWithValue, dispatch }) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
@@ -284,6 +285,17 @@ export const loginUser = createAsyncThunk(
       
       if (error) {
         return rejectWithValue(error.message);
+      }
+      
+      // After successful login, update the user state with the user data
+      if (data.user) {
+        dispatch(authActions.authSuccess({
+          id: data.user.id,
+          email: data.user.email || '',
+          displayName: data.user.user_metadata?.displayName || '',
+          role: data.user.user_metadata?.role,
+          serviceType: data.user.user_metadata?.serviceType
+        }));
       }
       
       return data;
@@ -295,8 +307,10 @@ export const loginUser = createAsyncThunk(
 
 export const signupUser = createAsyncThunk(
   'auth/signupUser',
-  async (userData: SignupData, { rejectWithValue }) => {
+  async (userData: SignupData, { rejectWithValue, dispatch }) => {
     try {
+      console.log("Signing up user with data:", userData);
+      
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
@@ -308,11 +322,28 @@ export const signupUser = createAsyncThunk(
       });
       
       if (error) {
+        console.error("Signup error:", error);
         return rejectWithValue(error.message);
       }
       
+      if (!data || !data.user) {
+        console.error("No user data returned after signup");
+        return rejectWithValue('No user data returned after signup');
+      }
+      
+      console.log("Signup successful, user data:", data.user);
+      
+      // After successful signup, update the user state with the user data
+      dispatch(authActions.authSuccess({
+        id: data.user.id,
+        email: data.user.email || '',
+        displayName: data.user.user_metadata?.displayName || '',
+        // Role will be set in post-signup flow
+      }));
+      
       return data;
     } catch (error: any) {
+      console.error("Signup exception:", error);
       return rejectWithValue(error.message || 'Error during signup');
     }
   }
@@ -337,16 +368,38 @@ export const logoutUser = createAsyncThunk(
 
 export const checkAuthThunk = createAsyncThunk(
   'auth/checkAuth',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      const { data, error } = await supabase.auth.getSession();
+      console.log("Checking auth state...");
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
-      if (error) {
-        return rejectWithValue(error.message);
+      if (sessionError) {
+        console.error("Error getting session:", sessionError);
+        return rejectWithValue(sessionError.message);
       }
       
-      return data.session?.user || null;
+      if (!sessionData || !sessionData.session) {
+        console.log("No active session found");
+        return null;
+      }
+      
+      const { user } = sessionData.session;
+      console.log("Active session found, user:", user);
+      
+      if (user) {
+        // Update the user state with the user data
+        dispatch(authActions.authSuccess({
+          id: user.id,
+          email: user.email || '',
+          displayName: user.user_metadata?.displayName || '',
+          role: user.user_metadata?.role,
+          serviceType: user.user_metadata?.serviceType
+        }));
+      }
+      
+      return user || null;
     } catch (error: any) {
+      console.error("Error checking auth state:", error);
       return rejectWithValue(error.message || 'Error checking auth state');
     }
   }

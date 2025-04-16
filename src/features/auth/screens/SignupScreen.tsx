@@ -76,14 +76,21 @@ const SignupScreen: React.FC = () => {
         name: data.displayName
       };
 
-      const result = await dispatch(signupUser(signupData));
+      console.log("Dispatching signupUser with data:", {
+        email: signupData.email,
+        name: signupData.name
+      });
+
+      const resultAction = await dispatch(signupUser(signupData));
       
-      if (result) {
+      if (signupUser.fulfilled.match(resultAction)) {
+        console.log("Signup successful, user created:", resultAction.payload);
         toast.success('¡Cuenta creada con éxito!');
         // Redirect to post-signup role selection
         navigate('/post-signup-role');
-      } else {
-        toast.error('Hubo un problema al crear tu cuenta. Intenta nuevamente.');
+      } else if (signupUser.rejected.match(resultAction)) {
+        console.error("Signup failed:", resultAction.error);
+        toast.error(resultAction.payload as string || 'Hubo un problema al crear tu cuenta. Intenta nuevamente.');
       }
     } catch (error) {
       console.error('Registration error:', error);

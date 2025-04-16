@@ -1,25 +1,66 @@
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
   loginUser,
   signupUser,
   logoutUser,
-  getCurrentUser as checkAuthThunk,
+  checkAuthThunk,
 } from '../store/authThunks';
 import { authActions } from '../store/authSlice';
 import { User, LoginCredentials, SignupData } from '../types';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const { user, isLoading, error } = useAppSelector(state => state.auth);
+  const [initialAuthCheckDone, setInitialAuthCheckDone] = useState(false);
   
-  // Check for existing session on mount
+  // Check for existing session on mount and set up auth state listener
   useEffect(() => {
-    if (!user) {
-      dispatch(checkAuthThunk());
-    }
-  }, [dispatch, user]);
+    // First check for existing session
+    const initAuth = async () => {
+      try {
+        // Wait for the auth check to complete
+        await dispatch(checkAuthThunk());
+        setInitialAuthCheckDone(true);
+      } catch (error) {
+        console.error('Error during initial auth check:', error);
+        setInitialAuthCheckDone(true);
+      }
+    };
+
+    // Set up the auth state change listener
+    const { data: { subscription }} = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, "Session:", session ? "exists" : "none");
+      
+      // Only dispatch actions after initial auth check to avoid duplicates
+      if (initialAuthCheckDone) {
+        if (session && session.user) {
+          console.log("User session detected, updating state:", session.user);
+          dispatch(authActions.authSuccess({
+            id: session.user.id,
+            email: session.user.email || '',
+            displayName: session.user.user_metadata?.displayName || '',
+            role: session.user.user_metadata?.role,
+            serviceType: session.user.user_metadata?.serviceType
+          }));
+        } else if (event === 'SIGNED_OUT') {
+          console.log("User signed out, clearing state");
+          dispatch(authActions.logoutSuccess());
+        }
+      }
+    });
+
+    // Initialize auth
+    initAuth();
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [dispatch, initialAuthCheckDone]);
   
   return {
     // State
