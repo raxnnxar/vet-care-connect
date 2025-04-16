@@ -20,6 +20,8 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/ui/molecules/dialog';
@@ -300,12 +302,13 @@ const ProfileSetupScreen = () => {
     }
   };
 
-  // Fixed: This function now only opens the confirmation dialog
-  const handleFinish = () => {
+  // This function now only opens the confirmation dialog when clicked on the "Finalizar y continuar" button
+  const handleFinish = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission
     setIsFinishDialogOpen(true);
   };
 
-  // Fixed: This function handles the actual submission when user confirms
+  // This function handles the actual submission when user confirms
   const handleConfirmFinish = async () => {
     const data = form.getValues();
     await handleSubmit(data);
@@ -363,7 +366,7 @@ const ProfileSetupScreen = () => {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleFinish)} className="space-y-6">
+          <form onSubmit={handleFinish} className="space-y-6">
             <FormField
               control={form.control}
               name="phone"
@@ -443,7 +446,15 @@ const ProfileSetupScreen = () => {
                 </div>
               )}
 
-              <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
+              <Dialog 
+                open={isPetDialogOpen} 
+                onOpenChange={(isOpen) => {
+                  // Only close if it's not currently submitting
+                  if (!isSubmitting) {
+                    setIsPetDialogOpen(isOpen);
+                  }
+                }}
+              >
                 <Button 
                   type="button"
                   variant="outline"
@@ -461,7 +472,10 @@ const ProfileSetupScreen = () => {
                     <DialogTitle>Agregar Nueva Mascota</DialogTitle>
                   </DialogHeader>
                   <div className="px-6 py-4">
-                    <PetForm onSubmit={handleAddPet} isSubmitting={isSubmitting || isPetLoading} />
+                    <PetForm 
+                      onSubmit={handleAddPet} 
+                      isSubmitting={isSubmitting || isPetLoading} 
+                    />
                   </div>
                 </DialogContent>
               </Dialog>
@@ -490,7 +504,7 @@ const ProfileSetupScreen = () => {
         </Form>
       </div>
       
-      {/* Photo upload dialog */}
+      {/* Photo upload dialog - This should appear after adding a pet, not when finishing */}
       {showPhotoUploadDialog && newPetId && (
         <PetPhotoUploadDialog
           isOpen={showPhotoUploadDialog}
@@ -500,8 +514,14 @@ const ProfileSetupScreen = () => {
         />
       )}
       
-      {/* Finish confirmation dialog */}
-      <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
+      {/* Finish confirmation dialog - This should only appear when clicking "Finalizar y continuar" */}
+      <AlertDialog 
+        open={isFinishDialogOpen} 
+        onOpenChange={(isOpen) => {
+          // Prevent freezing by properly managing state
+          setIsFinishDialogOpen(isOpen);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro que deseas continuar?</AlertDialogTitle>

@@ -78,7 +78,15 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => !isUploading && onClose(false)}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        // Only close if not uploading to prevent freezes
+        if (!isUploading) {
+          onClose(false);
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>¿Quieres agregar una foto para {petName}?</DialogTitle>
