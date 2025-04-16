@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Plus, Info, Loader2, Pencil } from 'lucide-react';
@@ -29,6 +29,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
+import PetPhotoUploadDialog from '@/features/pets/components/PetPhotoUploadDialog';
 
 interface FormValues {
   phone: string;
@@ -45,6 +46,7 @@ const ProfileSetupScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.auth);
+  const { createPet, isLoading: isPetLoading } = usePets();
   
   const [pets, setPets] = useState<PetData[]>([]);
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -52,7 +54,9 @@ const ProfileSetupScreen = () => {
   const [isPetDialogOpen, setIsPetDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAddingPet, setIsAddingPet] = useState(false);
+  const [newPetId, setNewPetId] = useState<string | null>(null);
+  const [newPetName, setNewPetName] = useState<string>('');
+  const [showPhotoUploadDialog, setShowPhotoUploadDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
@@ -84,23 +88,30 @@ const ProfileSetupScreen = () => {
 
   const handleAddPet = async (petData: any) => {
     try {
-      setIsAddingPet(true);
+      // Set a local loading state to show feedback to user
+      setIsSubmitting(true);
       
       if (!user?.id) {
         toast.error('Error: No se pudo identificar al usuario');
+        setIsSubmitting(false);
         return null;
       }
       
-      const { createPet } = usePets();
+      // Add owner ID to the pet data
       const completeData = {
         ...petData,
         owner_id: user.id
       };
       
       console.log('Adding pet with data:', completeData);
+      
+      // Call the createPet function from the usePets hook
       const result = await createPet(completeData);
       
-      if (result) {
+      if (result && result.id) {
+        console.log('Pet created successfully:', result);
+        
+        // Add the newly created pet to the local state
         const newPet = {
           id: result.id,
           name: result.name,
@@ -108,20 +119,34 @@ const ProfileSetupScreen = () => {
           breed: result.breed || '',
         };
         
-        setPets([...pets, newPet]);
+        setPets((prevPets) => [...prevPets, newPet]);
+        
+        // Close the pet dialog
         setIsPetDialogOpen(false);
-        toast.success('Mascota agregada exitosamente');
+        
+        // Set the new pet ID and name for the photo upload dialog
+        setNewPetId(result.id);
+        setNewPetName(result.name);
+        
+        // Show the photo upload dialog after a short delay
+        setTimeout(() => {
+          setShowPhotoUploadDialog(true);
+        }, 100);
+        
+        // Clear submission state
+        setIsSubmitting(false);
+        
+        return result;
       } else {
         toast.error('Error al agregar la mascota: No se recibieron datos');
+        setIsSubmitting(false);
+        return null;
       }
-      
-      return result;
     } catch (error) {
       console.error('Error adding pet:', error);
       toast.error('Error al agregar la mascota');
+      setIsSubmitting(false);
       return null;
-    } finally {
-      setIsAddingPet(false);
     }
   };
 
@@ -207,6 +232,16 @@ const ProfileSetupScreen = () => {
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
+  };
+
+  const handlePhotoDialogClose = (wasPhotoAdded: boolean) => {
+    setShowPhotoUploadDialog(false);
+    
+    if (wasPhotoAdded) {
+      toast.success('Foto de mascota guardada exitosamente');
+    }
+    
+    // Keep the user on this page - don't navigate away
   };
 
   return (
@@ -335,7 +370,7 @@ const ProfileSetupScreen = () => {
                     <DialogTitle>Agregar Nueva Mascota</DialogTitle>
                   </DialogHeader>
                   <div className="px-6 py-4">
-                    <PetForm onSubmit={handleAddPet} isSubmitting={isAddingPet} />
+                    <PetForm onSubmit={handleAddPet} isSubmitting={isSubmitting || isPetLoading} />
                   </div>
                 </DialogContent>
               </Dialog>
@@ -358,6 +393,16 @@ const ProfileSetupScreen = () => {
           </form>
         </Form>
       </div>
+      
+      {/* Photo upload dialog */}
+      {showPhotoUploadDialog && newPetId && (
+        <PetPhotoUploadDialog
+          isOpen={showPhotoUploadDialog}
+          petId={newPetId}
+          petName={newPetName}
+          onClose={handlePhotoDialogClose}
+        />
+      )}
     </div>
   );
 };

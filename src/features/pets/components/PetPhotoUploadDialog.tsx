@@ -11,7 +11,7 @@ import {
 import { Button } from '@/ui/atoms/button';
 import { Loader2, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { usePets } from '../hooks/usePets';
+import { usePets } from '../hooks';
 
 interface PetPhotoUploadDialogProps {
   isOpen: boolean;
@@ -51,13 +51,20 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
     
     try {
       setIsUploading(true);
-      await uploadProfilePicture(petId, selectedFile);
       
-      toast.success('¡Foto de perfil subida con éxito!');
-      onClose(true);
+      // Call the updated uploadProfilePicture function with the proper arguments
+      const result = await uploadProfilePicture(petId, selectedFile);
+      
+      if (result) {
+        toast.success('¡Foto de perfil subida con éxito!');
+        onClose(true);
+      } else {
+        throw new Error('No se pudo subir la foto');
+      }
     } catch (error) {
       console.error('Error uploading photo:', error);
       toast.error('Error al subir la foto. Por favor intenta nuevamente.');
+      onClose(false);
     } finally {
       setIsUploading(false);
     }

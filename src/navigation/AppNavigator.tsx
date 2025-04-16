@@ -21,12 +21,12 @@ const AppNavigator = () => {
       console.log('Current path:', location.pathname);
       
       // Handle post-signup flows separately from main navigation
-      if (location.pathname.includes('/post-signup-') || location.pathname.includes('/profile-setup')) {
+      if (location.pathname.includes('/post-signup-') || location.pathname === '/profile-setup') {
         return; // Let the Routes component handle these paths
       }
       
       // If user is authenticated but doesn't have a role yet, redirect to role selection
-      if (!user.role) {
+      if (!user.role || user.role._type === 'undefined') {
         console.log('User has no role, redirecting to role selection');
         navigate('/post-signup-role');
         return;
@@ -40,18 +40,18 @@ const AppNavigator = () => {
       }
 
       // If user is a service provider but doesn't have a service type, redirect to service type selection
-      if (user.role === USER_ROLES.VETERINARIAN && !user.serviceType) {
+      if (user.role === USER_ROLES.VETERINARIAN && (!user.serviceType || user.serviceType._type === 'undefined')) {
         console.log('Service provider has no service type, redirecting to service type selection');
         navigate('/post-signup-service-type');
         return;
       }
 
       // If user has complete profile, navigate to the appropriate dashboard
-      if (user.role) {
-        if (user.role === USER_ROLES.PET_OWNER) {
+      if (user.role && user.role !== USER_ROLES.NONE) {
+        if (user.role === USER_ROLES.PET_OWNER && location.pathname !== '/owner') {
           console.log('Navigating to pet owner dashboard');
           navigate('/owner');
-        } else if (user.role === USER_ROLES.VETERINARIAN) {
+        } else if (user.role === USER_ROLES.VETERINARIAN && location.pathname !== '/vet') {
           console.log('Navigating to vet dashboard');
           navigate('/vet');
         }

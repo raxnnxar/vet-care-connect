@@ -23,8 +23,10 @@ export const fetchPets = (filters?: PetFilters) => async (dispatch: AppDispatch)
     if (error) throw new Error(error.message || 'Failed to fetch pets');
     
     dispatch(petsActions.fetchPetsSuccess(data || []));
+    return data;
   } catch (err) {
     dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+    return null;
   }
 };
 
@@ -41,8 +43,10 @@ export const fetchPetById = (id: string) => async (dispatch: AppDispatch) => {
     if (!data) throw new Error('Pet not found');
     
     dispatch(petsActions.fetchPetSuccess(data));
+    return data;
   } catch (err) {
     dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+    return null;
   }
 };
 
@@ -51,8 +55,25 @@ export const fetchPetById = (id: string) => async (dispatch: AppDispatch) => {
  */
 export const addPet = createAsyncThunk(
   'pets/addPet',
-  async (petData: CreatePetData, { rejectWithValue }) => {
+  async (petData: CreatePetData, { rejectWithValue, dispatch }) => {
     try {
+      // Process medical history data before sending it to the API
+      if (petData.medicalHistory) {
+        // Ensure medications and surgeries are properly stringified
+        if (petData.medicalHistory.current_medications && 
+            Array.isArray(petData.medicalHistory.current_medications)) {
+          petData.medicalHistory.current_medications = 
+            JSON.stringify(petData.medicalHistory.current_medications);
+        }
+        
+        if (petData.medicalHistory.previous_surgeries && 
+            Array.isArray(petData.medicalHistory.previous_surgeries)) {
+          petData.medicalHistory.previous_surgeries = 
+            JSON.stringify(petData.medicalHistory.previous_surgeries);
+        }
+      }
+      
+      console.log('Sending pet data to API:', petData);
       const { data, error } = await petsApi.createPet(petData);
       
       if (error) {
@@ -66,6 +87,8 @@ export const addPet = createAsyncThunk(
         return rejectWithValue('Pet creation returned no data');
       }
       
+      // Dispatch success action to update Redux state
+      dispatch(petsActions.addPetSuccess(data));
       toast.success('Mascota agregada exitosamente');
       return data as Pet;
     } catch (err) {
@@ -128,31 +151,42 @@ export const fetchPetsByOwner = (ownerId: string) => async (dispatch: AppDispatc
     if (error) throw new Error(error.message || 'Failed to fetch owner\'s pets');
     
     dispatch(petsActions.fetchPetsSuccess(data || []));
+    return data;
   } catch (err) {
     dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+    return null;
   }
 };
 
 /**
  * Upload pet profile picture
  */
-export const uploadPetProfilePicture = (petId: string, file: File) => async (dispatch: AppDispatch) => {
-  dispatch(petsActions.requestStarted());
-  
-  try {
-    const { data, error } = await petsApi.uploadPetProfilePicture(petId, file);
+export const uploadPetProfilePicture = createAsyncThunk(
+  'pets/uploadProfilePicture',
+  async (args: { petId: string; file: File }, { rejectWithValue, dispatch }) => {
+    const { petId, file } = args;
     
-    if (error) throw new Error(error.message || 'Failed to upload pet profile picture');
-    if (!data) throw new Error('Photo upload returned no data');
-    
-    // Update pet with new profile picture URL in the store
-    dispatch(petsActions.updatePetProfilePictureSuccess({ id: petId, url: data.publicUrl }));
-    toast.success('Foto de perfil actualizada exitosamente');
-    
-    return data.publicUrl;
-  } catch (err) {
-    toast.error(err instanceof Error ? err.message : 'Error al subir la foto');
-    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
-    throw err;
+    try {
+      const { data, error } = await petsApi.uploadPetProfilePicture(petId, file);
+      
+      if (error) {
+        toast.error('Error al subir la foto de perfil');
+        return rejectWithValue(error.message || 'Failed to upload pet profile picture');
+      }
+      
+      if (!data) {
+        toast.error('Error: No se recibieron datos de la foto');
+        return rejectWithValue('Photo upload returned no data');
+      }
+      
+      // Update pet with new profile picture URL in the store
+      dispatch(petsActions.updatePetProfilePictureSuccess({ id: petId, url: data.publicUrl }));
+      toast.success('Foto de perfil actualizada exitosamente');
+      
+      return { url: data.publicUrl, id: petId };
+    } catch (err) {
+      toast.error('Error al subir la foto de mascota');
+      return rejectWithValue(err instanceof Error ? err.message : 'An unknown error occurred');
+    }
   }
-};
+);

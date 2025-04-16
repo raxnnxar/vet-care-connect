@@ -35,14 +35,20 @@ export const usePets = () => {
     
     try {
       console.log('Creating pet with data:', petData);
-      // Since addPet returns the pet data directly, we can just await the dispatch
-      const result = await dispatch(addPet(petData)).unwrap();
+      // Call the addPet thunk and properly handle the promise
+      const resultAction = await dispatch(addPet(petData));
       
-      // Return the pet data
-      return result;
+      // Extract the pet data from the resolved action
+      if (addPet.fulfilled.match(resultAction)) {
+        // Return the pet data directly
+        return resultAction.payload as Pet;
+      } else {
+        console.error('Failed to create pet:', resultAction.error);
+        return null;
+      }
     } catch (error) {
       console.error('Error creating pet:', error);
-      throw error;
+      return null;
     }
   }, [dispatch, user]);
   
@@ -65,8 +71,19 @@ export const usePets = () => {
     return Promise.resolve();
   }, [dispatch, user]);
   
-  const uploadProfilePicture = useCallback((petId: string, file: File) => {
-    return dispatch(uploadPetProfilePicture(petId, file));
+  const uploadProfilePicture = useCallback(async (petId: string, file: File): Promise<string | null> => {
+    try {
+      const resultAction = await dispatch(uploadPetProfilePicture(petId, file));
+      
+      if (uploadPetProfilePicture.fulfilled.match(resultAction)) {
+        const { url } = resultAction.payload;
+        return url;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      return null;
+    }
   }, [dispatch]);
   
   const clearError = useCallback(() => {
