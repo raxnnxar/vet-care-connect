@@ -2,11 +2,12 @@
 import { Pet, CreatePetData, UpdatePetData, PetFilters } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryOptions } from '../../../core/api/apiClient';
+import { IPetsApi } from './petsApiInterface';
 
 /**
  * API service for pet-related operations with Supabase
  */
-export const petsApi = {
+export const petsApi: IPetsApi = {
   /**
    * Get all pets with optional filtering
    */
@@ -16,8 +17,9 @@ export const petsApi = {
       
       // Apply filters if provided
       if (options?.filters) {
-        const filters = options.filters as Record<string, any>;
-        Object.entries(filters).forEach(([key, value]) => {
+        const filters = options.filters;
+        Object.keys(filters).forEach((key) => {
+          const value = filters[key as keyof PetFilters];
           if (value !== undefined && value !== null && value !== '') {
             query = query.eq(key, value);
           }
