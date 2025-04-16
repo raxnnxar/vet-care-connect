@@ -104,8 +104,8 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
             </div>
           ) : (
             <div 
-              className="border-2 border-dashed border-primary/30 rounded-md p-8 text-center 
-                         bg-primary/5 hover:border-primary/50 transition-colors 
+              className="border-2 border-dashed border-primary/50 rounded-md p-8 text-center 
+                         bg-primary/5 hover:border-primary/70 transition-colors 
                          flex flex-col items-center justify-center space-y-4"
             >
               <input
@@ -119,8 +119,8 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
                 htmlFor="pet-photo" 
                 className="cursor-pointer flex flex-col items-center gap-3 text-muted-foreground w-full h-full py-8"
               >
-                <div className="bg-primary/10 p-4 rounded-full">
-                  <Upload className="h-6 w-6 text-primary" />
+                <div className="bg-primary/15 p-4 rounded-full">
+                  <Upload className="h-8 w-8 text-primary" />
                 </div>
                 <span className="text-sm font-medium">Haz clic para seleccionar una foto</span>
                 <span className="text-xs text-gray-500">JPG, PNG (max. 5MB)</span>
@@ -129,7 +129,7 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
           )}
         </div>
         
-        <DialogFooter className="flex justify-between gap-6">
+        <DialogFooter className="flex justify-between sm:gap-6">
           <Button 
             variant="outline" 
             onClick={handleSkip}
@@ -141,7 +141,7 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
           <Button 
             onClick={handleUpload}
             disabled={!selectedFile || isUploading}
-            className="flex-1 bg-primary text-white hover:bg-primary/90"
+            className="flex-1 bg-primary text-white hover:bg-primary/90 ml-4"
           >
             {isUploading ? (
               <>

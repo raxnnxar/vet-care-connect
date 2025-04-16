@@ -300,17 +300,21 @@ const ProfileSetupScreen = () => {
     }
   };
 
+  // Fixed: This function now only opens the confirmation dialog
   const handleFinish = () => {
     setIsFinishDialogOpen(true);
   };
 
-  const handleConfirmFinish = () => {
-    navigate('/owner');
+  // Fixed: This function handles the actual submission when user confirms
+  const handleConfirmFinish = async () => {
+    const data = form.getValues();
+    await handleSubmit(data);
+    setIsFinishDialogOpen(false);
   };
 
   return (
-    <div className="min-h-screen bg-background py-6 px-4 md:px-6">
-      <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-6">
+    <div className="min-h-screen bg-background py-6 px-4 md:px-6 overflow-y-auto">
+      <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-6 mb-6">
         <h1 className="text-2xl font-semibold text-center mb-6">Completa tu Perfil</h1>
         
         {petSuccessAlert && (
@@ -403,8 +407,14 @@ const ProfileSetupScreen = () => {
                 </div>
               )}
 
+              {!isPetsLoading && pets.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No tienes mascotas registradas aún
+                </p>
+              )}
+
               {pets && pets.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 mb-4">
+                <div className="grid grid-cols-1 gap-4 mb-4 max-h-[300px] overflow-y-auto">
                   {pets.map(pet => (
                     <div key={pet.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                       <div className="flex items-center gap-4">
@@ -457,13 +467,23 @@ const ProfileSetupScreen = () => {
               </Dialog>
             </div>
 
-            <div className="flex justify-end mt-8">
+            <div className="flex justify-center mt-8">
               <Button 
                 type="submit"
                 className="bg-accent3 hover:bg-accent3/90 text-white py-4 px-6 text-base font-medium flex items-center justify-center"
+                disabled={isSubmitting}
               >
-                Finalizar y continuar
-                <ArrowRight className="ml-2 h-5 w-5" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    Finalizar y continuar
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </>
+                )}
               </Button>
             </div>
           </form>
