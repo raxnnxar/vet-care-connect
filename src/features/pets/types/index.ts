@@ -1,29 +1,57 @@
 
 /**
- * Pet related types
- * 
- * These types define the shape of pet data in the application
+ * Core pet entity type
  */
-
 export interface Pet {
   id: string;
   name: string;
-  type: string;
-  breed: string;
-  age: number;
-  weight: number;
-  ownerId: string;
-  imageUrl?: string;
-  medicalHistory?: MedicalRecord[];
+  species: string;
+  breed?: string;
+  sex?: string;
+  weight?: number; // in kg
+  temperament?: string;
+  date_of_birth?: string; // ISO date string
+  additional_notes?: string;
+  owner_id: string;
+  profile_picture_url?: string;
+  created_at: string;
 }
 
-export interface MedicalRecord {
-  id: string;
-  date: string;
-  diagnosis: string;
-  treatment: string;
-  veterinarianId: string;
-  notes?: string;
+/**
+ * Data required to create a new pet
+ */
+export interface CreatePetData {
+  name: string;
+  species: string;
+  breed?: string;
+  sex?: string;
+  weight?: number;
+  temperament?: string;
+  date_of_birth?: string;
+  additional_notes?: string;
+  owner_id: string;
+  medicalHistory?: PetMedicalHistory;
+}
+
+/**
+ * Data that can be updated on an existing pet
+ */
+export interface UpdatePetData {
+  name?: string;
+  species?: string;
+  breed?: string;
+  sex?: string;
+  weight?: number;
+  temperament?: string;
+  date_of_birth?: string;
+  additional_notes?: string;
+  profile_picture_url?: string;
+}
+
+/**
+ * Medical history for a pet
+ */
+export interface PetMedicalHistory {
   allergies?: string;
   chronic_conditions?: string;
   vaccines_document_url?: string;
@@ -31,37 +59,27 @@ export interface MedicalRecord {
   previous_surgeries?: Surgery[];
 }
 
+/**
+ * Medication information
+ */
 export interface Medication {
   name: string;
   dosage: string;
   frequency: string;
 }
 
+/**
+ * Surgery information
+ */
 export interface Surgery {
   type: string;
   date: string;
 }
 
-// Data types for creating and updating pets
-
-export type CreatePetData = Omit<Pet, 'id' | 'medicalHistory'> & {
-  medicalHistory?: Omit<MedicalRecord, 'id'>[];
-};
-
-export type UpdatePetData = Partial<Omit<Pet, 'id' | 'medicalHistory'>> & {
-  medicalHistory?: Omit<MedicalRecord, 'id'>[];
-};
-
-// Query response types
-export type PetsResponse = {
-  pets: Pet[];
-  count: number;
-};
-
-// Filter types
-export type PetFilters = {
-  type?: string;
-  breed?: string;
-  ownerId?: string;
-  ageRange?: [number, number];
-};
+/**
+ * Filter options for pet queries
+ */
+export interface PetFilters {
+  owner_id?: string;
+  species?: string;
+}

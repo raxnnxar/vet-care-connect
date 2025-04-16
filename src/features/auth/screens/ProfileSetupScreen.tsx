@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -66,7 +65,6 @@ const ProfileSetupScreen = () => {
     if (!file) return;
     
     try {
-      // Display image preview
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -75,7 +73,6 @@ const ProfileSetupScreen = () => {
       };
       reader.readAsDataURL(file);
       
-      // Store file for upload
       setProfileImageFile(file);
       
     } catch (error) {
@@ -93,17 +90,24 @@ const ProfileSetupScreen = () => {
         return;
       }
       
-      // In a real app with Supabase, we would do the following:
-      // const { data, error } = await supabase
-      //   .from('pets')
-      //   .insert({
-      //     ...petData,
-      //     owner_id: user.id
-      //   })
-      //   .select();
+      const { data, error } = await supabase
+        .from('pets')
+        .insert({
+          ...petData,
+          owner_id: user.id
+        })
+        .select();
       
-      // For now, we'll simulate a successful response
-      const newPet = {
+      if (error) {
+        throw error;
+      }
+      
+      const newPet = data && data[0] ? {
+        id: data[0].id,
+        name: data[0].name,
+        species: data[0].species,
+        breed: data[0].breed || '',
+      } : {
         id: `pet-${uuidv4()}`,
         name: petData.name,
         species: petData.species,
@@ -113,9 +117,12 @@ const ProfileSetupScreen = () => {
       setPets([...pets, newPet]);
       setIsPetDialogOpen(false);
       toast.success('Mascota agregada exitosamente');
+      
+      return data && data[0];
     } catch (error) {
       console.error('Error adding pet:', error);
       toast.error('Error al agregar la mascota');
+      return null;
     } finally {
       setIsAddingPet(false);
     }
@@ -126,7 +133,6 @@ const ProfileSetupScreen = () => {
     
     setIsUploading(true);
     try {
-      // First attempt to use our Supabase Storage integration
       try {
         const fileName = `${user.id}-${uuidv4()}`;
         const { data, error } = await supabase.storage
@@ -138,7 +144,6 @@ const ProfileSetupScreen = () => {
           
         if (error) throw error;
         
-        // Get the public URL
         const { data: publicUrlData } = supabase.storage
           .from('pet-owners-profile-pictures')
           .getPublicUrl(fileName);
@@ -146,7 +151,6 @@ const ProfileSetupScreen = () => {
         return publicUrlData.publicUrl;
       } catch (supabaseError) {
         console.error('Supabase storage error:', supabaseError);
-        // Fallback to our original service if Supabase fails
         const imageUrl = await profileService.uploadProfileImage(user.id, profileImageFile);
         return imageUrl;
       }
@@ -163,7 +167,6 @@ const ProfileSetupScreen = () => {
     try {
       setIsSubmitting(true);
       
-      // Validate phone number (simple validation for now)
       const phoneRegex = /^\+?[0-9]{8,15}$/;
       if (!phoneRegex.test(data.phone)) {
         toast.error('Por favor ingresa un número telefónico válido');
@@ -171,7 +174,6 @@ const ProfileSetupScreen = () => {
         return;
       }
 
-      // Upload profile image if available
       let imageUrl = null;
       if (profileImageFile) {
         imageUrl = await uploadProfilePicture();
@@ -182,14 +184,11 @@ const ProfileSetupScreen = () => {
         }
       }
 
-      // Update profile with phone number and image
       await dispatch(updateProfile({
         phone: data.phone,
         profileImage: imageUrl,
-        // In a real app, we would also save pets to the database here
       }) as any);
 
-      // Navigate to owner dashboard after successful completion
       toast.success('¡Perfil completado exitosamente!');
       navigate('/owner');
     } catch (error) {
@@ -367,4 +366,3 @@ const ProfileSetupScreen = () => {
 };
 
 export default ProfileSetupScreen;
-
