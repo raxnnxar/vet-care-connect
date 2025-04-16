@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload } from 'lucide-react';
@@ -59,7 +60,11 @@ const genderMappingReverse = {
   [PET_GENDER.FEMALE]: 'Hembra',
 };
 
-const SpeciesIcon = ({ species }) => {
+interface SpeciesIconProps {
+  species: string;
+}
+
+const SpeciesIcon: React.FC<SpeciesIconProps> = ({ species }) => {
   switch(species) {
     case 'Perro':
       return <Dog className="h-4 w-4" />;
@@ -108,7 +113,7 @@ interface PetFormValues {
 }
 
 interface PetFormProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: any) => Promise<any> | void;
   isSubmitting: boolean;
 }
 
@@ -213,9 +218,13 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
         setNewPetId(result.id);
         setNewPetName(data.name);
         setShowPhotoUploadDialog(true);
+        return result;
       }
+      
+      return null;
     } catch (error) {
       console.error('Error submitting pet data:', error);
+      return null;
     }
   };
   

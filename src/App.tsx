@@ -11,17 +11,17 @@ import { UserProvider } from "./contexts/UserContext";
 // Import our navigation component
 import AppNavigator from "./navigation/AppNavigator";
 
-const App = () => {
-  // Create a new QueryClient instance inside the component
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60 * 1000, // 1 minute
-        retry: 1,
-      },
-    }
-  });
+// Create a new QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      retry: 1,
+    },
+  }
+});
 
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ReduxProvider>

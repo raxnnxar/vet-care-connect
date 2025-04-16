@@ -10,13 +10,14 @@ export const petsApi = {
   /**
    * Get all pets with optional filtering
    */
-  async getPets(options?: QueryOptions) {
+  async getPets(options?: QueryOptions & { filters?: PetFilters }) {
     try {
       let query = supabase.from('pets').select('*');
       
       // Apply filters if provided
       if (options?.filters) {
-        Object.entries(options.filters).forEach(([key, value]) => {
+        const filters = options.filters as Record<string, any>;
+        Object.entries(filters).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
             query = query.eq(key, value);
           }
