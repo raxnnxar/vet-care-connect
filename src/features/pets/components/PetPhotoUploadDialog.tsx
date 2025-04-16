@@ -35,7 +35,6 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Create preview for the selected image
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -52,7 +51,6 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
     try {
       setIsUploading(true);
       
-      // Pass petId and file separately as that's how the hook expects them
       const result = await uploadProfilePicture(petId, selectedFile);
       
       if (result) {
@@ -105,7 +103,11 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
               </button>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center hover:border-primary transition-colors">
+            <div 
+              className="border-2 border-dashed border-primary/30 rounded-md p-8 text-center 
+                         bg-primary/5 hover:border-primary/50 transition-colors 
+                         flex flex-col items-center justify-center space-y-4"
+            >
               <input
                 id="pet-photo"
                 type="file"
@@ -117,26 +119,27 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
                 htmlFor="pet-photo" 
                 className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
               >
-                <Upload className="h-8 w-8" />
-                <span>Haz clic para seleccionar una foto</span>
-                <span className="text-xs">JPG, PNG (max. 5MB)</span>
+                <Upload className="h-10 w-10 text-primary" />
+                <span className="text-sm font-medium">Haz clic para seleccionar una foto</span>
+                <span className="text-xs text-gray-500">JPG, PNG (max. 5MB)</span>
               </label>
             </div>
           )}
         </div>
         
-        <DialogFooter className="sm:justify-between flex flex-row">
+        <DialogFooter className="flex justify-between space-x-4">
           <Button 
             variant="outline" 
             onClick={handleSkip}
             disabled={isUploading}
+            className="flex-1"
           >
             Ahora no
           </Button>
           <Button 
             onClick={handleUpload}
             disabled={!selectedFile || isUploading}
-            className="bg-primary text-white hover:bg-primary/90"
+            className="flex-1 bg-primary text-white hover:bg-primary/90"
           >
             {isUploading ? (
               <>

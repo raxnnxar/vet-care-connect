@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -329,7 +328,7 @@ const ProfileSetupScreen = () => {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleFinish)} className="space-y-6">
             <FormField
               control={form.control}
               name="phone"
@@ -366,8 +365,10 @@ const ProfileSetupScreen = () => {
             <div className="space-y-4 mt-6">
               <h2 className="text-base font-medium mb-2">Mis Mascotas</h2>
 
+              
+
               <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
-                {pets.length === 0 ? (
+                
                   <Button 
                     type="button"
                     variant="outline"
@@ -379,34 +380,7 @@ const ProfileSetupScreen = () => {
                       Agrega tu primera mascota
                     </span>
                   </Button>
-                ) : (
-                  <div className="space-y-4">
-                    <ul className="space-y-3">
-                      {pets.map((pet) => (
-                        <li key={pet.id} className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                          <div>
-                            <p className="font-medium">{pet.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {pet.species} {pet.breed ? `· ${pet.breed}` : ''}
-                            </p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <Button 
-                      type="button"
-                      variant="outline"
-                      className="border-dashed border-gray-300 flex h-auto py-4 px-4 items-center gap-2 w-full"
-                      onClick={() => setIsPetDialogOpen(true)}
-                    >
-                      <Plus className="h-5 w-5 text-accent1" />
-                      <span className="text-muted-foreground">
-                        Agregar otra mascota
-                      </span>
-                    </Button>
-                  </div>
-                )}
+                
                 <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden p-0">
                   <DialogHeader className="p-6 pb-2">
                     <DialogTitle>Agregar Nueva Mascota</DialogTitle>
@@ -419,23 +393,10 @@ const ProfileSetupScreen = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-8">
-              <Button 
-                type="submit" 
-                className="bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium"
-                disabled={isSubmitting || isUploading}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Guardando...
-                  </>
-                ) : (
-                  'Guardar perfil'
-                )}
-              </Button>
+              
 
               <Button 
-                type="button"
+                type="submit"
                 onClick={handleFinish}
                 className="bg-accent3 hover:bg-accent3/90 text-white py-4 px-6 text-base font-medium flex items-center justify-center"
               >
@@ -456,24 +417,6 @@ const ProfileSetupScreen = () => {
           onClose={handlePhotoDialogClose}
         />
       )}
-
-      {/* Finish confirmation dialog */}
-      <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Quieres finalizar la configuración?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {pets.length > 0 
-                ? 'Has agregado mascotas a tu perfil. ¿Quieres continuar a la pantalla principal?' 
-                : '¿Estás seguro que deseas continuar sin agregar mascotas?'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmFinish}>Continuar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
