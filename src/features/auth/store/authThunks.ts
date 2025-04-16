@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthCredentials, UpdateProfileOptions, AssignRoleParams, UpdateProviderTypeParams, LoginCredentials, SignupData } from '../types';
 import { supabase } from '@/integrations/supabase/client';
@@ -143,31 +142,34 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
-// Add the missing functions that are imported elsewhere
 export const assignUserRole = createAsyncThunk(
   'auth/assignUserRole',
   async ({ userId, role }: AssignRoleParams, { rejectWithValue }) => {
     try {
       console.log(`Assigning role ${role} to user ${userId}`);
       
-      let functionToCall = '';
-      
       if (role === 'pet_owner') {
-        functionToCall = 'create_pet_owner';
+        // Call create_pet_owner function
+        const { data, error } = await supabase.rpc('create_pet_owner', {
+          owner_id: userId
+        });
+        
+        if (error) {
+          console.error(`Error in create_pet_owner:`, error);
+          return rejectWithValue(error.message);
+        }
       } else if (role === 'service_provider') {
-        functionToCall = 'create_service_provider';
+        // Call create_service_provider function
+        const { data, error } = await supabase.rpc('create_service_provider', {
+          provider_id: userId
+        });
+        
+        if (error) {
+          console.error(`Error in create_service_provider:`, error);
+          return rejectWithValue(error.message);
+        }
       } else {
         return rejectWithValue(`Invalid role: ${role}`);
-      }
-      
-      // Call the appropriate database function
-      const { data, error } = await supabase.rpc(functionToCall, {
-        [role === 'pet_owner' ? 'owner_id' : 'provider_id']: userId
-      });
-      
-      if (error) {
-        console.error(`Error in ${functionToCall}:`, error);
-        return rejectWithValue(error.message);
       }
       
       // Also update the user's role in the profiles table
@@ -238,7 +240,6 @@ export const updateProviderType = createAsyncThunk(
   }
 );
 
-// Add additional functions needed in other files
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
