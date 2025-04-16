@@ -18,8 +18,8 @@ export const petsApi: IPetsApi = {
       // Apply filters if provided
       if (options?.filters) {
         const filters = options.filters;
-        Object.keys(filters).forEach((key) => {
-          const value = filters[key as keyof PetFilters];
+        (Object.keys(filters) as Array<keyof PetFilters>).forEach((key) => {
+          const value = filters[key];
           if (value !== undefined && value !== null && value !== '') {
             query = query.eq(key, value);
           }
