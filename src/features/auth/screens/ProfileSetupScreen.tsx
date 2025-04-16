@@ -185,7 +185,8 @@ const ProfileSetupScreen = () => {
         // Show the success alert
         setPetSuccessAlert(true);
         
-        // Show the photo upload dialog immediately
+        // Show the photo upload dialog immediately after a small delay 
+        // to ensure proper state updates
         setTimeout(() => {
           setShowPhotoUploadDialog(true);
         }, 100);
@@ -246,7 +247,10 @@ const ProfileSetupScreen = () => {
   // This function now only opens the confirmation dialog when clicked on the "Finalizar y continuar" button
   const handleFinish = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission
-    setIsFinishDialogOpen(true);
+    // Ensure we're not in the middle of any other process
+    if (!isSubmitting && !showPhotoUploadDialog && !isPetDialogOpen) {
+      setIsFinishDialogOpen(true);
+    }
   };
 
   // This function handles the actual submission when user confirms
@@ -272,6 +276,13 @@ const ProfileSetupScreen = () => {
     // Only allow closing if not currently submitting
     if (!isSubmitting || !isOpen) {
       setIsPetDialogOpen(isOpen);
+    }
+  };
+  
+  // Handle confirmation dialog state change with proper cleanup
+  const handleConfirmDialogChange = (isOpen: boolean) => {
+    if (!isSubmitting) {
+      setIsFinishDialogOpen(isOpen);
     }
   };
 
@@ -346,7 +357,7 @@ const ProfileSetupScreen = () => {
       {/* Finish confirmation dialog - This only appears when clicking "Finalizar y continuar" */}
       <AlertDialog 
         open={isFinishDialogOpen} 
-        onOpenChange={setIsFinishDialogOpen}
+        onOpenChange={handleConfirmDialogChange}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
