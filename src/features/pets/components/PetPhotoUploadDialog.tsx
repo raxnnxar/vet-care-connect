@@ -117,9 +117,11 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
               />
               <label 
                 htmlFor="pet-photo" 
-                className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
+                className="cursor-pointer flex flex-col items-center gap-3 text-muted-foreground w-full h-full py-8"
               >
-                <Upload className="h-10 w-10 text-primary" />
+                <div className="bg-primary/10 p-4 rounded-full">
+                  <Upload className="h-6 w-6 text-primary" />
+                </div>
                 <span className="text-sm font-medium">Haz clic para seleccionar una foto</span>
                 <span className="text-xs text-gray-500">JPG, PNG (max. 5MB)</span>
               </label>
@@ -127,7 +129,7 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
           )}
         </div>
         
-        <DialogFooter className="flex justify-between space-x-4">
+        <DialogFooter className="flex justify-between gap-6">
           <Button 
             variant="outline" 
             onClick={handleSkip}

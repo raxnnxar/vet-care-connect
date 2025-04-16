@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,13 +52,14 @@ interface PetData {
   name: string;
   species: string;
   breed: string;
+  profile_picture_url?: string;
 }
 
 const ProfileSetupScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.auth);
-  const { createPet, isLoading: isPetLoading } = usePets();
+  const { createPet, isLoading: isPetLoading, getCurrentUserPets, pets: userPets, isLoading: isPetsLoading } = usePets();
   
   const [pets, setPets] = useState<PetData[]>([]);
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -77,6 +79,20 @@ const ProfileSetupScreen = () => {
       phone: '',
     },
   });
+
+  // Fetch user's pets when component mounts or when a new pet is added
+  useEffect(() => {
+    if (user?.id) {
+      getCurrentUserPets();
+    }
+  }, [user, getCurrentUserPets]);
+
+  // Update local pets state when userPets changes
+  useEffect(() => {
+    if (userPets && userPets.length > 0) {
+      setPets(userPets);
+    }
+  }, [userPets]);
 
   // Hide success alert after 3 seconds
   useEffect(() => {
@@ -143,6 +159,7 @@ const ProfileSetupScreen = () => {
           name: result.name,
           species: result.species,
           breed: result.breed || '',
+          profile_picture_url: result.profile_picture_url,
         };
         
         setPets((prevPets) => [...prevPets, newPet]);
@@ -159,6 +176,9 @@ const ProfileSetupScreen = () => {
         
         // Show the photo upload dialog immediately
         setShowPhotoUploadDialog(true);
+        
+        // Refresh the pets list
+        getCurrentUserPets();
         
         // Clear submission state
         setIsSubmitting(false);
@@ -266,6 +286,8 @@ const ProfileSetupScreen = () => {
     
     if (wasPhotoAdded) {
       toast.success('Foto de mascota guardada exitosamente');
+      // Refresh the pets list after photo upload
+      getCurrentUserPets();
     }
   };
 
@@ -365,21 +387,55 @@ const ProfileSetupScreen = () => {
             <div className="space-y-4 mt-6">
               <h2 className="text-base font-medium mb-2">Mis Mascotas</h2>
 
-              
+              {isPetsLoading && (
+                <div className="flex justify-center py-6">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-2 text-sm text-muted-foreground">Cargando mascotas...</span>
+                </div>
+              )}
+
+              {pets && pets.length > 0 && (
+                <div className="grid grid-cols-1 gap-4 mb-4">
+                  {pets.map(pet => (
+                    <div key={pet.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                      <div className="flex items-center gap-4">
+                        {pet.profile_picture_url ? (
+                          <div className="h-14 w-14 rounded-full overflow-hidden">
+                            <img 
+                              src={pet.profile_picture_url} 
+                              alt={pet.name} 
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                            {pet.name.substring(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium">{pet.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {pet.species} {pet.breed ? `· ${pet.breed}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
-                
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    className="border-dashed border-gray-300 flex flex-col h-auto py-6 px-4 items-center gap-2 w-full max-w-sm"
-                    onClick={() => setIsPetDialogOpen(true)}
-                  >
-                    <Plus className="h-8 w-8 text-accent1" />
-                    <span className="text-center text-muted-foreground">
-                      Agrega tu primera mascota
-                    </span>
-                  </Button>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  className="border-dashed border-gray-300 flex flex-col h-auto py-6 px-4 items-center gap-2 w-full max-w-sm"
+                  onClick={() => setIsPetDialogOpen(true)}
+                >
+                  <Plus className="h-8 w-8 text-accent1" />
+                  <span className="text-center text-muted-foreground">
+                    {pets.length > 0 ? 'Agregar otra mascota' : 'Agrega tu primera mascota'}
+                  </span>
+                </Button>
                 
                 <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden p-0">
                   <DialogHeader className="p-6 pb-2">
@@ -392,12 +448,9 @@ const ProfileSetupScreen = () => {
               </Dialog>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-8">
-              
-
+            <div className="flex justify-end mt-8">
               <Button 
                 type="submit"
-                onClick={handleFinish}
                 className="bg-accent3 hover:bg-accent3/90 text-white py-4 px-6 text-base font-medium flex items-center justify-center"
               >
                 Finalizar y continuar
@@ -417,6 +470,24 @@ const ProfileSetupScreen = () => {
           onClose={handlePhotoDialogClose}
         />
       )}
+      
+      {/* Finish confirmation dialog */}
+      <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro que deseas continuar?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Una vez que finalices la configuración de tu perfil, serás dirigido al panel principal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmFinish} className="bg-accent3">
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
