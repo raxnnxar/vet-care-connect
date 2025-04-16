@@ -35,7 +35,9 @@ export const usePets = () => {
     
     try {
       const resultAction = await dispatch(addPet(petData));
-      const pet = resultAction.payload as Pet;
+      // Extract the pet data from the action result
+      const result = resultAction.unwrap ? resultAction.unwrap() : resultAction;
+      const pet = result as unknown as Pet;
       return pet;
     } catch (error) {
       console.error('Error creating pet:', error);

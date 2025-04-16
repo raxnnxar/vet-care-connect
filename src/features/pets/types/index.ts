@@ -26,8 +26,8 @@ export interface PetMedicalHistory {
   allergies?: string;
   chronic_conditions?: string;
   vaccines_document_url?: string;
-  current_medications?: Medication[];
-  previous_surgeries?: Surgery[];
+  current_medications?: Medication[] | JSON | any;
+  previous_surgeries?: Surgery[] | JSON | any;
 }
 
 /**

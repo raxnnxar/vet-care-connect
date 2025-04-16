@@ -76,13 +76,14 @@ export const petsApi: IPetsApi = {
       
       // If we have medical history data, insert it as well
       if (medicalHistory && Object.keys(medicalHistory).some(key => !!medicalHistory[key as keyof PetMedicalHistory])) {
+        // Convert medication and surgery objects to JSON strings for storage
         const medicalHistoryData = {
           pet_id: newPetData.id,
           allergies: medicalHistory.allergies || null,
           chronic_conditions: medicalHistory.chronic_conditions || null,
           vaccines_document_url: medicalHistory.vaccines_document_url || null,
-          current_medications: medicalHistory.current_medications || null,
-          previous_surgeries: medicalHistory.previous_surgeries || null,
+          current_medications: medicalHistory.current_medications ? JSON.stringify(medicalHistory.current_medications) : null,
+          previous_surgeries: medicalHistory.previous_surgeries ? JSON.stringify(medicalHistory.previous_surgeries) : null
         };
         
         const { error: medicalHistoryError } = await supabase
