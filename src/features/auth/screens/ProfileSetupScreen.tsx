@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/ui/atoms/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/molecules/dialog';
 import { Form } from '@/ui/molecules/form';
 import { Alert, AlertDescription } from "@/ui/molecules/alert";
@@ -26,7 +25,7 @@ import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
 import PetPhotoUploadDialog from '@/features/pets/components/PetPhotoUploadDialog';
 
-// Import new component files
+// Import component files
 import ProfileImageUploader from '../components/ProfileImageUploader';
 import PhoneNumberField from '../components/PhoneNumberField';
 import PetList from '../components/PetList';
@@ -187,25 +186,24 @@ const ProfileSetupScreen = () => {
         setPetSuccessAlert(true);
         
         // Show the photo upload dialog immediately
-        setShowPhotoUploadDialog(true);
+        setTimeout(() => {
+          setShowPhotoUploadDialog(true);
+        }, 100);
         
         // Refresh the pets list
         getCurrentUserPets();
         
-        // Clear submission state
-        setIsSubmitting(false);
-        
         return result;
       } else {
         toast.error('Error al agregar la mascota: No se recibieron datos');
-        setIsSubmitting(false);
         return null;
       }
     } catch (error) {
       console.error('Error adding pet:', error);
       toast.error('Error al agregar la mascota');
-      setIsSubmitting(false);
       return null;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -260,11 +258,20 @@ const ProfileSetupScreen = () => {
 
   const handlePhotoDialogClose = (wasPhotoAdded: boolean) => {
     setShowPhotoUploadDialog(false);
+    setNewPetId(null);
     
     if (wasPhotoAdded) {
       toast.success('Foto de mascota guardada exitosamente');
       // Refresh the pets list after photo upload
       getCurrentUserPets();
+    }
+  };
+
+  // Handle closing pet dialog - ensure we properly clean up state
+  const handlePetDialogOpenChange = (isOpen: boolean) => {
+    // Only allow closing if not currently submitting
+    if (!isSubmitting || !isOpen) {
+      setIsPetDialogOpen(isOpen);
     }
   };
 
@@ -300,12 +307,7 @@ const ProfileSetupScreen = () => {
 
               <Dialog 
                 open={isPetDialogOpen} 
-                onOpenChange={(isOpen) => {
-                  // Only close if it's not currently submitting
-                  if (!isSubmitting) {
-                    setIsPetDialogOpen(isOpen);
-                  }
-                }}
+                onOpenChange={handlePetDialogOpenChange}
               >
                 <AddPetButton 
                   onClick={() => setIsPetDialogOpen(true)} 
@@ -331,7 +333,7 @@ const ProfileSetupScreen = () => {
         </Form>
       </div>
       
-      {/* Photo upload dialog - This should appear after adding a pet, not when finishing */}
+      {/* Photo upload dialog - This appears after adding a pet */}
       {showPhotoUploadDialog && newPetId && (
         <PetPhotoUploadDialog
           isOpen={showPhotoUploadDialog}
@@ -341,13 +343,10 @@ const ProfileSetupScreen = () => {
         />
       )}
       
-      {/* Finish confirmation dialog - This should only appear when clicking "Finalizar y continuar" */}
+      {/* Finish confirmation dialog - This only appears when clicking "Finalizar y continuar" */}
       <AlertDialog 
         open={isFinishDialogOpen} 
-        onOpenChange={(isOpen) => {
-          // Prevent freezing by properly managing state
-          setIsFinishDialogOpen(isOpen);
-        }}
+        onOpenChange={setIsFinishDialogOpen}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -87,8 +87,8 @@ const PetPhotoUploadDialog: React.FC<PetPhotoUploadDialogProps> = ({
     <Dialog 
       open={isOpen} 
       onOpenChange={(open) => {
-        // Only close if not uploading to prevent freezes
-        if (!isUploading) {
+        // Only allow closing if not currently uploading
+        if (!isUploading && !open) {
           onClose(false);
         }
       }}
