@@ -34,11 +34,11 @@ export const usePets = () => {
     }
     
     try {
-      const resultAction = await dispatch(addPet(petData));
-      // Extract the pet data from the action result
-      const result = resultAction.unwrap ? resultAction.unwrap() : resultAction;
-      const pet = result as unknown as Pet;
-      return pet;
+      // Since addPet returns the pet data directly, we can just await the dispatch
+      const result = await dispatch(addPet(petData));
+      
+      // The result is the pet data returned from the thunk
+      return result as unknown as Pet;
     } catch (error) {
       console.error('Error creating pet:', error);
       throw error;
