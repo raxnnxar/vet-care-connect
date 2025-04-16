@@ -1,74 +1,84 @@
 
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
+// This is an edge function to create required storage buckets
+// This will be run when the app is deployed
+
+import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   try {
-    // Create a Supabase client with the Auth context of the logged in user
-    const supabaseClient = createClient(
+    // Create a Supabase client with the service role key
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
+    
+    // Create the required buckets
+    const buckets = [
       {
-        global: {
-          headers: {
-            Authorization: req.headers.get("Authorization")!,
-          },
-        },
+        id: "pet-owners-profile-pictures",
+        name: "Pet Owners Profile Pictures",
+        public: true,
+      },
+      {
+        id: "pet-profile-pictures",
+        name: "Pet Profile Pictures",
+        public: true,
+      },
+    ];
+    
+    const results = [];
+    
+    // Create each bucket
+    for (const bucket of buckets) {
+      try {
+        const { data, error } = await supabaseAdmin.storage.createBucket(
+          bucket.id, 
+          { 
+            public: bucket.public,
+            fileSizeLimit: 1024 * 1024 * 5, // 5MB limit
+          }
+        );
+        
+        if (error) {
+          results.push({ bucket: bucket.id, status: "error", message: error.message });
+        } else {
+          results.push({ bucket: bucket.id, status: "success" });
+        }
+      } catch (error) {
+        // If the bucket already exists, this is fine
+        if (error.message.includes("already exists")) {
+          results.push({ bucket: bucket.id, status: "exists" });
+        } else {
+          results.push({ bucket: bucket.id, status: "error", message: error.message });
+        }
+      }
+    }
+    
+    return new Response(
+      JSON.stringify({ success: true, results }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
       }
     );
-
-    // Check if the pet-profile-pictures bucket exists
-    const { data: buckets, error: bucketsError } = await supabaseClient
-      .storage
-      .listBuckets();
-
-    if (bucketsError) {
-      throw bucketsError;
-    }
-
-    // Create pet-profile-pictures bucket if it doesn't exist
-    const petProfilePicturesBucket = buckets?.find(bucket => bucket.name === 'pet-profile-pictures');
-    if (!petProfilePicturesBucket) {
-      const { data, error } = await supabaseClient
-        .storage
-        .createBucket('pet-profile-pictures', {
-          public: true,
-          fileSizeLimit: 2097152, // 2MB
-          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
-        });
-
-      if (error) {
-        throw error;
-      }
-    }
-
-    // Create pet-vaccine-documents bucket if it doesn't exist
-    const petVaccineDocumentsBucket = buckets?.find(bucket => bucket.name === 'pet-vaccine-documents');
-    if (!petVaccineDocumentsBucket) {
-      const { data, error } = await supabaseClient
-        .storage
-        .createBucket('pet-vaccine-documents', {
-          public: true,
-          fileSizeLimit: 5242880, // 5MB
-          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
-        });
-
-      if (error) {
-        throw error;
-      }
-    }
-
-    return new Response(JSON.stringify({ 
-      message: "Storage buckets created successfully", 
-      buckets: ['pet-profile-pictures', 'pet-vaccine-documents']
-    }), {
-      headers: { "Content-Type": "application/json" },
-      status: 200,
-    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { "Content-Type": "application/json" },
-      status: 400,
-    });
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      }
+    );
   }
 });

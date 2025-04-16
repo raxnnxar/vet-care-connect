@@ -1,192 +1,150 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { AppDispatch } from '../../../state/store';
-import { petsActions } from './petsSlice';
 import { petsApi } from '../api/petsApi';
-import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
-import { QueryOptions } from '../../../core/api/apiClient';
-import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { v4 as uuidv4 } from 'uuid';
+import { 
+  Pet,
+  CreatePetData,
+  UpdatePetData,
+  PetFilters 
+} from '../types';
 
-/**
- * Fetch all pets with optional filtering
- */
-export const fetchPets = (filters?: PetFilters) => async (dispatch: AppDispatch) => {
-  dispatch(petsActions.requestStarted());
-  
-  try {
-    const options: QueryOptions = { 
-      filters: filters as Record<string, any> 
-    };
-    
-    const { data, error } = await petsApi.getPets(options);
-    
-    if (error) throw new Error(error.message || 'Failed to fetch pets');
-    
-    dispatch(petsActions.fetchPetsSuccess(data || []));
-    return data;
-  } catch (err) {
-    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
-    return null;
-  }
-};
-
-/**
- * Fetch a single pet by ID
- */
-export const fetchPetById = (id: string) => async (dispatch: AppDispatch) => {
-  dispatch(petsActions.requestStarted());
-  
-  try {
-    const { data, error } = await petsApi.getPetById(id);
-    
-    if (error) throw new Error(error.message || 'Failed to fetch pet');
-    if (!data) throw new Error('Pet not found');
-    
-    dispatch(petsActions.fetchPetSuccess(data));
-    return data;
-  } catch (err) {
-    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
-    return null;
-  }
-};
-
-/**
- * Add a new pet
- */
-export const addPet = createAsyncThunk(
-  'pets/addPet',
-  async (petData: CreatePetData, { rejectWithValue, dispatch }) => {
+export const fetchPets = createAsyncThunk(
+  'pets/fetchPets',
+  async (filters?: PetFilters, { rejectWithValue }) => {
     try {
-      // Process medical history data before sending it to the API
-      if (petData.medicalHistory) {
-        // Ensure medications and surgeries are properly stringified
-        if (petData.medicalHistory.current_medications && 
-            Array.isArray(petData.medicalHistory.current_medications)) {
-          petData.medicalHistory.current_medications = 
-            JSON.stringify(petData.medicalHistory.current_medications);
-        }
-        
-        if (petData.medicalHistory.previous_surgeries && 
-            Array.isArray(petData.medicalHistory.previous_surgeries)) {
-          petData.medicalHistory.previous_surgeries = 
-            JSON.stringify(petData.medicalHistory.previous_surgeries);
-        }
-      }
-      
-      console.log('Sending pet data to API:', petData);
-      const { data, error } = await petsApi.createPet(petData);
-      
-      if (error) {
-        console.error('Error adding pet:', error);
-        toast.error(`Error al agregar mascota: ${error.message || 'Error desconocido'}`);
-        return rejectWithValue(error.message || 'Failed to add pet');
-      }
-      
-      if (!data) {
-        toast.error('Error al agregar mascota: No se devolvieron datos');
-        return rejectWithValue('Pet creation returned no data');
-      }
-      
-      // Dispatch success action to update Redux state
-      dispatch(petsActions.addPetSuccess(data));
-      toast.success('Mascota agregada exitosamente');
-      return data as Pet;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-      console.error('Error adding pet:', err);
-      toast.error(`Error al agregar mascota: ${errorMessage}`);
-      return rejectWithValue(errorMessage);
+      const response = await petsApi.getAllPets(filters);
+      return response;
+    } catch (error) {
+      console.error('Error fetching pets:', error);
+      return rejectWithValue(error);
     }
   }
 );
 
-/**
- * Update an existing pet
- */
-export const modifyPet = (id: string, petData: UpdatePetData) => async (dispatch: AppDispatch) => {
-  dispatch(petsActions.requestStarted());
-  
-  try {
-    const { data, error } = await petsApi.updatePet(id, petData);
-    
-    if (error) throw new Error(error.message || 'Failed to update pet');
-    if (!data) throw new Error('Pet update returned no data');
-    
-    dispatch(petsActions.updatePetSuccess(data));
-    toast.success('Mascota actualizada exitosamente');
-  } catch (err) {
-    toast.error(err instanceof Error ? err.message : 'Error al actualizar mascota');
-    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+export const fetchPetById = createAsyncThunk(
+  'pets/fetchPetById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await petsApi.getPetById(id);
+      return response;
+    } catch (error) {
+      console.error('Error fetching pet by id:', error);
+      return rejectWithValue(error);
+    }
   }
-};
+);
 
-/**
- * Remove a pet
- */
-export const removePet = (id: string) => async (dispatch: AppDispatch) => {
-  dispatch(petsActions.requestStarted());
-  
-  try {
-    const { error } = await petsApi.deletePet(id);
-    
-    if (error) throw new Error(error.message || 'Failed to delete pet');
-    
-    dispatch(petsActions.deletePetSuccess(id));
-    toast.success('Mascota eliminada exitosamente');
-  } catch (err) {
-    toast.error(err instanceof Error ? err.message : 'Error al eliminar mascota');
-    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
+export const addPet = createAsyncThunk(
+  'pets/addPet',
+  async (petData: CreatePetData, { rejectWithValue }) => {
+    try {
+      // First, create the pet entry
+      const petResponse = await petsApi.createPet(petData);
+      
+      // If there's medical history data, create a related entry
+      if (petData.medicalHistory && petResponse.id) {
+        try {
+          const medicalHistoryData = {
+            ...petData.medicalHistory,
+            pet_id: petResponse.id,
+          };
+          
+          await petsApi.createPetMedicalHistory(petResponse.id, medicalHistoryData);
+        } catch (medError) {
+          console.error('Error creating medical history:', medError);
+          // We don't reject here since pet was already created
+        }
+      }
+      
+      return petResponse;
+    } catch (error) {
+      console.error('Error adding pet:', error);
+      return rejectWithValue(error);
+    }
   }
-};
+);
 
-/**
- * Fetch pets by owner ID
- */
-export const fetchPetsByOwner = (ownerId: string) => async (dispatch: AppDispatch) => {
-  dispatch(petsActions.requestStarted());
-  
-  try {
-    const { data, error } = await petsApi.getPetsByOwner(ownerId);
-    
-    if (error) throw new Error(error.message || 'Failed to fetch owner\'s pets');
-    
-    dispatch(petsActions.fetchPetsSuccess(data || []));
-    return data;
-  } catch (err) {
-    dispatch(petsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
-    return null;
+export const modifyPet = createAsyncThunk(
+  'pets/updatePet',
+  async (
+    { id, petData }: { id: string; petData: UpdatePetData }, 
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await petsApi.updatePet(id, petData);
+      return response;
+    } catch (error) {
+      console.error('Error updating pet:', error);
+      return rejectWithValue(error);
+    }
   }
-};
+);
 
-/**
- * Upload pet profile picture
- */
+export const removePet = createAsyncThunk(
+  'pets/deletePet',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await petsApi.deletePet(id);
+      return id;
+    } catch (error) {
+      console.error('Error deleting pet:', error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const fetchPetsByOwner = createAsyncThunk(
+  'pets/fetchPetsByOwner',
+  async (ownerId: string, { rejectWithValue }) => {
+    try {
+      const response = await petsApi.getPetsByOwner(ownerId);
+      return response;
+    } catch (error) {
+      console.error('Error fetching pets by owner:', error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+interface UploadParams {
+  petId: string;
+  file: File;
+}
+
 export const uploadPetProfilePicture = createAsyncThunk(
   'pets/uploadProfilePicture',
-  async (args: { petId: string; file: File }, { rejectWithValue, dispatch }) => {
-    const { petId, file } = args;
-    
+  async ({ petId, file }: UploadParams, { rejectWithValue }) => {
     try {
-      const { data, error } = await petsApi.uploadPetProfilePicture(petId, file);
+      // Use the specific pattern for pet profile pictures: {pet_id}/profile.jpg
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${petId}/profile.${fileExt}`;
       
-      if (error) {
-        toast.error('Error al subir la foto de perfil');
-        return rejectWithValue(error.message || 'Failed to upload pet profile picture');
-      }
+      // Upload to the pet-profile-pictures bucket
+      const { data, error } = await supabase.storage
+        .from('pet-profile-pictures')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) throw error;
       
-      if (!data) {
-        toast.error('Error: No se recibieron datos de la foto');
-        return rejectWithValue('Photo upload returned no data');
-      }
+      // Get the public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('pet-profile-pictures')
+        .getPublicUrl(filePath);
+        
+      const url = publicUrlData.publicUrl;
       
-      // Update pet with new profile picture URL in the store
-      dispatch(petsActions.updatePetProfilePictureSuccess({ id: petId, url: data.publicUrl }));
-      toast.success('Foto de perfil actualizada exitosamente');
+      // Update the pet record with the profile picture URL
+      await petsApi.updatePet(petId, { profile_picture_url: url });
       
-      return { url: data.publicUrl, id: petId };
-    } catch (err) {
-      toast.error('Error al subir la foto de mascota');
-      return rejectWithValue(err instanceof Error ? err.message : 'An unknown error occurred');
+      return { url, petId };
+    } catch (error) {
+      console.error('Error uploading pet profile picture:', error);
+      return rejectWithValue(error);
     }
   }
 );

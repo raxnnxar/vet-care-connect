@@ -1,7 +1,8 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Plus, Info, Loader2, Pencil } from 'lucide-react';
+import { Plus, Info, Loader2, Pencil, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/ui/atoms/button';
@@ -30,6 +31,17 @@ import { supabase } from '@/integrations/supabase/client';
 import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
 import PetPhotoUploadDialog from '@/features/pets/components/PetPhotoUploadDialog';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/ui/molecules/alert-dialog";
+import { Alert, AlertDescription } from "@/ui/molecules/alert";
 
 interface FormValues {
   phone: string;
@@ -57,6 +69,8 @@ const ProfileSetupScreen = () => {
   const [newPetId, setNewPetId] = useState<string | null>(null);
   const [newPetName, setNewPetName] = useState<string>('');
   const [showPhotoUploadDialog, setShowPhotoUploadDialog] = useState(false);
+  const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
+  const [petSuccessAlert, setPetSuccessAlert] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
@@ -64,6 +78,19 @@ const ProfileSetupScreen = () => {
       phone: '',
     },
   });
+
+  // Hide success alert after 3 seconds
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (petSuccessAlert) {
+      timer = setTimeout(() => {
+        setPetSuccessAlert(false);
+      }, 3000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [petSuccessAlert]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -128,10 +155,11 @@ const ProfileSetupScreen = () => {
         setNewPetId(result.id);
         setNewPetName(result.name);
         
-        // Show the photo upload dialog after a short delay
-        setTimeout(() => {
-          setShowPhotoUploadDialog(true);
-        }, 100);
+        // Show the success alert
+        setPetSuccessAlert(true);
+        
+        // Show the photo upload dialog immediately
+        setShowPhotoUploadDialog(true);
         
         // Clear submission state
         setIsSubmitting(false);
@@ -240,14 +268,28 @@ const ProfileSetupScreen = () => {
     if (wasPhotoAdded) {
       toast.success('Foto de mascota guardada exitosamente');
     }
-    
-    // Keep the user on this page - don't navigate away
+  };
+
+  const handleFinish = () => {
+    setIsFinishDialogOpen(true);
+  };
+
+  const handleConfirmFinish = () => {
+    navigate('/owner');
   };
 
   return (
     <div className="min-h-screen bg-background py-6 px-4 md:px-6">
       <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-6">
         <h1 className="text-2xl font-semibold text-center mb-6">Completa tu Perfil</h1>
+        
+        {petSuccessAlert && (
+          <Alert className="mb-4 bg-green-50 border-green-200">
+            <AlertDescription className="text-green-700">
+              ¡Mascota agregada con éxito!
+            </AlertDescription>
+          </Alert>
+        )}
         
         <div className="flex flex-col items-center mb-6">
           <div className="relative mb-4">
@@ -376,20 +418,31 @@ const ProfileSetupScreen = () => {
               </Dialog>
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium mt-8"
-              disabled={isSubmitting || isUploading}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Guardando...
-                </>
-              ) : (
-                'Completar Perfil'
-              )}
-            </Button>
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-8">
+              <Button 
+                type="submit" 
+                className="bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium"
+                disabled={isSubmitting || isUploading}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  'Guardar perfil'
+                )}
+              </Button>
+
+              <Button 
+                type="button"
+                onClick={handleFinish}
+                className="bg-accent3 hover:bg-accent3/90 text-white py-4 px-6 text-base font-medium flex items-center justify-center"
+              >
+                Finalizar y continuar
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
           </form>
         </Form>
       </div>
@@ -403,6 +456,24 @@ const ProfileSetupScreen = () => {
           onClose={handlePhotoDialogClose}
         />
       )}
+
+      {/* Finish confirmation dialog */}
+      <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Quieres finalizar la configuración?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pets.length > 0 
+                ? 'Has agregado mascotas a tu perfil. ¿Quieres continuar a la pantalla principal?' 
+                : '¿Estás seguro que deseas continuar sin agregar mascotas?'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmFinish}>Continuar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
