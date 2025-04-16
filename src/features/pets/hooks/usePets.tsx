@@ -34,11 +34,12 @@ export const usePets = () => {
     }
     
     try {
+      console.log('Creating pet with data:', petData);
       // Since addPet returns the pet data directly, we can just await the dispatch
-      const result = await dispatch(addPet(petData));
+      const result = await dispatch(addPet(petData)).unwrap();
       
-      // The result is the pet data returned from the thunk
-      return result as unknown as Pet;
+      // Return the pet data
+      return result;
     } catch (error) {
       console.error('Error creating pet:', error);
       throw error;

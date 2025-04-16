@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AppDispatch } from '../../../state/store';
 import { petsActions } from './petsSlice';
 import { petsApi } from '../api/petsApi';
-import { CreatePetData, UpdatePetData, PetFilters } from '../types';
+import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
 import { QueryOptions } from '../../../core/api/apiClient';
 import { toast } from 'sonner';
 
@@ -49,31 +49,33 @@ export const fetchPetById = (id: string) => async (dispatch: AppDispatch) => {
 /**
  * Add a new pet
  */
-export const addPet = (petData: CreatePetData) => async (dispatch: AppDispatch) => {
-  dispatch(petsActions.requestStarted());
-  
-  try {
-    const { data, error } = await petsApi.createPet(petData);
-    
-    if (error) {
-      console.error('Error adding pet:', error);
-      throw new Error(error.message || 'Failed to add pet');
+export const addPet = createAsyncThunk(
+  'pets/addPet',
+  async (petData: CreatePetData, { rejectWithValue }) => {
+    try {
+      const { data, error } = await petsApi.createPet(petData);
+      
+      if (error) {
+        console.error('Error adding pet:', error);
+        toast.error(`Error al agregar mascota: ${error.message || 'Error desconocido'}`);
+        return rejectWithValue(error.message || 'Failed to add pet');
+      }
+      
+      if (!data) {
+        toast.error('Error al agregar mascota: No se devolvieron datos');
+        return rejectWithValue('Pet creation returned no data');
+      }
+      
+      toast.success('Mascota agregada exitosamente');
+      return data as Pet;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      console.error('Error adding pet:', err);
+      toast.error(`Error al agregar mascota: ${errorMessage}`);
+      return rejectWithValue(errorMessage);
     }
-    
-    if (!data) throw new Error('Pet creation returned no data');
-    
-    dispatch(petsActions.addPetSuccess(data));
-    toast.success('Mascota agregada exitosamente');
-    
-    return data;
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-    console.error('Error adding pet:', err);
-    toast.error(`Error al agregar mascota: ${errorMessage}`);
-    dispatch(petsActions.requestFailed(errorMessage));
-    throw err;
   }
-};
+);
 
 /**
  * Update an existing pet

@@ -28,6 +28,7 @@ import { profileService } from '../api/profileService';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import PetForm from '@/features/pets/components/PetForm';
+import { usePets } from '@/features/pets/hooks';
 
 interface FormValues {
   phone: string;
@@ -87,38 +88,34 @@ const ProfileSetupScreen = () => {
       
       if (!user?.id) {
         toast.error('Error: No se pudo identificar al usuario');
-        return;
+        return null;
       }
       
-      const { data, error } = await supabase
-        .from('pets')
-        .insert({
-          ...petData,
-          owner_id: user.id
-        })
-        .select();
-      
-      if (error) {
-        throw error;
-      }
-      
-      const newPet = data && data[0] ? {
-        id: data[0].id,
-        name: data[0].name,
-        species: data[0].species,
-        breed: data[0].breed || '',
-      } : {
-        id: `pet-${uuidv4()}`,
-        name: petData.name,
-        species: petData.species,
-        breed: petData.breed || '',
+      const { createPet } = usePets();
+      const completeData = {
+        ...petData,
+        owner_id: user.id
       };
       
-      setPets([...pets, newPet]);
-      setIsPetDialogOpen(false);
-      toast.success('Mascota agregada exitosamente');
+      console.log('Adding pet with data:', completeData);
+      const result = await createPet(completeData);
       
-      return data && data[0];
+      if (result) {
+        const newPet = {
+          id: result.id,
+          name: result.name,
+          species: result.species,
+          breed: result.breed || '',
+        };
+        
+        setPets([...pets, newPet]);
+        setIsPetDialogOpen(false);
+        toast.success('Mascota agregada exitosamente');
+      } else {
+        toast.error('Error al agregar la mascota: No se recibieron datos');
+      }
+      
+      return result;
     } catch (error) {
       console.error('Error adding pet:', error);
       toast.error('Error al agregar la mascota');
