@@ -1,221 +1,145 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { User } from '../types';
+import { AuthCredentials } from '../types';
 import { supabase } from '@/integrations/supabase/client';
-import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
-import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
-import { authActions } from './authSlice';
-import { authApi } from '../api/authApi';
-import { profileService } from '../api/profileService';
+import { UpdateProfileOptions } from '../types';
 
-// Login thunk
-export const loginUser = createAsyncThunk(
-  'auth/login',
-  async ({ email, password }: { email: string; password: string }, { rejectWithValue, dispatch }) => {
+export const signIn = createAsyncThunk(
+  'auth/signIn',
+  async (credentials: AuthCredentials, { rejectWithValue }) => {
     try {
-      dispatch(authActions.authRequestStarted());
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
+      const { data, error } = await supabase.auth.signInWithPassword(credentials);
+      
       if (error) {
-        dispatch(authActions.authFailed(error.message));
         return rejectWithValue(error.message);
       }
-
-      // Success - update auth state
-      if (data.user) {
-        const user = {
-          id: data.user.id,
-          email: data.user.email || '',
-          displayName: data.user.user_metadata?.displayName || '',
-          role: data.user.user_metadata?.role,
-          serviceType: data.user.user_metadata?.serviceType
-        };
-        dispatch(authActions.authSuccess(user));
-        return user;
-      }
       
-      return rejectWithValue('Login failed - no user data returned');
-    } catch (error) {
-      dispatch(authActions.authFailed(error instanceof Error ? error.message : 'Unknown error'));
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error during sign in');
     }
   }
 );
 
-// Signup thunk
-export const signupUser = createAsyncThunk(
-  'auth/signup',
-  async ({ email, password, name }: { email: string; password: string; name: string }, { rejectWithValue, dispatch }) => {
+export const signUp = createAsyncThunk(
+  'auth/signUp',
+  async (credentials: AuthCredentials, { rejectWithValue }) => {
     try {
-      dispatch(authActions.authRequestStarted());
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            displayName: name,
-          },
-        },
-      });
-
+      const { data, error } = await supabase.auth.signUp(credentials);
+      
       if (error) {
-        dispatch(authActions.authFailed(error.message));
         return rejectWithValue(error.message);
       }
-
-      // Success - update auth state
-      if (data.user) {
-        const user = {
-          id: data.user.id,
-          email: data.user.email || '',
-          displayName: name,
-          // Role will be set in the post-signup flow
-        };
-        dispatch(authActions.authSuccess(user));
-        return user;
-      }
       
-      return rejectWithValue('Signup failed - no user data returned');
-    } catch (error) {
-      dispatch(authActions.authFailed(error instanceof Error ? error.message : 'Unknown error'));
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error during sign up');
     }
   }
 );
 
-// Logout thunk
-export const logoutUser = createAsyncThunk(
-  'auth/logout',
-  async (_, { rejectWithValue, dispatch }) => {
+export const signOut = createAsyncThunk(
+  'auth/signOut',
+  async (_, { rejectWithValue }) => {
     try {
-      dispatch(authActions.authRequestStarted());
       const { error } = await supabase.auth.signOut();
-
+      
       if (error) {
-        dispatch(authActions.authFailed(error.message));
         return rejectWithValue(error.message);
       }
-
-      dispatch(authActions.logoutSuccess());
+      
       return null;
-    } catch (error) {
-      dispatch(authActions.authFailed(error instanceof Error ? error.message : 'Unknown error'));
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error during sign out');
     }
   }
 );
 
-// Get current user thunk
-export const getCurrentUser = createAsyncThunk(
-  'auth/getCurrentUser',
-  async (_, { rejectWithValue, dispatch }) => {
-    try {
-      dispatch(authActions.authRequestStarted());
-      const { data, error } = await supabase.auth.getUser();
-
-      if (error) {
-        dispatch(authActions.authFailed(error.message));
-        return rejectWithValue(error.message);
-      }
-
-      if (data && data.user) {
-        const user = {
-          id: data.user.id,
-          email: data.user.email || '',
-          displayName: data.user.user_metadata?.displayName || '',
-          role: data.user.user_metadata?.role,
-          serviceType: data.user.user_metadata?.serviceType
-        };
-        dispatch(authActions.authSuccess(user));
-        return user;
-      } else {
-        dispatch(authActions.logoutSuccess());
-        return null;
-      }
-    } catch (error) {
-      dispatch(authActions.authFailed(error instanceof Error ? error.message : 'Unknown error'));
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
-    }
-  }
-);
-
-// Update user role thunk
-export const assignUserRole = createAsyncThunk(
-  'auth/assignUserRole',
-  async ({ userId, role }: { userId: string; role: string }, { rejectWithValue }) => {
-    try {
-      console.log(`Assigning role ${role} to user ${userId}`);
-      
-      const { error, role: updatedRole } = await authApi.updateUserRole(userId, role);
-      
-      if (error) {
-        console.error('Error in assignUserRole:', error);
-        return rejectWithValue(error);
-      }
-      
-      return { role: updatedRole };
-    } catch (error) {
-      console.error('Error in assignUserRole:', error);
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
-    }
-  }
-);
-
-// Update provider type thunk
-export const updateProviderType = createAsyncThunk(
-  'auth/updateProviderType',
-  async ({ providerId, providerType }: { providerId: string; providerType: string }, { rejectWithValue }) => {
-    try {
-      console.log(`Updating provider type to ${providerType} for user ${providerId}`);
-      
-      const { error, providerType: updatedType } = await authApi.updateProviderType(providerId, providerType);
-      
-      if (error) {
-        console.error('Error in updateProviderType:', error);
-        return rejectWithValue(error);
-      }
-
-      return { providerType: updatedType };
-    } catch (error) {
-      console.error('Error in updateProviderType:', error);
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
-    }
-  }
-);
-
-// Add the updateProfile function
 export const updateProfile = createAsyncThunk(
   'auth/updateProfile',
-  async ({ phone, profileImage }: { phone: string, profileImage?: string | null }, { rejectWithValue, getState }: any) => {
+  async (options: UpdateProfileOptions, { rejectWithValue, getState }) => {
     try {
-      const state = getState();
-      const user = state.auth.user;
+      const { auth } = getState() as { auth: { user: any } };
+      const userId = auth.user?.id;
       
-      if (!user || !user.id) {
-        return rejectWithValue('No authenticated user found');
+      if (!userId) {
+        return rejectWithValue('User not authenticated');
       }
       
-      // Update the pet owner profile in Supabase using our profileService
-      const success = await profileService.updatePetOwnerProfile(user.id, {
-        phoneNumber: phone,
-        profilePictureUrl: profileImage
-      });
+      // Update pet owner profile in Supabase
+      const { error } = await supabase
+        .from('pet_owners')
+        .update({
+          phone_number: options.phone,
+          profile_picture_url: options.profileImage
+        })
+        .eq('id', userId);
       
-      if (!success) {
-        return rejectWithValue('Failed to update profile');
+      if (error) {
+        console.error('Error updating profile:', error);
+        return rejectWithValue(error.message);
       }
       
-      // Return the updated user data
+      // If we have pets to store, we would do this:
+      if (options.pets && options.pets.length > 0) {
+        for (const pet of options.pets) {
+          const { error: petError } = await supabase
+            .from('pets')
+            .insert({
+              ...pet,
+              owner_id: userId
+            });
+            
+          if (petError) {
+            console.error('Error adding pet:', petError);
+            // Continue despite errors
+          }
+        }
+      }
+      
       return {
-        ...user,
-        phone,
-        profileImage: profileImage || user.profileImage
+        phone: options.phone,
+        profileImage: options.profileImage,
+        pets: options.pets || []
       };
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Error updating profile');
+    }
+  }
+);
+
+export const getCurrentUser = createAsyncThunk(
+  'auth/getCurrentUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      
+      if (error) {
+        return rejectWithValue(error.message);
+      }
+      
+      return data?.user || null;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error getting current user');
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) {
+        return rejectWithValue(error.message);
+      }
+      
+      return true;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error sending password reset email');
     }
   }
 );

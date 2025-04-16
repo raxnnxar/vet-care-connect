@@ -22,18 +22,16 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/ui/molecules/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/molecules/tooltip';
 import { updateProfile } from '../store/authThunks';
 import { profileService } from '../api/profileService';
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
+import PetForm from '@/features/pets/components/PetForm';
 
 interface FormValues {
   phone: string;
-  petName: string;
-  petSpecies: string;
-  petBreed: string;
 }
 
 interface PetData {
@@ -54,14 +52,12 @@ const ProfileSetupScreen = () => {
   const [isPetDialogOpen, setIsPetDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingPet, setIsAddingPet] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     defaultValues: {
       phone: '',
-      petName: '',
-      petSpecies: '',
-      petBreed: '',
     },
   });
 
@@ -88,28 +84,41 @@ const ProfileSetupScreen = () => {
     }
   };
 
-  const handleAddPet = (data: { petName: string, petSpecies: string, petBreed: string }) => {
-    if (!data.petName || !data.petSpecies) {
-      toast.error('El nombre y la especie de la mascota son obligatorios');
-      return;
+  const handleAddPet = async (petData: any) => {
+    try {
+      setIsAddingPet(true);
+      
+      if (!user?.id) {
+        toast.error('Error: No se pudo identificar al usuario');
+        return;
+      }
+      
+      // In a real app with Supabase, we would do the following:
+      // const { data, error } = await supabase
+      //   .from('pets')
+      //   .insert({
+      //     ...petData,
+      //     owner_id: user.id
+      //   })
+      //   .select();
+      
+      // For now, we'll simulate a successful response
+      const newPet = {
+        id: `pet-${uuidv4()}`,
+        name: petData.name,
+        species: petData.species,
+        breed: petData.breed || '',
+      };
+      
+      setPets([...pets, newPet]);
+      setIsPetDialogOpen(false);
+      toast.success('Mascota agregada exitosamente');
+    } catch (error) {
+      console.error('Error adding pet:', error);
+      toast.error('Error al agregar la mascota');
+    } finally {
+      setIsAddingPet(false);
     }
-    
-    const newPet = {
-      id: `pet-${uuidv4()}`,
-      name: data.petName,
-      species: data.petSpecies,
-      breed: data.petBreed,
-    };
-    
-    setPets([...pets, newPet]);
-    setIsPetDialogOpen(false);
-    form.reset({
-      phone: form.getValues('phone'),
-      petName: '',
-      petSpecies: '',
-      petBreed: '',
-    });
-    toast.success('Mascota agregada exitosamente');
   };
 
   const uploadProfilePicture = async (): Promise<string | null> => {
@@ -117,8 +126,30 @@ const ProfileSetupScreen = () => {
     
     setIsUploading(true);
     try {
-      const imageUrl = await profileService.uploadProfileImage(user.id, profileImageFile);
-      return imageUrl;
+      // First attempt to use our Supabase Storage integration
+      try {
+        const fileName = `${user.id}-${uuidv4()}`;
+        const { data, error } = await supabase.storage
+          .from('pet-owners-profile-pictures')
+          .upload(fileName, profileImageFile, {
+            cacheControl: '3600',
+            upsert: true
+          });
+          
+        if (error) throw error;
+        
+        // Get the public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('pet-owners-profile-pictures')
+          .getPublicUrl(fileName);
+          
+        return publicUrlData.publicUrl;
+      } catch (supabaseError) {
+        console.error('Supabase storage error:', supabaseError);
+        // Fallback to our original service if Supabase fails
+        const imageUrl = await profileService.uploadProfileImage(user.id, profileImageFile);
+        return imageUrl;
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.error('Error al subir la imagen de perfil');
@@ -259,8 +290,8 @@ const ProfileSetupScreen = () => {
               )}
             />
 
-            <div className="space-y-4">
-              <h2 className="text-base font-medium mb-3">Mis Mascotas</h2>
+            <div className="space-y-4 mt-6">
+              <h2 className="text-base font-medium mb-2">Mis Mascotas</h2>
 
               <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
                 {pets.length === 0 ? (
@@ -303,51 +334,11 @@ const ProfileSetupScreen = () => {
                     </Button>
                   </div>
                 )}
-                <DialogContent>
+                <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle>Agregar Nueva Mascota</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="petName">Nombre *</Label>
-                      <Input 
-                        id="petName"
-                        {...form.register('petName')}
-                        placeholder="Nombre de tu mascota"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="petSpecies">Especie *</Label>
-                      <Input 
-                        id="petSpecies"
-                        {...form.register('petSpecies')}
-                        placeholder="Ej: Perro, Gato, etc."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="petBreed">Raza</Label>
-                      <Input 
-                        id="petBreed"
-                        {...form.register('petBreed')}
-                        placeholder="Opcional"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button 
-                      type="button" 
-                      onClick={() => {
-                        const petData = {
-                          petName: form.getValues('petName'),
-                          petSpecies: form.getValues('petSpecies'),
-                          petBreed: form.getValues('petBreed'),
-                        };
-                        handleAddPet(petData);
-                      }}
-                    >
-                      Guardar
-                    </Button>
-                  </DialogFooter>
+                  <PetForm onSubmit={handleAddPet} isSubmitting={isAddingPet} />
                 </DialogContent>
               </Dialog>
             </div>

@@ -1,49 +1,34 @@
 
-/**
- * Authentication related types
- * 
- * These types define the shape of authentication data in the application
- */
-import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
-import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
+export interface AuthCredentials {
+  email: string;
+  password: string;
+}
 
 export interface User {
   id: string;
   email: string;
-  displayName: string;
-  role?: UserRoleType;
-  profileImage?: string;
-  phone?: string;
-  serviceType?: ServiceTypeType;
+  displayName?: string;
+  role?: string;
+  // Additional user fields as needed
+}
+
+export interface UpdateProfileOptions {
+  phone: string;
+  profileImage?: string | null;
+  pets?: any[]; // Array of pet objects to be saved
 }
 
 export interface AuthState {
   user: User | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface SignupData {
-  email: string;
-  password: string;
-  displayName: string;
-}
-
-export interface AuthResponse {
+export interface Session {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  refresh_token: string;
   user: User;
-  token: string;
-}
-
-export interface ResetPasswordData {
-  token: string;
-  newPassword: string;
-}
-
-export interface PasswordResetRequest {
-  email: string;
 }

@@ -101,6 +101,47 @@ export type Database = {
           },
         ]
       }
+      pet_medical_history: {
+        Row: {
+          allergies: string | null
+          chronic_conditions: string | null
+          created_at: string | null
+          current_medications: Json | null
+          id: string
+          pet_id: string | null
+          previous_surgeries: Json | null
+          vaccines_document_url: string | null
+        }
+        Insert: {
+          allergies?: string | null
+          chronic_conditions?: string | null
+          created_at?: string | null
+          current_medications?: Json | null
+          id?: string
+          pet_id?: string | null
+          previous_surgeries?: Json | null
+          vaccines_document_url?: string | null
+        }
+        Update: {
+          allergies?: string | null
+          chronic_conditions?: string | null
+          created_at?: string | null
+          current_medications?: Json | null
+          id?: string
+          pet_id?: string | null
+          previous_surgeries?: Json | null
+          vaccines_document_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_medical_history_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pet_owners: {
         Row: {
           address: string | null
@@ -132,36 +173,45 @@ export type Database = {
       }
       pets: {
         Row: {
+          additional_notes: string | null
           breed: string | null
           created_at: string | null
           date_of_birth: string | null
           id: string
-          medical_history: Json | null
           name: string
           owner_id: string | null
+          profile_picture_url: string | null
+          sex: string | null
           species: string
+          temperament: string | null
           weight: number | null
         }
         Insert: {
+          additional_notes?: string | null
           breed?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           id?: string
-          medical_history?: Json | null
           name: string
           owner_id?: string | null
+          profile_picture_url?: string | null
+          sex?: string | null
           species: string
+          temperament?: string | null
           weight?: number | null
         }
         Update: {
+          additional_notes?: string | null
           breed?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           id?: string
-          medical_history?: Json | null
           name?: string
           owner_id?: string | null
+          profile_picture_url?: string | null
+          sex?: string | null
           species?: string
+          temperament?: string | null
           weight?: number | null
         }
         Relationships: [
