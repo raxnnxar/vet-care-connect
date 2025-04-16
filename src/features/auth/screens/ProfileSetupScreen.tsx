@@ -334,11 +334,13 @@ const ProfileSetupScreen = () => {
                     </Button>
                   </div>
                 )}
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
+                <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden p-0">
+                  <DialogHeader className="p-6 pb-2">
                     <DialogTitle>Agregar Nueva Mascota</DialogTitle>
                   </DialogHeader>
-                  <PetForm onSubmit={handleAddPet} isSubmitting={isAddingPet} />
+                  <div className="px-6 py-4">
+                    <PetForm onSubmit={handleAddPet} isSubmitting={isAddingPet} />
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -365,3 +367,4 @@ const ProfileSetupScreen = () => {
 };
 
 export default ProfileSetupScreen;
+

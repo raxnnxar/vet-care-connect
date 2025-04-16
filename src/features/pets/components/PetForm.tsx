@@ -6,6 +6,7 @@ import { Input } from '@/ui/atoms/input';
 import { Label } from '@/ui/atoms/label';
 import { Textarea } from '@/ui/atoms/textarea';
 import { Button } from '@/ui/atoms/button';
+import { ScrollArea } from '@/ui/molecules/scroll-area';
 import {
   Select,
   SelectContent,
@@ -234,401 +235,412 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
   };
   
   return (
-    <form onSubmit={handleSubmit(processFormData)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name" className="font-medium text-base">
-          Nombre *
-        </Label>
-        <Input
-          id="name"
-          {...register('name', { required: "El nombre es obligatorio" })}
-          placeholder="Nombre de tu mascota"
-          className={errors.name ? "border-red-500" : ""}
-        />
-        {errors.name && (
-          <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
-        )}
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="species" className="font-medium text-base">
-          Animal *
-        </Label>
-        <Controller
-          control={control}
-          name="species"
-          rules={{ required: "Debes seleccionar un tipo de animal" }}
-          render={({ field }) => (
-            <Select 
-              onValueChange={field.onChange} 
-              defaultValue={field.value}
-            >
-              <SelectTrigger className={errors.species ? "border-red-500" : ""}>
-                <SelectValue placeholder="Selecciona un animal" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Perro">
-                  <div className="flex items-center gap-2">
-                    <Dog className="h-4 w-4" />
-                    <span>Perro</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="Gato">
-                  <div className="flex items-center gap-2">
-                    <Cat className="h-4 w-4" />
-                    <span>Gato</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="Tortuga">
-                  <div className="flex items-center gap-2">
-                    <Turtle className="h-4 w-4" />
-                    <span>Tortuga</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="Ave">
-                  <div className="flex items-center gap-2">
-                    <Bird className="h-4 w-4" />
-                    <span>Ave</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="Conejo">
-                  <div className="flex items-center gap-2">
-                    <Rabbit className="h-4 w-4" />
-                    <span>Conejo</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="Hámster">
-                  <div className="flex items-center gap-2">
-                    <Rabbit className="h-4 w-4" />
-                    <span>Hámster</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="Otro">
-                  <div className="flex items-center gap-2">
-                    <Info className="h-4 w-4" />
-                    <span>Otro</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-        {errors.species && (
-          <p className="text-sm text-red-500 mt-1">{errors.species.message}</p>
-        )}
-      </div>
-      
-      {selectedSpecies === 'Otro' && (
+    <ScrollArea className="max-h-[70vh] pr-4 overflow-y-auto">
+      <form onSubmit={handleSubmit(processFormData)} className="space-y-4 pb-4">
         <div className="space-y-2">
-          <Label htmlFor="customSpecies" className="font-medium text-base">
-            Especifica el tipo de animal *
+          <Label htmlFor="name" className="font-medium text-base">
+            Nombre *
           </Label>
           <Input
-            id="customSpecies"
-            {...register('customSpecies', { 
-              required: selectedSpecies === 'Otro' ? "Por favor especifica el tipo de animal" : false 
-            })}
-            placeholder="Tipo de animal"
-            className={errors.customSpecies ? "border-red-500" : ""}
+            id="name"
+            {...register('name', { required: "El nombre es obligatorio" })}
+            placeholder="Nombre de tu mascota"
+            className={errors.name ? "border-red-500" : ""}
           />
-          {errors.customSpecies && (
-            <p className="text-sm text-red-500 mt-1">{errors.customSpecies.message}</p>
-          )}
-        </div>
-      )}
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="age" className="font-medium text-base">
-            Edad (años)
-          </Label>
-          <Input
-            id="age"
-            type="number"
-            {...register('age', { 
-              valueAsNumber: true,
-              min: { value: 0, message: "La edad no puede ser negativa" },
-              max: { value: 100, message: "La edad parece ser demasiado alta" }
-            })}
-            placeholder="Edad en años"
-            className={errors.age ? "border-red-500" : ""}
-          />
-          {errors.age && (
-            <p className="text-sm text-red-500 mt-1">{errors.age.message}</p>
+          {errors.name && (
+            <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
           )}
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="weight" className="font-medium text-base">
-            Peso (kg)
+          <Label htmlFor="species" className="font-medium text-base">
+            Animal *
           </Label>
-          <Input
-            id="weight"
-            type="number"
-            step="0.1"
-            {...register('weight', { 
-              valueAsNumber: true,
-              min: { value: 0, message: "El peso no puede ser negativo" },
-              max: { value: 1000, message: "El peso parece ser demasiado alto" }
-            })}
-            placeholder="Peso en kg"
-            className={errors.weight ? "border-red-500" : ""}
+          <Controller
+            control={control}
+            name="species"
+            rules={{ required: "Debes seleccionar un tipo de animal" }}
+            render={({ field }) => (
+              <Select 
+                onValueChange={field.onChange} 
+                defaultValue={field.value}
+              >
+                <SelectTrigger className={errors.species ? "border-red-500" : ""}>
+                  <SelectValue placeholder="Selecciona un animal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Perro">
+                    <div className="flex items-center gap-2">
+                      <Dog className="h-4 w-4" />
+                      <span>Perro</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="Gato">
+                    <div className="flex items-center gap-2">
+                      <Cat className="h-4 w-4" />
+                      <span>Gato</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="Tortuga">
+                    <div className="flex items-center gap-2">
+                      <Turtle className="h-4 w-4" />
+                      <span>Tortuga</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="Ave">
+                    <div className="flex items-center gap-2">
+                      <Bird className="h-4 w-4" />
+                      <span>Ave</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="Conejo">
+                    <div className="flex items-center gap-2">
+                      <Rabbit className="h-4 w-4" />
+                      <span>Conejo</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="Hámster">
+                    <div className="flex items-center gap-2">
+                      <Rabbit className="h-4 w-4" />
+                      <span>Hámster</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="Otro">
+                    <div className="flex items-center gap-2">
+                      <Info className="h-4 w-4" />
+                      <span>Otro</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           />
-          {errors.weight && (
-            <p className="text-sm text-red-500 mt-1">{errors.weight.message}</p>
+          {errors.species && (
+            <p className="text-sm text-red-500 mt-1">{errors.species.message}</p>
           )}
         </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="sex" className="font-medium text-base">
-          Sexo
-        </Label>
-        <Controller
-          control={control}
-          name="sex"
-          render={({ field }) => (
-            <Select 
-              onValueChange={field.onChange} 
-              defaultValue={field.value}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona el sexo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Macho">Macho</SelectItem>
-                <SelectItem value="Hembra">Hembra</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="temperament" className="font-medium text-base">
-          Temperamento
-        </Label>
-        <Input
-          id="temperament"
-          {...register('temperament')}
-          placeholder="Ej: Juguetón, Tranquilo, Cariñoso"
-          className={errors.temperament ? "border-red-500" : ""}
-        />
-      </div>
-      
-      {/* Medical History Section */}
-      <Collapsible
-        open={isMedicalHistoryOpen}
-        onOpenChange={setIsMedicalHistoryOpen}
-        className="border rounded-md p-2 shadow-sm bg-gray-50"
-      >
-        <CollapsibleTrigger asChild>
-          <Button 
-            type="button" 
-            variant="ghost" 
-            className="flex w-full justify-between items-center p-2 hover:bg-gray-100"
-          >
-            <div className="flex items-center gap-2 text-primary">
-              <Syringe className="h-5 w-5" />
-              <span className="font-medium">Historial Médico</span>
-            </div>
-            {isMedicalHistoryOpen ? (
-              <ChevronDown className="h-5 w-5" />
-            ) : (
-              <ChevronRight className="h-5 w-5" />
+        
+        {selectedSpecies === 'Otro' && (
+          <div className="space-y-2">
+            <Label htmlFor="customSpecies" className="font-medium text-base">
+              Especifica el tipo de animal *
+            </Label>
+            <Input
+              id="customSpecies"
+              {...register('customSpecies', { 
+                required: selectedSpecies === 'Otro' ? "Por favor especifica el tipo de animal" : false 
+              })}
+              placeholder="Tipo de animal"
+              className={errors.customSpecies ? "border-red-500" : ""}
+            />
+            {errors.customSpecies && (
+              <p className="text-sm text-red-500 mt-1">{errors.customSpecies.message}</p>
             )}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="p-2 space-y-4 mt-2">
-          {/* Vaccine Record Upload */}
+          </div>
+        )}
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="vaccineDocument" className="font-medium text-base">
-              Registro de vacunas
+            <Label htmlFor="age" className="font-medium text-base">
+              Edad (años)
             </Label>
-            <div className="flex flex-col gap-2">
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
-                <Input
-                  id="vaccineDocument"
-                  type="file"
-                  accept=".pdf,.png,.jpg,.jpeg"
-                  onChange={(e) => handleFileUpload(e.target.files)}
-                  className="hidden"
-                  disabled={uploadingDocument}
-                />
-                <Label 
-                  htmlFor="vaccineDocument" 
-                  className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
-                >
-                  <Upload className="h-8 w-8" />
-                  <span>{uploadingDocument ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}</span>
+            <Input
+              id="age"
+              type="number"
+              {...register('age', { 
+                valueAsNumber: true,
+                min: { value: 0, message: "La edad no puede ser negativa" },
+                max: { value: 100, message: "La edad parece ser demasiado alta" }
+              })}
+              placeholder="Edad en años"
+              className={errors.age ? "border-red-500" : ""}
+            />
+            {errors.age && (
+              <p className="text-sm text-red-500 mt-1">{errors.age.message}</p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="weight" className="font-medium text-base">
+              Peso (kg)
+            </Label>
+            <Input
+              id="weight"
+              type="number"
+              step="0.1"
+              {...register('weight', { 
+                valueAsNumber: true,
+                min: { value: 0, message: "El peso no puede ser negativo" },
+                max: { value: 1000, message: "El peso parece ser demasiado alto" }
+              })}
+              placeholder="Peso en kg"
+              className={errors.weight ? "border-red-500" : ""}
+            />
+            {errors.weight && (
+              <p className="text-sm text-red-500 mt-1">{errors.weight.message}</p>
+            )}
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="sex" className="font-medium text-base">
+            Sexo
+          </Label>
+          <Controller
+            control={control}
+            name="sex"
+            render={({ field }) => (
+              <Select 
+                onValueChange={field.onChange} 
+                defaultValue={field.value}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona el sexo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Macho">Macho</SelectItem>
+                  <SelectItem value="Hembra">Hembra</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="temperament" className="font-medium text-base">
+            Temperamento
+          </Label>
+          <Input
+            id="temperament"
+            {...register('temperament')}
+            placeholder="Ej: Juguetón, Tranquilo, Cariñoso"
+            className={errors.temperament ? "border-red-500" : ""}
+          />
+        </div>
+        
+        {/* Medical History Section */}
+        <div className="relative">
+          <Collapsible
+            open={isMedicalHistoryOpen}
+            onOpenChange={setIsMedicalHistoryOpen}
+            className="border rounded-md p-2 shadow-sm bg-gray-50"
+          >
+            <CollapsibleTrigger asChild>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="flex w-full justify-between items-center p-2 hover:bg-gray-100"
+              >
+                <div className="flex items-center gap-2 text-primary">
+                  <Syringe className="h-5 w-5" />
+                  <span className="font-medium">Historial Médico</span>
+                </div>
+                {isMedicalHistoryOpen ? (
+                  <ChevronDown className="h-5 w-5" />
+                ) : (
+                  <ChevronRight className="h-5 w-5" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="p-2 space-y-4 mt-2">
+              {/* Vaccine Record Upload */}
+              <div className="space-y-2">
+                <Label htmlFor="vaccineDocument" className="font-medium text-base">
+                  Registro de vacunas
                 </Label>
+                <div className="flex flex-col gap-2">
+                  <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
+                    <Input
+                      id="vaccineDocument"
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      onChange={(e) => handleFileUpload(e.target.files)}
+                      className="hidden"
+                      disabled={uploadingDocument}
+                    />
+                    <Label 
+                      htmlFor="vaccineDocument" 
+                      className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
+                    >
+                      <Upload className="h-8 w-8" />
+                      <span>{uploadingDocument ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}</span>
+                    </Label>
+                  </div>
+                  {uploadedDocumentUrl && (
+                    <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
+                      <FilePlus className="h-4 w-4" />
+                      <span className="text-sm">Documento subido exitosamente</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              {uploadedDocumentUrl && (
-                <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
-                  <FilePlus className="h-4 w-4" />
-                  <span className="text-sm">Documento subido exitosamente</span>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Current Medications */}
-          <div className="space-y-2">
-            <Label className="font-medium text-base">
-              Medicamentos actuales
-            </Label>
-            <div className="space-y-4">
-              {medicationFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2 items-start">
-                  <div className="grid grid-cols-3 gap-2 flex-1">
-                    <Input
-                      {...register(`medications.${index}.name`)}
-                      placeholder="Nombre del medicamento"
-                      className="col-span-1"
-                    />
-                    <Input
-                      {...register(`medications.${index}.dosage`)}
-                      placeholder="Dosis (mg, ml, etc.)"
-                      className="col-span-1"
-                    />
-                    <Input
-                      {...register(`medications.${index}.frequency`)}
-                      placeholder="Frecuencia"
-                      className="col-span-1"
-                    />
-                  </div>
-                  {index > 0 && (
-                    <Button 
-                      type="button" 
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => removeMedication(index)}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
               
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
-                onClick={() => appendMedication({ 
-                  id: uuidv4(), 
-                  name: '', 
-                  dosage: '', 
-                  frequency: '' 
-                })}
-              >
-                <Plus className="h-4 w-4" />
-                <span>Agregar medicamento</span>
-              </Button>
-            </div>
-          </div>
-          
-          {/* Previous Surgeries */}
-          <div className="space-y-2">
-            <Label className="font-medium text-base">
-              Cirugías previas
-            </Label>
-            <div className="space-y-4">
-              {surgeryFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2 items-start">
-                  <div className="grid grid-cols-2 gap-2 flex-1">
-                    <Input
-                      {...register(`surgeries.${index}.type`)}
-                      placeholder="Tipo de cirugía"
-                      className="col-span-1"
-                    />
-                    <Input
-                      {...register(`surgeries.${index}.date`)}
-                      placeholder="Fecha (MM/YYYY)"
-                      className="col-span-1"
-                    />
-                  </div>
-                  {index > 0 && (
-                    <Button 
-                      type="button" 
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => removeSurgery(index)}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                  )}
+              {/* Current Medications */}
+              <div className="space-y-2">
+                <Label className="font-medium text-base">
+                  Medicamentos actuales
+                </Label>
+                <div className="space-y-4">
+                  {medicationFields.map((field, index) => (
+                    <div key={field.id} className="flex gap-2 items-start">
+                      <div className="grid grid-cols-3 gap-2 flex-1">
+                        <Input
+                          {...register(`medications.${index}.name`)}
+                          placeholder="Nombre del medicamento"
+                          className="col-span-1"
+                        />
+                        <Input
+                          {...register(`medications.${index}.dosage`)}
+                          placeholder="Dosis (mg, ml, etc.)"
+                          className="col-span-1"
+                        />
+                        <Input
+                          {...register(`medications.${index}.frequency`)}
+                          placeholder="Frecuencia"
+                          className="col-span-1"
+                        />
+                      </div>
+                      {index > 0 && (
+                        <Button 
+                          type="button" 
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={() => removeMedication(index)}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1"
+                    onClick={() => appendMedication({ 
+                      id: uuidv4(), 
+                      name: '', 
+                      dosage: '', 
+                      frequency: '' 
+                    })}
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Agregar medicamento</span>
+                  </Button>
                 </div>
-              ))}
+              </div>
               
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
-                onClick={() => appendSurgery({ 
-                  id: uuidv4(), 
-                  type: '', 
-                  date: '' 
-                })}
-              >
-                <Plus className="h-4 w-4" />
-                <span>Agregar cirugía</span>
-              </Button>
-            </div>
-          </div>
-          
-          {/* Allergies */}
-          <div className="space-y-2">
-            <Label htmlFor="allergies" className="font-medium text-base">
-              Alergias
-            </Label>
-            <Textarea
-              id="allergies"
-              {...register('allergies')}
-              placeholder="Alergias conocidas del animal"
-              className="min-h-[80px]"
-            />
-          </div>
-          
-          {/* Chronic Conditions */}
-          <div className="space-y-2">
-            <Label htmlFor="chronicConditions" className="font-medium text-base">
-              Condiciones crónicas
-            </Label>
-            <Textarea
-              id="chronicConditions"
-              {...register('chronicConditions')}
-              placeholder="Condiciones médicas crónicas"
-              className="min-h-[80px]"
-            />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-      
-      <div className="space-y-2">
-        <Label htmlFor="additionalNotes" className="font-medium text-base">
-          Notas adicionales
-        </Label>
-        <Textarea
-          id="additionalNotes"
-          {...register('additionalNotes')}
-          placeholder="Información adicional relevante sobre tu mascota"
-          className="min-h-[100px]"
-        />
-      </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium mt-2"
-        disabled={isSubmitting || uploadingDocument}
-      >
-        {isSubmitting ? 'Guardando...' : 'Guardar mascota'}
-      </Button>
-    </form>
+              {/* Previous Surgeries */}
+              <div className="space-y-2">
+                <Label className="font-medium text-base">
+                  Cirugías previas
+                </Label>
+                <div className="space-y-4">
+                  {surgeryFields.map((field, index) => (
+                    <div key={field.id} className="flex gap-2 items-start">
+                      <div className="grid grid-cols-2 gap-2 flex-1">
+                        <Input
+                          {...register(`surgeries.${index}.type`)}
+                          placeholder="Tipo de cirugía"
+                          className="col-span-1"
+                        />
+                        <Input
+                          {...register(`surgeries.${index}.date`)}
+                          placeholder="Fecha (MM/YYYY)"
+                          className="col-span-1"
+                        />
+                      </div>
+                      {index > 0 && (
+                        <Button 
+                          type="button" 
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={() => removeSurgery(index)}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1"
+                    onClick={() => appendSurgery({ 
+                      id: uuidv4(), 
+                      type: '', 
+                      date: '' 
+                    })}
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Agregar cirugía</span>
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Allergies */}
+              <div className="space-y-2">
+                <Label htmlFor="allergies" className="font-medium text-base">
+                  Alergias
+                </Label>
+                <Textarea
+                  id="allergies"
+                  {...register('allergies')}
+                  placeholder="Alergias conocidas del animal"
+                  className="min-h-[80px]"
+                />
+              </div>
+              
+              {/* Chronic Conditions */}
+              <div className="space-y-2">
+                <Label htmlFor="chronicConditions" className="font-medium text-base">
+                  Condiciones crónicas
+                </Label>
+                <Textarea
+                  id="chronicConditions"
+                  {...register('chronicConditions')}
+                  placeholder="Condiciones médicas crónicas"
+                  className="min-h-[80px]"
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+          {/* Visual indicator for scrollable content when medical history is expanded */}
+          {isMedicalHistoryOpen && (
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+          )}
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="additionalNotes" className="font-medium text-base">
+            Notas adicionales
+          </Label>
+          <Textarea
+            id="additionalNotes"
+            {...register('additionalNotes')}
+            placeholder="Información adicional relevante sobre tu mascota"
+            className="min-h-[100px]"
+          />
+        </div>
+        
+        <div className="sticky bottom-0 pt-4 bg-white bg-opacity-95 mt-6 shadow-sm">
+          <Button 
+            type="submit" 
+            className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium"
+            disabled={isSubmitting || uploadingDocument}
+          >
+            {isSubmitting ? 'Guardando...' : 'Guardar mascota'}
+          </Button>
+        </div>
+      </form>
+    </ScrollArea>
   );
 };
 
 export default PetForm;
+
