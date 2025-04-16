@@ -1,5 +1,5 @@
 
-import { Pet, CreatePetData, UpdatePetData, PetFilters } from '../types';
+import { Pet, CreatePetData, UpdatePetData, PetFilters, PetMedicalHistory } from '../types';
 import { QueryOptions } from '../../../core/api/apiClient';
 
 export interface IPetsApi {
@@ -56,6 +56,14 @@ export interface IPetsApi {
    */
   uploadPetProfilePicture(petId: string, file: File): Promise<{
     data: { publicUrl: string } | null;
+    error: Error | null;
+  }>;
+  
+  /**
+   * Create pet medical history
+   */
+  createPetMedicalHistory(petId: string, medicalHistoryData: PetMedicalHistory): Promise<{
+    data: any | null;
     error: Error | null;
   }>;
 }

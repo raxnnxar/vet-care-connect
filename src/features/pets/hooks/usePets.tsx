@@ -53,7 +53,7 @@ export const usePets = () => {
   }, [dispatch, user]);
   
   const updatePet = useCallback((id: string, petData: UpdatePetData) => {
-    return dispatch(modifyPet(id, petData));
+    return dispatch(modifyPet({ id, petData }));
   }, [dispatch]);
   
   const deletePet = useCallback((id: string) => {

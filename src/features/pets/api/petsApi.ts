@@ -198,5 +198,39 @@ export const petsApi: IPetsApi = {
       console.error('Error in uploadPetProfilePicture:', error);
       return { data: null, error: error as Error };
     }
+  },
+  
+  /**
+   * Create pet medical history
+   */
+  async createPetMedicalHistory(petId: string, medicalHistoryData: PetMedicalHistory) {
+    try {
+      // Prepare the data for insertion
+      const insertData = {
+        pet_id: petId,
+        allergies: medicalHistoryData.allergies || null,
+        chronic_conditions: medicalHistoryData.chronic_conditions || null,
+        vaccines_document_url: medicalHistoryData.vaccines_document_url || null,
+        current_medications: medicalHistoryData.current_medications ? 
+          JSON.stringify(medicalHistoryData.current_medications) : null,
+        previous_surgeries: medicalHistoryData.previous_surgeries ? 
+          JSON.stringify(medicalHistoryData.previous_surgeries) : null
+      };
+      
+      const { data, error } = await supabase
+        .from('pet_medical_history')
+        .insert(insertData)
+        .select();
+      
+      if (error) {
+        console.error('Error creating pet medical history:', error);
+        return { data: null, error };
+      }
+      
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error in createPetMedicalHistory:', error);
+      return { data: null, error: error as Error };
+    }
   }
 };
