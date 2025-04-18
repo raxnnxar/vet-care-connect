@@ -47,6 +47,9 @@ export const ROUTES = {
   HELP: '/help',
   FAQ: '/faq',
   CONTACT: '/contact',
+  
+  // Add the CHATS route
+  CHATS: '/chats',
 };
 
 /**
