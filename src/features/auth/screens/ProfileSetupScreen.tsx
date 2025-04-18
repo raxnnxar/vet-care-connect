@@ -24,6 +24,11 @@ import { supabase } from '@/integrations/supabase/client';
 import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
 import PetPhotoUploadDialog from '@/features/pets/components/PetPhotoUploadDialog';
+import ProfileImageUploader from '@/features/auth/components/ProfileImageUploader';
+import PhoneNumberField from '@/features/auth/components/PhoneNumberField';
+import PetList from '@/features/auth/components/PetList';
+import AddPetButton from '@/features/auth/components/AddPetButton';
+import FinishSetupButton from '@/features/auth/components/FinishSetupButton';
 
 interface FormValues {
   phone: string;
