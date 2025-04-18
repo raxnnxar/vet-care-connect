@@ -1,8 +1,8 @@
 
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { ServiceCategoryGrid } from '@/features/home/components/ServiceCategoryGrid';
-import { PetFriendlyMap } from '@/features/home/components/PetFriendlyMap';
+import ServiceCategoryGrid from '@/features/home/components/ServiceCategoryGrid';
+import PetFriendlyMap from '@/features/home/components/PetFriendlyMap';
 
 const OwnerDashboardScreen: React.FC = () => {
   const { user } = useSelector((state: any) => state.auth);
