@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -221,10 +222,14 @@ const ProfileSetupScreen = () => {
       console.log('Profile updated, waiting for state to update...', result);
       await new Promise(resolve => setTimeout(resolve, 300));
 
+      // Set the session storage flag to indicate profile has been completed
+      sessionStorage.setItem('profileCompleted', 'true');
+      console.log('Set profileCompleted flag in sessionStorage');
+
       toast.success('¡Perfil completado exitosamente!');
       
-      console.log('Profile setup complete, navigating to owner home');
-      navigate(ROUTES.OWNER_HOME);
+      console.log('Profile setup complete, navigating to owner/dashboard');
+      navigate('/owner/dashboard');
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error al guardar el perfil. Por favor intenta de nuevo.');
