@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Home, Calendar, Search, User, Settings, MessageSquare } from 'lucide-react';
 import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
+import OwnerProfileScreen from '@/features/owner/screens/OwnerProfileScreen';
 import { SCREENS } from './navigationConfig';
 import { usePets } from '@/features/pets/hooks';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -104,7 +105,6 @@ const OwnerProfileScreen = () => (
   </div>
 );
 
-// Main owner navigator with bottom tabs
 const OwnerNavigator = () => {
   const [currentScreen, setCurrentScreen] = useState<OwnerScreen>('OwnerHome');
   
@@ -114,10 +114,10 @@ const OwnerNavigator = () => {
         return <OwnerHomeScreen />;
       case 'OwnerPets':
         return <OwnerPetsScreen />;
-      case 'OwnerAppointments':
-        return <OwnerAppointmentsScreen />;
       case 'OwnerProfile':
         return <OwnerProfileScreen />;
+      case 'OwnerAppointments':
+        return <OwnerAppointmentsScreen />;
       default:
         return <OwnerHomeScreen />;
     }
@@ -125,7 +125,6 @@ const OwnerNavigator = () => {
 
   return (
     <div className="relative h-full">
-      {/* Header */}
       {renderScreen()}
     </div>
   );
