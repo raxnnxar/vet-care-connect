@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, Calendar, Search, User, Settings, MessageSquare } from 'lucide-react';
 import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
-import OwnerProfileScreen from '@/features/owner/screens/OwnerProfileScreen';
 import { SCREENS } from './navigationConfig';
 import { usePets } from '@/features/pets/hooks';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import OwnerProfileScreenComponent from '@/features/owner/screens/OwnerProfileScreen';
 
 type OwnerScreen = 'OwnerHome' | 'OwnerPets' | 'OwnerAppointments' | 'OwnerProfile';
 
-// Import PetScreen component
 import PetForm from '@/features/pets/components/PetForm';
 
-// Placeholder screen components
 const OwnerHomeScreenOld = () => (
   <div className="flex items-center justify-center h-screen">
     <div className="text-center">
@@ -97,14 +95,6 @@ const OwnerAppointmentsScreen = () => (
   </div>
 );
 
-const OwnerProfileScreen = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="text-center">
-      <h2 className="text-xl font-semibold">Owner Profile Screen</h2>
-    </div>
-  </div>
-);
-
 const OwnerNavigator = () => {
   const [currentScreen, setCurrentScreen] = useState<OwnerScreen>('OwnerHome');
   
@@ -115,7 +105,7 @@ const OwnerNavigator = () => {
       case 'OwnerPets':
         return <OwnerPetsScreen />;
       case 'OwnerProfile':
-        return <OwnerProfileScreen />;
+        return <OwnerProfileScreenComponent />;
       case 'OwnerAppointments':
         return <OwnerAppointmentsScreen />;
       default:
