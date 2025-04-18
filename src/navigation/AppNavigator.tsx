@@ -76,7 +76,6 @@ const AppNavigator = () => {
     }
   }, [user, navigate, location.pathname]);
 
-  // Render the correct routes based on authentication state and path
   return (
     <Routes>
       {/* Post-signup flow routes */}

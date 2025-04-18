@@ -1,22 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
-import { Home, Calendar, Search, User, Settings, MessageSquare } from 'lucide-react';
-import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { SCREENS } from './navigationConfig';
 import { usePets } from '@/features/pets/hooks';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
 import OwnerProfileScreenComponent from '@/features/owner/screens/OwnerProfileScreen';
-
-type OwnerScreen = 'OwnerHome' | 'OwnerPets' | 'OwnerAppointments' | 'OwnerProfile';
-
 import PetForm from '@/features/pets/components/PetForm';
-
-const OwnerHomeScreenOld = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="text-center">
-      <h2 className="text-xl font-semibold">Owner Home Screen</h2>
-    </div>
-  </div>
-);
 
 const OwnerPetsScreen = () => {
   const { createPet, isLoading, error, getCurrentUserPets, pets } = usePets();
@@ -96,26 +86,24 @@ const OwnerAppointmentsScreen = () => (
 );
 
 const OwnerNavigator = () => {
-  const [currentScreen, setCurrentScreen] = useState<OwnerScreen>('OwnerHome');
+  const location = useLocation();
   
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 'OwnerHome':
-        return <OwnerHomeScreen />;
-      case 'OwnerPets':
-        return <OwnerPetsScreen />;
-      case 'OwnerProfile':
-        return <OwnerProfileScreenComponent />;
-      case 'OwnerAppointments':
-        return <OwnerAppointmentsScreen />;
-      default:
-        return <OwnerHomeScreen />;
-    }
-  };
+  // Logging to help with debugging navigation issues
+  useEffect(() => {
+    console.log('OwnerNavigator mounted, current path:', location.pathname);
+  }, [location]);
 
   return (
     <div className="relative h-full">
-      {renderScreen()}
+      <Routes>
+        <Route path="/" element={<OwnerHomeScreen />} />
+        <Route path="/home" element={<OwnerHomeScreen />} />
+        <Route path="/pets" element={<OwnerPetsScreen />} />
+        <Route path="/profile" element={<OwnerProfileScreenComponent />} />
+        <Route path="/appointments" element={<OwnerAppointmentsScreen />} />
+        {/* Default route redirects to home */}
+        <Route path="*" element={<OwnerHomeScreen />} />
+      </Routes>
     </div>
   );
 };

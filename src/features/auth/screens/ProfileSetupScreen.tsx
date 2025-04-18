@@ -235,7 +235,10 @@ const ProfileSetupScreen = () => {
       }) as any);
 
       toast.success('¡Perfil completado exitosamente!');
-      navigate(ROUTES.OWNER_HOME); // Use the specific OWNER_HOME route
+      
+      // Force navigate directly to the owner home screen
+      console.log('Profile setup complete, navigating to owner home');
+      navigate(ROUTES.OWNER_HOME);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error al guardar el perfil. Por favor intenta de nuevo.');
