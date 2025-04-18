@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Activity, Scissors, ShoppingBag, Dog, Map, Building } from 'lucide-react';
+import { Heart, Scissors, Store, Dog, Map, Building } from 'lucide-react';
 
 type ServiceCategory = {
   id: string;
@@ -13,7 +13,7 @@ const serviceCategories: ServiceCategory[] = [
   {
     id: 'health',
     name: 'Salud',
-    icon: <Activity className="w-6 h-6" />,
+    icon: <Heart className="w-6 h-6" />,
   },
   {
     id: 'spa',
@@ -23,7 +23,7 @@ const serviceCategories: ServiceCategory[] = [
   {
     id: 'store',
     name: 'Tienda',
-    icon: <ShoppingBag className="w-6 h-6" />,
+    icon: <Store className="w-6 h-6" />,
     isComingSoon: true,
   },
   {
@@ -56,7 +56,7 @@ const ServiceCategoryGrid = () => {
                      transition-all duration-200 ${category.isComingSoon ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md active:scale-95'}`}
           disabled={category.isComingSoon}
         >
-          <div className="text-primary mb-2">{category.icon}</div>
+          <div className="text-[#5FBFB3] mb-2">{category.icon}</div>
           <span className="text-sm font-medium text-gray-700">{category.name}</span>
           {category.isComingSoon && (
             <span className="absolute top-2 right-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">

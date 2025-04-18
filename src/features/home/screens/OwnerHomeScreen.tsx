@@ -11,9 +11,9 @@ const OwnerHomeScreen = () => {
   return (
     <LayoutBase
       header={
-        <div className="flex justify-between items-center px-4 py-3 bg-primary">
+        <div className="flex justify-between items-center px-4 py-3 bg-[#5FBFB3]">
           <VettLogo color="#FFFFFF" height={32} />
-          <button className="text-white">
+          <button className="text-white hover:bg-white/10 p-2 rounded-full transition-colors">
             <Bell size={24} />
           </button>
         </div>
@@ -25,8 +25,8 @@ const OwnerHomeScreen = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Buscar"
-            className="w-full px-4 py-2 pl-10 bg-white/80 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Buscar servicios veterinarios..."
+            className="w-full px-4 py-2 pl-10 bg-white/80 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5FBFB3] focus:border-transparent"
           />
           <span className="absolute inset-y-0 left-3 flex items-center">
             <svg className="w-5 h-5 text-gray-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24">
