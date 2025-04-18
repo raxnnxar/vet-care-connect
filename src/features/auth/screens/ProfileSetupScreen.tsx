@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
+import { ROUTES } from '@/frontend/shared/constants/routes';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/molecules/dialog';
 import { Form } from '@/ui/molecules/form';
 import { Alert, AlertDescription } from "@/ui/molecules/alert";
@@ -235,7 +235,7 @@ const ProfileSetupScreen = () => {
       }) as any);
 
       toast.success('¡Perfil completado exitosamente!');
-      navigate('/owner');
+      navigate(ROUTES.OWNER_HOME); // Use the specific OWNER_HOME route
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error al guardar el perfil. Por favor intenta de nuevo.');
