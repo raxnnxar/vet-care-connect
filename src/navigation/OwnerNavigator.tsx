@@ -88,10 +88,15 @@ const OwnerAppointmentsScreen = () => (
 const OwnerNavigator = () => {
   const location = useLocation();
   
-  // Logging to help with debugging navigation issues
+  // Enhanced debugging for navigation issues
   useEffect(() => {
     console.log('OwnerNavigator mounted, current path:', location.pathname);
-  }, [location]);
+    
+    // Log when the home screen is being rendered
+    if (location.pathname === '/owner' || location.pathname === '/owner/home' || location.pathname === '/owner/') {
+      console.log('Rendering owner home screen');
+    }
+  }, [location.pathname]);
 
   return (
     <div className="relative h-full">

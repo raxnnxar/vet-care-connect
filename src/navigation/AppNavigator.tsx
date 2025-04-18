@@ -21,8 +21,7 @@ const AppNavigator = () => {
       console.log('Current user state in AppNavigator:', user);
       console.log('Current path:', location.pathname);
       
-      // Skip navigation logic if user is already on the correct profile setup or post-signup screens
-      // This prevents interrupting the user flow when they are completing their profile
+      // Skip navigation logic if user is already on profile setup or post-signup screens
       if (
         location.pathname === '/profile-setup' || 
         location.pathname === '/post-signup-role' || 
@@ -31,11 +30,12 @@ const AppNavigator = () => {
         console.log('User is on a profile setup/post-signup screen, allowing completion of flow');
         return;
       }
-
+      
       // Skip navigation logic if user is already on the correct owner/vet path
       // and has completed all required profile information
       if (
-        (user.role === USER_ROLES.PET_OWNER && user.phone && location.pathname.startsWith('/owner')) || 
+        (user.role === USER_ROLES.PET_OWNER && user.phone && 
+          (location.pathname.startsWith('/owner') || location.pathname === ROUTES.OWNER_HOME)) || 
         (user.role === USER_ROLES.VETERINARIAN && user.serviceType && location.pathname.startsWith('/vet'))
       ) {
         console.log('User has complete profile and is on the correct path, skipping navigation');
@@ -65,10 +65,10 @@ const AppNavigator = () => {
 
       // If user has complete profile, navigate to the appropriate dashboard
       if (user.role) {
-        if (user.role === USER_ROLES.PET_OWNER && user.phone && !location.pathname.startsWith('/owner')) {
+        if (user.role === USER_ROLES.PET_OWNER && user.phone && !location.pathname.includes('/owner')) {
           console.log('Pet owner profile complete, navigating to pet owner dashboard');
           navigate(ROUTES.OWNER_HOME);
-        } else if (user.role === USER_ROLES.VETERINARIAN && user.serviceType && !location.pathname.startsWith('/vet')) {
+        } else if (user.role === USER_ROLES.VETERINARIAN && user.serviceType && !location.pathname.includes('/vet')) {
           console.log('Vet profile complete, navigating to vet dashboard');
           navigate('/vet');
         }

@@ -25,23 +25,15 @@ import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
 import PetPhotoUploadDialog from '@/features/pets/components/PetPhotoUploadDialog';
 
-// Import component files
-import ProfileImageUploader from '../components/ProfileImageUploader';
-import PhoneNumberField from '../components/PhoneNumberField';
-import PetList from '../components/PetList';
-import AddPetButton from '../components/AddPetButton';
-import FinishSetupButton from '../components/FinishSetupButton';
-
 interface FormValues {
   phone: string;
 }
 
-// Update the PetData interface to match Pet type from the API
 interface PetData {
   id: string;
   name: string;
   species: string;
-  breed?: string; // Now optional to match Pet type
+  breed?: string;
   profile_picture_url?: string;
 }
 
@@ -69,29 +61,25 @@ const ProfileSetupScreen = () => {
     },
   });
 
-  // Fetch user's pets when component mounts or when a new pet is added
   useEffect(() => {
     if (user?.id) {
       getCurrentUserPets();
     }
   }, [user, getCurrentUserPets]);
 
-  // Update local pets state when userPets changes
   useEffect(() => {
     if (userPets && userPets.length > 0) {
-      // Map the Pet[] to PetData[] to ensure type compatibility
       const mappedPets: PetData[] = userPets.map(pet => ({
         id: pet.id,
         name: pet.name,
         species: pet.species,
-        breed: pet.breed || '', // Provide default empty string if breed is undefined
+        breed: pet.breed || '',
         profile_picture_url: pet.profile_picture_url
       }));
       setPets(mappedPets);
     }
   }, [userPets]);
 
-  // Hide success alert after 3 seconds
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (petSuccessAlert) {
@@ -141,7 +129,6 @@ const ProfileSetupScreen = () => {
 
   const handleAddPet = async (petData: any) => {
     try {
-      // Set a local loading state to show feedback to user
       setIsSubmitting(true);
       
       if (!user?.id) {
@@ -150,7 +137,6 @@ const ProfileSetupScreen = () => {
         return null;
       }
       
-      // Add owner ID to the pet data
       const completeData = {
         ...petData,
         owner_id: user.id
@@ -158,13 +144,11 @@ const ProfileSetupScreen = () => {
       
       console.log('Adding pet with data:', completeData);
       
-      // Call the createPet function from the usePets hook
       const result = await createPet(completeData);
       
       if (result && result.id) {
         console.log('Pet created successfully:', result);
         
-        // Add the newly created pet to the local state
         const newPet = {
           id: result.id,
           name: result.name,
@@ -175,23 +159,17 @@ const ProfileSetupScreen = () => {
         
         setPets((prevPets) => [...prevPets, newPet]);
         
-        // Close the pet dialog
         setIsPetDialogOpen(false);
         
-        // Set the new pet ID and name for the photo upload dialog
         setNewPetId(result.id);
         setNewPetName(result.name);
         
-        // Show the success alert
         setPetSuccessAlert(true);
         
-        // Show the photo upload dialog immediately after a small delay 
-        // to ensure proper state updates
         setTimeout(() => {
           setShowPhotoUploadDialog(true);
         }, 100);
         
-        // Refresh the pets list
         getCurrentUserPets();
         
         return result;
@@ -229,16 +207,19 @@ const ProfileSetupScreen = () => {
         }
       }
 
-      await dispatch(updateProfile({
+      const result = await dispatch(updateProfile({
         phone: data.phone,
         profileImage: imageUrl,
       }) as any);
 
-      toast.success('¡Perfil completado exitosamente!');
-      
-      // Force navigate directly to the owner home screen
-      console.log('Profile setup complete, navigating to owner home');
-      navigate(ROUTES.OWNER_HOME);
+      if (result) {
+        toast.success('¡Perfil completado exitosamente!');
+        
+        console.log('Profile setup complete, navigating to owner home');
+        setTimeout(() => {
+          navigate(ROUTES.OWNER_HOME);
+        }, 100);
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error al guardar el perfil. Por favor intenta de nuevo.');
@@ -247,16 +228,13 @@ const ProfileSetupScreen = () => {
     }
   };
 
-  // This function now only opens the confirmation dialog when clicked on the "Finalizar y continuar" button
   const handleFinish = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    // Ensure we're not in the middle of any other process
+    e.preventDefault();
     if (!isSubmitting && !showPhotoUploadDialog && !isPetDialogOpen) {
       setIsFinishDialogOpen(true);
     }
   };
 
-  // This function handles the actual submission when user confirms
   const handleConfirmFinish = async () => {
     const data = form.getValues();
     await handleSubmit(data);
@@ -269,20 +247,16 @@ const ProfileSetupScreen = () => {
     
     if (wasPhotoAdded) {
       toast.success('Foto de mascota guardada exitosamente');
-      // Refresh the pets list after photo upload
       getCurrentUserPets();
     }
   };
 
-  // Handle closing pet dialog - ensure we properly clean up state
   const handlePetDialogOpenChange = (isOpen: boolean) => {
-    // Only allow closing if not currently submitting
     if (!isSubmitting || !isOpen) {
       setIsPetDialogOpen(isOpen);
     }
   };
-  
-  // Handle confirmation dialog state change with proper cleanup
+
   const handleConfirmDialogChange = (isOpen: boolean) => {
     if (!isSubmitting) {
       setIsFinishDialogOpen(isOpen);
@@ -347,7 +321,6 @@ const ProfileSetupScreen = () => {
         </Form>
       </div>
       
-      {/* Photo upload dialog - This appears after adding a pet */}
       {showPhotoUploadDialog && newPetId && (
         <PetPhotoUploadDialog
           isOpen={showPhotoUploadDialog}
@@ -357,7 +330,6 @@ const ProfileSetupScreen = () => {
         />
       )}
       
-      {/* Finish confirmation dialog - This only appears when clicking "Finalizar y continuar" */}
       <AlertDialog 
         open={isFinishDialogOpen} 
         onOpenChange={handleConfirmDialogChange}
