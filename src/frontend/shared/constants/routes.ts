@@ -1,4 +1,3 @@
-
 /**
  * Application route definitions
  */
@@ -18,6 +17,7 @@ export const ROUTES = {
   
   // Pet owner routes
   OWNER_DASHBOARD: '/owner/dashboard',
+  OWNER_HOME: '/owner/home',
   PETS: '/pets',
   PET_DETAIL: '/pets/:id',
   ADD_PET: '/pets/add',
@@ -66,6 +66,7 @@ export const ROUTE_GROUPS = {
   
   PET_OWNER: [
     ROUTES.OWNER_DASHBOARD,
+    ROUTES.OWNER_HOME,
     ROUTES.PETS,
     ROUTES.PET_DETAIL,
     ROUTES.ADD_PET,
