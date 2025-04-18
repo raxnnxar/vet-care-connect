@@ -212,19 +212,19 @@ const ProfileSetupScreen = () => {
         }
       }
 
+      console.log('Updating profile...');
       const result = await dispatch(updateProfile({
         phone: data.phone,
         profileImage: imageUrl,
       }) as any);
+      
+      console.log('Profile updated, waiting for state to update...', result);
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      if (result) {
-        toast.success('¡Perfil completado exitosamente!');
-        
-        console.log('Profile setup complete, navigating to owner home');
-        setTimeout(() => {
-          navigate(ROUTES.OWNER_HOME);
-        }, 100);
-      }
+      toast.success('¡Perfil completado exitosamente!');
+      
+      console.log('Profile setup complete, navigating to owner home');
+      navigate(ROUTES.OWNER_HOME);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error al guardar el perfil. Por favor intenta de nuevo.');
