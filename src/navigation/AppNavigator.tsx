@@ -21,26 +21,25 @@ const AppNavigator = () => {
       console.log('Current user state in AppNavigator:', user);
       console.log('Current path:', location.pathname);
       
-      // Skip navigation logic if user is already on the correct owner/vet path
+      // Skip navigation logic if user is already on the correct profile setup or post-signup screens
+      // This prevents interrupting the user flow when they are completing their profile
       if (
-        (user.role === USER_ROLES.PET_OWNER && location.pathname.startsWith('/owner')) || 
-        (user.role === USER_ROLES.VETERINARIAN && location.pathname.startsWith('/vet'))
+        location.pathname === '/profile-setup' || 
+        location.pathname === '/post-signup-role' || 
+        location.pathname === '/post-signup-service-type'
       ) {
-        console.log('User already on the correct path, skipping navigation');
+        console.log('User is on a profile setup/post-signup screen, allowing completion of flow');
         return;
       }
-      
-      // Handle post-signup flows separately from main navigation
-      if (location.pathname.includes('/post-signup-') || location.pathname === '/profile-setup') {
-        // Don't interrupt the flow if the user is in the middle of the signup process
-        // and doesn't have the required data yet
-        if (
-          (location.pathname === '/post-signup-role' && !user.role) ||
-          (location.pathname === '/post-signup-service-type' && user.role === USER_ROLES.VETERINARIAN && !user.serviceType) ||
-          (location.pathname === '/profile-setup' && user.role === USER_ROLES.PET_OWNER && !user.phone)
-        ) {
-          return; // Let the user complete the current step
-        }
+
+      // Skip navigation logic if user is already on the correct owner/vet path
+      // and has completed all required profile information
+      if (
+        (user.role === USER_ROLES.PET_OWNER && user.phone && location.pathname.startsWith('/owner')) || 
+        (user.role === USER_ROLES.VETERINARIAN && user.serviceType && location.pathname.startsWith('/vet'))
+      ) {
+        console.log('User has complete profile and is on the correct path, skipping navigation');
+        return;
       }
       
       // If user is authenticated but doesn't have a role yet, redirect to role selection
@@ -66,11 +65,11 @@ const AppNavigator = () => {
 
       // If user has complete profile, navigate to the appropriate dashboard
       if (user.role) {
-        if (user.role === USER_ROLES.PET_OWNER && !location.pathname.startsWith('/owner')) {
-          console.log('Navigating to pet owner dashboard');
+        if (user.role === USER_ROLES.PET_OWNER && user.phone && !location.pathname.startsWith('/owner')) {
+          console.log('Pet owner profile complete, navigating to pet owner dashboard');
           navigate(ROUTES.OWNER_HOME);
-        } else if (user.role === USER_ROLES.VETERINARIAN && !location.pathname.startsWith('/vet')) {
-          console.log('Navigating to vet dashboard');
+        } else if (user.role === USER_ROLES.VETERINARIAN && user.serviceType && !location.pathname.startsWith('/vet')) {
+          console.log('Vet profile complete, navigating to vet dashboard');
           navigate('/vet');
         }
       }
