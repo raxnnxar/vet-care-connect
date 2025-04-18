@@ -9,6 +9,7 @@ import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
 import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
 import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
 import ProfileSetupScreen from '../features/auth/screens/ProfileSetupScreen';
+import { ROUTES } from '@/frontend/shared/constants/routes';
 
 const AppNavigator = () => {
   const { user } = useSelector((state: any) => state.auth);
@@ -20,9 +21,26 @@ const AppNavigator = () => {
       console.log('Current user state in AppNavigator:', user);
       console.log('Current path:', location.pathname);
       
+      // Skip navigation logic if user is already on the correct owner/vet path
+      if (
+        (user.role === USER_ROLES.PET_OWNER && location.pathname.startsWith('/owner')) || 
+        (user.role === USER_ROLES.VETERINARIAN && location.pathname.startsWith('/vet'))
+      ) {
+        console.log('User already on the correct path, skipping navigation');
+        return;
+      }
+      
       // Handle post-signup flows separately from main navigation
       if (location.pathname.includes('/post-signup-') || location.pathname === '/profile-setup') {
-        return; // Let the Routes component handle these paths
+        // Don't interrupt the flow if the user is in the middle of the signup process
+        // and doesn't have the required data yet
+        if (
+          (location.pathname === '/post-signup-role' && !user.role) ||
+          (location.pathname === '/post-signup-service-type' && user.role === USER_ROLES.VETERINARIAN && !user.serviceType) ||
+          (location.pathname === '/profile-setup' && user.role === USER_ROLES.PET_OWNER && !user.phone)
+        ) {
+          return; // Let the user complete the current step
+        }
       }
       
       // If user is authenticated but doesn't have a role yet, redirect to role selection
@@ -33,7 +51,7 @@ const AppNavigator = () => {
       }
 
       // If user is a pet owner without a phone number, redirect to profile setup
-      if (user.role === USER_ROLES.PET_OWNER && !user.phone) {
+      if (user.role === USER_ROLES.PET_OWNER && (!user.phone || user.phone === undefined)) {
         console.log('Pet owner has no phone, redirecting to profile setup');
         navigate('/profile-setup');
         return;
@@ -48,10 +66,10 @@ const AppNavigator = () => {
 
       // If user has complete profile, navigate to the appropriate dashboard
       if (user.role) {
-        if (user.role === USER_ROLES.PET_OWNER && location.pathname !== '/owner') {
+        if (user.role === USER_ROLES.PET_OWNER && !location.pathname.startsWith('/owner')) {
           console.log('Navigating to pet owner dashboard');
-          navigate('/owner');
-        } else if (user.role === USER_ROLES.VETERINARIAN && location.pathname !== '/vet') {
+          navigate(ROUTES.OWNER_HOME);
+        } else if (user.role === USER_ROLES.VETERINARIAN && !location.pathname.startsWith('/vet')) {
           console.log('Navigating to vet dashboard');
           navigate('/vet');
         }
