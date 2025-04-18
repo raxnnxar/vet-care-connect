@@ -21,12 +21,6 @@ const AppNavigator = () => {
       console.log('Current user state in AppNavigator:', user);
       console.log('Current path:', location.pathname);
       
-      // Check for profile completion flag
-      const profileCompleted = sessionStorage.getItem('profileCompleted') === 'true';
-      if (profileCompleted) {
-        console.log('Profile completion flag found, bypassing role check');
-      }
-      
       // Skip navigation logic if user is already on profile setup or post-signup screens
       if (
         location.pathname === '/profile-setup' || 
@@ -37,21 +31,19 @@ const AppNavigator = () => {
         return;
       }
       
-      // Skip navigation logic if user is already on the owner dashboard path and the profile was completed
+      // Skip navigation logic if user is already on the correct owner/vet path
+      // and has completed all required profile information
       if (
-        (location.pathname === '/owner/dashboard' || location.pathname.startsWith('/owner')) && 
-        profileCompleted
+        (user.role === USER_ROLES.PET_OWNER && user.phone && 
+          (location.pathname.startsWith('/owner') || location.pathname === ROUTES.OWNER_HOME)) || 
+        (user.role === USER_ROLES.VETERINARIAN && user.serviceType && location.pathname.startsWith('/vet'))
       ) {
-        console.log('User is on the dashboard with completed profile, skipping navigation');
+        console.log('User has complete profile and is on the correct path, skipping navigation');
         return;
       }
       
-      // If user is authenticated but doesn't have a role yet and profile wasn't just completed, redirect to role selection
+      // If user is authenticated but doesn't have a role yet, redirect to role selection
       if (!user.role || user.role === undefined) {
-        if (profileCompleted) {
-          console.log('Profile was completed, skipping role redirect');
-          return;
-        }
         console.log('User has no role, redirecting to role selection');
         navigate('/post-signup-role');
         return;
@@ -75,7 +67,7 @@ const AppNavigator = () => {
       if (user.role) {
         if (user.role === USER_ROLES.PET_OWNER && user.phone && !location.pathname.includes('/owner')) {
           console.log('Pet owner profile complete, navigating to pet owner dashboard');
-          navigate('/owner/dashboard');
+          navigate(ROUTES.OWNER_HOME);
         } else if (user.role === USER_ROLES.VETERINARIAN && user.serviceType && !location.pathname.includes('/vet')) {
           console.log('Vet profile complete, navigating to vet dashboard');
           navigate('/vet');
@@ -83,18 +75,6 @@ const AppNavigator = () => {
       }
     }
   }, [user, navigate, location.pathname]);
-
-  // Clear the profile completed flag when the component unmounts
-  useEffect(() => {
-    return () => {
-      if (location.pathname !== '/profile-setup' && 
-          location.pathname !== '/post-signup-role' && 
-          location.pathname !== '/post-signup-service-type') {
-        sessionStorage.removeItem('profileCompleted');
-        console.log('Cleared profileCompleted flag');
-      }
-    };
-  }, [location.pathname]);
 
   return (
     <Routes>

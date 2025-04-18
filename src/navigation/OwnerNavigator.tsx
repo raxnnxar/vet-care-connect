@@ -1,11 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { SCREENS } from './navigationConfig';
 import { usePets } from '@/features/pets/hooks';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
-import OwnerDashboardScreen from '@/features/owner/screens/OwnerDashboardScreen';
 import OwnerProfileScreenComponent from '@/features/owner/screens/OwnerProfileScreen';
 import PetForm from '@/features/pets/components/PetForm';
 
@@ -93,23 +92,22 @@ const OwnerNavigator = () => {
   useEffect(() => {
     console.log('OwnerNavigator mounted, current path:', location.pathname);
     
-    // Log when dashboard is being rendered
-    if (location.pathname === '/owner' || location.pathname === '/owner/dashboard') {
-      console.log('Rendering owner dashboard screen');
+    // Log when the home screen is being rendered
+    if (location.pathname === '/owner' || location.pathname === '/owner/home' || location.pathname === '/owner/') {
+      console.log('Rendering owner home screen');
     }
   }, [location.pathname]);
 
   return (
     <div className="relative h-full">
       <Routes>
-        <Route path="/" element={<OwnerDashboardScreen />} />
-        <Route path="/dashboard" element={<OwnerDashboardScreen />} />
+        <Route path="/" element={<OwnerHomeScreen />} />
         <Route path="/home" element={<OwnerHomeScreen />} />
         <Route path="/pets" element={<OwnerPetsScreen />} />
         <Route path="/profile" element={<OwnerProfileScreenComponent />} />
         <Route path="/appointments" element={<OwnerAppointmentsScreen />} />
-        {/* Default route redirects to dashboard */}
-        <Route path="*" element={<OwnerDashboardScreen />} />
+        {/* Default route redirects to home */}
+        <Route path="*" element={<OwnerHomeScreen />} />
       </Routes>
     </div>
   );
