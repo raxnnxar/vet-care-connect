@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/ui/molecules/alert-dialog";
-import { updateProfile, checkAuthThunk } from '../store/authThunks';
+import { updateProfile } from '../store/authThunks';
 import { profileService } from '../api/profileService';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,15 +86,12 @@ const ProfileSetupScreen = () => {
   }, [userPets]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
     if (petSuccessAlert) {
-      timer = setTimeout(() => {
+      const timer = setTimeout(() => {
         setPetSuccessAlert(false);
       }, 3000);
+      return () => clearTimeout(timer);
     }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
   }, [petSuccessAlert]);
 
   const uploadProfilePicture = async (): Promise<string | null> => {
@@ -120,8 +117,7 @@ const ProfileSetupScreen = () => {
         return publicUrlData.publicUrl;
       } catch (supabaseError) {
         console.error('Supabase storage error:', supabaseError);
-        const imageUrl = await profileService.uploadProfileImage(user.id, profileImageFile);
-        return imageUrl;
+        return null;
       }
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -147,216 +143,177 @@ const ProfileSetupScreen = () => {
         owner_id: user.id
       };
       
-      console.log('Adding pet with data:', completeData);
+      const newPet = await createPet(completeData);
       
-      const result = await createPet(completeData);
-      
-      if (result && result.id) {
-        console.log('Pet created successfully:', result);
-        
-        const newPet = {
-          id: result.id,
-          name: result.name,
-          species: result.species,
-          breed: result.breed || '',
-          profile_picture_url: result.profile_picture_url,
-        };
-        
-        setPets((prevPets) => [...prevPets, newPet]);
-        
+      if (newPet) {
         setIsPetDialogOpen(false);
-        
-        setNewPetId(result.id);
-        setNewPetName(result.name);
-        
+        setNewPetId(newPet.id);
+        setNewPetName(newPet.name);
         setPetSuccessAlert(true);
         
-        setTimeout(() => {
+        // If the pet has a photo, show the photo upload dialog
+        if (petData.hasPhoto) {
           setShowPhotoUploadDialog(true);
-        }, 100);
+        }
         
-        getCurrentUserPets();
-        
-        return result;
+        return newPet;
       } else {
-        toast.error('Error al agregar la mascota: No se recibieron datos');
+        toast.error('Error al crear la mascota');
         return null;
       }
     } catch (error) {
-      console.error('Error adding pet:', error);
-      toast.error('Error al agregar la mascota');
+      console.error('Error creating pet:', error);
+      toast.error('Error al crear la mascota');
       return null;
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleSubmit = async (data: FormValues) => {
+  const handleFinish = async () => {
     try {
       setIsSubmitting(true);
       
-      const phoneRegex = /^\+?[0-9]{8,15}$/;
-      if (!phoneRegex.test(data.phone)) {
-        toast.error('Por favor ingresa un número telefónico válido');
+      // Validate phone number
+      if (!form.getValues().phone) {
+        toast.error('Por favor, ingresa un número de teléfono');
         setIsSubmitting(false);
         return;
       }
-
-      let imageUrl = null;
+      
+      // Upload profile picture if available
+      let profilePictureUrl = null;
       if (profileImageFile) {
-        imageUrl = await uploadProfilePicture();
-        if (!imageUrl && profileImageFile) {
-          toast.error('Error al subir la imagen de perfil');
-          setIsSubmitting(false);
-          return;
-        }
+        profilePictureUrl = await uploadProfilePicture();
       }
-
-      console.log('Updating profile...');
-      const result = await dispatch(updateProfile({
-        phone: data.phone,
-        profileImage: imageUrl,
-      }) as any);
       
-      console.log('Profile updated, waiting for state to update...', result);
+      // Update user profile
+      const updateData = {
+        phone: form.getValues().phone,
+        profileImage: profilePictureUrl
+      };
       
-      // Force a delay to ensure state updates properly
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      toast.success('¡Perfil completado exitosamente!');
+      const resultAction = await dispatch(updateProfile(updateData) as any);
       
-      console.log('Profile setup complete, navigating to owner home');
-      
-      // Force a refresh of the auth state before navigation
-      await dispatch(checkAuthThunk() as any);
-      
-      // Use direct navigation with replace to prevent back navigation
-      navigate('/owner/home', { replace: true });
+      if (updateProfile.fulfilled.match(resultAction)) {
+        toast.success('Perfil actualizado con éxito');
+        
+        // Navigate to the correct route based on user role
+        if (user?.role === 'pet_owner') {
+          console.log('Profile setup complete, navigating to owner home');
+          navigate('/owner');
+        } else if (user?.role === 'service_provider') {
+          console.log('Profile setup complete, navigating to vet home');
+          navigate('/vet');
+        } else {
+          console.log('Unknown role, navigating to role selection');
+          navigate('/post-signup-role');
+        }
+      } else {
+        toast.error('Error al actualizar el perfil');
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Error al guardar el perfil. Por favor intenta de nuevo.');
+      toast.error('Error al actualizar el perfil');
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleFinish = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isSubmitting && !showPhotoUploadDialog && !isPetDialogOpen) {
-      setIsFinishDialogOpen(true);
-    }
-  };
-
-  const handleConfirmFinish = async () => {
-    const data = form.getValues();
-    await handleSubmit(data);
-    setIsFinishDialogOpen(false);
-  };
-
-  const handlePhotoDialogClose = (wasPhotoAdded: boolean) => {
-    setShowPhotoUploadDialog(false);
-    setNewPetId(null);
-    
-    if (wasPhotoAdded) {
-      toast.success('Foto de mascota guardada exitosamente');
-      getCurrentUserPets();
-    }
-  };
-
-  const handlePetDialogOpenChange = (isOpen: boolean) => {
-    if (!isSubmitting || !isOpen) {
-      setIsPetDialogOpen(isOpen);
-    }
-  };
-
-  const handleConfirmDialogChange = (isOpen: boolean) => {
-    if (!isSubmitting) {
-      setIsFinishDialogOpen(isOpen);
+      setIsFinishDialogOpen(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background py-6 px-4 md:px-6 overflow-y-auto">
-      <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-6 mb-6">
-        <h1 className="text-2xl font-semibold text-center mb-6">Completa tu Perfil</h1>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="flex-1 max-w-md mx-auto w-full p-4">
+        <h1 className="text-2xl font-bold text-center my-6">Completa tu Perfil</h1>
         
-        {petSuccessAlert && (
-          <Alert className="mb-4 bg-green-50 border-green-200">
-            <AlertDescription className="text-green-700">
-              ¡Mascota agregada con éxito!
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        <ProfileImageUploader
-          profileImage={profileImage}
-          setProfileImage={setProfileImage}
-          setProfileImageFile={setProfileImageFile}
-          isUploading={isUploading}
-          displayName={user?.displayName}
-        />
-
         <Form {...form}>
-          <form onSubmit={handleFinish} className="space-y-6">
-            <PhoneNumberField control={form.control} />
-
-            <div className="space-y-4 mt-6">
-              <h2 className="text-base font-medium mb-2">Mis Mascotas</h2>
-              
-              <PetList pets={pets} isLoading={isPetsLoading} />
-
-              <Dialog 
-                open={isPetDialogOpen} 
-                onOpenChange={handlePetDialogOpenChange}
-              >
-                <AddPetButton 
-                  onClick={() => setIsPetDialogOpen(true)} 
-                  hasPets={pets.length > 0}
-                />
-                
-                <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden p-0">
-                  <DialogHeader className="p-6 pb-2">
-                    <DialogTitle>Agregar Nueva Mascota</DialogTitle>
-                  </DialogHeader>
-                  <div className="px-6 py-4">
-                    <PetForm 
-                      onSubmit={handleAddPet} 
-                      isSubmitting={isSubmitting || isPetLoading} 
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
+          <div className="space-y-6">
+            {/* Profile Image */}
+            <div className="flex flex-col items-center">
+              <ProfileImageUploader
+                profileImage={profileImage}
+                setProfileImage={setProfileImage}
+                setProfileImageFile={setProfileImageFile}
+                isUploading={isUploading}
+                displayName={user?.displayName}
+              />
             </div>
-
-            <FinishSetupButton isSubmitting={isSubmitting} />
-          </form>
+            
+            {/* Phone Number */}
+            <div className="space-y-2">
+              <PhoneNumberField
+                form={form}
+                name="phone"
+                label="Número de Teléfono"
+                placeholder="Ej: +12345678"
+                helpText="Ingresa tu número de teléfono con código de país"
+              />
+            </div>
+            
+            {/* Pets Section */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Mis Mascotas</h2>
+              
+              {/* Pet List */}
+              <PetList pets={pets} isLoading={isPetsLoading} />
+              
+              {/* Add Pet Button */}
+              <AddPetButton onClick={() => setIsPetDialogOpen(true)} />
+            </div>
+            
+            {/* Finish Setup Button */}
+            <FinishSetupButton onClick={() => setIsFinishDialogOpen(true)} />
+          </div>
         </Form>
       </div>
       
+      {/* Pet Form Dialog */}
+      <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar Mascota</DialogTitle>
+          </DialogHeader>
+          <PetForm onSubmit={handleAddPet} isSubmitting={isSubmitting} onCancel={() => setIsPetDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
+      
+      {/* Pet Photo Upload Dialog */}
       {showPhotoUploadDialog && newPetId && (
         <PetPhotoUploadDialog
-          isOpen={showPhotoUploadDialog}
           petId={newPetId}
           petName={newPetName}
-          onClose={handlePhotoDialogClose}
+          isOpen={showPhotoUploadDialog}
+          onClose={() => setShowPhotoUploadDialog(false)}
         />
       )}
       
-      <AlertDialog 
-        open={isFinishDialogOpen} 
-        onOpenChange={handleConfirmDialogChange}
-      >
+      {/* Success Alert */}
+      {petSuccessAlert && (
+        <Alert className="fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-sm bg-green-50 border-green-200">
+          <AlertDescription className="text-green-800">
+            ¡Mascota agregada con éxito!
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {/* Finish Confirmation Dialog */}
+      <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro que deseas continuar?</AlertDialogTitle>
+            <AlertDialogTitle>Finalizar configuración</AlertDialogTitle>
             <AlertDialogDescription>
-              Una vez que finalices la configuración de tu perfil, serás dirigido al panel principal.
+              ¿Estás seguro de que deseas finalizar la configuración de tu perfil?
+              {pets.length === 0 && (
+                <p className="mt-2 text-amber-600">
+                  No has agregado ninguna mascota. Puedes agregarlas más tarde desde tu perfil.
+                </p>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmFinish} className="bg-accent3">
-              Confirmar
+            <AlertDialogAction onClick={handleFinish} disabled={isSubmitting}>
+              {isSubmitting ? 'Procesando...' : 'Finalizar y continuar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
