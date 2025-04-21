@@ -27,6 +27,7 @@ import {
   CollapsibleTrigger 
 } from '@/ui/molecules/collapsible';
 import { v4 as uuidv4 } from 'uuid';
+import { PetFormProps } from '@/features/pets/types/PetFormProps';
 
 const speciesMapping = {
   'Perro': PET_CATEGORIES.DOG,
@@ -110,11 +111,13 @@ interface PetFormValues {
 }
 
 interface PetFormProps {
+  mode: 'create' | 'edit';
   onSubmit: (data: any) => Promise<any> | void;
   isSubmitting: boolean;
+  onCancel?: () => void;
 }
 
-const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
+const PetForm: React.FC<PetFormProps> = ({ mode, onSubmit, isSubmitting, onCancel }) => {
   const [isMedicalHistoryOpen, setIsMedicalHistoryOpen] = useState(false);
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
@@ -611,6 +614,16 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, isSubmitting }) => {
           >
             {isSubmitting ? 'Guardando...' : 'Guardar mascota'}
           </Button>
+          {onCancel && (
+            <Button 
+              type="button" 
+              variant="ghost" 
+              className="ml-2"
+              onClick={onCancel}
+            >
+              Cancelar
+            </Button>
+          )}
         </div>
       </form>
     </ScrollArea>

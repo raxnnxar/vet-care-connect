@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -7,7 +8,7 @@ import { z } from 'zod';
 import { useAppSelector } from '@/state/store';
 import { supabase } from '@/integrations/supabase/client';
 import { ROUTES } from '@/frontend/shared/constants/routes';
-import { PetForm } from '@/features/pets/components/PetForm';
+import PetForm from '@/features/pets/components/PetForm';
 import { Pet } from '@/features/pets/types';
 import AddPetButton from '../components/AddPetButton';
 import FinishSetupButton from '../components/FinishSetupButton';
@@ -47,7 +48,8 @@ const ProfileSetupScreen = () => {
           if (error) throw error;
 
           if (data) {
-            form.setValue('phoneNumber', data.phone_number || '');
+            // Using optional chaining to avoid the TypeScript error
+            form.setValue('phoneNumber', data?.phone_number || '');
           }
         } catch (error) {
           console.error('Error fetching profile:', error);
