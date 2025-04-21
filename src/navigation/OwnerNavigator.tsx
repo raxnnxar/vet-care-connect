@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import OwnerHomeScreen from '../features/owner/screens/OwnerHomeScreen';
+import OwnerHomeScreen from '../features/home/screens/OwnerHomeScreen';
 import OwnerProfileScreen from '../features/owner/screens/OwnerProfileScreen';
 import PetForm from '../features/pets/components/PetForm';
 import PetDetailScreen from '../features/pets/screens/PetDetailScreen';
