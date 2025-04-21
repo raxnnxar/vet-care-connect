@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/ui/molecules/alert-dialog";
 import { updateProfile } from '../store/authThunks';
+import { authActions } from '../store/authSlice';
 import { profileService } from '../api/profileService';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -217,16 +218,13 @@ const ProfileSetupScreen = () => {
       
       console.log('Database update successful, updating Redux state');
       
-      // Dispatch an action to update the Redux state with the new role
-      dispatch({
-        type: 'auth/setUserRole',
-        payload: {
-          ...user,
-          role: 'pet_owner',
-          phone: form.getValues().phone,
-          profileImage: profilePictureUrl
-        }
-      });
+      // Use the proper action creator from authActions
+      dispatch(authActions.setUserRole({
+        ...user,
+        role: 'pet_owner',
+        phone: form.getValues().phone,
+        profileImage: profilePictureUrl
+      }));
       
       toast.success('Perfil actualizado con éxito');
       
