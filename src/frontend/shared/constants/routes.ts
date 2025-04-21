@@ -1,101 +1,49 @@
 /**
  * Application route definitions
+ * Consolidated source of truth for all routes in the application
  */
 
 export const ROUTES = {
-  // Public routes
+  // Auth routes
   HOME: '/',
   LOGIN: '/login',
-  REGISTER: '/register',
+  SIGNUP: '/signup',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password/:token',
+  POST_SIGNUP_ROLE: '/post-signup-role',
+  POST_SIGNUP_SERVICE_TYPE: '/post-signup-service-type',
+  PROFILE_SETUP: '/profile-setup',
+  
+  // Owner routes
+  OWNER: '/owner',
+  OWNER_HOME: '/owner',  // Base route is the home
+  OWNER_PROFILE: '/owner/profile',
+  OWNER_PETS: '/owner/pets',
+  OWNER_PET_DETAIL: '/owner/pets/:id',
+  OWNER_ADD_PET: '/owner/pets/add',
+  OWNER_EDIT_PET: '/owner/pets/:id/edit',
+  OWNER_APPOINTMENTS: '/owner/appointments',
+  OWNER_APPOINTMENT_DETAIL: '/owner/appointments/:id',
+  OWNER_BOOK_APPOINTMENT: '/owner/appointments/book/:vetId',
+  OWNER_FIND_VETS: '/owner/find-vets',
+  OWNER_VET_DETAIL: '/owner/vets/:id',
+  OWNER_NOTIFICATIONS: '/owner/notifications',
+  OWNER_SETTINGS: '/owner/settings',
+  
+  // Vet routes
+  VET: '/vet',
+  VET_HOME: '/vet',
+  VET_PROFILE: '/vet/profile',
+  VET_SCHEDULE: '/vet/schedule',
+  VET_APPOINTMENTS: '/vet/appointments',
+  VET_APPOINTMENT_DETAIL: '/vet/appointments/:id',
+  VET_PATIENTS: '/vet/patients',
+  VET_PATIENT_DETAIL: '/vet/patients/:id',
+  VET_NOTIFICATIONS: '/vet/notifications',
+  VET_SETTINGS: '/vet/settings',
   
   // Common routes
-  PROFILE: '/profile',
-  SETTINGS: '/settings',
   NOTIFICATIONS: '/notifications',
-  
-  // Pet owner routes
-  OWNER_DASHBOARD: '/owner/dashboard',
-  OWNER_HOME: '/owner/home',
-  PETS: '/pets',
-  PET_DETAIL: '/pets/:id',
-  ADD_PET: '/pets/add',
-  EDIT_PET: '/pets/:id/edit',
-  
-  // Veterinarian routes
-  VET_DASHBOARD: '/vet/dashboard',
-  VET_SCHEDULE: '/vet/schedule',
-  
-  // Appointment routes
-  APPOINTMENTS: '/appointments',
-  APPOINTMENT_DETAIL: '/appointments/:id',
-  APPOINTMENT_BOOKING: '/appointments/book/:vetId',
-  APPOINTMENT_RESCHEDULE: '/appointments/:id/reschedule',
-  
-  // Search and discovery
-  VETS: '/vets',
-  VET_DETAIL: '/vets/:id',
-  CLINICS: '/clinics',
-  CLINIC_DETAIL: '/clinics/:id',
-  
-  // Reviews and feedback
-  REVIEWS: '/reviews',
-  WRITE_REVIEW: '/reviews/write/:appointmentId',
-  
-  // Help and support
-  HELP: '/help',
-  FAQ: '/faq',
-  CONTACT: '/contact',
-  
-  // Add the CHATS route
-  CHATS: '/chats',
-};
-
-/**
- * Route groups by user role for authorization
- */
-export const ROUTE_GROUPS = {
-  PUBLIC: [
-    ROUTES.HOME,
-    ROUTES.LOGIN,
-    ROUTES.REGISTER,
-    ROUTES.FORGOT_PASSWORD,
-    ROUTES.RESET_PASSWORD,
-    ROUTES.HELP,
-    ROUTES.FAQ,
-    ROUTES.CONTACT,
-  ],
-  
-  PET_OWNER: [
-    ROUTES.OWNER_DASHBOARD,
-    ROUTES.OWNER_HOME,
-    ROUTES.PETS,
-    ROUTES.PET_DETAIL,
-    ROUTES.ADD_PET,
-    ROUTES.EDIT_PET,
-    ROUTES.APPOINTMENTS,
-    ROUTES.APPOINTMENT_DETAIL,
-    ROUTES.APPOINTMENT_BOOKING,
-    ROUTES.APPOINTMENT_RESCHEDULE,
-    ROUTES.VETS,
-    ROUTES.VET_DETAIL,
-    ROUTES.CLINICS,
-    ROUTES.CLINIC_DETAIL,
-    ROUTES.REVIEWS,
-    ROUTES.WRITE_REVIEW,
-    ROUTES.PROFILE,
-    ROUTES.SETTINGS,
-    ROUTES.NOTIFICATIONS,
-  ],
-  
-  VETERINARIAN: [
-    ROUTES.VET_DASHBOARD,
-    ROUTES.VET_SCHEDULE,
-    ROUTES.APPOINTMENTS,
-    ROUTES.APPOINTMENT_DETAIL,
-    ROUTES.PROFILE,
-    ROUTES.SETTINGS,
-    ROUTES.NOTIFICATIONS,
-  ],
+  SETTINGS: '/settings',
+  PROFILE: '/profile',
 };
