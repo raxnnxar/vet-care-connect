@@ -16,7 +16,6 @@ import PhoneNumberField from '../components/PhoneNumberField';
 import ProfileAddressField from '../components/ProfileAddressField';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
 import PetList from '../components/PetList';
-import PetPhotoUploadDialog from '@/features/pets/components/PetPhotoUploadDialog';
 import { usePets } from '@/features/pets/hooks';
 
 const profileSchema = z.object({
@@ -33,9 +32,6 @@ const ProfileSetupScreen = () => {
   const [currentPets, setCurrentPets] = useState<Pet[]>([]);
   const [isSubmittingPet, setIsSubmittingPet] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(true);
-  const [showPhotoDialog, setShowPhotoDialog] = useState(false);
-  const [currentPetId, setCurrentPetId] = useState<string>('');
-  const [currentPetName, setCurrentPetName] = useState<string>('');
   const [isFetchingPets, setIsFetchingPets] = useState(true);
   const { getCurrentUserPets, createPet } = usePets();
 
@@ -82,8 +78,7 @@ const ProfileSetupScreen = () => {
           setIsFetchingPets(true);
           const result = await getCurrentUserPets();
           
-          // Check if result exists and has a payload property that is an array
-          if (result && 'payload' in result && Array.isArray(result.payload)) {
+          if (result && result.payload && Array.isArray(result.payload)) {
             setCurrentPets(result.payload);
           } else {
             console.log('No pets found or invalid response format');
@@ -127,15 +122,11 @@ const ProfileSetupScreen = () => {
         // Add to local state
         setCurrentPets((prevPets) => [...prevPets, newPet]);
         setShowPetForm(false);
-        
-        // Show photo upload dialog
-        setCurrentPetId(newPet.id);
-        setCurrentPetName(newPet.name);
-        setShowPhotoDialog(true);
-        
         toast.success('Mascota agregada con éxito');
         return newPet;
       }
+      
+      toast.error('Error al agregar la mascota');
       return null;
     } catch (error) {
       console.error('Error al agregar la mascota:', error);
@@ -143,19 +134,6 @@ const ProfileSetupScreen = () => {
       return null;
     } finally {
       setIsSubmittingPet(false);
-    }
-  };
-
-  const handlePhotoDialogClose = (wasPhotoAdded: boolean) => {
-    setShowPhotoDialog(false);
-    
-    if (wasPhotoAdded && user?.id) {
-      // Refresh pets list to show the updated photo
-      getCurrentUserPets().then((result) => {
-        if (result && 'payload' in result && Array.isArray(result.payload)) {
-          setCurrentPets(result.payload);
-        }
-      });
     }
   };
 
@@ -258,15 +236,6 @@ const ProfileSetupScreen = () => {
             </div>
           </div>
         </div>
-      )}
-      
-      {showPhotoDialog && (
-        <PetPhotoUploadDialog
-          isOpen={showPhotoDialog}
-          petId={currentPetId}
-          petName={currentPetName}
-          onClose={handlePhotoDialogClose}
-        />
       )}
     </div>
   );

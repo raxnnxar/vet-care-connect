@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useRef } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload } from 'lucide-react';
 import { Input } from '@/ui/atoms/input';
@@ -28,6 +29,7 @@ import {
 } from '@/ui/molecules/collapsible';
 import { v4 as uuidv4 } from 'uuid';
 import { PetFormProps as ImportedPetFormProps } from '@/features/pets/types/PetFormProps';
+import { Avatar, AvatarFallback, AvatarImage } from '@/ui/atoms/avatar';
 
 const speciesMapping = {
   'Perro': PET_CATEGORIES.DOG,
@@ -121,6 +123,9 @@ const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting,
   const [isMedicalHistoryOpen, setIsMedicalHistoryOpen] = useState(false);
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
+  const [petPhotoPreview, setPetPhotoPreview] = useState<string | null>(null);
+  const [petPhotoFile, setPetPhotoFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { register, handleSubmit, control, watch, formState: { errors }, setValue } = useForm<PetFormValues>({
     defaultValues: {
@@ -171,6 +176,20 @@ const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting,
     }
   };
   
+  const handlePetPhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setPetPhotoPreview(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+    setPetPhotoFile(file);
+  };
+  
   const processFormData = async (data: PetFormValues) => {
     const transformedData: any = {
       name: data.name,
@@ -180,6 +199,7 @@ const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting,
       weight: data.weight || null,
       sex: data.sex ? genderMapping[data.sex] : null,
       temperament: data.temperament || '',
+      petPhotoFile: petPhotoFile, // Add the pet photo file
     };
     
     if (data.age) {
@@ -222,6 +242,44 @@ const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting,
   return (
     <ScrollArea className="max-h-[70vh] pr-4 overflow-y-auto">
       <form onSubmit={handleSubmit(processFormData)} className="space-y-4 pb-4">
+        {/* Pet Photo Upload */}
+        <div className="flex flex-col items-center gap-2 mb-4">
+          <div className="relative">
+            <Avatar className="h-24 w-24 border-2 border-primary/30">
+              {petPhotoPreview ? (
+                <AvatarImage 
+                  src={petPhotoPreview} 
+                  alt="Foto de mascota" 
+                  className="object-cover"
+                />
+              ) : (
+                <AvatarFallback className="bg-primary/10">
+                  <Upload className="h-6 w-6 text-primary/50" />
+                </AvatarFallback>
+              )}
+            </Avatar>
+            
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1.5 shadow-md hover:bg-primary/90 transition-colors"
+            >
+              <Upload className="h-3 w-3" />
+            </button>
+            
+            <input 
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePetPhotoSelect}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {petPhotoPreview ? "Foto seleccionada" : "Añadir una foto de tu mascota"}
+          </p>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="name" className="font-medium text-base">
             Nombre *

@@ -71,7 +71,13 @@ export const addPet = createAsyncThunk(
           };
           
           // Use the petsApi method to create medical history
-          await petsApi.getPetById(data.id); // This is just to use a method that exists, but we'll need to implement createPetMedicalHistory
+          const { error: medHistoryError } = await supabase
+            .from('pet_medical_history')
+            .insert(medicalHistoryData);
+            
+          if (medHistoryError) {
+            console.error('Error creating medical history:', medHistoryError);
+          }
         } catch (medError) {
           console.error('Error creating medical history:', medError);
           // We don't reject here since pet was already created
@@ -152,6 +158,8 @@ export const uploadPetProfilePicture = createAsyncThunk(
   'pets/uploadProfilePicture',
   async ({ petId, file }: { petId: string; file: File }, { rejectWithValue }) => {
     try {
+      console.log('Uploading profile picture for pet:', petId);
+      
       // Create a unique file path
       const fileExt = file.name.split('.').pop();
       const filePath = `${petId}/${Date.now()}.${fileExt}`;
@@ -164,7 +172,10 @@ export const uploadPetProfilePicture = createAsyncThunk(
           contentType: file.type
         });
       
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Error uploading file to storage:', uploadError);
+        throw uploadError;
+      }
       
       // Get the public URL for the uploaded file
       const { data: publicUrlData } = supabase.storage
@@ -172,6 +183,7 @@ export const uploadPetProfilePicture = createAsyncThunk(
         .getPublicUrl(filePath);
       
       const imageUrl = publicUrlData.publicUrl;
+      console.log('Uploaded image URL:', imageUrl);
       
       // Update the pet record with the new profile picture URL
       const { error: updateError } = await supabase
@@ -182,7 +194,10 @@ export const uploadPetProfilePicture = createAsyncThunk(
         })
         .eq('id', petId);
       
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating pet record with image URL:', updateError);
+        throw updateError;
+      }
       
       return { id: petId, url: imageUrl };
     } catch (error) {

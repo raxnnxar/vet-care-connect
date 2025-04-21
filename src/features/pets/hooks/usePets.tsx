@@ -35,12 +35,37 @@ export const usePets = () => {
     
     try {
       console.log('Creating pet with data:', petData);
+      
+      // Extract the photo file from the data
+      const petPhotoFile = petData.petPhotoFile;
+      delete petData.petPhotoFile;
+      
       // Call the addPet thunk and properly handle the promise
       const resultAction = await dispatch(addPet(petData));
       
       // Extract the pet data from the resolved action
       if (addPet.fulfilled.match(resultAction)) {
         console.log('Pet created successfully:', resultAction.payload);
+        
+        // If we have a photo file, upload it
+        if (petPhotoFile && resultAction.payload?.id) {
+          console.log('Uploading pet photo for:', resultAction.payload.id);
+          const photoResult = await dispatch(uploadPetProfilePicture({
+            petId: resultAction.payload.id,
+            file: petPhotoFile
+          }));
+          
+          if (uploadPetProfilePicture.fulfilled.match(photoResult)) {
+            console.log('Photo uploaded successfully:', photoResult.payload);
+            // Update the pet object with the photo URL
+            const petWithPhoto = {
+              ...resultAction.payload,
+              profile_picture_url: photoResult.payload.url
+            };
+            return petWithPhoto;
+          }
+        }
+        
         // Return the pet data directly
         return resultAction.payload as Pet;
       } else {
