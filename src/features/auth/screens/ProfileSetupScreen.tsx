@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -51,7 +52,7 @@ const ProfileSetupScreen = () => {
           // First, ensure user exists in pet_owners table
           const { data: ownerExists, error: ownerCheckError } = await supabase
             .from('pet_owners')
-            .select('id')
+            .select('id, phone_number, address')
             .eq('id', user.id)
             .single();
           
@@ -66,22 +67,10 @@ const ProfileSetupScreen = () => {
             } else {
               console.log('Successfully created owner record');
             }
-          }
-          
-          // Fetch profile data
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-          if (error) throw error;
-
-          if (data) {
-            // Cast the data to include phone_number field which might be present
-            const profileData = data as { phone_number?: string; address?: string };
-            form.setValue('phoneNumber', profileData.phone_number || '');
-            form.setValue('address', profileData.address || '');
+          } else {
+            // If owner exists, populate form with existing data
+            form.setValue('phoneNumber', ownerExists.phone_number || '');
+            form.setValue('address', ownerExists.address || '');
           }
         } catch (error) {
           console.error('Error fetching profile:', error);
@@ -168,17 +157,35 @@ const ProfileSetupScreen = () => {
       const values = form.getValues();
       
       if (user?.id) {
-        // Update profile in database
+        // Update pet_owners table instead of profiles
+        console.log('Updating pet_owners with phone and address');
         const { error } = await supabase
-          .from('profiles')
+          .from('pet_owners')
           .update({
             phone_number: values.phoneNumber,
+            address: values.address
+          })
+          .eq('id', user.id);
+          
+        if (error) {
+          console.error('Error updating pet_owners:', error);
+          throw error;
+        }
+        
+        // Also update the profiles table with the address field which it does have
+        console.log('Updating profiles with address');
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
             address: values.address,
             updated_at: new Date().toISOString()
           })
           .eq('id', user.id);
           
-        if (error) throw error;
+        if (profileError) {
+          console.error('Error updating profile address:', profileError);
+          // Don't throw here, as we've already updated the pet_owners table
+        }
         
         toast.success('Perfil actualizado con éxito');
         navigate(ROUTES.OWNER);
