@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/ui/molecules/alert-dialog";
-import { updateProfile } from '../store/authThunks';
+import { updateProfile, checkAuthThunk } from '../store/authThunks';
 import { profileService } from '../api/profileService';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -219,12 +219,19 @@ const ProfileSetupScreen = () => {
       }) as any);
       
       console.log('Profile updated, waiting for state to update...', result);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Force a delay to ensure state updates properly
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       toast.success('¡Perfil completado exitosamente!');
       
       console.log('Profile setup complete, navigating to owner home');
-      navigate(ROUTES.OWNER_HOME);
+      
+      // Force a refresh of the auth state before navigation
+      await dispatch(checkAuthThunk() as any);
+      
+      // Use direct navigation with replace to prevent back navigation
+      navigate('/owner/home', { replace: true });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error al guardar el perfil. Por favor intenta de nuevo.');
