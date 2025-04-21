@@ -173,6 +173,7 @@ const ProfileSetupScreen = () => {
   const handleFinish = async () => {
     try {
       setIsSubmitting(true);
+      console.log('Starting profile finish process');
       
       // Validate phone number
       if (!form.getValues().phone) {
@@ -187,37 +188,63 @@ const ProfileSetupScreen = () => {
         profilePictureUrl = await uploadProfilePicture();
       }
       
-      // Update user profile
-      const updateData = {
-        phone: form.getValues().phone,
-        profileImage: profilePictureUrl
-      };
-      
-      const resultAction = await dispatch(updateProfile(updateData) as any);
-      
-      if (updateProfile.fulfilled.match(resultAction)) {
-        toast.success('Perfil actualizado con éxito');
-        
-        // Navigate to the correct route based on user role
-        if (user?.role === 'pet_owner') {
-          console.log('Profile setup complete, navigating to owner home');
-          navigate('/owner');
-        } else if (user?.role === 'service_provider') {
-          console.log('Profile setup complete, navigating to vet home');
-          navigate('/vet');
-        } else {
-          console.log('Unknown role, navigating to role selection');
-          navigate('/post-signup-role');
-        }
-      } else {
-        toast.error('Error al actualizar el perfil');
+      // First, ensure the user has a role in the database
+      if (!user?.id) {
+        toast.error('Error: No se pudo identificar al usuario');
+        setIsSubmitting(false);
+        return;
       }
+      
+      console.log('Explicitly setting user role to pet_owner in database');
+      
+      // Explicitly set the user role to pet_owner in the database
+      const { error: roleError } = await supabase
+        .from('users')
+        .update({ 
+          role: 'pet_owner',
+          phone_number: form.getValues().phone,
+          profile_picture_url: profilePictureUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+      
+      if (roleError) {
+        console.error('Error updating user role:', roleError);
+        toast.error('Error al actualizar el perfil');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      console.log('Database update successful, updating Redux state');
+      
+      // Dispatch an action to update the Redux state with the new role
+      dispatch({
+        type: 'auth/setUserRole',
+        payload: {
+          ...user,
+          role: 'pet_owner',
+          phone: form.getValues().phone,
+          profileImage: profilePictureUrl
+        }
+      });
+      
+      toast.success('Perfil actualizado con éxito');
+      
+      console.log('Profile setup complete, forcing navigation to owner home');
+      
+      // Close dialog first to prevent any interference
+      setIsFinishDialogOpen(false);
+      
+      // Force navigation to owner home with replace to prevent back navigation
+      setTimeout(() => {
+        navigate('/owner', { replace: true });
+      }, 100);
+      
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error al actualizar el perfil');
     } finally {
       setIsSubmitting(false);
-      setIsFinishDialogOpen(false);
     }
   };
 
