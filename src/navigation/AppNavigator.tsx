@@ -30,6 +30,12 @@ const AppNavigator = () => {
         return;
       }
       
+      // If user is already in the owner or vet section, don't redirect
+      if (location.pathname.startsWith('/owner') || location.pathname.startsWith('/vet')) {
+        console.log('User is already in the correct section, no redirect needed');
+        return;
+      }
+      
       // If user has no role yet, direct them to role selection
       if (!user.role) {
         console.log('User has no role, redirecting to role selection');
