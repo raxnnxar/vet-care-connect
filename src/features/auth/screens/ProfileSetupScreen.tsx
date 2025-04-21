@@ -48,8 +48,9 @@ const ProfileSetupScreen = () => {
           if (error) throw error;
 
           if (data) {
-            // Using optional chaining to avoid the TypeScript error
-            form.setValue('phoneNumber', data?.phone_number || '');
+            // Cast the data to include phone_number field which might be present
+            const profileData = data as { phone_number?: string };
+            form.setValue('phoneNumber', profileData.phone_number || '');
           }
         } catch (error) {
           console.error('Error fetching profile:', error);

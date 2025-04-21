@@ -27,7 +27,7 @@ import {
   CollapsibleTrigger 
 } from '@/ui/molecules/collapsible';
 import { v4 as uuidv4 } from 'uuid';
-import { PetFormProps } from '@/features/pets/types/PetFormProps';
+import { PetFormProps as ImportedPetFormProps } from '@/features/pets/types/PetFormProps';
 
 const speciesMapping = {
   'Perro': PET_CATEGORIES.DOG,
@@ -117,7 +117,7 @@ interface PetFormProps {
   onCancel?: () => void;
 }
 
-const PetForm: React.FC<PetFormProps> = ({ mode, onSubmit, isSubmitting, onCancel }) => {
+const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting, onCancel }) => {
   const [isMedicalHistoryOpen, setIsMedicalHistoryOpen] = useState(false);
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -21,6 +20,7 @@ const OwnerNavigator = () => {
   const location = useLocation();
   const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
+
   const { createPet, updatePet } = usePets();
 
   const handleCreatePet = async (petData: any): Promise<Pet | null> => {
