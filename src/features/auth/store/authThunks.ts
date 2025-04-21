@@ -126,18 +126,33 @@ export const signupUser = createAsyncThunk(
       
       if (error) throw error;
       
-      const { error: insertError } = await supabase
+      // Check if a profile already exists for this user
+      const { data: existingProfile, error: profileCheckError } = await supabase
         .from('profiles')
-        .insert({
-          id: data.user?.id,
-          email: email,
-          display_name: name,
-          role: 'pet_owner',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
+        .select('*')
+        .eq('id', data.user?.id)
+        .single();
       
-      if (insertError) throw insertError;
+      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+        // If it's an error other than "no rows returned", throw it
+        throw profileCheckError;
+      }
+      
+      // Only insert a new profile if one doesn't exist already
+      if (!existingProfile) {
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user?.id,
+            email: email,
+            display_name: name,
+            role: 'pet_owner',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        
+        if (insertError) throw insertError;
+      }
       
       const user: User = {
         id: data.user!.id,

@@ -3,14 +3,17 @@
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, display_name, role, created_at)
-  VALUES (
-    new.id, 
-    new.email, 
-    coalesce(new.raw_user_meta_data->>'displayName', 'User'), 
-    coalesce(new.raw_user_meta_data->>'role', 'pet_owner'), -- Default to 'pet_owner' if no role is provided
-    now()
-  );
+  -- Check if a profile for this user already exists
+  IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = new.id) THEN
+    INSERT INTO public.profiles (id, email, display_name, role, created_at)
+    VALUES (
+      new.id, 
+      new.email, 
+      coalesce(new.raw_user_meta_data->>'displayName', 'User'), 
+      coalesce(new.raw_user_meta_data->>'role', 'pet_owner'), -- Default to 'pet_owner' if no role is provided
+      now()
+    );
+  END IF;
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

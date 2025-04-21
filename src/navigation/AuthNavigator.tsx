@@ -7,6 +7,7 @@ import SignupScreen from '../features/auth/screens/SignupScreen';
 import LoginScreen from '../features/auth/screens/LoginScreen';
 import ForgotPasswordScreen from '../features/auth/screens/ForgotPasswordScreen';
 import ResetPasswordScreen from '../features/auth/screens/ResetPasswordScreen';
+import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
 
 const AuthNavigator = () => {
   return (
@@ -17,6 +18,7 @@ const AuthNavigator = () => {
         <Route path={ROUTES.SIGNUP.replace('/', '')} element={<SignupScreen />} />
         <Route path={ROUTES.FORGOT_PASSWORD.replace('/', '')} element={<ForgotPasswordScreen />} />
         <Route path={ROUTES.RESET_PASSWORD.replace('/', '')} element={<ResetPasswordScreen />} />
+        <Route path="post-signup-role" element={<PostSignupRoleScreen />} />
         {/* Default route redirects to welcome screen */}
         <Route path="*" element={<WelcomeScreen />} />
       </Routes>
