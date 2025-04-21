@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
@@ -13,6 +12,8 @@ import {
 import { petsActions } from '../store/petsSlice';
 import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const usePets = () => {
   const dispatch = useAppDispatch();
@@ -28,20 +29,44 @@ export const usePets = () => {
   }, [dispatch]);
   
   const createPet = useCallback(async (petData: CreatePetData): Promise<Pet | null> => {
-    // Inject the owner_id if available and not provided
-    if (user?.id && !petData.owner_id) {
-      petData.owner_id = user.id;
-    }
-    
     try {
+      // Inject the owner_id if available and not provided
+      if (user?.id && !petData.owner_id) {
+        petData.owner_id = user.id;
+      }
+      
+      console.log('Creating pet with owner ID:', petData.owner_id);
       console.log('Creating pet with data:', petData);
+      
+      // Check if the user exists in the pet_owners table first
+      const { data: ownerExists, error: ownerCheckError } = await supabase
+        .from('pet_owners')
+        .select('id')
+        .eq('id', petData.owner_id)
+        .single();
+      
+      // If owner doesn't exist, create an entry in the pet_owners table first
+      if (!ownerExists || ownerCheckError) {
+        console.log('Owner not found in pet_owners table, creating entry...');
+        const { error: createOwnerError } = await supabase
+          .from('pet_owners')
+          .insert({ id: petData.owner_id });
+          
+        if (createOwnerError) {
+          console.error('Failed to create owner record:', createOwnerError);
+          toast.error('Error al configurar el perfil de dueño');
+          return null;
+        }
+        console.log('Owner record created successfully');
+      }
       
       // Extract the photo file from the data
       const petPhotoFile = petData.petPhotoFile;
-      delete petData.petPhotoFile;
+      const petDataForSubmit = { ...petData };
+      delete petDataForSubmit.petPhotoFile;
       
       // Call the addPet thunk and properly handle the promise
-      const resultAction = await dispatch(addPet(petData));
+      const resultAction = await dispatch(addPet(petDataForSubmit));
       
       // Extract the pet data from the resolved action
       if (addPet.fulfilled.match(resultAction)) {
@@ -70,10 +95,12 @@ export const usePets = () => {
         return resultAction.payload as Pet;
       } else {
         console.error('Failed to create pet:', resultAction.error);
+        toast.error(`Error al crear mascota: ${resultAction.error.message || 'Error desconocido'}`);
         return null;
       }
     } catch (error) {
       console.error('Error creating pet:', error);
+      toast.error('Error al crear mascota');
       return null;
     }
   }, [dispatch, user]);

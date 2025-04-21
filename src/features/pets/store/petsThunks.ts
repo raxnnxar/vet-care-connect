@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { petsApi } from '../api/petsApi';
 import { supabase } from '@/integrations/supabase/client';

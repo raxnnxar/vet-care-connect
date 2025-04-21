@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -49,6 +48,27 @@ const ProfileSetupScreen = () => {
     const fetchUserProfile = async () => {
       if (user?.id) {
         try {
+          // First, ensure user exists in pet_owners table
+          const { data: ownerExists, error: ownerCheckError } = await supabase
+            .from('pet_owners')
+            .select('id')
+            .eq('id', user.id)
+            .single();
+          
+          if (!ownerExists || ownerCheckError) {
+            console.log('Creating pet_owners record for user', user.id);
+            const { error: createOwnerError } = await supabase
+              .from('pet_owners')
+              .insert({ id: user.id });
+              
+            if (createOwnerError) {
+              console.error('Error creating owner record:', createOwnerError);
+            } else {
+              console.log('Successfully created owner record');
+            }
+          }
+          
+          // Fetch profile data
           const { data, error } = await supabase
             .from('profiles')
             .select('*')
@@ -124,9 +144,10 @@ const ProfileSetupScreen = () => {
         setShowPetForm(false);
         toast.success('Mascota agregada con éxito');
         return newPet;
+      } else {
+        toast.error('Error al agregar la mascota. Por favor intenta nuevamente.');
       }
       
-      toast.error('Error al agregar la mascota');
       return null;
     } catch (error) {
       console.error('Error al agregar la mascota:', error);
