@@ -9,6 +9,7 @@
 export const USER_ROLES = {
   PET_OWNER: 'pet_owner',
   VETERINARIAN: 'veterinarian',
+  SERVICE_PROVIDER: 'service_provider', // Added this role
   ADMIN: 'admin',
 } as const;
 

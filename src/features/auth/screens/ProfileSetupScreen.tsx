@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -200,7 +201,7 @@ const ProfileSetupScreen = () => {
       
       // Explicitly set the user role to pet_owner in the database
       const { error: roleError } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ 
           role: 'pet_owner',
           phone_number: form.getValues().phone,
@@ -220,7 +221,7 @@ const ProfileSetupScreen = () => {
       
       // Fetch the updated user data to ensure we have the correct role
       const { data: updatedUserData, error: fetchError } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
@@ -300,7 +301,10 @@ const ProfileSetupScreen = () => {
               <PetList pets={pets} isLoading={isPetsLoading} />
               
               {/* Add Pet Button */}
-              <AddPetButton onClick={() => setIsPetDialogOpen(true)} />
+              <AddPetButton 
+                onClick={() => setIsPetDialogOpen(true)} 
+                hasPets={pets.length > 0} 
+              />
             </div>
             
             {/* Finish Setup Button */}

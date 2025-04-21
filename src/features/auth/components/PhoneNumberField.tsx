@@ -1,56 +1,35 @@
 
 import React from 'react';
-import { Info } from 'lucide-react';
-import { Control } from 'react-hook-form';
-import { 
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage
-} from '@/ui/molecules/form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@/ui/molecules/form';
 import { Input } from '@/ui/atoms/input';
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/ui/molecules/tooltip';
+import { UseFormReturn } from 'react-hook-form';
 
-interface PhoneNumberFieldProps {
-  control: Control<any>;
+export interface PhoneNumberFieldProps {
+  form: UseFormReturn<any>;
+  name: string;
+  label: string;
+  placeholder: string;
+  helpText?: string;
 }
 
-const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({ control }) => {
+const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
+  form,
+  name,
+  label,
+  placeholder,
+  helpText
+}) => {
   return (
     <FormField
-      control={control}
-      name="phone"
+      control={form.control}
+      name={name}
       render={({ field }) => (
         <FormItem>
-          <div className="flex items-center gap-2 mb-1.5">
-            <FormLabel className="text-base font-medium">Número de Teléfono</FormLabel>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent side="right" className="max-w-[280px]">
-                  <p className="text-sm">
-                    Tu número de teléfono se utilizará como contacto de emergencia
-                    para los veterinarios y para prevenir el abandono de mascotas.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input 
-              placeholder="Ej: +123456789" 
-              {...field} 
-              className="text-base md:text-sm"
-            />
+            <Input {...field} type="tel" placeholder={placeholder} className="h-10" />
           </FormControl>
+          {helpText && <FormDescription>{helpText}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}

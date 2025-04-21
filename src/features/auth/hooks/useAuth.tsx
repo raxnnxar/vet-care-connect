@@ -1,3 +1,4 @@
+
 import { useEffect, useCallback, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
@@ -41,7 +42,7 @@ export const useAuth = () => {
         try {
           // Fetch user profile data including role from your database
           const { data: userData, error: userError } = await supabase
-            .from('users')
+            .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();

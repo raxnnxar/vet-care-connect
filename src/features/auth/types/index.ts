@@ -36,7 +36,7 @@ export interface Session {
   user: User;
 }
 
-// Add new interfaces for the missing functions
+// Update the LoginCredentials and SignupData interfaces
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -45,7 +45,7 @@ export interface LoginCredentials {
 export interface SignupData {
   email: string;
   password: string;
-  name?: string;
+  name?: string;  // Changed from displayName to name to match what's used in thunks
 }
 
 export interface AssignRoleParams {
@@ -54,6 +54,6 @@ export interface AssignRoleParams {
 }
 
 export interface UpdateProviderTypeParams {
-  providerId: string;
+  userId: string;
   providerType: string;
 }

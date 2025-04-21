@@ -1,7 +1,8 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
-import { User } from '../types';
+import { User, LoginCredentials, SignupData } from '../types';
 import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
 import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 
@@ -24,7 +25,7 @@ export const checkAuthThunk = createAsyncThunk(
       
       // Always fetch fresh user data from the database
       const { data: userData, error: userError } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
@@ -62,7 +63,7 @@ export const checkAuthThunk = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: { email: string; password: string }, { dispatch, rejectWithValue }) => {
+  async ({ email, password }: LoginCredentials, { dispatch, rejectWithValue }) => {
     try {
       dispatch(authActions.authRequestStarted());
       
@@ -75,7 +76,7 @@ export const loginUser = createAsyncThunk(
       
       // Fetch user profile data
       const { data: userData, error: userError } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', data.user.id)
         .single();
@@ -103,7 +104,7 @@ export const loginUser = createAsyncThunk(
 
 export const signupUser = createAsyncThunk(
   'auth/signup',
-  async ({ email, password, displayName }: { email: string; password: string; displayName: string }, { dispatch, rejectWithValue }) => {
+  async ({ email, password, name }: SignupData, { dispatch, rejectWithValue }) => {
     try {
       dispatch(authActions.authRequestStarted());
       
@@ -113,7 +114,7 @@ export const signupUser = createAsyncThunk(
         password,
         options: {
           data: {
-            displayName
+            displayName: name
           }
         }
       });
@@ -122,11 +123,11 @@ export const signupUser = createAsyncThunk(
       
       // Create a user record in the users table
       const { error: insertError } = await supabase
-        .from('users')
+        .from('profiles')
         .insert({
           id: data.user?.id,
           email: email,
-          display_name: displayName,
+          display_name: name,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
@@ -136,7 +137,7 @@ export const signupUser = createAsyncThunk(
       const user: User = {
         id: data.user!.id,
         email: email,
-        displayName: displayName,
+        displayName: name,
         role: null,
         serviceType: null,
         phone: '',
@@ -167,10 +168,10 @@ export const logoutUser = createAsyncThunk(
 
 export const assignUserRole = createAsyncThunk(
   'auth/assignRole',
-  async ({ userId, role }: { userId: string; role: UserRoleType }, { rejectWithValue }) => {
+  async ({ userId, role }: { userId: string; role: string }, { rejectWithValue }) => {
     try {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ role, updated_at: new Date().toISOString() })
         .eq('id', userId);
       
@@ -188,7 +189,7 @@ export const updateProviderType = createAsyncThunk(
   async ({ userId, providerType }: { userId: string; providerType: ServiceTypeType }, { rejectWithValue }) => {
     try {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ service_type: providerType, updated_at: new Date().toISOString() })
         .eq('id', userId);
       
@@ -215,7 +216,7 @@ export const updateProfile = createAsyncThunk(
       }
       
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update(updateData)
         .eq('id', userId);
       
