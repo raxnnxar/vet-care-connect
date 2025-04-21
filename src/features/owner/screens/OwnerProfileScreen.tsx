@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { profileImageService } from '@/features/auth/api/profileImageService';
 import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
+import PetListItem from '@/features/pets/components/PetListItem';
 
 const OwnerProfileScreen = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -22,6 +23,7 @@ const OwnerProfileScreen = () => {
     profilePicture: '',
   });
   const [showPetForm, setShowPetForm] = useState(false);
+  const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const { getCurrentUserPets } = usePets();
   const [userPets, setUserPets] = useState([]);
 
@@ -106,6 +108,35 @@ const OwnerProfileScreen = () => {
       toast.success('Mascota agregada');
     }
     return newPet;
+  };
+
+  const handleEditPet = (pet: Pet) => {
+    setEditingPet(pet);
+    setShowPetForm(true);
+  };
+
+  const handlePetFormSubmit = async (petData: any) => {
+    try {
+      if (editingPet) {
+        const updatedPet = await usePets().updatePet(editingPet.id, petData);
+        if (updatedPet) {
+          setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPet : p));
+          setShowPetForm(false);
+          setEditingPet(null);
+          toast.success('Mascota actualizada exitosamente');
+        }
+      } else {
+        const newPet = await usePets().createPet(petData);
+        if (newPet) {
+          setUserPets(prev => [...prev, newPet]);
+          setShowPetForm(false);
+          toast.success('Mascota agregada exitosamente');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving pet:', error);
+      toast.error('Error al guardar la mascota');
+    }
   };
 
   return (
@@ -218,33 +249,11 @@ const OwnerProfileScreen = () => {
           {userPets.length > 0 ? (
             <div className="grid gap-4">
               {userPets.map(pet => (
-                <div 
+                <PetListItem 
                   key={pet.id} 
-                  className="flex items-center gap-4 bg-gray-100 p-3 rounded-lg"
-                >
-                  <Avatar>
-                    {pet.profile_picture_url ? (
-                      <img 
-                        src={pet.profile_picture_url} 
-                        alt={pet.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="bg-[#5FBFB3] flex items-center justify-center text-white">
-                        {pet.name.charAt(0)}
-                      </div>
-                    )}
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-semibold">{pet.name}</p>
-                    <p className="text-sm text-gray-600">
-                      {pet.species} {pet.breed ? `- ${pet.breed}` : ''}
-                    </p>
-                  </div>
-                  <Button variant="ghost" size="icon">
-                    <Pencil size={20} />
-                  </Button>
-                </div>
+                  pet={pet} 
+                  onEditClick={handleEditPet} 
+                />
               ))}
             </div>
           ) : (
@@ -254,7 +263,10 @@ const OwnerProfileScreen = () => {
           <Button 
             variant="outline" 
             className="w-full mt-4"
-            onClick={() => setShowPetForm(true)}
+            onClick={() => {
+              setEditingPet(null);
+              setShowPetForm(true);
+            }}
           >
             Añadir mascota
           </Button>
@@ -265,12 +277,18 @@ const OwnerProfileScreen = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-lg transform transition-all animate-scale-in">
             <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Agregar mascota</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                {editingPet ? 'Editar mascota' : 'Agregar mascota'}
+              </h2>
               <PetForm
-                mode="create"
-                onSubmit={handleAddPet}
+                mode={editingPet ? 'edit' : 'create'}
+                pet={editingPet}
+                onSubmit={handlePetFormSubmit}
                 isSubmitting={false}
-                onCancel={() => setShowPetForm(false)}
+                onCancel={() => {
+                  setShowPetForm(false);
+                  setEditingPet(null);
+                }}
               />
             </div>
           </div>

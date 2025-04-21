@@ -2,9 +2,9 @@
 import { Pet } from './index';
 
 export interface PetFormProps {
-  mode: 'create' | 'edit' | 'list';
+  mode: 'create' | 'edit';
   onSubmit: (petData: any) => Promise<Pet | null>;
   isSubmitting: boolean;
   onCancel?: () => void;
-  petId?: string;
+  pet?: Pet | null;
 }
