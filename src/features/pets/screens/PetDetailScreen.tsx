@@ -23,7 +23,15 @@ const PetDetailScreen: React.FC = () => {
       setIsLoading(true);
       try {
         const petData = await getPetById(id);
-        setPet(petData);
+        if (petData) {
+          setPet(petData as Pet);
+        } else {
+          toast({
+            title: "Error",
+            description: "No se pudo encontrar la mascota",
+            variant: "destructive"
+          });
+        }
       } catch (error) {
         console.error('Error fetching pet details:', error);
         toast({
@@ -120,6 +128,11 @@ const PetDetailScreen: React.FC = () => {
     );
   }
 
+  const petAge = pet.date_of_birth ? 
+    calculateAge(pet.date_of_birth) : 'No especificada';
+  
+  const petDescription = pet.additional_notes || 'Sin descripción';
+
   return (
     <LayoutBase
       header={
@@ -168,7 +181,7 @@ const PetDetailScreen: React.FC = () => {
               
               <div>
                 <p className="text-sm text-gray-500">Edad</p>
-                <p>{pet.age || 'No especificada'}</p>
+                <p>{petAge}</p>
               </div>
               
               <div>
@@ -178,7 +191,7 @@ const PetDetailScreen: React.FC = () => {
               
               <div className="col-span-2">
                 <p className="text-sm text-gray-500">Descripción</p>
-                <p>{pet.description || 'Sin descripción'}</p>
+                <p>{petDescription}</p>
               </div>
             </div>
           </div>
@@ -218,5 +231,27 @@ const PetDetailScreen: React.FC = () => {
     </LayoutBase>
   );
 };
+
+// Helper function to calculate age from date of birth
+function calculateAge(dateOfBirth: string): string {
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
+  
+  let years = today.getFullYear() - birthDate.getFullYear();
+  const months = today.getMonth() - birthDate.getMonth();
+  
+  // Adjust years if birth month hasn't happened yet this year
+  if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+    years--;
+  }
+  
+  if (years === 0) {
+    // Calculate months for puppies/kittens
+    const monthsAge = months < 0 ? 12 + months : months;
+    return `${monthsAge} meses`;
+  }
+  
+  return `${years} años`;
+}
 
 export default PetDetailScreen;

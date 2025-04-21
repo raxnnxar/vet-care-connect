@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,6 +31,7 @@ import PetList from '@/features/auth/components/PetList';
 import AddPetButton from '@/features/auth/components/AddPetButton';
 import FinishSetupButton from '@/features/auth/components/FinishSetupButton';
 import { RootState } from '@/state/store';
+import { ProfileData } from '../types';
 
 interface FormValues {
   phone: string;
@@ -154,7 +154,6 @@ const ProfileSetupScreen = () => {
         setNewPetName(newPet.name);
         setPetSuccessAlert(true);
         
-        // If the pet has a photo, show the photo upload dialog
         if (petData.hasPhoto) {
           setShowPhotoUploadDialog(true);
         }
@@ -178,20 +177,17 @@ const ProfileSetupScreen = () => {
       setIsSubmitting(true);
       console.log('Starting profile finish process');
       
-      // Validate phone number
       if (!form.getValues().phone) {
         toast.error('Por favor, ingresa un número de teléfono');
         setIsSubmitting(false);
         return;
       }
       
-      // Upload profile picture if available
       let profilePictureUrl = null;
       if (profileImageFile) {
         profilePictureUrl = await uploadProfilePicture();
       }
       
-      // First, ensure the user has a role in the database
       if (!user?.id) {
         toast.error('Error: No se pudo identificar al usuario');
         setIsSubmitting(false);
@@ -200,7 +196,6 @@ const ProfileSetupScreen = () => {
       
       console.log('Explicitly setting user role to pet_owner in database');
       
-      // Explicitly set the user role to pet_owner in the database
       const { error: roleError } = await supabase
         .from('profiles')
         .update({ 
@@ -220,7 +215,6 @@ const ProfileSetupScreen = () => {
       
       console.log('Database update successful, updating Redux state');
       
-      // Fetch the updated user data to ensure we have the correct role
       const { data: updatedUserData, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
@@ -234,25 +228,21 @@ const ProfileSetupScreen = () => {
         return;
       }
       
-      console.log('Updated user data from database:', updatedUserData);
+      const profileData = updatedUserData as ProfileData;
       
-      // Use the proper action creator from authActions with the fresh data
       dispatch(authActions.setUserRole({
         ...user,
-        role: updatedUserData.role,
-        phone: updatedUserData.phone_number,
-        profileImage: updatedUserData.profile_picture_url
+        role: profileData.role,
+        phone: profileData.phone_number,
+        profileImage: profileData.profile_picture_url
       }));
       
       toast.success('Perfil actualizado con éxito');
       
       console.log('Profile setup complete, forcing navigation to owner home');
       
-      // Close dialog first to prevent any interference
       setIsFinishDialogOpen(false);
       
-      // Force navigation to owner home with replace to prevent back navigation
-      // Use a longer timeout to ensure state updates have time to propagate
       setTimeout(() => {
         navigate('/owner', { replace: true });
       }, 800);
@@ -272,7 +262,6 @@ const ProfileSetupScreen = () => {
         
         <Form {...form}>
           <div className="space-y-6">
-            {/* Profile Image */}
             <div className="flex flex-col items-center">
               <ProfileImageUploader
                 profileImage={profileImage}
@@ -283,10 +272,9 @@ const ProfileSetupScreen = () => {
               />
             </div>
             
-            {/* Phone Number */}
             <div className="space-y-2">
               <PhoneNumberField
-                form={form}
+                control={form.control}
                 name="phone"
                 label="Número de Teléfono"
                 placeholder="Ej: +12345678"
@@ -294,27 +282,22 @@ const ProfileSetupScreen = () => {
               />
             </div>
             
-            {/* Pets Section */}
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Mis Mascotas</h2>
               
-              {/* Pet List */}
               <PetList pets={pets} isLoading={isPetsLoading} />
               
-              {/* Add Pet Button */}
               <AddPetButton 
                 onClick={() => setIsPetDialogOpen(true)} 
                 hasPets={pets.length > 0} 
               />
             </div>
             
-            {/* Finish Setup Button */}
             <FinishSetupButton onClick={() => setIsFinishDialogOpen(true)} />
           </div>
         </Form>
       </div>
       
-      {/* Pet Form Dialog */}
       <Dialog open={isPetDialogOpen} onOpenChange={setIsPetDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -324,7 +307,6 @@ const ProfileSetupScreen = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Pet Photo Upload Dialog */}
       {showPhotoUploadDialog && newPetId && (
         <PetPhotoUploadDialog
           petId={newPetId}
@@ -334,7 +316,6 @@ const ProfileSetupScreen = () => {
         />
       )}
       
-      {/* Success Alert */}
       {petSuccessAlert && (
         <Alert className="fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-sm bg-green-50 border-green-200">
           <AlertDescription className="text-green-800">
@@ -343,7 +324,6 @@ const ProfileSetupScreen = () => {
         </Alert>
       )}
       
-      {/* Finish Confirmation Dialog */}
       <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

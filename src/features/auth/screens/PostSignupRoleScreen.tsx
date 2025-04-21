@@ -74,7 +74,7 @@ const PostSignupRoleScreen: React.FC = () => {
       // Map the selected role to the database value
       if (selectedRole === USER_ROLES.PET_OWNER) {
         roleToAssign = 'pet_owner';
-      } else if (selectedRole === USER_ROLES.VETERINARIAN || selectedRole === USER_ROLES.SERVICE_PROVIDER) {
+      } else if (selectedRole === USER_ROLES.SERVICE_PROVIDER) {
         roleToAssign = 'service_provider';
       } else {
         roleToAssign = String(selectedRole);
@@ -101,7 +101,7 @@ const PostSignupRoleScreen: React.FC = () => {
         toast.success('Rol seleccionado con éxito');
         
         // If service provider, proceed to service type selection
-        if (selectedRole === USER_ROLES.VETERINARIAN || selectedRole === USER_ROLES.SERVICE_PROVIDER) {
+        if (selectedRole === USER_ROLES.SERVICE_PROVIDER) {
           // Navigate to the service type selection screen
           navigate('/post-signup-service-type');
         } else {

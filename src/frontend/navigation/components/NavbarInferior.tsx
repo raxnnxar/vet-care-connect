@@ -17,7 +17,7 @@ const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) =
       <NavItem 
         icon={<Calendar size={24} />} 
         label="Citas" 
-        to={ROUTES.OWNER_APPOINTMENTS} 
+        to={ROUTES.OWNER_APPOINTMENTS || '/owner/appointments'} 
         isActive={activeTab === 'appointments'} 
       />
       <NavItem 
@@ -29,7 +29,7 @@ const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) =
       <NavItem 
         icon={<MessageSquare size={24} />} 
         label="Chats" 
-        to={ROUTES.OWNER_CHATS || '/owner/chats'} 
+        to={'/owner/chats'} 
         isActive={activeTab === 'chats'} 
       />
       <NavItem 

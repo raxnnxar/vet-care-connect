@@ -1,8 +1,7 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
-import { User, LoginCredentials, SignupData } from '../types';
+import { User, LoginCredentials, SignupData, ProfileData } from '../types';
 import { USER_ROLES } from '@/core/constants/app.constants';
 import { ServiceTypeType } from '../types/serviceTypes';
 
@@ -37,19 +36,22 @@ export const checkAuthThunk = createAsyncThunk(
       
       console.log('User data from database:', userData);
       
+      // Explicitly cast to ProfileData
+      const profileData = userData as ProfileData;
+      
       // Create the user object with all necessary data
-      const user = {
+      const user: User = {
         id: session.user.id,
         email: session.user.email || '',
-        displayName: userData?.display_name || '',
-        role: userData?.role || null,
-        serviceType: userData?.service_type || null,
-        phone: userData?.phone_number || '',
-        profileImage: userData?.profile_picture_url || null,
+        displayName: profileData?.display_name || '',
+        role: profileData?.role || null,
+        serviceType: profileData?.service_type || null,
+        phone: profileData?.phone_number || '',
+        profileImage: profileData?.profile_picture_url || null,
         // Include original db field names
-        service_type: userData?.service_type || null,
-        phone_number: userData?.phone_number || '',
-        profile_picture_url: userData?.profile_picture_url || null,
+        service_type: profileData?.service_type || null,
+        phone_number: profileData?.phone_number || '',
+        profile_picture_url: profileData?.profile_picture_url || null,
       };
       
       console.log('Constructed user object with role:', user.role);
@@ -87,18 +89,20 @@ export const loginUser = createAsyncThunk(
       
       if (userError) throw userError;
       
+      const profileData = userData as ProfileData;
+      
       const user: User = {
         id: data.user.id,
         email: data.user.email!,
-        displayName: userData?.display_name || '',
-        role: userData?.role,
-        serviceType: userData?.service_type,
-        phone: userData?.phone_number || '',
-        profileImage: userData?.profile_picture_url || null,
+        displayName: profileData?.display_name || '',
+        role: profileData?.role,
+        serviceType: profileData?.service_type,
+        phone: profileData?.phone_number || '',
+        profileImage: profileData?.profile_picture_url || null,
         // Include original db field names
-        service_type: userData?.service_type || null,
-        phone_number: userData?.phone_number || '',
-        profile_picture_url: userData?.profile_picture_url || null,
+        service_type: profileData?.service_type || null,
+        phone_number: profileData?.phone_number || '',
+        profile_picture_url: profileData?.profile_picture_url || null,
       };
       
       dispatch(authActions.authSuccess(user));

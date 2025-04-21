@@ -12,7 +12,7 @@ export interface User {
   serviceType?: string;
   phone?: string;
   profileImage?: string;
-  // Add field mappings from the database schema
+  // Database field mappings
   service_type?: string;
   phone_number?: string;
   profile_picture_url?: string;
@@ -38,7 +38,6 @@ export interface Session {
   user: User;
 }
 
-// Update the LoginCredentials and SignupData interfaces
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -47,7 +46,7 @@ export interface LoginCredentials {
 export interface SignupData {
   email: string;
   password: string;
-  name?: string;  // Changed from displayName to name to match what's used in thunks
+  name?: string;
 }
 
 export interface AssignRoleParams {
@@ -58,4 +57,17 @@ export interface AssignRoleParams {
 export interface UpdateProviderTypeParams {
   userId: string;
   providerType: string;
+}
+
+// Define the ProfileData interface to match the database structure
+export interface ProfileData {
+  id: string;
+  email: string;
+  display_name: string;
+  role: string;
+  service_type?: string;
+  phone_number?: string;
+  profile_picture_url?: string;
+  created_at?: string;
+  updated_at?: string;
 }

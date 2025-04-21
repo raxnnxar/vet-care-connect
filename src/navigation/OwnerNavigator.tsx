@@ -14,11 +14,34 @@ import VetDetailScreen from '../features/vets/screens/VetDetailScreen';
 import NotificationsScreen from '../features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
 import { RootState } from '@/state/store';
+import { usePets } from '@/features/pets/hooks';
 
 const OwnerNavigator = () => {
   const location = useLocation();
   const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
+  const { createPet, updatePet } = usePets();
+
+  // Dummy handlers for PetForm - these would be replaced with actual handlers in a real implementation
+  const handleCreatePet = async (petData: any) => {
+    try {
+      return await createPet(petData);
+    } catch (error) {
+      console.error("Error creating pet:", error);
+      return null;
+    }
+  };
+
+  const handleUpdatePet = async (petData: any) => {
+    if (!petData.id) return null;
+    try {
+      await updatePet(petData.id, petData);
+      return petData;
+    } catch (error) {
+      console.error("Error updating pet:", error);
+      return null;
+    }
+  };
 
   useEffect(() => {
     console.log('OwnerNavigator mounted, current path:', location.pathname);
@@ -41,10 +64,28 @@ const OwnerNavigator = () => {
         <Route path="/home" element={<OwnerHomeScreen />} />
         <Route path="/profile" element={<OwnerProfileScreen />} />
         
-        <Route path="/pets" element={<PetForm />} />
-        <Route path="/pets/add" element={<PetForm />} />
+        <Route path="/pets" element={
+          <PetForm 
+            mode="list" 
+            onSubmit={handleCreatePet} 
+            isSubmitting={false}
+          />
+        } />
+        <Route path="/pets/add" element={
+          <PetForm 
+            mode="create" 
+            onSubmit={handleCreatePet} 
+            isSubmitting={false}
+          />
+        } />
         <Route path="/pets/:id" element={<PetDetailScreen />} />
-        <Route path="/pets/:id/edit" element={<PetForm />} />
+        <Route path="/pets/:id/edit" element={
+          <PetForm 
+            mode="edit" 
+            onSubmit={handleUpdatePet} 
+            isSubmitting={false}
+          />
+        } />
         
         <Route path="/appointments" element={<OwnerAppointmentsScreen />} />
         <Route path="/appointments/:id" element={<AppointmentDetailScreen />} />

@@ -1,33 +1,33 @@
 
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@/ui/molecules/form';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/ui/molecules/form';
 import { Input } from '@/ui/atoms/input';
-import { UseFormReturn } from 'react-hook-form';
+import { Control } from 'react-hook-form';
 
 export interface PhoneNumberFieldProps {
-  form: UseFormReturn<any>;
+  control: Control<any>;
   name: string;
   label: string;
-  placeholder: string;
+  placeholder?: string;
   helpText?: string;
 }
 
-const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
-  form,
-  name,
-  label,
-  placeholder,
-  helpText
+const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({ 
+  control, 
+  name, 
+  label, 
+  placeholder = '', 
+  helpText = '' 
 }) => {
   return (
     <FormField
-      control={form.control}
+      control={control}
       name={name}
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input {...field} type="tel" placeholder={placeholder} className="h-10" />
+            <Input placeholder={placeholder} {...field} />
           </FormControl>
           {helpText && <FormDescription>{helpText}</FormDescription>}
           <FormMessage />

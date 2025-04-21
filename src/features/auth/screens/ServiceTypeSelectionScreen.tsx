@@ -47,7 +47,7 @@ const ServiceTypeSelectionScreen: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // Update the provider type
+      // Update the provider type using the updateProviderType thunk
       const resultAction = await dispatch(updateProviderType({
         userId: user.id,
         providerType: selectedServiceType
