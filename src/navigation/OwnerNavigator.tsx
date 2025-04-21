@@ -1,104 +1,55 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import OwnerHomeScreen from '../features/home/screens/OwnerHomeScreen';
-import OwnerProfileScreen from '../features/owner/screens/OwnerProfileScreen';
+import OwnerHomeScreen from '../features/owner/screens/OwnerHomeScreen';
+import OwnerProfileScreen from '../features/profile/screens/OwnerProfileScreen';
 import PetForm from '../features/pets/components/PetForm';
-import PetDetailScreen from '../features/pets/screens/PetDetailScreen';
-import OwnerAppointmentsScreen from '../features/appointments/screens/OwnerAppointmentsScreen';
-import AppointmentDetailScreen from '../features/appointments/screens/AppointmentDetailScreen';
-import BookAppointmentScreen from '../features/appointments/screens/BookAppointmentScreen';
-import FindVetsScreen from '../features/vets/screens/FindVetsScreen';
-import VetDetailScreen from '../features/vets/screens/VetDetailScreen';
-import NotificationsScreen from '../features/notifications/screens/NotificationsScreen';
-import SettingsScreen from '../features/settings/screens/SettingsScreen';
-import { RootState } from '@/state/store';
-import { usePets } from '@/features/pets/hooks';
-import { Pet } from '@/features/pets/types';
+import PetDetailsScreen from '../features/pets/screens/PetDetailsScreen';
+import AppointmentBookingScreen from '../features/appointments/screens/AppointmentBookingScreen';
+import AppointmentDetailsScreen from '../features/appointments/screens/AppointmentDetailsScreen';
+import AppointmentsListScreen from '../features/appointments/screens/AppointmentsListScreen';
+import OwnerLayout from '../layouts/OwnerLayout';
+import { ROUTES } from '../frontend/shared/constants/routes';
+import { usePets } from '../features/pets/hooks';
 
 const OwnerNavigator = () => {
-  const location = useLocation();
-  const { user } = useSelector((state: RootState) => state.auth);
-  const navigate = useNavigate();
-  const { createPet, updatePet } = usePets();
+  const { user } = useSelector((state: any) => state.auth);
+  const { createPet } = usePets();
 
-  const handleCreatePet = async (petData: any): Promise<Pet | null> => {
-    try {
-      return await createPet(petData);
-    } catch (error) {
-      console.error("Error creating pet:", error);
-      return null;
-    }
+  // Redirect if user is not authenticated or not a pet owner
+  if (!user || user.role !== 'pet_owner') {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  const handleAddPet = async (petData: any) => {
+    if (!user?.id) return null;
+    
+    const completeData = {
+      ...petData,
+      owner_id: user.id
+    };
+    
+    return await createPet(completeData);
   };
-
-  const handleUpdatePet = async (petData: any): Promise<Pet | null> => {
-    if (!petData.id) return null;
-    try {
-      await updatePet(petData.id, petData);
-      return petData;
-    } catch (error) {
-      console.error("Error updating pet:", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    console.log('OwnerNavigator mounted, current path:', location.pathname);
-    // Force the role to be pet_owner when in the owner section
-    if (user && !user.role && location.pathname.startsWith('/owner')) {
-      console.log('User in owner section but no role set, forcing pet_owner role');
-      // This is a temporary fix to prevent redirect loops
-      return;
-    }
-  }, [
-    location.pathname,
-    user,
-    navigate
-  ]);
 
   return (
-    <div className="relative h-full">
+    <OwnerLayout>
       <Routes>
         <Route path="/" element={<OwnerHomeScreen />} />
-        <Route path="/home" element={<OwnerHomeScreen />} />
         <Route path="/profile" element={<OwnerProfileScreen />} />
-        
-        <Route path="/pets" element={
+        <Route path="/pets/new" element={
           <PetForm 
-            mode="list" 
-            onSubmit={handleCreatePet} 
-            isSubmitting={false}
+            onSubmit={handleAddPet} 
+            isSubmitting={false} 
           />
         } />
-        <Route path="/pets/add" element={
-          <PetForm 
-            mode="create" 
-            onSubmit={handleCreatePet} 
-            isSubmitting={false}
-          />
-        } />
-        <Route path="/pets/:id" element={<PetDetailScreen />} />
-        <Route path="/pets/:id/edit" element={
-          <PetForm 
-            mode="edit" 
-            onSubmit={handleUpdatePet} 
-            isSubmitting={false}
-          />
-        } />
-        
-        <Route path="/appointments" element={<OwnerAppointmentsScreen />} />
-        <Route path="/appointments/:id" element={<AppointmentDetailScreen />} />
-        <Route path="/appointments/book/:vetId" element={<BookAppointmentScreen />} />
-        
-        <Route path="/find-vets" element={<FindVetsScreen />} />
-        <Route path="/vets/:id" element={<VetDetailScreen />} />
-        
-        <Route path="/notifications" element={<NotificationsScreen />} />
-        <Route path="/settings" element={<SettingsScreen />} />
-        
-        <Route path="*" element={<OwnerHomeScreen />} />
+        <Route path="/pets/:petId" element={<PetDetailsScreen />} />
+        <Route path="/appointments" element={<AppointmentsListScreen />} />
+        <Route path="/appointments/new" element={<AppointmentBookingScreen />} />
+        <Route path="/appointments/:appointmentId" element={<AppointmentDetailsScreen />} />
+        <Route path="*" element={<Navigate to="/owner" replace />} />
       </Routes>
-    </div>
+    </OwnerLayout>
   );
 };
 
