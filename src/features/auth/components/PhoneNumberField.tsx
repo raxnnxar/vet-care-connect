@@ -1,39 +1,42 @@
 
 import React from 'react';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/ui/molecules/form';
 import { Input } from '@/ui/atoms/input';
-import { Control } from 'react-hook-form';
 
 export interface PhoneNumberFieldProps {
-  control: Control<any>;
-  name: string;
+  value: string;
+  onChange: (value: string) => void;
   label: string;
-  placeholder?: string;
+  placeholder: string;
   helpText?: string;
 }
 
-const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({ 
-  control, 
-  name, 
-  label, 
-  placeholder = '', 
-  helpText = '' 
-}) => {
+const PhoneNumberField = ({
+  value,
+  onChange,
+  label,
+  placeholder,
+  helpText
+}: PhoneNumberFieldProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow numbers and basic phone formatting characters
+    const formattedValue = e.target.value.replace(/[^\d+\-() ]/g, '');
+    onChange(formattedValue);
+  };
+
   return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{label}</FormLabel>
-          <FormControl>
-            <Input placeholder={placeholder} {...field} />
-          </FormControl>
-          {helpText && <FormDescription>{helpText}</FormDescription>}
-          <FormMessage />
-        </FormItem>
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <Input
+        type="tel"
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="w-full p-2 border rounded"
+      />
+      {helpText && (
+        <p className="text-xs text-gray-500">{helpText}</p>
       )}
-    />
+    </div>
   );
 };
 

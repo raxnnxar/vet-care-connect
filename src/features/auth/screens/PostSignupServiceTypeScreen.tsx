@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { AppDispatch, RootState } from '@/state/store';
-import { updateProviderType } from '../store/authThunks';
+import { updateServiceType } from '../store/authThunks';
 import { USER_ROLES } from '@/core/constants/app.constants';
 import { SERVICE_TYPES, ServiceTypeType } from '../types/serviceTypes';
 
@@ -15,8 +14,8 @@ const PostSignupServiceTypeScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   
-  const handleContinue = async () => {
-    if (!selectedType) {
+  const handleServiceTypeSelection = async (serviceType: ServiceTypeType) => {
+    if (!serviceType) {
       toast.error('Por favor, selecciona un tipo de servicio para continuar');
       return;
     }
@@ -31,20 +30,20 @@ const PostSignupServiceTypeScreen: React.FC = () => {
     setIsLoading(true);
     
     try {
-      console.log('Starting updateProviderType with:', { userId: user.id, providerType: selectedType });
+      console.log('Starting updateServiceType with:', { userId: user.id, serviceType });
       
-      const resultAction = await dispatch(updateProviderType({
-        userId: user.id,
-        providerType: selectedType
+      const result = await dispatch(updateServiceType({ 
+        userId: user!.id,
+        serviceType
       }));
       
-      if (updateProviderType.fulfilled.match(resultAction)) {
-        console.log('Service type selection successful:', resultAction.payload);
+      if (updateServiceType.fulfilled.match(result)) {
+        console.log('Service type selection successful:', result.payload);
         toast.success('Tipo de servicio seleccionado con éxito');
         
         navigate('/profile-setup');
       } else {
-        console.error('Service type selection failed:', resultAction.error);
+        console.error('Service type selection failed:', result.error);
         toast.error('Hubo un problema al seleccionar el tipo de servicio. Por favor intenta de nuevo.');
       }
     } catch (error) {
@@ -110,7 +109,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
           </div>
           
           <button
-            onClick={handleContinue}
+            onClick={() => handleServiceTypeSelection(selectedType)}
             disabled={!selectedType || isLoading}
             className={`w-full py-3 px-4 mt-8 rounded-lg text-white font-medium transition-colors ${
               selectedType && !isLoading

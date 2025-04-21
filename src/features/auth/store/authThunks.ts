@@ -1,3 +1,4 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
@@ -154,7 +155,11 @@ export const signupUser = createAsyncThunk(
         role: null,
         serviceType: null,
         phone: '',
-        profileImage: null
+        profileImage: null,
+        // Include original db field names
+        service_type: null,
+        phone_number: '',
+        profile_picture_url: null
       };
       
       dispatch(authActions.authSuccess(user));
@@ -197,18 +202,18 @@ export const assignUserRole = createAsyncThunk(
   }
 );
 
-export const updateProviderType = createAsyncThunk(
-  'auth/updateProviderType',
-  async ({ userId, providerType }: { userId: string; providerType: string }, { rejectWithValue }) => {
+export const updateServiceType = createAsyncThunk(
+  'auth/updateServiceType',
+  async ({ userId, serviceType }: { userId: string; serviceType: string }, { rejectWithValue }) => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ service_type: providerType, updated_at: new Date().toISOString() })
+        .update({ service_type: serviceType, updated_at: new Date().toISOString() })
         .eq('id', userId);
       
       if (error) throw error;
       
-      return { userId, providerType };
+      return { userId, serviceType };
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

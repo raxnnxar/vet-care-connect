@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../types';
 import { 
   assignUserRole, 
-  updateProviderType, 
+  updateServiceType, 
   updateProfile, 
   checkAuthThunk, 
   loginUser, 
@@ -143,22 +143,23 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
       
-      // Provider type cases
-      .addCase(updateProviderType.pending, (state) => {
+      // Service type cases
+      .addCase(updateServiceType.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(updateProviderType.fulfilled, (state, action) => {
+      .addCase(updateServiceType.fulfilled, (state, action) => {
         if (state.user) {
           state.user = {
             ...state.user,
-            serviceType: action.payload.providerType as ServiceTypeType
+            serviceType: action.payload.serviceType as ServiceTypeType,
+            service_type: action.payload.serviceType as ServiceTypeType
           };
         }
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(updateProviderType.rejected, (state, action) => {
+      .addCase(updateServiceType.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
@@ -173,7 +174,9 @@ const authSlice = createSlice({
           state.user = {
             ...state.user,
             phone: action.payload.phone,
-            profileImage: action.payload.profileImage
+            phone_number: action.payload.phone,
+            profileImage: action.payload.profileImage,
+            profile_picture_url: action.payload.profileImage
           };
         }
         state.isLoading = false;
