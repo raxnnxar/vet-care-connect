@@ -1,8 +1,11 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ROUTES } from '@/frontend/shared/constants/routes';
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
 import SignupScreen from '../features/auth/screens/SignupScreen';
+
+// Update path to LoginScreen
 import LoginScreen from '../features/auth/screens/LoginScreen';
 import ForgotPasswordScreen from '../features/auth/screens/ForgotPasswordScreen';
 import ResetPasswordScreen from '../features/auth/screens/ResetPasswordScreen';
