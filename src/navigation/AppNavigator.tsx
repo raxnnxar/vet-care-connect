@@ -22,74 +22,60 @@ const AppNavigator = () => {
       
       // Skip navigation logic if user is already on profile setup or post-signup screens
       if (
-        location.pathname === '/profile-setup' || 
-        location.pathname === '/post-signup-role' || 
-        location.pathname === '/post-signup-service-type'
+        location.pathname === ROUTES.PROFILE_SETUP || 
+        location.pathname === ROUTES.POST_SIGNUP_ROLE || 
+        location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE
       ) {
         console.log('User is on a profile setup/post-signup screen, allowing completion of flow');
         return;
       }
       
-      // Modified condition: Be more permissive with paths and don't strictly require phone
-      // for users who are already in the owner section
-      if (
-        (user.role === USER_ROLES.PET_OWNER && 
-          (location.pathname.startsWith('/owner') || location.pathname === ROUTES.OWNER_HOME)) || 
-        (user.role === USER_ROLES.VETERINARIAN && location.pathname.startsWith('/vet'))
-      ) {
-        console.log('User is on the correct path, skipping navigation');
+      // If user has no role yet, direct them to role selection
+      if (!user.role) {
+        console.log('User has no role, redirecting to role selection');
+        navigate(ROUTES.POST_SIGNUP_ROLE);
         return;
       }
       
-      // If user is authenticated but doesn't have a role yet, redirect to role selection
-      if (!user.role || user.role === undefined) {
-        console.log('User has no role, redirecting to role selection');
-        navigate('/post-signup-role');
-        return;
-      }
-
-      // If user is a pet owner without a phone number and not already in owner section,
-      // redirect to profile setup
-      if (user.role === USER_ROLES.PET_OWNER && 
-          (!user.phone || user.phone === undefined) && 
-          !location.pathname.startsWith('/owner')) {
-        console.log('Pet owner has no phone, redirecting to profile setup');
-        navigate('/profile-setup');
-        return;
-      }
-
-      // If user is a service provider but doesn't have a service type, redirect to service type selection
-      if (user.role === USER_ROLES.VETERINARIAN && (!user.serviceType || user.serviceType === undefined)) {
-        console.log('Service provider has no service type, redirecting to service type selection');
-        navigate('/post-signup-service-type');
-        return;
-      }
-
-      // If user has complete profile, navigate to the appropriate dashboard
-      if (user.role) {
-        if (user.role === USER_ROLES.PET_OWNER && !location.pathname.includes('/owner')) {
-          console.log('Pet owner profile complete, navigating to pet owner dashboard');
-          navigate(ROUTES.OWNER_HOME);
-        } else if (user.role === USER_ROLES.VETERINARIAN && user.serviceType && !location.pathname.includes('/vet')) {
-          console.log('Vet profile complete, navigating to vet dashboard');
-          navigate('/vet');
+      // If user is on the root path, redirect based on role
+      if (location.pathname === '/') {
+        if (user.role === 'pet_owner') {
+          console.log('Redirecting pet owner to owner home');
+          navigate(ROUTES.OWNER);
+        } else if (user.role === 'service_provider') {
+          console.log('Redirecting service provider to vet home');
+          navigate(ROUTES.VET);
         }
+      }
+    } else {
+      console.log('No user found in AppNavigator');
+      
+      // If no user and not on auth routes, redirect to login
+      if (
+        !location.pathname.startsWith('/login') && 
+        !location.pathname.startsWith('/signup') &&
+        !location.pathname.startsWith('/forgot-password') &&
+        !location.pathname.startsWith('/reset-password') &&
+        location.pathname !== '/'
+      ) {
+        console.log('No user and not on auth route, redirecting to login');
+        navigate(ROUTES.LOGIN);
       }
     }
   }, [user, navigate, location.pathname]);
 
   return (
     <Routes>
-      {/* Post-signup flow routes */}
-      <Route path="/post-signup-role" element={<PostSignupRoleScreen />} />
-      <Route path="/post-signup-service-type" element={<PostSignupServiceTypeScreen />} />
-      <Route path="/profile-setup" element={<ProfileSetupScreen />} />
-
-      {/* Main navigators based on user role */}
-      <Route path="/owner/*" element={<OwnerNavigator />} />
-      <Route path="/vet/*" element={<VetNavigator />} />
+      {/* Auth and onboarding routes */}
+      <Route path={ROUTES.POST_SIGNUP_ROLE} element={<PostSignupRoleScreen />} />
+      <Route path={ROUTES.POST_SIGNUP_SERVICE_TYPE} element={<PostSignupServiceTypeScreen />} />
+      <Route path={ROUTES.PROFILE_SETUP} element={<ProfileSetupScreen />} />
       
-      {/* Default to auth navigator for all other paths */}
+      {/* Nested navigators */}
+      <Route path={`${ROUTES.OWNER}/*`} element={<OwnerNavigator />} />
+      <Route path={`${ROUTES.VET}/*`} element={<VetNavigator />} />
+      
+      {/* Auth routes - should be last to catch all other routes when not authenticated */}
       <Route path="/*" element={<AuthNavigator />} />
     </Routes>
   );
