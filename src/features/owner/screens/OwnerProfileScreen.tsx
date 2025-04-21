@@ -1,148 +1,98 @@
 
-import React, { useState } from 'react';
-import { User } from '@/core/types/user';
+import React from 'react';
+import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useSelector } from 'react-redux';
-import { Edit2 } from 'lucide-react';
-import { LayoutBase } from '@/frontend/navigation/components';
-import { NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
-import { Input } from '@/ui/atoms/input';
-import { Label } from '@/ui/atoms/label';
-import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
-import ProfileImageUploader from '@/features/auth/components/ProfileImageUploader';
-import PetList from '@/features/auth/components/PetList';
-import { toast } from 'sonner';
-import { usePets } from '@/features/pets/hooks';
+import { Avatar } from '@/ui/atoms/avatar';
+import { CalendarDays, Mail, Phone, Settings, User } from 'lucide-react';
+import { RootState } from '@/state/store';
 
 const OwnerProfileScreen = () => {
-  const { user } = useSelector((state: any) => state.auth);
-  const { pets, isLoading: petsLoading } = usePets();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<Partial<User>>(user || {});
-  const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleSave = async () => {
-    try {
-      // In a real app, we would update the user profile here
-      toast.success('Perfil actualizado con éxito');
-      setIsEditing(false);
-    } catch (error) {
-      toast.error('Error al actualizar el perfil');
-    }
-  };
-
-  const handleCancel = () => {
-    setEditedUser(user);
-    setProfileImage(user?.profileImage || null);
-    setProfileImageFile(null);
-    setIsEditing(false);
-  };
+  const { user } = useSelector((state: RootState) => state.auth);
 
   return (
     <LayoutBase
       header={
-        <div className="flex justify-between items-center px-4 py-3 bg-[#5FBFB3] text-white">
-          <h1 className="text-lg font-semibold">Mi Perfil</h1>
-          {!isEditing && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/10"
-              onClick={handleEdit}
-            >
-              <Edit2 className="h-5 w-5" />
-            </Button>
-          )}
+        <div className="flex justify-between items-center px-4 py-3 bg-[#5FBFB3]">
+          <h1 className="text-white font-medium text-lg">Mi Perfil</h1>
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Settings size={22} />
+          </Button>
         </div>
       }
       footer={<NavbarInferior activeTab="profile" />}
     >
-      <div className="flex flex-col gap-6 p-4 pb-20">
-        {/* Profile Image Section */}
-        <div className="flex flex-col items-center">
-          {isEditing ? (
-            <ProfileImageUploader
-              profileImage={profileImage}
-              setProfileImage={setProfileImage}
-              setProfileImageFile={setProfileImageFile}
-              isUploading={isUploading}
-              displayName={user?.displayName}
-            />
-          ) : (
-            <Avatar className="h-24 w-24 border-4 border-primary/30">
-              <AvatarImage src={user?.profileImage} />
-              <AvatarFallback className="bg-primary/20 text-primary text-xl">
-                {user?.displayName?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          )}
+      <div className="flex flex-col p-4 pb-20">
+        {/* Profile Header */}
+        <div className="flex flex-col items-center mb-6 bg-white rounded-lg p-6 shadow-sm">
+          <Avatar className="h-24 w-24 mb-3">
+            {user?.profileImage || user?.profile_picture_url ? (
+              <img src={user.profileImage || user.profile_picture_url} alt={user.displayName} />
+            ) : (
+              <div className="bg-[#5FBFB3] flex items-center justify-center w-full h-full text-white text-2xl">
+                {user?.displayName?.charAt(0) || <User size={36} />}
+              </div>
+            )}
+          </Avatar>
+          <h2 className="text-xl font-semibold">{user?.displayName || "Usuario"}</h2>
+          <p className="text-gray-500">Dueño de mascota</p>
         </div>
 
-        {/* User Information Section */}
-        <div className="space-y-4 bg-white rounded-lg p-4 shadow-sm">
-          <div className="space-y-2">
-            <Label htmlFor="displayName">Nombre</Label>
-            <Input
-              id="displayName"
-              value={isEditing ? editedUser.displayName : user?.displayName}
-              onChange={(e) => setEditedUser({ ...editedUser, displayName: e.target.value })}
-              readOnly={!isEditing}
-              className={!isEditing ? 'bg-gray-50' : ''}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono</Label>
-            <Input
-              id="phone"
-              value={isEditing ? editedUser.phone : user?.phone}
-              onChange={(e) => setEditedUser({ ...editedUser, phone: e.target.value })}
-              readOnly={!isEditing}
-              className={!isEditing ? 'bg-gray-50' : ''}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              value={user?.email}
-              readOnly
-              className="bg-gray-50"
-            />
+        {/* Contact Information */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+          <h3 className="text-lg font-medium mb-4">Información de contacto</h3>
+          
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Mail className="text-[#5FBFB3]" size={20} />
+              <span>{user?.email || "No disponible"}</span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Phone className="text-[#5FBFB3]" size={20} />
+              <span>{user?.phone || user?.phone_number || "No disponible"}</span>
+            </div>
           </div>
         </div>
 
-        {/* Edit Buttons */}
-        {isEditing && (
-          <div className="flex gap-3">
-            <Button
-              className="flex-1 bg-gray-200 text-gray-700 hover:bg-gray-300"
-              onClick={handleCancel}
-            >
-              Cancelar
-            </Button>
-            <Button
-              className="flex-1"
-              onClick={handleSave}
-            >
-              Guardar
-            </Button>
+        {/* Account Details */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+          <h3 className="text-lg font-medium mb-4">Detalles de cuenta</h3>
+          
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <User className="text-[#5FBFB3]" size={20} />
+              <div>
+                <p className="text-gray-500 text-sm">Tipo de usuario</p>
+                <p>Dueño de mascota</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <CalendarDays className="text-[#5FBFB3]" size={20} />
+              <div>
+                <p className="text-gray-500 text-sm">Fecha de registro</p>
+                <p>{new Date().toLocaleDateString()}</p>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
-        {/* Pets Section */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Mis Mascotas</h2>
-          </div>
-          <PetList pets={pets} isLoading={petsLoading} />
+        {/* Actions */}
+        <div className="space-y-3 mt-2">
+          <Button 
+            variant="outline" 
+            className="w-full border-[#5FBFB3] text-[#5FBFB3] hover:bg-[#5FBFB3]/10"
+          >
+            Editar Perfil
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full border-red-500 text-red-500 hover:bg-red-500/10"
+          >
+            Cerrar Sesión
+          </Button>
         </div>
       </div>
     </LayoutBase>

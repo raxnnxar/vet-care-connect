@@ -69,7 +69,16 @@ const PostSignupRoleScreen: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const roleToAssign = selectedRole === USER_ROLES.PET_OWNER ? 'pet_owner' : 'service_provider';
+      let roleToAssign: string;
+      
+      // Map the selected role to the database value
+      if (selectedRole === USER_ROLES.PET_OWNER) {
+        roleToAssign = 'pet_owner';
+      } else if (selectedRole === USER_ROLES.SERVICE_PROVIDER) {
+        roleToAssign = 'service_provider';
+      } else {
+        roleToAssign = String(selectedRole);
+      }
       
       console.log('Starting assignUserRole with:', { 
         userId: user.id, 
@@ -92,7 +101,7 @@ const PostSignupRoleScreen: React.FC = () => {
         toast.success('Rol seleccionado con éxito');
         
         // If service provider, proceed to service type selection
-        if (selectedRole === USER_ROLES.VETERINARIAN) {
+        if (selectedRole === USER_ROLES.SERVICE_PROVIDER) {
           // Navigate to the service type selection screen
           navigate('/post-signup-service-type');
         } else {
@@ -192,16 +201,16 @@ const PostSignupRoleScreen: React.FC = () => {
 
             {/* Service Provider Option with improved text alignment and spacing */}
             <label 
-              id="role-veterinarian"
+              id="role-service_provider"
               className={`relative flex flex-col p-7 rounded-xl transition-all transform duration-300 ${
-                selectedRole === USER_ROLES.VETERINARIAN 
+                selectedRole === USER_ROLES.SERVICE_PROVIDER 
                   ? 'bg-white shadow-lg border-2 border-accent1' 
                   : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F8FAFC]'
               }`}
             >
               <div className="flex items-center">
                 <div className={`p-3 rounded-lg mr-5 ${
-                  selectedRole === USER_ROLES.VETERINARIAN 
+                  selectedRole === USER_ROLES.SERVICE_PROVIDER 
                     ? 'bg-accent1/15 text-accent1' 
                     : 'bg-gray-100 text-gray-500'
                 }`}>
@@ -211,9 +220,9 @@ const PostSignupRoleScreen: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-gray-800 text-lg">Proveedor de servicios</span>
                     <RadioGroupItem 
-                      value={USER_ROLES.VETERINARIAN} 
-                      id="veterinarian"
-                      className={`h-5 w-5 ml-4 ${selectedRole === USER_ROLES.VETERINARIAN ? 'border-accent1 text-accent1' : ''}`}
+                      value={USER_ROLES.SERVICE_PROVIDER} 
+                      id="service-provider"
+                      className={`h-5 w-5 ml-4 ${selectedRole === USER_ROLES.SERVICE_PROVIDER ? 'border-accent1 text-accent1' : ''}`}
                     />
                   </div>
                 </div>

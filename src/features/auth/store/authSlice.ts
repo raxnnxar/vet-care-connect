@@ -1,3 +1,4 @@
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../types';
 import { 
@@ -10,7 +11,7 @@ import {
   logoutUser 
 } from './authThunks';
 import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
-import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
+import { ServiceTypeType } from '../types/serviceTypes';
 
 interface AuthState {
   user: User | null;

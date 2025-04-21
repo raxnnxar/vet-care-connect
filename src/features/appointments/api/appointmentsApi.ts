@@ -39,7 +39,7 @@ export const updateAppointment = async (id: string, appointmentData: UpdateAppoi
  * Cancel an appointment (specialized update operation)
  */
 export const cancelAppointment = async (id: string): Promise<ApiResponse<Appointment>> => {
-  return apiClient.appointments.update<Appointment>(id, { status: 'canceled' });
+  return apiClient.appointments.update<Appointment>(id, { status: 'cancelled' });
 };
 
 /**

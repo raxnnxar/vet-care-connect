@@ -1,68 +1,60 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
+import { SearchIcon, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
+import { Input } from '@/ui/atoms/input';
 
 const FindVetsScreen = () => {
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
-  const handleViewVet = (vetId: string) => {
-    navigate(`/owner/vets/${vetId}`);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Implement search functionality
+    console.log('Searching for:', searchTerm);
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);
   };
 
   return (
     <LayoutBase
       header={
-        <div className="flex justify-between items-center px-4 py-3 bg-[#5FBFB3]">
-          <h1 className="text-white text-xl font-semibold">Buscar Veterinarios</h1>
+        <div className="flex items-center justify-between p-4 bg-[#79D0B8]">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              className="text-white p-1 mr-2" 
+              onClick={handleGoBack}
+            >
+              <ArrowLeft size={24} />
+            </Button>
+            <h1 className="text-xl font-medium text-white">Buscar Veterinarios</h1>
+          </div>
         </div>
       }
       footer={<NavbarInferior activeTab="home" />}
     >
-      <div className="p-4">
-        <div className="relative mb-6">
-          <input
-            type="text"
-            placeholder="Buscar por nombre o especialidad..."
-            className="w-full px-4 py-2 pl-10 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5FBFB3] focus:border-transparent"
-          />
-          <span className="absolute inset-y-0 left-3 flex items-center">
-            <svg className="w-5 h-5 text-gray-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </span>
-        </div>
-        
-        <h2 className="text-lg font-semibold mb-4">Veterinarios Cercanos</h2>
-        
-        {/* Demo veterinarian card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-4">
-          <div className="flex justify-between">
-            <div>
-              <h3 className="font-medium">Dr. Carlos Rodríguez</h3>
-              <p className="text-sm text-gray-500">Medicina General</p>
-              <div className="flex items-center mt-1">
-                <span className="text-yellow-500">★★★★☆</span>
-                <span className="text-xs text-gray-500 ml-1">(4.2)</span>
-              </div>
-            </div>
-            <Button size="sm" onClick={() => handleViewVet("123")}>Ver Perfil</Button>
+      <div className="p-4 pb-20">
+        <form onSubmit={handleSearch} className="mb-6">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Input
+              type="search"
+              placeholder="Buscar por nombre o especialidad"
+              className="pl-10 pr-4 py-3 w-full rounded-full border border-gray-300 focus:border-[#79D0B8] focus:ring-[#79D0B8]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-4">
-          <div className="flex justify-between">
-            <div>
-              <h3 className="font-medium">Dra. Ana Martínez</h3>
-              <p className="text-sm text-gray-500">Cirugía</p>
-              <div className="flex items-center mt-1">
-                <span className="text-yellow-500">★★★★★</span>
-                <span className="text-xs text-gray-500 ml-1">(4.9)</span>
-              </div>
-            </div>
-            <Button size="sm" onClick={() => handleViewVet("456")}>Ver Perfil</Button>
-          </div>
+        </form>
+
+        {/* Placeholder for search results */}
+        <div className="space-y-4">
+          <p className="text-gray-500 text-center my-8">Busca veterinarios cercanos para agendar una cita</p>
         </div>
       </div>
     </LayoutBase>

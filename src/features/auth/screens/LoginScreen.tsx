@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -16,18 +16,17 @@ import {
   FormMessage,
 } from '@/ui/molecules/form';
 import { toast } from 'sonner';
-import { isSupabaseConfigured } from '@/integrations/supabase/client';
 import { useDispatch } from 'react-redux';
-import { loginThunk } from '../store/authThunks';
-import { AppDispatch } from '@/state/store';
 import { ROUTES } from '@/frontend/shared/constants/routes';
+import { AppDispatch } from '@/state/store';
+import { loginUser } from '../store/authThunks';
 
 const loginFormSchema = z.object({
   email: z.string().email({
     message: 'Por favor ingresa un correo electrónico válido.',
   }),
-  password: z.string().min(1, {
-    message: 'La contraseña es requerida.',
+  password: z.string().min(6, {
+    message: 'La contraseña debe tener al menos 6 caracteres.',
   }),
 });
 
@@ -53,32 +52,25 @@ const LoginScreen: React.FC = () => {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
-    
     try {
-      if (!isSupabaseConfigured) {
-        toast.error('La conexión con Supabase no está configurada. Por favor configure primero su conexión de Supabase.');
-        setIsLoading(false);
-        return;
-      }
+      const resultAction = await dispatch(loginUser({
+        email: data.email,
+        password: data.password,
+      }));
       
-      const resultAction = await dispatch(loginThunk(data));
-      
-      if (loginThunk.fulfilled.match(resultAction)) {
-        console.log("Login successful:", resultAction.payload);
-        toast.success('¡Inicio de sesión exitoso!');
-        
-        // Navigate based on user role
-        if (resultAction.payload.role === 'pet_owner') {
+      if (loginUser.fulfilled.match(resultAction)) {
+        toast.success('Inicio de sesión exitoso');
+        // Redirect to the appropriate screen based on user role
+        const user = resultAction.payload;
+        if (user.role === 'pet_owner') {
           navigate(ROUTES.OWNER);
-        } else if (resultAction.payload.role === 'service_provider') {
+        } else if (user.role === 'service_provider') {
           navigate(ROUTES.VET);
         } else {
-          // If no role is assigned yet, redirect to role selection
           navigate(ROUTES.POST_SIGNUP_ROLE);
         }
-      } else if (loginThunk.rejected.match(resultAction)) {
-        console.error("Login failed:", resultAction.error);
-        toast.error(resultAction.payload as string || 'Credenciales incorrectas. Intenta nuevamente.');
+      } else {
+        toast.error(resultAction.payload as string || 'Error al iniciar sesión');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -86,32 +78,6 @@ const LoginScreen: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleForgotPassword = () => {
-    navigate(ROUTES.FORGOT_PASSWORD);
-  };
-
-  const renderSupabaseWarning = () => {
-    if (!isSupabaseConfigured) {
-      return (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm">
-                La conexión con Supabase no está configurada. El inicio de sesión está deshabilitado.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return null;
   };
 
   return (
@@ -132,14 +98,12 @@ const LoginScreen: React.FC = () => {
             Iniciar sesión
           </h1>
           <p className="text-white text-lg opacity-90">
-            Ingresa tus datos para acceder
+            Ingresa tus datos para acceder a tu cuenta
           </p>
         </div>
         
         <div className="w-full max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            {renderSupabaseWarning()}
-            
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <FormField
@@ -190,20 +154,15 @@ const LoginScreen: React.FC = () => {
                 />
                 
                 <div className="flex justify-end">
-                  <Button 
-                    type="button" 
-                    variant="link" 
-                    onClick={handleForgotPassword}
-                    className="p-0 text-[#79D0B8] hover:text-[#5FBFB3]"
-                  >
+                  <Link to={ROUTES.FORGOT_PASSWORD} className="text-[#79D0B8] text-sm hover:underline">
                     ¿Olvidaste tu contraseña?
-                  </Button>
+                  </Link>
                 </div>
                 
                 <Button
                   type="submit"
-                  className="w-full h-12 mt-6 bg-[#79D0B8] hover:bg-[#6abfaa] text-white font-semibold rounded-lg text-lg"
-                  disabled={isLoading || !isSupabaseConfigured}
+                  className="w-full h-12 mt-2 bg-[#79D0B8] hover:bg-[#6abfaa] text-white font-semibold rounded-lg text-lg"
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center">
@@ -217,20 +176,17 @@ const LoginScreen: React.FC = () => {
                     'Iniciar sesión'
                   )}
                 </Button>
-                
-                <div className="text-center mt-4">
-                  <span className="text-gray-600">¿No tienes una cuenta?</span>
-                  <Button 
-                    type="button" 
-                    variant="link" 
-                    onClick={() => navigate(ROUTES.SIGNUP)}
-                    className="text-[#79D0B8] hover:text-[#5FBFB3]"
-                  >
-                    Crear cuenta
-                  </Button>
-                </div>
               </form>
             </Form>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-white">
+              ¿No tienes una cuenta?{' '}
+              <Link to={ROUTES.SIGNUP} className="font-semibold hover:underline">
+                Regístrate
+              </Link>
+            </p>
           </div>
         </div>
       </div>
