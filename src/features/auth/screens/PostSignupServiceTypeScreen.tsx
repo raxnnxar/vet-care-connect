@@ -1,26 +1,19 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
-import { AppDispatch } from '@/state/store';
+import { AppDispatch, RootState } from '@/state/store';
 import { updateProviderType } from '../store/authThunks';
 import { USER_ROLES } from '@/core/constants/app.constants';
-
-export const SERVICE_TYPES = {
-  VETERINARIAN: 'veterinarian',
-  GROOMING: 'grooming',
-  BOARDING: 'boarding',
-  WALKING: 'walking',
-} as const;
-
-export type ServiceTypeType = (typeof SERVICE_TYPES)[keyof typeof SERVICE_TYPES];
+import { SERVICE_TYPES, ServiceTypeType } from '../types/serviceTypes';
 
 const PostSignupServiceTypeScreen: React.FC = () => {
   const [selectedType, setSelectedType] = useState<ServiceTypeType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   
   const handleContinue = async () => {
     if (!selectedType) {

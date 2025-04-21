@@ -1,64 +1,60 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
+import { SearchIcon, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
-import { Card } from '@/ui/molecules/card';
-import { Search } from 'lucide-react';
 import { Input } from '@/ui/atoms/input';
 
-const FindVetsScreen: React.FC = () => {
+const FindVetsScreen = () => {
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  
-  const handleVetSelected = (vetId: string) => {
-    navigate(`/owner/vets/${vetId}`);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Implement search functionality
+    console.log('Searching for:', searchTerm);
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);
   };
 
   return (
     <LayoutBase
       header={
-        <div className="px-4 py-3 bg-[#79D0B8]">
-          <h1 className="text-white font-medium text-lg mb-2">Encontrar Veterinarios</h1>
-          <div className="relative">
-            <Input 
-              type="search"
-              placeholder="Buscar veterinarios..." 
-              className="pl-10 bg-white/90 border-transparent"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+        <div className="flex items-center justify-between p-4 bg-[#79D0B8]">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              className="text-white p-1 mr-2" 
+              onClick={handleGoBack}
+            >
+              <ArrowLeft size={24} />
+            </Button>
+            <h1 className="text-xl font-medium text-white">Buscar Veterinarios</h1>
           </div>
         </div>
       }
-      footer={<NavbarInferior activeTab="search" />}
+      footer={<NavbarInferior activeTab="home" />}
     >
       <div className="p-4 pb-20">
-        <h2 className="text-lg font-medium mb-3">Veterinarios Cercanos</h2>
-        
-        {/* Sample vet cards */}
-        {[1, 2, 3].map((id) => (
-          <Card key={id} className="mb-4 overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleVetSelected(`vet-${id}`)}>
-            <div className="flex p-4">
-              <div className="h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                <span className="text-gray-500">Foto</span>
-              </div>
-              <div>
-                <h3 className="font-medium">Dr. Ejemplo #{id}</h3>
-                <p className="text-sm text-gray-500">Veterinario General</p>
-                <div className="flex items-center mt-1">
-                  <div className="text-xs px-2 py-0.5 bg-[#79D0B8]/20 text-[#79D0B8] rounded-full">
-                    Disponible hoy
-                  </div>
-                  <span className="text-xs text-gray-500 ml-2">A 2km</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
+        <form onSubmit={handleSearch} className="mb-6">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Input
+              type="search"
+              placeholder="Buscar por nombre o especialidad"
+              className="pl-10 pr-4 py-3 w-full rounded-full border border-gray-300 focus:border-[#79D0B8] focus:ring-[#79D0B8]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </form>
 
-        <div className="text-center mt-4">
-          <Button variant="outline">
-            Cargar más
-          </Button>
+        {/* Placeholder for search results */}
+        <div className="space-y-4">
+          <p className="text-gray-500 text-center my-8">Busca veterinarios cercanos para agendar una cita</p>
         </div>
       </div>
     </LayoutBase>

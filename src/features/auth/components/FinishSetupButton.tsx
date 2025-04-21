@@ -1,33 +1,19 @@
 
 import React from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 
-interface FinishSetupButtonProps {
-  isSubmitting: boolean;
+export interface FinishSetupButtonProps {
+  onClick: () => void;
 }
 
-const FinishSetupButton: React.FC<FinishSetupButtonProps> = ({ isSubmitting }) => {
+const FinishSetupButton = ({ onClick }: FinishSetupButtonProps) => {
   return (
-    <div className="flex justify-center mt-8">
-      <Button 
-        type="submit"
-        className="bg-accent3 hover:bg-accent3/90 text-white py-4 px-6 text-base font-medium flex items-center justify-center"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Guardando...
-          </>
-        ) : (
-          <>
-            Finalizar y continuar
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </>
-        )}
-      </Button>
-    </div>
+    <Button 
+      onClick={onClick}
+      className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3] text-white py-3"
+    >
+      Finalizar configuración
+    </Button>
   );
 };
 

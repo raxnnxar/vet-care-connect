@@ -12,7 +12,10 @@ export interface User {
   serviceType?: string;
   phone?: string;
   profileImage?: string;
-  // Additional user fields as needed
+  // Add field mappings from the database schema
+  service_type?: string;
+  phone_number?: string;
+  profile_picture_url?: string;
 }
 
 export interface UpdateProfileOptions {
@@ -23,7 +26,6 @@ export interface UpdateProfileOptions {
 
 export interface AuthState {
   user: User | null;
-  isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
 }

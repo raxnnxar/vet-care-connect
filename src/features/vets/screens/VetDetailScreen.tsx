@@ -1,123 +1,107 @@
 
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
+import { ArrowLeft, MapPin, Phone, Mail, Calendar, Star } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
-import { ArrowLeft, Calendar, Phone, Mail, MapPin, Clock, Star } from 'lucide-react';
+import { Avatar } from '@/ui/atoms/avatar';
 
-const VetDetailScreen: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+const VetDetailScreen = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const handleBookAppointment = () => {
     navigate(`/owner/appointments/book/${id}`);
   };
 
-  const goBack = () => {
-    navigate(-1);
-  };
-
   return (
     <LayoutBase
       header={
-        <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
-          <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
-            <ArrowLeft />
+        <div className="flex items-center p-4 bg-[#79D0B8]">
+          <Button 
+            variant="ghost" 
+            className="text-white p-1 mr-2" 
+            onClick={handleGoBack}
+          >
+            <ArrowLeft size={24} />
           </Button>
-          <h1 className="text-white font-medium text-lg ml-2">Perfil de Veterinario</h1>
+          <h1 className="text-xl font-medium text-white">Perfil del Veterinario</h1>
         </div>
       }
-      footer={<NavbarInferior activeTab="search" />}
+      footer={<NavbarInferior activeTab="home" />}
     >
       <div className="p-4 pb-20">
-        {/* Vet profile header */}
-        <Card className="mb-4 overflow-hidden">
-          <div className="p-4">
-            <div className="flex items-center mb-4">
-              <div className="h-20 w-20 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                <span className="text-gray-500">Foto</span>
+        <Card className="mb-6">
+          <div className="p-4 flex items-center">
+            <Avatar className="h-24 w-24 border-2 border-[#79D0B8]">
+              <div className="bg-gray-200 w-full h-full flex items-center justify-center text-gray-500">
+                DR
               </div>
-              <div>
-                <h2 className="text-xl font-semibold">Dr. Ejemplo</h2>
-                <p className="text-gray-600">Veterinario General</p>
-                <div className="flex items-center mt-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="h-4 w-4 text-gray-300" />
-                  <span className="text-sm text-gray-500 ml-1">4.0 (24 reseñas)</span>
+            </Avatar>
+            
+            <div className="ml-4">
+              <h2 className="text-xl font-semibold">Dr. Ricardo Martínez</h2>
+              <p className="text-gray-600">Veterinario General</p>
+              
+              <div className="flex items-center mt-1">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      size={16}
+                      className={star <= 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
+                    />
+                  ))}
                 </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 mt-2">
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 text-[#79D0B8] mr-2" />
-                <span className="text-sm">A 2km - Calle Ejemplo #123, Ciudad</span>
-              </div>
-              
-              <div className="flex items-center">
-                <Phone className="h-5 w-5 text-[#79D0B8] mr-2" />
-                <span className="text-sm">+52 555 123 4567</span>
-              </div>
-              
-              <div className="flex items-center">
-                <Mail className="h-5 w-5 text-[#79D0B8] mr-2" />
-                <span className="text-sm">ejemplo@veterinario.com</span>
-              </div>
-              
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 text-[#79D0B8] mr-2" />
-                <span className="text-sm">Lunes a Viernes: 9AM - 6PM</span>
+                <span className="ml-1 text-sm text-gray-600">4.0 (24 reseñas)</span>
               </div>
             </div>
           </div>
         </Card>
-
-        {/* About section */}
-        <Card className="mb-4">
+        
+        <Card className="mb-6">
           <div className="p-4">
-            <h3 className="text-lg font-medium mb-2">Sobre mí</h3>
+            <h3 className="font-medium text-lg mb-3">Acerca de</h3>
             <p className="text-gray-600">
-              Veterinario con más de 10 años de experiencia especializado en animales pequeños. 
-              Ofrezco servicios de medicina preventiva, diagnóstico y tratamiento para mascotas.
+              Veterinario con 10 años de experiencia en el cuidado de pequeñas especies. 
+              Especializado en medicina preventiva y tratamiento de enfermedades comunes.
             </p>
           </div>
         </Card>
-
-        {/* Services section */}
-        <Card className="mb-4">
+        
+        <Card className="mb-6">
           <div className="p-4">
-            <h3 className="text-lg font-medium mb-2">Servicios</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center">
-                <div className="w-2 h-2 bg-[#79D0B8] rounded-full mr-2"></div>
-                <span>Consultas generales</span>
-              </li>
-              <li className="flex items-center">
-                <div className="w-2 h-2 bg-[#79D0B8] rounded-full mr-2"></div>
-                <span>Vacunación</span>
-              </li>
-              <li className="flex items-center">
-                <div className="w-2 h-2 bg-[#79D0B8] rounded-full mr-2"></div>
-                <span>Desparasitación</span>
-              </li>
-              <li className="flex items-center">
-                <div className="w-2 h-2 bg-[#79D0B8] rounded-full mr-2"></div>
-                <span>Cirugía menor</span>
-              </li>
-            </ul>
+            <h3 className="font-medium text-lg mb-3">Contacto</h3>
+            
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <MapPin className="text-[#79D0B8] mr-3" size={20} />
+                <span>Av. Principal #123, Col. Centro</span>
+              </div>
+              
+              <div className="flex items-center">
+                <Phone className="text-[#79D0B8] mr-3" size={20} />
+                <span>+52 55 1234 5678</span>
+              </div>
+              
+              <div className="flex items-center">
+                <Mail className="text-[#79D0B8] mr-3" size={20} />
+                <span>dr.martinez@vetclinic.com</span>
+              </div>
+            </div>
           </div>
         </Card>
-
-        {/* Book button */}
+        
         <Button 
-          className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
           onClick={handleBookAppointment}
+          className="w-full bg-[#79D0B8] hover:bg-[#68BBA3] py-3"
         >
-          <Calendar className="mr-2 h-5 w-5" />
+          <Calendar className="mr-2" size={20} />
           Agendar Cita
         </Button>
       </div>

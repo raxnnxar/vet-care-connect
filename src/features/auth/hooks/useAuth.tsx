@@ -60,9 +60,13 @@ export const useAuth = () => {
             email: session.user.email || '',
             displayName: userData?.display_name || '',
             role: userData?.role || null,
-            serviceType: userData?.service_type || null,
             phone: userData?.phone_number || '',
             profileImage: userData?.profile_picture_url || null,
+            // Store the original database field names too
+            service_type: userData?.service_type || null,
+            phone_number: userData?.phone_number || '',
+            profile_picture_url: userData?.profile_picture_url || null,
+            serviceType: userData?.service_type || null,
           };
           
           console.log('Constructed user object with role:', user.role);

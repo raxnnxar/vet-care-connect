@@ -8,8 +8,7 @@
 // User roles in the system
 export const USER_ROLES = {
   PET_OWNER: 'pet_owner',
-  VETERINARIAN: 'veterinarian',
-  SERVICE_PROVIDER: 'service_provider', // Added this role
+  SERVICE_PROVIDER: 'service_provider',
   ADMIN: 'admin',
 } as const;
 

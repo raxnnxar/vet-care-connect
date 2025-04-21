@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import OwnerHomeScreen from '../features/home/screens/OwnerHomeScreen';
@@ -13,10 +13,11 @@ import FindVetsScreen from '../features/vets/screens/FindVetsScreen';
 import VetDetailScreen from '../features/vets/screens/VetDetailScreen';
 import NotificationsScreen from '../features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
+import { RootState } from '@/state/store';
 
 const OwnerNavigator = () => {
   const location = useLocation();
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,10 +41,10 @@ const OwnerNavigator = () => {
         <Route path="/home" element={<OwnerHomeScreen />} />
         <Route path="/profile" element={<OwnerProfileScreen />} />
         
-        <Route path="/pets" element={<PetForm mode="list" />} />
-        <Route path="/pets/add" element={<PetForm mode="create" />} />
+        <Route path="/pets" element={<PetForm />} />
+        <Route path="/pets/add" element={<PetForm />} />
         <Route path="/pets/:id" element={<PetDetailScreen />} />
-        <Route path="/pets/:id/edit" element={<PetForm mode="edit" />} />
+        <Route path="/pets/:id/edit" element={<PetForm />} />
         
         <Route path="/appointments" element={<OwnerAppointmentsScreen />} />
         <Route path="/appointments/:id" element={<AppointmentDetailScreen />} />

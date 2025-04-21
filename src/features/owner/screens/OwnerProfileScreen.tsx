@@ -5,9 +5,10 @@ import { useSelector } from 'react-redux';
 import { Button } from '@/ui/atoms/button';
 import { Avatar } from '@/ui/atoms/avatar';
 import { CalendarDays, Mail, Phone, Settings, User } from 'lucide-react';
+import { RootState } from '@/state/store';
 
 const OwnerProfileScreen = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   return (
     <LayoutBase
@@ -25,15 +26,15 @@ const OwnerProfileScreen = () => {
         {/* Profile Header */}
         <div className="flex flex-col items-center mb-6 bg-white rounded-lg p-6 shadow-sm">
           <Avatar className="h-24 w-24 mb-3">
-            {user?.profile_picture_url ? (
-              <img src={user.profile_picture_url} alt={user.display_name} />
+            {user?.profileImage || user?.profile_picture_url ? (
+              <img src={user.profileImage || user.profile_picture_url} alt={user.displayName} />
             ) : (
               <div className="bg-[#5FBFB3] flex items-center justify-center w-full h-full text-white text-2xl">
-                {user?.display_name?.charAt(0) || <User size={36} />}
+                {user?.displayName?.charAt(0) || <User size={36} />}
               </div>
             )}
           </Avatar>
-          <h2 className="text-xl font-semibold">{user?.display_name || "Usuario"}</h2>
+          <h2 className="text-xl font-semibold">{user?.displayName || "Usuario"}</h2>
           <p className="text-gray-500">Dueño de mascota</p>
         </div>
 
@@ -49,7 +50,7 @@ const OwnerProfileScreen = () => {
             
             <div className="flex items-center gap-3">
               <Phone className="text-[#5FBFB3]" size={20} />
-              <span>{user?.phone_number || "No disponible"}</span>
+              <span>{user?.phone || user?.phone_number || "No disponible"}</span>
             </div>
           </div>
         </div>

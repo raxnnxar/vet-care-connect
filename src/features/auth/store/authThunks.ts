@@ -3,8 +3,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
 import { User, LoginCredentials, SignupData } from '../types';
-import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
-import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
+import { USER_ROLES } from '@/core/constants/app.constants';
+import { ServiceTypeType } from '../types/serviceTypes';
 
 export const checkAuthThunk = createAsyncThunk(
   'auth/checkAuth',
@@ -46,6 +46,10 @@ export const checkAuthThunk = createAsyncThunk(
         serviceType: userData?.service_type || null,
         phone: userData?.phone_number || '',
         profileImage: userData?.profile_picture_url || null,
+        // Include original db field names
+        service_type: userData?.service_type || null,
+        phone_number: userData?.phone_number || '',
+        profile_picture_url: userData?.profile_picture_url || null,
       };
       
       console.log('Constructed user object with role:', user.role);
@@ -87,10 +91,14 @@ export const loginUser = createAsyncThunk(
         id: data.user.id,
         email: data.user.email!,
         displayName: userData?.display_name || '',
-        role: userData?.role as UserRoleType,
-        serviceType: userData?.service_type as ServiceTypeType,
+        role: userData?.role,
+        serviceType: userData?.service_type,
         phone: userData?.phone_number || '',
-        profileImage: userData?.profile_picture_url || null
+        profileImage: userData?.profile_picture_url || null,
+        // Include original db field names
+        service_type: userData?.service_type || null,
+        phone_number: userData?.phone_number || '',
+        profile_picture_url: userData?.profile_picture_url || null,
       };
       
       dispatch(authActions.authSuccess(user));
@@ -121,13 +129,14 @@ export const signupUser = createAsyncThunk(
       
       if (error) throw error;
       
-      // Create a user record in the users table
+      // Create a user record in the profiles table
       const { error: insertError } = await supabase
         .from('profiles')
         .insert({
           id: data.user?.id,
           email: email,
           display_name: name,
+          role: null, // Role will be set later in onboarding
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
@@ -186,7 +195,7 @@ export const assignUserRole = createAsyncThunk(
 
 export const updateProviderType = createAsyncThunk(
   'auth/updateProviderType',
-  async ({ userId, providerType }: { userId: string; providerType: ServiceTypeType }, { rejectWithValue }) => {
+  async ({ userId, providerType }: { userId: string; providerType: string }, { rejectWithValue }) => {
     try {
       const { error } = await supabase
         .from('profiles')

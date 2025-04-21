@@ -6,7 +6,7 @@ import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
 import { ArrowLeft, Edit, Trash2, Calendar } from 'lucide-react';
 import { usePets } from '@/features/pets/hooks/usePets';
-import { PetType } from '@/features/pets/types';
+import { Pet } from '@/features/pets/types';
 import { useToast } from "@/hooks/use-toast";
 
 const PetDetailScreen: React.FC = () => {
@@ -14,7 +14,7 @@ const PetDetailScreen: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { getPetById, deletePet } = usePets();
-  const [pet, setPet] = useState<PetType | null>(null);
+  const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ const PetDetailScreen: React.FC = () => {
             <h1 className="text-white font-medium text-lg ml-2">Cargando...</h1>
           </div>
         }
-        footer={<NavbarInferior activeTab="pets" />}
+        footer={<NavbarInferior activeTab="home" />}
       >
         <div className="p-4 flex justify-center items-center h-full">
           <div className="animate-pulse flex flex-col w-full gap-4">
@@ -106,7 +106,7 @@ const PetDetailScreen: React.FC = () => {
             <h1 className="text-white font-medium text-lg ml-2">Mascota no encontrada</h1>
           </div>
         }
-        footer={<NavbarInferior activeTab="pets" />}
+        footer={<NavbarInferior activeTab="home" />}
       >
         <div className="p-4">
           <Card className="p-4 text-center">
@@ -130,15 +130,15 @@ const PetDetailScreen: React.FC = () => {
           <h1 className="text-white font-medium text-lg ml-2">{pet.name}</h1>
         </div>
       }
-      footer={<NavbarInferior activeTab="pets" />}
+      footer={<NavbarInferior activeTab="home" />}
     >
       <div className="p-4 pb-20">
         {/* Pet image */}
         <div className="mb-6">
-          {pet.photo_url ? (
+          {pet.profile_picture_url ? (
             <div className="h-64 rounded-lg overflow-hidden">
               <img 
-                src={pet.photo_url} 
+                src={pet.profile_picture_url} 
                 alt={pet.name} 
                 className="w-full h-full object-cover"
               />

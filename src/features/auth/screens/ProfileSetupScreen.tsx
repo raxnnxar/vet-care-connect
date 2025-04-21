@@ -31,6 +31,7 @@ import PhoneNumberField from '@/features/auth/components/PhoneNumberField';
 import PetList from '@/features/auth/components/PetList';
 import AddPetButton from '@/features/auth/components/AddPetButton';
 import FinishSetupButton from '@/features/auth/components/FinishSetupButton';
+import { RootState } from '@/state/store';
 
 interface FormValues {
   phone: string;
@@ -47,7 +48,7 @@ interface PetData {
 const ProfileSetupScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const { createPet, isLoading: isPetLoading, getCurrentUserPets, pets: userPets, isLoading: isPetsLoading } = usePets();
   
   const [pets, setPets] = useState<PetData[]>([]);
@@ -319,7 +320,7 @@ const ProfileSetupScreen = () => {
           <DialogHeader>
             <DialogTitle>Agregar Mascota</DialogTitle>
           </DialogHeader>
-          <PetForm onSubmit={handleAddPet} isSubmitting={isSubmitting} onCancel={() => setIsPetDialogOpen(false)} />
+          <PetForm onSubmit={handleAddPet} isSubmitting={isSubmitting} />
         </DialogContent>
       </Dialog>
       
