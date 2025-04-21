@@ -107,6 +107,7 @@ const ProfileSetupScreen = () => {
   };
 
   const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
+    console.log("Pet submission started with data:", petData);
     setIsSubmittingPet(true);
     try {
       if (!user?.id) {
@@ -115,11 +116,13 @@ const ProfileSetupScreen = () => {
       }
       
       // Create the pet in the database
+      console.log("Creating pet with owner ID:", user.id);
       const newPet = await createPet({
         ...petData,
         owner_id: user.id
       });
       
+      console.log("Pet creation result:", newPet);
       if (newPet) {
         // Add to local state
         setCurrentPets((prevPets) => [...prevPets, newPet]);

@@ -1,3 +1,4 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { petsApi } from '../api/petsApi';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,6 +50,8 @@ export const addPet = createAsyncThunk(
   'pets/addPet',
   async (petData: CreatePetData, { rejectWithValue }) => {
     try {
+      console.log('addPet thunk called with data:', petData);
+      
       // First, create the pet entry
       const { data, error } = await petsApi.createPet(petData);
       
@@ -56,6 +59,8 @@ export const addPet = createAsyncThunk(
         console.error('Error creating pet:', error);
         return rejectWithValue(error || new Error('Failed to create pet'));
       }
+      
+      console.log('Pet created successfully in API:', data);
       
       // If there's medical history data, create a related entry
       if (petData.medicalHistory && data.id) {

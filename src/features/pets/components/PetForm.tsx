@@ -607,23 +607,25 @@ const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting,
         </div>
         
         <div className="sticky bottom-0 pt-4 bg-white bg-opacity-95 mt-6 shadow-sm">
-          <Button 
-            type="submit" 
-            className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium"
-            disabled={isSubmitting || uploadingDocument}
-          >
-            {isSubmitting ? 'Guardando...' : 'Guardar mascota'}
-          </Button>
-          {onCancel && (
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button 
-              type="button" 
-              variant="ghost" 
-              className="ml-2"
-              onClick={onCancel}
+              type="submit" 
+              className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium"
+              disabled={isSubmitting || uploadingDocument}
             >
-              Cancelar
+              {isSubmitting ? 'Guardando...' : 'Guardar mascota'}
             </Button>
-          )}
+            {onCancel && (
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="w-full text-center"
+                onClick={onCancel}
+              >
+                Cancelar
+              </Button>
+            )}
+          </div>
         </div>
       </form>
     </ScrollArea>

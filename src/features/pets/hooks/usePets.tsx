@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
@@ -39,6 +40,7 @@ export const usePets = () => {
       
       // Extract the pet data from the resolved action
       if (addPet.fulfilled.match(resultAction)) {
+        console.log('Pet created successfully:', resultAction.payload);
         // Return the pet data directly
         return resultAction.payload as Pet;
       } else {
