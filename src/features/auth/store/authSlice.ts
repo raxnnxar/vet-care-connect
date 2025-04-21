@@ -1,4 +1,3 @@
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../types';
 import { 
@@ -56,6 +55,12 @@ const authSlice = createSlice({
       state.error = null;
     },
     clearErrors(state) {
+      state.error = null;
+    },
+    // New reducer to explicitly set user role
+    setUserRole(state, action: PayloadAction<User>) {
+      state.user = action.payload;
+      state.isLoading = false;
       state.error = null;
     },
   },
