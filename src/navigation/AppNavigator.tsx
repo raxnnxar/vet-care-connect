@@ -31,8 +31,13 @@ const AppNavigator = () => {
       }
       
       // If user is already in the owner or vet section, don't redirect
-      if (location.pathname.startsWith('/owner') || location.pathname.startsWith('/vet')) {
-        console.log('User is already in the correct section, no redirect needed');
+      if (location.pathname.startsWith('/owner')) {
+        console.log('User is already in the owner section, no redirect needed');
+        return;
+      }
+      
+      if (location.pathname.startsWith('/vet')) {
+        console.log('User is already in the vet section, no redirect needed');
         return;
       }
       
