@@ -37,7 +37,7 @@ const ProfileSetupScreen = () => {
   const [currentPetId, setCurrentPetId] = useState<string>('');
   const [currentPetName, setCurrentPetName] = useState<string>('');
   const [isFetchingPets, setIsFetchingPets] = useState(true);
-  const { getCurrentUserPets } = usePets();
+  const { getCurrentUserPets, createPet } = usePets();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -81,11 +81,17 @@ const ProfileSetupScreen = () => {
         try {
           setIsFetchingPets(true);
           const result = await getCurrentUserPets();
-          if (result.payload && Array.isArray(result.payload)) {
+          
+          // Check if result exists and has a payload property that is an array
+          if (result && 'payload' in result && Array.isArray(result.payload)) {
             setCurrentPets(result.payload);
+          } else {
+            console.log('No pets found or invalid response format');
+            setCurrentPets([]);
           }
         } catch (error) {
           console.error('Error fetching pets:', error);
+          setCurrentPets([]);
         } finally {
           setIsFetchingPets(false);
         }
@@ -103,11 +109,15 @@ const ProfileSetupScreen = () => {
   const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
     setIsSubmittingPet(true);
     try {
+      if (!user?.id) {
+        toast.error('Usuario no encontrado');
+        return null;
+      }
+      
       // Create the pet in the database
-      const { createPet } = usePets();
       const newPet = await createPet({
         ...petData,
-        owner_id: user?.id
+        owner_id: user.id
       });
       
       if (newPet) {
@@ -136,10 +146,10 @@ const ProfileSetupScreen = () => {
   const handlePhotoDialogClose = (wasPhotoAdded: boolean) => {
     setShowPhotoDialog(false);
     
-    if (wasPhotoAdded) {
+    if (wasPhotoAdded && user?.id) {
       // Refresh pets list to show the updated photo
       getCurrentUserPets().then((result) => {
-        if (result.payload && Array.isArray(result.payload)) {
+        if (result && 'payload' in result && Array.isArray(result.payload)) {
           setCurrentPets(result.payload);
         }
       });
