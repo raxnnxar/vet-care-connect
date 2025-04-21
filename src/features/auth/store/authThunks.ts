@@ -1,3 +1,4 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
@@ -236,4 +237,4 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-export { loginUser, logoutUser, assignUserRole, updateServiceType, updateProfile };
+// Remove the duplicate exports here - they're already exported individually above
