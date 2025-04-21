@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Stethoscope, Scissors } from 'lucide-react';
@@ -6,16 +5,23 @@ import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
-import { AppDispatch, RootState } from '@/state/store';
+import { AppDispatch } from '@/state/store';
 import { updateProviderType } from '../store/authThunks';
-import { SERVICE_TYPES, ServiceTypeType } from '../types/serviceTypes';
 
-const ServiceTypeSelectionScreen: React.FC = () => {
+// If this file doesn't exist or is incomplete, let's make sure it has the proper type definition
+export const SERVICE_TYPES = {
+  VETERINARIAN: 'veterinarian',
+  GROOMING: 'grooming',
+} as const;
+
+export type ServiceTypeType = (typeof SERVICE_TYPES)[keyof typeof SERVICE_TYPES];
+
+const PostSignupServiceTypeScreen: React.FC = () => {
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceTypeType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: any) => state.auth);
   
   // Define color variables to match the role selection screen
   const brandColor = "#79d0b8"; // Teal color for the brand
@@ -23,7 +29,7 @@ const ServiceTypeSelectionScreen: React.FC = () => {
   useEffect(() => {
     // Check if user exists and has necessary data
     if (!user || !user.id) {
-      console.error("Missing user data in ServiceTypeSelectionScreen:", user);
+      console.error("Missing user data in PostSignupServiceTypeScreen:", user);
       toast.warning('Información de usuario incompleta. Por favor, inicia sesión nuevamente si el problema persiste.');
     }
   }, [user]);
@@ -47,9 +53,9 @@ const ServiceTypeSelectionScreen: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // Update the provider type using the updateProviderType thunk
+      // Update the provider type
       const resultAction = await dispatch(updateProviderType({
-        userId: user.id,
+        providerId: user.id,
         providerType: selectedServiceType
       }));
       
@@ -222,4 +228,4 @@ const ServiceTypeSelectionScreen: React.FC = () => {
   );
 };
 
-export default ServiceTypeSelectionScreen;
+export default PostSignupServiceTypeScreen;

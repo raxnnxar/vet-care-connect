@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Users, Briefcase } from 'lucide-react';
@@ -36,7 +35,7 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
       onRoleSelected(selectedRole);
     } else if (selectedRole) {
       // Route to different screens based on selected role
-      if (selectedRole === USER_ROLES.SERVICE_PROVIDER) {
+      if (selectedRole === USER_ROLES.VETERINARIAN) {
         navigate('/service-type-selection');
       } else {
         navigate('/signup');
@@ -130,16 +129,16 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
 
             {/* Service Provider Option with improved text alignment and spacing */}
             <label 
-              id="role-SERVICE_PROVIDER"
+              id="role-VETERINARIAN"
               className={`relative flex flex-col p-7 rounded-xl transition-all transform duration-300 ${
-                selectedRole === USER_ROLES.SERVICE_PROVIDER 
+                selectedRole === USER_ROLES.VETERINARIAN 
                   ? 'bg-white shadow-lg border-2 border-accent1' 
                   : 'bg-[#F1F5F9] border border-white/60 hover:bg-[#F8FAFC]'
               }`}
             >
               <div className="flex items-center">
                 <div className={`p-3 rounded-lg mr-5 ${
-                  selectedRole === USER_ROLES.SERVICE_PROVIDER 
+                  selectedRole === USER_ROLES.VETERINARIAN 
                     ? 'bg-accent1/15 text-accent1' 
                     : 'bg-gray-100 text-gray-500'
                 }`}>
@@ -149,9 +148,9 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-gray-800 text-lg">Proveedor de servicios</span>
                     <RadioGroupItem 
-                      value={USER_ROLES.SERVICE_PROVIDER} 
-                      id="service-provider"
-                      className={`h-5 w-5 ml-4 ${selectedRole === USER_ROLES.SERVICE_PROVIDER ? 'border-accent1 text-accent1' : ''}`}
+                      value={USER_ROLES.VETERINARIAN} 
+                      id="veterinarian"
+                      className={`h-5 w-5 ml-4 ${selectedRole === USER_ROLES.VETERINARIAN ? 'border-accent1 text-accent1' : ''}`}
                     />
                   </div>
                 </div>

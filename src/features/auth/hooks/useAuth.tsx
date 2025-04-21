@@ -1,4 +1,3 @@
-
 import { useEffect, useCallback, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
@@ -8,7 +7,7 @@ import {
   checkAuthThunk,
 } from '../store/authThunks';
 import { authActions } from '../store/authSlice';
-import { User, LoginCredentials, SignupData, ProfileData } from '../types';
+import { User, LoginCredentials, SignupData } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -42,7 +41,7 @@ export const useAuth = () => {
         try {
           // Fetch user profile data including role from your database
           const { data: userData, error: userError } = await supabase
-            .from('profiles')
+            .from('users')
             .select('*')
             .eq('id', session.user.id)
             .single();
@@ -55,21 +54,14 @@ export const useAuth = () => {
           console.log('User data from database:', userData);
           
           // Create the user object with all necessary data
-          // Explicitly handle as ProfileData to ensure type safety
-          const profileData = userData as ProfileData;
-          
-          const user: User = {
+          const user = {
             id: session.user.id,
             email: session.user.email || '',
-            displayName: profileData?.display_name || '',
-            role: profileData?.role || null,
-            phone: profileData?.phone_number || '',
-            profileImage: profileData?.profile_picture_url || null,
-            // Store the original database field names too
-            service_type: profileData?.service_type || null,
-            phone_number: profileData?.phone_number || '',
-            profile_picture_url: profileData?.profile_picture_url || null,
-            serviceType: profileData?.service_type || null,
+            displayName: userData?.display_name || '',
+            role: userData?.role || null,
+            serviceType: userData?.service_type || null,
+            phone: userData?.phone_number || '',
+            profileImage: userData?.profile_picture_url || null,
           };
           
           console.log('Constructed user object with role:', user.role);

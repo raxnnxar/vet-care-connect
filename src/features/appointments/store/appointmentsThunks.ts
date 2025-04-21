@@ -113,7 +113,7 @@ export const cancelExistingAppointment = (id: string) => async (dispatch: AppDis
     if (error) throw new Error(error.message || 'Failed to cancel appointment');
     if (!data) throw new Error('Appointment cancellation returned no data');
     
-    dispatch(appointmentsActions.updateAppointmentSuccess({ ...data, status: 'cancelled' }));
+    dispatch(appointmentsActions.updateAppointmentSuccess({ ...data, status: 'canceled' }));
     return data;
   } catch (err) {
     dispatch(appointmentsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));

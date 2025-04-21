@@ -12,10 +12,7 @@ export interface User {
   serviceType?: string;
   phone?: string;
   profileImage?: string;
-  // Database field mappings
-  service_type?: string;
-  phone_number?: string;
-  profile_picture_url?: string;
+  // Additional user fields as needed
 }
 
 export interface UpdateProfileOptions {
@@ -26,6 +23,7 @@ export interface UpdateProfileOptions {
 
 export interface AuthState {
   user: User | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
 }
@@ -38,6 +36,7 @@ export interface Session {
   user: User;
 }
 
+// Add new interfaces for the missing functions
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -55,19 +54,6 @@ export interface AssignRoleParams {
 }
 
 export interface UpdateProviderTypeParams {
-  userId: string;
+  providerId: string;
   providerType: string;
-}
-
-// Define the ProfileData interface to match the database structure
-export interface ProfileData {
-  id: string;
-  email: string;
-  display_name: string;
-  role: string;
-  service_type?: string;
-  phone_number?: string;
-  profile_picture_url?: string;
-  created_at?: string;
-  updated_at?: string;
 }

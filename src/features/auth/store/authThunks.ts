@@ -1,9 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
-import { User, LoginCredentials, SignupData, ProfileData } from '../types';
-import { USER_ROLES } from '@/core/constants/app.constants';
-import { ServiceTypeType } from '../types/serviceTypes';
+import { User } from '../types';
+import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
+import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
 
 export const checkAuthThunk = createAsyncThunk(
   'auth/checkAuth',
@@ -24,7 +24,7 @@ export const checkAuthThunk = createAsyncThunk(
       
       // Always fetch fresh user data from the database
       const { data: userData, error: userError } = await supabase
-        .from('profiles')
+        .from('users')
         .select('*')
         .eq('id', session.user.id)
         .single();
@@ -36,22 +36,15 @@ export const checkAuthThunk = createAsyncThunk(
       
       console.log('User data from database:', userData);
       
-      // Explicitly cast to ProfileData
-      const profileData = userData as ProfileData;
-      
       // Create the user object with all necessary data
-      const user: User = {
+      const user = {
         id: session.user.id,
         email: session.user.email || '',
-        displayName: profileData?.display_name || '',
-        role: profileData?.role || null,
-        serviceType: profileData?.service_type || null,
-        phone: profileData?.phone_number || '',
-        profileImage: profileData?.profile_picture_url || null,
-        // Include original db field names
-        service_type: profileData?.service_type || null,
-        phone_number: profileData?.phone_number || '',
-        profile_picture_url: profileData?.profile_picture_url || null,
+        displayName: userData?.display_name || '',
+        role: userData?.role || null,
+        serviceType: userData?.service_type || null,
+        phone: userData?.phone_number || '',
+        profileImage: userData?.profile_picture_url || null,
       };
       
       console.log('Constructed user object with role:', user.role);
@@ -69,7 +62,7 @@ export const checkAuthThunk = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: LoginCredentials, { dispatch, rejectWithValue }) => {
+  async ({ email, password }: { email: string; password: string }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(authActions.authRequestStarted());
       
@@ -82,27 +75,21 @@ export const loginUser = createAsyncThunk(
       
       // Fetch user profile data
       const { data: userData, error: userError } = await supabase
-        .from('profiles')
+        .from('users')
         .select('*')
         .eq('id', data.user.id)
         .single();
       
       if (userError) throw userError;
       
-      const profileData = userData as ProfileData;
-      
       const user: User = {
         id: data.user.id,
         email: data.user.email!,
-        displayName: profileData?.display_name || '',
-        role: profileData?.role,
-        serviceType: profileData?.service_type,
-        phone: profileData?.phone_number || '',
-        profileImage: profileData?.profile_picture_url || null,
-        // Include original db field names
-        service_type: profileData?.service_type || null,
-        phone_number: profileData?.phone_number || '',
-        profile_picture_url: profileData?.profile_picture_url || null,
+        displayName: userData?.display_name || '',
+        role: userData?.role as UserRoleType,
+        serviceType: userData?.service_type as ServiceTypeType,
+        phone: userData?.phone_number || '',
+        profileImage: userData?.profile_picture_url || null
       };
       
       dispatch(authActions.authSuccess(user));
@@ -116,7 +103,7 @@ export const loginUser = createAsyncThunk(
 
 export const signupUser = createAsyncThunk(
   'auth/signup',
-  async ({ email, password, name }: SignupData, { dispatch, rejectWithValue }) => {
+  async ({ email, password, displayName }: { email: string; password: string; displayName: string }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(authActions.authRequestStarted());
       
@@ -126,21 +113,20 @@ export const signupUser = createAsyncThunk(
         password,
         options: {
           data: {
-            displayName: name
+            displayName
           }
         }
       });
       
       if (error) throw error;
       
-      // Create a user record in the profiles table
+      // Create a user record in the users table
       const { error: insertError } = await supabase
-        .from('profiles')
+        .from('users')
         .insert({
           id: data.user?.id,
           email: email,
-          display_name: name,
-          role: null, // Role will be set later in onboarding
+          display_name: displayName,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
@@ -150,7 +136,7 @@ export const signupUser = createAsyncThunk(
       const user: User = {
         id: data.user!.id,
         email: email,
-        displayName: name,
+        displayName: displayName,
         role: null,
         serviceType: null,
         phone: '',
@@ -181,10 +167,10 @@ export const logoutUser = createAsyncThunk(
 
 export const assignUserRole = createAsyncThunk(
   'auth/assignRole',
-  async ({ userId, role }: { userId: string; role: string }, { rejectWithValue }) => {
+  async ({ userId, role }: { userId: string; role: UserRoleType }, { rejectWithValue }) => {
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('users')
         .update({ role, updated_at: new Date().toISOString() })
         .eq('id', userId);
       
@@ -199,10 +185,10 @@ export const assignUserRole = createAsyncThunk(
 
 export const updateProviderType = createAsyncThunk(
   'auth/updateProviderType',
-  async ({ userId, providerType }: { userId: string; providerType: string }, { rejectWithValue }) => {
+  async ({ userId, providerType }: { userId: string; providerType: ServiceTypeType }, { rejectWithValue }) => {
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('users')
         .update({ service_type: providerType, updated_at: new Date().toISOString() })
         .eq('id', userId);
       
@@ -229,7 +215,7 @@ export const updateProfile = createAsyncThunk(
       }
       
       const { error } = await supabase
-        .from('profiles')
+        .from('users')
         .update(updateData)
         .eq('id', userId);
       

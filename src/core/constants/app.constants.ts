@@ -1,79 +1,80 @@
 
-// Define app-wide constants
+/**
+ * App Constants
+ * 
+ * Core constants used throughout the application
+ */
 
-// User roles
+// User roles in the system
 export const USER_ROLES = {
   PET_OWNER: 'pet_owner',
-  SERVICE_PROVIDER: 'service_provider', 
-  VETERINARIAN: 'veterinarian', // Adding VETERINARIAN role for backward compatibility
-  ADMIN: 'admin'
+  VETERINARIAN: 'veterinarian',
+  ADMIN: 'admin',
 } as const;
 
 export type UserRoleType = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
-// Pet Categories
+// Provider types (veterinary specialties)
+export const PROVIDER_TYPES = {
+  GENERAL_PRACTITIONER: 'general_practitioner',
+  SURGEON: 'surgeon',
+  DERMATOLOGIST: 'dermatologist',
+  CARDIOLOGIST: 'cardiologist',
+  NEUROLOGIST: 'neurologist',
+  OPHTHALMOLOGIST: 'ophthalmologist',
+  DENTIST: 'dentist',
+  EMERGENCY: 'emergency',
+  BEHAVIORIST: 'behaviorist',
+  NUTRITIONIST: 'nutritionist',
+} as const;
+
+export type ProviderTypeType = (typeof PROVIDER_TYPES)[keyof typeof PROVIDER_TYPES];
+
+// Appointment status types
+export const APPOINTMENT_STATUS = {
+  SCHEDULED: 'scheduled',
+  CONFIRMED: 'confirmed',
+  COMPLETED: 'completed',
+  CANCELED: 'canceled',
+  MISSED: 'missed',
+  RESCHEDULED: 'rescheduled',
+  PENDING_PAYMENT: 'pending_payment',
+} as const;
+
+export type AppointmentStatusType = (typeof APPOINTMENT_STATUS)[keyof typeof APPOINTMENT_STATUS];
+
+// Appointment types
+export const APPOINTMENT_TYPES = {
+  CHECK_UP: 'check-up',
+  VACCINATION: 'vaccination',
+  EMERGENCY: 'emergency',
+  SURGERY: 'surgery',
+  FOLLOW_UP: 'follow-up',
+  DENTAL_CLEANING: 'dental-cleaning',
+  GROOMING: 'grooming',
+  CONSULTATION: 'consultation',
+} as const;
+
+export type AppointmentTypeType = (typeof APPOINTMENT_TYPES)[keyof typeof APPOINTMENT_TYPES];
+
+// Gender types for pets
+export const PET_GENDER = {
+  MALE: 'male',
+  FEMALE: 'female',
+  UNKNOWN: 'unknown',
+} as const;
+
+export type PetGenderType = (typeof PET_GENDER)[keyof typeof PET_GENDER];
+
+// Pet categories
 export const PET_CATEGORIES = {
   DOG: 'dog',
   CAT: 'cat',
   BIRD: 'bird',
   REPTILE: 'reptile',
+  FISH: 'fish',
   SMALL_MAMMAL: 'small_mammal',
-  OTHER: 'other'
+  OTHER: 'other',
 } as const;
 
 export type PetCategoryType = (typeof PET_CATEGORIES)[keyof typeof PET_CATEGORIES];
-
-// Pet Genders
-export const PET_GENDER = {
-  MALE: 'male',
-  FEMALE: 'female'
-} as const;
-
-export type PetGenderType = (typeof PET_GENDER)[keyof typeof PET_GENDER];
-
-// Appointment Constants
-export const APPOINTMENT_STATUS = {
-  PENDING: 'pending',
-  CONFIRMED: 'confirmed',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled'
-} as const;
-
-export type AppointmentStatusType = (typeof APPOINTMENT_STATUS)[keyof typeof APPOINTMENT_STATUS];
-
-export const APPOINTMENT_TYPES = {
-  CHECK_UP: 'check_up',
-  VACCINATION: 'vaccination',
-  EMERGENCY: 'emergency',
-  SURGERY: 'surgery'
-} as const;
-
-export type AppointmentTypeType = (typeof APPOINTMENT_TYPES)[keyof typeof APPOINTMENT_TYPES];
-
-// API endpoints
-export const API_ENDPOINTS = {
-  AUTH: '/auth',
-  USERS: '/users',
-  PETS: '/pets',
-  APPOINTMENTS: '/appointments',
-  VETS: '/vets',
-  SERVICES: '/services'
-};
-
-// Local storage keys
-export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'vett_auth_token',
-  USER: 'vett_user'
-};
-
-// Error messages
-export const ERROR_MESSAGES = {
-  GENERIC: 'Ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.',
-  AUTH: {
-    INVALID_CREDENTIALS: 'Correo electrónico o contraseña incorrectos.',
-    WEAK_PASSWORD: 'La contraseña debe tener al menos 8 caracteres.',
-    EMAIL_IN_USE: 'Este correo electrónico ya está registrado.',
-    INVALID_EMAIL: 'Por favor, introduce un correo electrónico válido.'
-  }
-};
-

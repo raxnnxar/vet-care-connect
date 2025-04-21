@@ -5,10 +5,8 @@ import { Home, Calendar, MessageSquare, Settings, User } from 'lucide-react';
 import { ROUTES } from '../../shared/constants/routes';
 import { cn } from '@/lib/utils';
 
-export type NavTabType = 'home' | 'appointments' | 'chats' | 'settings' | 'profile' | 'pets' | 'search';
-
 interface NavbarInferiorProps {
-  activeTab?: NavTabType;
+  activeTab?: 'home' | 'appointments' | 'chats' | 'settings' | 'profile';
 }
 
 const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) => {
@@ -17,31 +15,31 @@ const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) =
       <NavItem 
         icon={<Calendar size={24} />} 
         label="Citas" 
-        to={ROUTES.OWNER_APPOINTMENTS || '/owner/appointments'} 
+        to={ROUTES.APPOINTMENTS} 
         isActive={activeTab === 'appointments'} 
       />
       <NavItem 
         icon={<Home size={24} />} 
         label="Inicio" 
-        to={ROUTES.OWNER} 
+        to={ROUTES.HOME} 
         isActive={activeTab === 'home'} 
       />
       <NavItem 
         icon={<MessageSquare size={24} />} 
         label="Chats" 
-        to={'/owner/chats'} 
+        to={ROUTES.CHATS} 
         isActive={activeTab === 'chats'} 
       />
       <NavItem 
         icon={<Settings size={24} />} 
         label="Ajustes" 
-        to={ROUTES.OWNER_SETTINGS || '/owner/settings'} 
+        to={ROUTES.SETTINGS} 
         isActive={activeTab === 'settings'} 
       />
       <NavItem 
         icon={<User size={24} />} 
         label="Perfil" 
-        to={ROUTES.OWNER_PROFILE} 
+        to={ROUTES.PROFILE} 
         isActive={activeTab === 'profile'} 
       />
     </div>
