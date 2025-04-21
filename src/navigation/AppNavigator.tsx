@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -31,14 +30,14 @@ const AppNavigator = () => {
         return;
       }
       
-      // Skip navigation logic if user is already on the correct owner/vet path
-      // and has completed all required profile information
+      // Modified condition: Be more permissive with paths and don't strictly require phone
+      // for users who are already in the owner section
       if (
-        (user.role === USER_ROLES.PET_OWNER && user.phone && 
+        (user.role === USER_ROLES.PET_OWNER && 
           (location.pathname.startsWith('/owner') || location.pathname === ROUTES.OWNER_HOME)) || 
-        (user.role === USER_ROLES.VETERINARIAN && user.serviceType && location.pathname.startsWith('/vet'))
+        (user.role === USER_ROLES.VETERINARIAN && location.pathname.startsWith('/vet'))
       ) {
-        console.log('User has complete profile and is on the correct path, skipping navigation');
+        console.log('User is on the correct path, skipping navigation');
         return;
       }
       
@@ -49,8 +48,11 @@ const AppNavigator = () => {
         return;
       }
 
-      // If user is a pet owner without a phone number, redirect to profile setup
-      if (user.role === USER_ROLES.PET_OWNER && (!user.phone || user.phone === undefined)) {
+      // If user is a pet owner without a phone number and not already in owner section,
+      // redirect to profile setup
+      if (user.role === USER_ROLES.PET_OWNER && 
+          (!user.phone || user.phone === undefined) && 
+          !location.pathname.startsWith('/owner')) {
         console.log('Pet owner has no phone, redirecting to profile setup');
         navigate('/profile-setup');
         return;
@@ -65,7 +67,7 @@ const AppNavigator = () => {
 
       // If user has complete profile, navigate to the appropriate dashboard
       if (user.role) {
-        if (user.role === USER_ROLES.PET_OWNER && user.phone && !location.pathname.includes('/owner')) {
+        if (user.role === USER_ROLES.PET_OWNER && !location.pathname.includes('/owner')) {
           console.log('Pet owner profile complete, navigating to pet owner dashboard');
           navigate(ROUTES.OWNER_HOME);
         } else if (user.role === USER_ROLES.VETERINARIAN && user.serviceType && !location.pathname.includes('/vet')) {
