@@ -8,7 +8,7 @@ BEGIN
     new.id, 
     new.email, 
     coalesce(new.raw_user_meta_data->>'displayName', 'User'), 
-    coalesce(new.raw_user_meta_data->>'role', null),
+    coalesce(new.raw_user_meta_data->>'role', 'pet_owner'), -- Default to 'pet_owner' if no role is provided
     now()
   );
   RETURN new;

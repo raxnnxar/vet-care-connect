@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
@@ -23,7 +22,6 @@ export const checkAuthThunk = createAsyncThunk(
       
       console.log('Active session found, user:', session.user);
       
-      // Always fetch fresh user data from the database
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('*')
@@ -37,10 +35,8 @@ export const checkAuthThunk = createAsyncThunk(
       
       console.log('User data from database:', userData);
       
-      // Explicitly cast to ProfileData
       const profileData = userData as ProfileData;
       
-      // Create the user object with all necessary data
       const user: User = {
         id: session.user.id,
         email: session.user.email || '',
@@ -49,7 +45,6 @@ export const checkAuthThunk = createAsyncThunk(
         serviceType: profileData?.service_type || null,
         phone: profileData?.phone_number || '',
         profileImage: profileData?.profile_picture_url || null,
-        // Include original db field names
         service_type: profileData?.service_type || null,
         phone_number: profileData?.phone_number || '',
         profile_picture_url: profileData?.profile_picture_url || null,
@@ -57,9 +52,7 @@ export const checkAuthThunk = createAsyncThunk(
       
       console.log('Constructed user object with role:', user.role);
       
-      // Dispatch the authSuccess action to update the state
       dispatch(authActions.authSuccess(user));
-      
       return user;
     } catch (error) {
       console.error('Auth check error:', error);
@@ -81,7 +74,6 @@ export const loginUser = createAsyncThunk(
       
       if (error) throw error;
       
-      // Fetch user profile data
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('*')
@@ -100,7 +92,6 @@ export const loginUser = createAsyncThunk(
         serviceType: profileData?.service_type,
         phone: profileData?.phone_number || '',
         profileImage: profileData?.profile_picture_url || null,
-        // Include original db field names
         service_type: profileData?.service_type || null,
         phone_number: profileData?.phone_number || '',
         profile_picture_url: profileData?.profile_picture_url || null,
@@ -121,27 +112,26 @@ export const signupUser = createAsyncThunk(
     try {
       dispatch(authActions.authRequestStarted());
       
-      // Sign up the user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            displayName: name
+            displayName: name,
+            role: 'pet_owner'
           }
         }
       });
       
       if (error) throw error;
       
-      // Create a user record in the profiles table
       const { error: insertError } = await supabase
         .from('profiles')
         .insert({
           id: data.user?.id,
           email: email,
           display_name: name,
-          role: null, // Role will be set later in onboarding
+          role: 'pet_owner',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
@@ -152,11 +142,10 @@ export const signupUser = createAsyncThunk(
         id: data.user!.id,
         email: email,
         displayName: name,
-        role: null,
+        role: 'pet_owner',
         serviceType: null,
         phone: '',
         profileImage: null,
-        // Include original db field names
         service_type: null,
         phone_number: '',
         profile_picture_url: null
@@ -246,3 +235,5 @@ export const updateProfile = createAsyncThunk(
     }
   }
 );
+
+export { loginUser, logoutUser, assignUserRole, updateServiceType, updateProfile };

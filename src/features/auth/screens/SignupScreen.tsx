@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
@@ -89,7 +90,10 @@ const SignupScreen: React.FC = () => {
         navigate('/post-signup-role');
       } else if (signupUser.rejected.match(resultAction)) {
         console.error("Signup failed:", resultAction.error);
-        toast.error(resultAction.payload as string || 'Hubo un problema al crear tu cuenta. Intenta nuevamente.');
+        const errorMessage = typeof resultAction.payload === 'string' 
+          ? resultAction.payload 
+          : 'Hubo un problema al crear tu cuenta. Intenta nuevamente.';
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error('Registration error:', error);
