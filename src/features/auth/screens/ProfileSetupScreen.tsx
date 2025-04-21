@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/ui/molecules/alert-dialog";
-import { updateProfile, checkAuthThunk } from '../store/authThunks';
+import { updateProfile } from '../store/authThunks';
 import { authActions } from '../store/authSlice';
 import { profileService } from '../api/profileService';
 import { v4 as uuidv4 } from 'uuid';
@@ -218,28 +218,12 @@ const ProfileSetupScreen = () => {
       
       console.log('Database update successful, updating Redux state');
       
-      // Fetch the updated user data to ensure we have the correct role
-      const { data: updatedUserData, error: fetchError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-        
-      if (fetchError) {
-        console.error('Error fetching updated user data:', fetchError);
-        toast.error('Error al actualizar el perfil');
-        setIsSubmitting(false);
-        return;
-      }
-      
-      console.log('Updated user data from database:', updatedUserData);
-      
-      // Use the proper action creator from authActions with the fresh data
+      // Use the proper action creator from authActions
       dispatch(authActions.setUserRole({
         ...user,
-        role: updatedUserData.role,
-        phone: updatedUserData.phone_number,
-        profileImage: updatedUserData.profile_picture_url
+        role: 'pet_owner',
+        phone: form.getValues().phone,
+        profileImage: profilePictureUrl
       }));
       
       toast.success('Perfil actualizado con éxito');
@@ -250,10 +234,9 @@ const ProfileSetupScreen = () => {
       setIsFinishDialogOpen(false);
       
       // Force navigation to owner home with replace to prevent back navigation
-      // Use a longer timeout to ensure state updates have time to propagate
       setTimeout(() => {
         navigate('/owner', { replace: true });
-      }, 800);
+      }, 100);
       
     } catch (error) {
       console.error('Error updating profile:', error);

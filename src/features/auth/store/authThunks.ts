@@ -1,158 +1,80 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
-import { authActions } from './authSlice';
-import { User } from '../types';
-import { USER_ROLES, UserRoleType } from '@/core/constants/app.constants';
-import { ServiceTypeType } from '../screens/ServiceTypeSelectionScreen';
+import { profileService } from '../api/profileService';
 
-export const checkAuthThunk = createAsyncThunk(
-  'auth/checkAuth',
-  async (_, { dispatch, rejectWithValue }) => {
+export const signupThunk = createAsyncThunk(
+  'auth/signup',
+  async ({ email, password, displayName }: { email: string; password: string; displayName: string }, { rejectWithValue }) => {
     try {
-      console.log('Checking auth state...');
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
       if (error) throw error;
-      
-      if (!session) {
-        console.log('No active session found');
-        dispatch(authActions.logoutSuccess());
-        return null;
-      }
-      
-      console.log('Active session found, user:', session.user);
-      
-      // Always fetch fresh user data from the database
+
+      // Create user profile in the database
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (userError) {
-        console.error('Error fetching user data:', userError);
-        return rejectWithValue(userError);
-      }
-      
-      console.log('User data from database:', userData);
-      
-      // Create the user object with all necessary data
-      const user = {
-        id: session.user.id,
-        email: session.user.email || '',
-        displayName: userData?.display_name || '',
-        role: userData?.role || null,
-        serviceType: userData?.service_type || null,
-        phone: userData?.phone_number || '',
-        profileImage: userData?.profile_picture_url || null,
+        .insert([
+          {
+            id: data.user?.id,
+            email,
+            display_name: displayName,
+            created_at: new Date().toISOString(),
+          },
+        ])
+        .select();
+
+      if (userError) throw userError;
+
+      return {
+        id: data.user?.id,
+        email: data.user?.email,
+        displayName,
       };
-      
-      console.log('Constructed user object with role:', user.role);
-      
-      // Dispatch the authSuccess action to update the state
-      dispatch(authActions.authSuccess(user));
-      
-      return user;
-    } catch (error) {
-      console.error('Auth check error:', error);
-      return rejectWithValue(error);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
     }
   }
 );
 
-export const loginUser = createAsyncThunk(
+export const loginThunk = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: { email: string; password: string }, { dispatch, rejectWithValue }) => {
+  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      dispatch(authActions.authRequestStarted());
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
-      
+
       if (error) throw error;
-      
+
       // Fetch user profile data
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('id', data.user.id)
         .single();
-      
+
       if (userError) throw userError;
-      
-      const user: User = {
+
+      return {
         id: data.user.id,
-        email: data.user.email!,
-        displayName: userData?.display_name || '',
-        role: userData?.role as UserRoleType,
-        serviceType: userData?.service_type as ServiceTypeType,
-        phone: userData?.phone_number || '',
-        profileImage: userData?.profile_picture_url || null
+        email: data.user.email,
+        displayName: userData.display_name,
+        role: userData.role,
+        serviceType: userData.service_type,
+        phone: userData.phone_number,
+        profileImage: userData.profile_picture_url,
       };
-      
-      dispatch(authActions.authSuccess(user));
-      return user;
     } catch (error: any) {
-      dispatch(authActions.authFailed(error.message));
       return rejectWithValue(error.message);
     }
   }
 );
 
-export const signupUser = createAsyncThunk(
-  'auth/signup',
-  async ({ email, password, displayName }: { email: string; password: string; displayName: string }, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(authActions.authRequestStarted());
-      
-      // Sign up the user
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            displayName
-          }
-        }
-      });
-      
-      if (error) throw error;
-      
-      // Create a user record in the users table
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert({
-          id: data.user?.id,
-          email: email,
-          display_name: displayName,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-      
-      if (insertError) throw insertError;
-      
-      const user: User = {
-        id: data.user!.id,
-        email: email,
-        displayName: displayName,
-        role: null,
-        serviceType: null,
-        phone: '',
-        profileImage: null
-      };
-      
-      dispatch(authActions.authSuccess(user));
-      return user;
-    } catch (error: any) {
-      dispatch(authActions.authFailed(error.message));
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const logoutUser = createAsyncThunk(
+export const logoutThunk = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
@@ -165,37 +87,76 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
-export const assignUserRole = createAsyncThunk(
-  'auth/assignRole',
-  async ({ userId, role }: { userId: string; role: UserRoleType }, { rejectWithValue }) => {
+export const checkAuthThunk = createAsyncThunk(
+  'auth/checkAuth',
+  async (_, { rejectWithValue }) => {
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ role, updated_at: new Date().toISOString() })
-        .eq('id', userId);
+      console.log('Checking auth state...');
+      const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) throw error;
       
-      return { userId, role };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+      if (!session) {
+        console.log('No active session found');
+        return null;
+      }
+      
+      console.log('Active session found, user:', session.user);
+      
+      // Fetch user profile data including role from your database
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (userError) {
+        console.error('Error fetching user data:', userError);
+        throw userError;
+      }
+      
+      console.log('User data from database:', userData);
+      
+      // Return combined user data
+      return {
+        id: session.user.id,
+        email: session.user.email,
+        displayName: userData?.display_name || '',
+        role: userData?.role || null,
+        serviceType: userData?.service_type || null,
+        phone: userData?.phone_number || '',
+        profileImage: userData?.profile_picture_url || null,
+      };
+    } catch (error) {
+      console.error('Auth check error:', error);
+      return rejectWithValue(error);
     }
   }
 );
 
-export const updateProviderType = createAsyncThunk(
-  'auth/updateProviderType',
-  async ({ userId, providerType }: { userId: string; providerType: ServiceTypeType }, { rejectWithValue }) => {
+export const assignUserRole = createAsyncThunk(
+  'auth/assignUserRole',
+  async ({ userId, role }: { userId: string; role: string }, { rejectWithValue }) => {
     try {
-      const { error } = await supabase
+      console.log(`Assigning role ${role} to user ${userId}`);
+      
+      // Update the user's role in the database
+      const { data, error } = await supabase
         .from('users')
-        .update({ service_type: providerType, updated_at: new Date().toISOString() })
-        .eq('id', userId);
+        .update({ role })
+        .eq('id', userId)
+        .select();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating user role:', error);
+        throw error;
+      }
       
-      return { userId, providerType };
+      console.log('Role update successful:', data);
+      
+      return { userId, role, userData: data[0] };
     } catch (error: any) {
+      console.error('Error in assignUserRole:', error);
       return rejectWithValue(error.message);
     }
   }
@@ -203,25 +164,76 @@ export const updateProviderType = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
   'auth/updateProfile',
-  async ({ userId, phone, profileImage }: { userId: string; phone: string; profileImage?: string }, { rejectWithValue }) => {
+  async (profileData: any, { getState, rejectWithValue }) => {
     try {
-      const updateData: any = {
-        phone_number: phone,
-        updated_at: new Date().toISOString()
-      };
+      console.log('Updating profile...');
+      const { auth } = getState() as { auth: { user: any } };
+      const userId = auth.user?.id;
       
-      if (profileImage) {
-        updateData.profile_picture_url = profileImage;
+      if (!userId) {
+        throw new Error('User ID not found');
       }
       
-      const { error } = await supabase
+      // Update user profile in the database
+      const { data, error } = await supabase
         .from('users')
-        .update(updateData)
-        .eq('id', userId);
+        .update({
+          phone_number: profileData.phone,
+          profile_picture_url: profileData.profileImage,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId)
+        .select();
+      
+      if (error) {
+        console.error('Error updating profile:', error);
+        throw error;
+      }
+      
+      console.log('Profile updated, waiting for state to update...', data);
+      
+      // Fetch the complete user data to ensure we have all fields
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (userError) {
+        console.error('Error fetching updated user data:', userError);
+        throw userError;
+      }
+      
+      return {
+        id: userId,
+        email: auth.user.email,
+        displayName: userData.display_name,
+        role: userData.role,
+        serviceType: userData.service_type,
+        phone: userData.phone_number,
+        profileImage: userData.profile_picture_url,
+      };
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateServiceType = createAsyncThunk(
+  'auth/updateServiceType',
+  async ({ userId, serviceType }: { userId: string; serviceType: string }, { rejectWithValue }) => {
+    try {
+      // Update the user's service type in the database
+      const { data, error } = await supabase
+        .from('users')
+        .update({ service_type: serviceType })
+        .eq('id', userId)
+        .select();
       
       if (error) throw error;
       
-      return { userId, phone, profileImage };
+      return { userId, serviceType, userData: data[0] };
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
