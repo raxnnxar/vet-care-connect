@@ -1,100 +1,277 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useSelector } from 'react-redux';
 import { Button } from '@/ui/atoms/button';
 import { Avatar } from '@/ui/atoms/avatar';
-import { CalendarDays, Mail, Phone, Settings, User } from 'lucide-react';
+import { Pencil, User } from 'lucide-react';
 import { RootState } from '@/state/store';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { profileImageService } from '@/features/auth/api/profileImageService';
+import { PetForm } from '@/features/pets/components/PetForm';
+import { usePets } from '@/features/pets/hooks';
 
 const OwnerProfileScreen = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedPhone, setEditedPhone] = useState('');
+  const [editedAddress, setEditedAddress] = useState('');
+  const [userDetails, setUserDetails] = useState({
+    phone: '',
+    address: '',
+    profilePicture: '',
+  });
+  const [showPetForm, setShowPetForm] = useState(false);
+  const { getCurrentUserPets } = usePets();
+  const [userPets, setUserPets] = useState([]);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (user?.id) {
+        const { data, error } = await supabase
+          .from('pet_owners')
+          .select('phone_number, address, profile_picture_url')
+          .eq('id', user.id)
+          .single();
+
+        if (data) {
+          setUserDetails({
+            phone: data.phone_number || '',
+            address: data.address || '',
+            profilePicture: data.profile_picture_url || '',
+          });
+          setEditedPhone(data.phone_number || '');
+          setEditedAddress(data.address || '');
+        }
+
+        const petsResult = await getCurrentUserPets();
+        if (petsResult.payload) {
+          setUserPets(petsResult.payload);
+        }
+      }
+    };
+
+    fetchUserDetails();
+  }, [user]);
+
+  const handleProfileImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && user?.id) {
+      const uploadedUrl = await profileImageService.uploadProfileImage(user.id, file);
+      if (uploadedUrl) {
+        setUserDetails(prev => ({ ...prev, profilePicture: uploadedUrl }));
+        toast.success('Imagen de perfil actualizada');
+      }
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (user?.id) {
+      const { error } = await supabase
+        .from('pet_owners')
+        .update({
+          phone_number: editedPhone,
+          address: editedAddress
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        toast.error('Error al guardar cambios');
+      } else {
+        setUserDetails(prev => ({
+          ...prev,
+          phone: editedPhone,
+          address: editedAddress
+        }));
+        setIsEditing(false);
+        toast.success('Cambios guardados exitosamente');
+      }
+    }
+  };
+
+  const handleAddPet = async (petData: any) => {
+    const newPet = await usePets().createPet(petData);
+    if (newPet) {
+      setUserPets(prev => [...prev, newPet]);
+      setShowPetForm(false);
+      toast.success('Mascota agregada');
+    }
+    return newPet;
+  };
 
   return (
     <LayoutBase
       header={
         <div className="flex justify-between items-center px-4 py-3 bg-[#5FBFB3]">
           <h1 className="text-white font-medium text-lg">Mi Perfil</h1>
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-            <Settings size={22} />
-          </Button>
         </div>
       }
       footer={<NavbarInferior activeTab="profile" />}
     >
       <div className="flex flex-col p-4 pb-20">
         {/* Profile Header */}
-        <div className="flex flex-col items-center mb-6 bg-white rounded-lg p-6 shadow-sm">
-          <Avatar className="h-24 w-24 mb-3">
-            {user?.profileImage || user?.profile_picture_url ? (
-              <img src={user.profileImage || user.profile_picture_url} alt={user.displayName} />
-            ) : (
-              <div className="bg-[#5FBFB3] flex items-center justify-center w-full h-full text-white text-2xl">
-                {user?.displayName?.charAt(0) || <User size={36} />}
-              </div>
-            )}
-          </Avatar>
+        <div className="flex flex-col items-center mb-6 bg-white rounded-lg p-6 shadow-sm relative">
+          <div className="relative mb-3">
+            <Avatar className="h-24 w-24">
+              {userDetails.profilePicture ? (
+                <img 
+                  src={userDetails.profilePicture} 
+                  alt={user?.displayName} 
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <div className="bg-[#5FBFB3] flex items-center justify-center w-full h-full text-white text-2xl">
+                  {user?.displayName?.charAt(0) || <User size={36} />}
+                </div>
+              )}
+            </Avatar>
+            <label 
+              htmlFor="profile-image-upload" 
+              className="absolute bottom-0 right-0 bg-[#5FBFB3] text-white rounded-full p-2 cursor-pointer"
+            >
+              <Pencil size={16} />
+              <input 
+                type="file" 
+                id="profile-image-upload" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleProfileImageUpload}
+              />
+            </label>
+          </div>
           <h2 className="text-xl font-semibold">{user?.displayName || "Usuario"}</h2>
           <p className="text-gray-500">Dueño de mascota</p>
         </div>
 
         {/* Contact Information */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <h3 className="text-lg font-medium mb-4">Información de contacto</h3>
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-4 relative">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium">Información de contacto</h3>
+            {!isEditing && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsEditing(true)}
+              >
+                <Pencil size={20} />
+              </Button>
+            )}
+          </div>
           
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <Mail className="text-[#5FBFB3]" size={20} />
+              <span className="font-medium">Correo electrónico:</span>
               <span>{user?.email || "No disponible"}</span>
             </div>
             
             <div className="flex items-center gap-3">
-              <Phone className="text-[#5FBFB3]" size={20} />
-              <span>{user?.phone || user?.phone_number || "No disponible"}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Account Details */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <h3 className="text-lg font-medium mb-4">Detalles de cuenta</h3>
-          
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <User className="text-[#5FBFB3]" size={20} />
-              <div>
-                <p className="text-gray-500 text-sm">Tipo de usuario</p>
-                <p>Dueño de mascota</p>
-              </div>
+              <span className="font-medium">Teléfono:</span>
+              {isEditing ? (
+                <input 
+                  type="tel" 
+                  value={editedPhone}
+                  onChange={(e) => setEditedPhone(e.target.value)}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              ) : (
+                <span>{userDetails.phone || "No disponible"}</span>
+              )}
             </div>
             
             <div className="flex items-center gap-3">
-              <CalendarDays className="text-[#5FBFB3]" size={20} />
-              <div>
-                <p className="text-gray-500 text-sm">Fecha de registro</p>
-                <p>{new Date().toLocaleDateString()}</p>
-              </div>
+              <span className="font-medium">Dirección:</span>
+              {isEditing ? (
+                <input 
+                  type="text" 
+                  value={editedAddress}
+                  onChange={(e) => setEditedAddress(e.target.value)}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              ) : (
+                <span>{userDetails.address || "No disponible"}</span>
+              )}
             </div>
+
+            {isEditing && (
+              <div className="flex justify-end mt-2">
+                <Button 
+                  variant="default" 
+                  onClick={handleSaveChanges}
+                >
+                  Guardar cambios
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="space-y-3 mt-2">
-          <Button 
-            variant="outline" 
-            className="w-full border-[#5FBFB3] text-[#5FBFB3] hover:bg-[#5FBFB3]/10"
-          >
-            Editar Perfil
-          </Button>
+        {/* Mis Mascotas Section */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+          <h3 className="text-lg font-medium mb-4">Mis Mascotas</h3>
           
+          {userPets.length > 0 ? (
+            <div className="grid gap-4">
+              {userPets.map(pet => (
+                <div 
+                  key={pet.id} 
+                  className="flex items-center gap-4 bg-gray-100 p-3 rounded-lg"
+                >
+                  <Avatar>
+                    {pet.profile_picture_url ? (
+                      <img 
+                        src={pet.profile_picture_url} 
+                        alt={pet.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="bg-[#5FBFB3] flex items-center justify-center text-white">
+                        {pet.name.charAt(0)}
+                      </div>
+                    )}
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="font-semibold">{pet.name}</p>
+                    <p className="text-sm text-gray-600">
+                      {pet.species} {pet.breed ? `- ${pet.breed}` : ''}
+                    </p>
+                  </div>
+                  <Button variant="ghost" size="icon">
+                    <Pencil size={20} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">No tienes mascotas registradas</p>
+          )}
+
           <Button 
             variant="outline" 
-            className="w-full border-red-500 text-red-500 hover:bg-red-500/10"
+            className="w-full mt-4"
+            onClick={() => setShowPetForm(true)}
           >
-            Cerrar Sesión
+            Añadir mascota
           </Button>
         </div>
       </div>
+
+      {/* Add Pet Modal */}
+      {showPetForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-lg transform transition-all animate-scale-in">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Agregar mascota</h2>
+              <PetForm
+                mode="create"
+                onSubmit={handleAddPet}
+                isSubmitting={false}
+                onCancel={() => setShowPetForm(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </LayoutBase>
   );
 };
