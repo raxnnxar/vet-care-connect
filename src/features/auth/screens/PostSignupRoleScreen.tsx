@@ -96,8 +96,8 @@ const PostSignupRoleScreen: React.FC = () => {
           // Navigate to the service type selection screen
           navigate('/post-signup-service-type');
         } else {
-          // If pet owner, navigate to the owner dashboard
-          navigate('/owner');
+          // Changed: If pet owner, navigate to profile setup instead of owner dashboard
+          navigate('/profile-setup');
         }
       } else {
         console.error('Role selection failed:', resultAction.error);
