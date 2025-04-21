@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import OwnerHomeScreen from '../features/home/screens/OwnerHomeScreen';
-import OwnerProfileScreenComponent from '../features/profile/screens/OwnerProfileScreen';
+import OwnerProfileScreenComponent from '../features/owner/screens/OwnerProfileScreen';
 import PetForm from '../features/pets/components/PetForm';
 import PetDetailScreen from '../features/pets/screens/PetDetailScreen';
 import OwnerAppointmentsScreen from '../features/appointments/screens/OwnerAppointmentsScreen';
@@ -13,6 +13,11 @@ import VetDetailScreen from '../features/vets/screens/VetDetailScreen';
 import NotificationsScreen from '../features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
 import { ROUTES } from '@/frontend/shared/constants/routes';
+
+const mockSubmitPet = async (petData: any) => {
+  console.log('Mock submit pet:', petData);
+  return petData;
+};
 
 const OwnerNavigator = () => {
   const location = useLocation();
@@ -39,10 +44,28 @@ const OwnerNavigator = () => {
         <Route path="/profile" element={<OwnerProfileScreenComponent />} />
         
         {/* Pet routes */}
-        <Route path="/pets" element={<PetForm mode="list" />} />
-        <Route path="/pets/add" element={<PetForm mode="create" />} />
+        <Route path="/pets" element={
+          <PetForm 
+            mode="list" 
+            onSubmit={mockSubmitPet} 
+            isSubmitting={false} 
+          />
+        } />
+        <Route path="/pets/add" element={
+          <PetForm 
+            mode="create" 
+            onSubmit={mockSubmitPet} 
+            isSubmitting={false} 
+          />
+        } />
         <Route path="/pets/:id" element={<PetDetailScreen />} />
-        <Route path="/pets/:id/edit" element={<PetForm mode="edit" />} />
+        <Route path="/pets/:id/edit" element={
+          <PetForm 
+            mode="edit" 
+            onSubmit={mockSubmitPet} 
+            isSubmitting={false} 
+          />
+        } />
         
         {/* Appointment routes */}
         <Route path="/appointments" element={<OwnerAppointmentsScreen />} />
