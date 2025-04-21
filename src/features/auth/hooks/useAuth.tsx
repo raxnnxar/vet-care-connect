@@ -1,4 +1,3 @@
-
 import { useEffect, useCallback, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
@@ -32,24 +31,49 @@ export const useAuth = () => {
     };
 
     // Set up the auth state change listener
-    const { data: { subscription }} = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription }} = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, "Session:", session ? "exists" : "none");
       
-      // Only dispatch actions after initial auth check to avoid duplicates
-      if (initialAuthCheckDone) {
-        if (session && session.user) {
-          console.log("User session detected, updating state:", session.user);
-          dispatch(authActions.authSuccess({
+      if (session) {
+        console.log("User session detected, updating state:", session.user);
+        
+        // Instead of just using metadata, fetch the complete user data from the database
+        try {
+          // Fetch user profile data including role from your database
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (userError) {
+            console.error('Error fetching user data:', userError);
+            return;
+          }
+          
+          console.log('User data from database:', userData);
+          
+          // Create the user object with all necessary data
+          const user = {
             id: session.user.id,
             email: session.user.email || '',
-            displayName: session.user.user_metadata?.displayName || '',
-            role: session.user.user_metadata?.role,
-            serviceType: session.user.user_metadata?.serviceType
-          }));
-        } else if (event === 'SIGNED_OUT') {
-          console.log("User signed out, clearing state");
-          dispatch(authActions.logoutSuccess());
+            displayName: userData?.display_name || '',
+            role: userData?.role || null,
+            serviceType: userData?.service_type || null,
+            phone: userData?.phone_number || '',
+            profileImage: userData?.profile_picture_url || null,
+          };
+          
+          console.log('Constructed user object with role:', user.role);
+          
+          // Dispatch the authSuccess action to update the state
+          dispatch(authActions.authSuccess(user));
+        } catch (error) {
+          console.error('Error handling auth state change:', error);
         }
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out, clearing state");
+        dispatch(authActions.logoutSuccess());
       }
     });
 
