@@ -15,6 +15,7 @@ import NotificationsScreen from '../features/notifications/screens/Notifications
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
 import { RootState } from '@/state/store';
 import { usePets } from '@/features/pets/hooks';
+import { Pet } from '@/features/pets/types';
 
 const OwnerNavigator = () => {
   const location = useLocation();
@@ -22,8 +23,7 @@ const OwnerNavigator = () => {
   const navigate = useNavigate();
   const { createPet, updatePet } = usePets();
 
-  // Dummy handlers for PetForm - these would be replaced with actual handlers in a real implementation
-  const handleCreatePet = async (petData: any) => {
+  const handleCreatePet = async (petData: any): Promise<Pet | null> => {
     try {
       return await createPet(petData);
     } catch (error) {
@@ -32,7 +32,7 @@ const OwnerNavigator = () => {
     }
   };
 
-  const handleUpdatePet = async (petData: any) => {
+  const handleUpdatePet = async (petData: any): Promise<Pet | null> => {
     if (!petData.id) return null;
     try {
       await updatePet(petData.id, petData);
@@ -104,3 +104,4 @@ const OwnerNavigator = () => {
 };
 
 export default OwnerNavigator;
+
