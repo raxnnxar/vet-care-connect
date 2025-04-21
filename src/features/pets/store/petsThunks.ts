@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { petsApi } from '../api/petsApi';
 import { supabase } from '@/integrations/supabase/client';
@@ -146,33 +145,41 @@ interface UploadParams {
 
 export const uploadPetProfilePicture = createAsyncThunk(
   'pets/uploadProfilePicture',
-  async ({ petId, file }: UploadParams, { rejectWithValue }) => {
+  async ({ petId, file }: { petId: string; file: File }, { rejectWithValue }) => {
     try {
-      // Use the specific pattern for pet profile pictures: {pet_id}/profile.jpg
+      // Create a unique file path
       const fileExt = file.name.split('.').pop();
-      const filePath = `${petId}/profile.${fileExt}`;
+      const filePath = `${petId}/${Date.now()}.${fileExt}`;
       
-      // Upload to the pet-profile-pictures bucket
-      const { data, error } = await supabase.storage
+      // Upload the file to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('pet-profile-pictures')
         .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
+          upsert: true,
+          contentType: file.type
         });
-
-      if (error) throw error;
       
-      // Get the public URL
+      if (uploadError) throw uploadError;
+      
+      // Get the public URL for the uploaded file
       const { data: publicUrlData } = supabase.storage
         .from('pet-profile-pictures')
         .getPublicUrl(filePath);
-        
-      const url = publicUrlData.publicUrl;
       
-      // Update the pet record with the profile picture URL
-      await petsApi.updatePet(petId, { profile_picture_url: url });
+      const imageUrl = publicUrlData.publicUrl;
       
-      return { url, petId };
+      // Update the pet record with the new profile picture URL
+      const { error: updateError } = await supabase
+        .from('pets')
+        .update({ 
+          profile_picture_url: imageUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', petId);
+      
+      if (updateError) throw updateError;
+      
+      return { id: petId, url: imageUrl };
     } catch (error) {
       console.error('Error uploading pet profile picture:', error);
       return rejectWithValue(error);
