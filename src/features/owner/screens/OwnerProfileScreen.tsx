@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useSelector } from 'react-redux';
@@ -9,7 +8,7 @@ import { RootState } from '@/state/store';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { profileImageService } from '@/features/auth/api/profileImageService';
-import { PetForm } from '@/features/pets/components/PetForm';
+import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
 
 const OwnerProfileScreen = () => {
@@ -45,15 +44,24 @@ const OwnerProfileScreen = () => {
           setEditedAddress(data.address || '');
         }
 
-        const petsResult = await getCurrentUserPets();
-        if (petsResult.payload) {
-          setUserPets(petsResult.payload);
+        try {
+          const petsResult = await getCurrentUserPets();
+          
+          if (petsResult && 'payload' in petsResult && Array.isArray(petsResult.payload)) {
+            setUserPets(petsResult.payload);
+          } else {
+            console.log('No pets found or invalid response format', petsResult);
+            setUserPets([]);
+          }
+        } catch (error) {
+          console.error('Error fetching pets:', error);
+          setUserPets([]);
         }
       }
     };
 
     fetchUserDetails();
-  }, [user]);
+  }, [user, getCurrentUserPets]);
 
   const handleProfileImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -110,7 +118,6 @@ const OwnerProfileScreen = () => {
       footer={<NavbarInferior activeTab="profile" />}
     >
       <div className="flex flex-col p-4 pb-20">
-        {/* Profile Header */}
         <div className="flex flex-col items-center mb-6 bg-white rounded-lg p-6 shadow-sm relative">
           <div className="relative mb-3">
             <Avatar className="h-24 w-24">
@@ -144,7 +151,6 @@ const OwnerProfileScreen = () => {
           <p className="text-gray-500">Dueño de mascota</p>
         </div>
 
-        {/* Contact Information */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4 relative">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">Información de contacto</h3>
@@ -206,7 +212,6 @@ const OwnerProfileScreen = () => {
           </div>
         </div>
 
-        {/* Mis Mascotas Section */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
           <h3 className="text-lg font-medium mb-4">Mis Mascotas</h3>
           
@@ -256,7 +261,6 @@ const OwnerProfileScreen = () => {
         </div>
       </div>
 
-      {/* Add Pet Modal */}
       {showPetForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-lg transform transition-all animate-scale-in">
