@@ -24,7 +24,8 @@ const PetDetailScreen: React.FC = () => {
       try {
         const petData = await getPetById(id);
         if (petData) {
-          setPet(petData as Pet);
+          // Explicitly cast the result to Pet or handle it safely
+          setPet(petData as unknown as Pet);
         } else {
           toast({
             title: "Error",
