@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useSelector } from 'react-redux';
@@ -11,6 +12,7 @@ import { profileImageService } from '@/features/auth/api/profileImageService';
 import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
 import PetListItem from '@/features/pets/components/PetListItem';
+import { Pet } from '@/features/pets/types';
 
 const OwnerProfileScreen = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -24,8 +26,8 @@ const OwnerProfileScreen = () => {
   });
   const [showPetForm, setShowPetForm] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
-  const { getCurrentUserPets } = usePets();
-  const [userPets, setUserPets] = useState([]);
+  const { getCurrentUserPets, createPet, updatePet } = usePets();
+  const [userPets, setUserPets] = useState<Pet[]>([]);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -100,42 +102,36 @@ const OwnerProfileScreen = () => {
     }
   };
 
-  const handleAddPet = async (petData: any) => {
-    const newPet = await usePets().createPet(petData);
-    if (newPet) {
-      setUserPets(prev => [...prev, newPet]);
-      setShowPetForm(false);
-      toast.success('Mascota agregada');
-    }
-    return newPet;
-  };
-
   const handleEditPet = (pet: Pet) => {
     setEditingPet(pet);
     setShowPetForm(true);
   };
 
-  const handlePetFormSubmit = async (petData: any) => {
+  const handlePetFormSubmit = async (petData: any): Promise<Pet | null> => {
     try {
       if (editingPet) {
-        const updatedPet = await usePets().updatePet(editingPet.id, petData);
-        if (updatedPet) {
-          setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPet : p));
+        const updatedPet = await updatePet(editingPet.id, petData);
+        if (updatedPet && updatedPet.payload) {
+          setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPet.payload : p));
           setShowPetForm(false);
           setEditingPet(null);
           toast.success('Mascota actualizada exitosamente');
+          return updatedPet.payload;
         }
       } else {
-        const newPet = await usePets().createPet(petData);
+        const newPet = await createPet(petData);
         if (newPet) {
           setUserPets(prev => [...prev, newPet]);
           setShowPetForm(false);
           toast.success('Mascota agregada exitosamente');
+          return newPet;
         }
       }
+      return null;
     } catch (error) {
       console.error('Error saving pet:', error);
       toast.error('Error al guardar la mascota');
+      return null;
     }
   };
 

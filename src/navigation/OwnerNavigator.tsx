@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -64,13 +65,7 @@ const OwnerNavigator = () => {
         <Route path="/home" element={<OwnerHomeScreen />} />
         <Route path="/profile" element={<OwnerProfileScreen />} />
         
-        <Route path="/pets" element={
-          <PetForm 
-            mode="list" 
-            onSubmit={handleCreatePet} 
-            isSubmitting={false}
-          />
-        } />
+        <Route path="/pets" element={<OwnerHomeScreen />} />
         <Route path="/pets/add" element={
           <PetForm 
             mode="create" 
