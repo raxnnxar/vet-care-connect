@@ -13,7 +13,7 @@ interface PetDetailModalProps {
   pet: Pet;
   isOpen: boolean;
   onClose: () => void;
-  onPetUpdate: (updatedPet: Pet) => void;
+  onPetUpdate: (updatedPet: Pet) => Promise<Pet | null>;
 }
 
 const PetDetailModal: React.FC<PetDetailModalProps> = ({ 
@@ -26,16 +26,18 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handlePetUpdate = async (updatedPetData: any) => {
+  const handlePetUpdate = async (updatedPetData: any): Promise<Pet | null> => {
     try {
       const result = await onPetUpdate(updatedPetData);
       if (result) {
         toast.success('Mascota actualizada exitosamente');
         setIsEditing(false);
       }
+      return result;
     } catch (error) {
       console.error('Error updating pet:', error);
       toast.error('Error al actualizar la mascota');
+      return null;
     }
   };
 
