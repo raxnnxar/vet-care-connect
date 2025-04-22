@@ -1,18 +1,17 @@
 
 import React from 'react';
-import { Bird, Cat, Dog, Pencil, User } from 'lucide-react';
+import { Bird, Cat, Dog, ChevronRight, User } from 'lucide-react';
 import { Avatar } from '@/ui/atoms/avatar';
 import { Button } from '@/ui/atoms/button';
 import { Pet } from '../types';
 
 interface PetListItemProps {
   pet: Pet;
-  onEditClick: (pet: Pet) => void;
+  onClick: (pet: Pet) => void;
 }
 
-const PetListItem: React.FC<PetListItemProps> = ({ pet, onEditClick }) => {
+const PetListItem: React.FC<PetListItemProps> = ({ pet, onClick }) => {
   const getAnimalIcon = (species: string | undefined) => {
-    // Handle undefined or empty species
     if (!species) {
       return <User className="h-full w-full p-2 text-[#5FBFB3]" />;
     }
@@ -30,7 +29,10 @@ const PetListItem: React.FC<PetListItemProps> = ({ pet, onEditClick }) => {
   };
 
   return (
-    <div className="flex items-center gap-4 bg-gray-100 p-3 rounded-lg">
+    <div 
+      className="flex items-center gap-4 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+      onClick={() => onClick(pet)}
+    >
       <Avatar className="h-14 w-14 border-2 border-[#5FBFB3]/20">
         {pet.profile_picture_url ? (
           <img 
@@ -50,13 +52,7 @@ const PetListItem: React.FC<PetListItemProps> = ({ pet, onEditClick }) => {
           {pet.species} {pet.breed ? `- ${pet.breed}` : ''}
         </p>
       </div>
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={() => onEditClick(pet)}
-      >
-        <Pencil size={20} />
-      </Button>
+      <ChevronRight className="h-5 w-5 text-gray-400" />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useSelector } from 'react-redux';
@@ -12,6 +11,7 @@ import { profileImageService } from '@/features/auth/api/profileImageService';
 import PetForm from '@/features/pets/components/PetForm';
 import { usePets } from '@/features/pets/hooks';
 import PetListItem from '@/features/pets/components/PetListItem';
+import PetDetailModal from '@/features/pets/components/PetDetailModal';
 import { Pet } from '@/features/pets/types';
 
 const OwnerProfileScreen = () => {
@@ -26,6 +26,7 @@ const OwnerProfileScreen = () => {
   });
   const [showPetForm, setShowPetForm] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const { getCurrentUserPets, createPet, updatePet } = usePets();
   const [userPets, setUserPets] = useState<Pet[]>([]);
 
@@ -112,7 +113,6 @@ const OwnerProfileScreen = () => {
       if (editingPet) {
         const updatedPet = await updatePet(editingPet.id, petData);
         if (updatedPet && updatedPet.payload) {
-          // Ensure we're working with a Pet type by explicitly typing or casting
           const updatedPetData = updatedPet.payload as Pet;
           setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPetData : p));
           setShowPetForm(false);
@@ -123,7 +123,6 @@ const OwnerProfileScreen = () => {
       } else {
         const newPet = await createPet(petData);
         if (newPet) {
-          // Ensure newPet conforms to Pet type
           const newPetData = newPet as unknown as Pet;
           setUserPets(prev => [...prev, newPetData]);
           setShowPetForm(false);
@@ -135,6 +134,27 @@ const OwnerProfileScreen = () => {
     } catch (error) {
       console.error('Error saving pet:', error);
       toast.error('Error al guardar la mascota');
+      return null;
+    }
+  };
+
+  const handlePetClick = (pet: Pet) => {
+    setSelectedPet(pet);
+  };
+
+  const handlePetUpdate = async (petData: any): Promise<Pet | null> => {
+    try {
+      if (!selectedPet) return null;
+      const result = await updatePet(selectedPet.id, petData);
+      if (result && result.payload) {
+        const updatedPet = result.payload as Pet;
+        setUserPets(prev => prev.map(p => p.id === updatedPet.id ? updatedPet : p));
+        return updatedPet;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error updating pet:', error);
+      toast.error('Error al actualizar la mascota');
       return null;
     }
   };
@@ -251,8 +271,8 @@ const OwnerProfileScreen = () => {
               {userPets.map(pet => (
                 <PetListItem 
                   key={pet.id} 
-                  pet={pet} 
-                  onEditClick={handleEditPet} 
+                  pet={pet}
+                  onClick={handlePetClick}
                 />
               ))}
             </div>
@@ -272,6 +292,15 @@ const OwnerProfileScreen = () => {
           </Button>
         </div>
       </div>
+
+      {selectedPet && (
+        <PetDetailModal
+          pet={selectedPet}
+          isOpen={!!selectedPet}
+          onClose={() => setSelectedPet(null)}
+          onPetUpdate={handlePetUpdate}
+        />
+      )}
 
       {showPetForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
