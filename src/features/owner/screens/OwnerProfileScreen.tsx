@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useSelector } from 'react-redux';
@@ -145,7 +146,37 @@ const OwnerProfileScreen = () => {
   const handlePetUpdate = async (petData: any): Promise<Pet | null> => {
     try {
       if (!selectedPet) return null;
-      const result = await updatePet(selectedPet.id, petData);
+      
+      // Clone the pet data to avoid modifying the original
+      const petUpdateData = { ...petData };
+      
+      // Remove petPhotoFile from the update data as it's not a column in the database
+      if (petUpdateData.petPhotoFile) {
+        const photoFile = petUpdateData.petPhotoFile;
+        delete petUpdateData.petPhotoFile;
+        
+        // Handle photo upload separately if needed
+        if (photoFile) {
+          console.log('Uploading pet photo separately');
+          try {
+            const uploadResult = await usePets().uploadProfilePicture(selectedPet.id, photoFile);
+            if (uploadResult) {
+              petUpdateData.profile_picture_url = uploadResult;
+            }
+          } catch (photoError) {
+            console.error('Error uploading pet photo:', photoError);
+          }
+        }
+      }
+
+      // Remove medicalHistory as it needs to be handled separately
+      if (petUpdateData.medicalHistory) {
+        delete petUpdateData.medicalHistory;
+      }
+      
+      console.log('Updating pet with clean data:', petUpdateData);
+      const result = await updatePet(selectedPet.id, petUpdateData);
+      
       if (result && result.payload) {
         const updatedPet = result.payload as Pet;
         setUserPets(prev => prev.map(p => p.id === updatedPet.id ? updatedPet : p));

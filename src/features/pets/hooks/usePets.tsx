@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
@@ -105,8 +106,38 @@ export const usePets = () => {
     }
   }, [dispatch, user]);
   
-  const updatePet = useCallback((id: string, petData: UpdatePetData) => {
-    return dispatch(modifyPet({ id, petData }));
+  const updatePet = useCallback(async (id: string, petData: UpdatePetData) => {
+    try {
+      console.log('Updating pet with ID:', id);
+      console.log('Update data:', petData);
+      
+      // Clean up data before sending to Supabase
+      const cleanPetData = { ...petData };
+      
+      // Remove non-database fields
+      if ('petPhotoFile' in cleanPetData) {
+        delete cleanPetData.petPhotoFile;
+      }
+      
+      if ('medicalHistory' in cleanPetData) {
+        delete cleanPetData.medicalHistory;
+      }
+      
+      const resultAction = await dispatch(modifyPet({ id, petData: cleanPetData }));
+      
+      if (modifyPet.fulfilled.match(resultAction)) {
+        console.log('Pet updated successfully:', resultAction.payload);
+        return { payload: resultAction.payload };
+      } else {
+        console.error('Failed to update pet:', resultAction.error);
+        toast.error(`Error al actualizar mascota: ${resultAction.error.message || 'Error desconocido'}`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error updating pet:', error);
+      toast.error('Error al actualizar mascota');
+      return null;
+    }
   }, [dispatch]);
   
   const deletePet = useCallback((id: string) => {
@@ -168,3 +199,5 @@ export const usePets = () => {
     resetState,
   };
 };
+
+export default usePets;

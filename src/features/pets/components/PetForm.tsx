@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload } from 'lucide-react';
 import { Input } from '@/ui/atoms/input';
@@ -28,7 +28,7 @@ import {
   CollapsibleTrigger 
 } from '@/ui/molecules/collapsible';
 import { v4 as uuidv4 } from 'uuid';
-import { PetFormProps as ImportedPetFormProps } from '@/features/pets/types/PetFormProps';
+import { PetFormProps } from '@/features/pets/types/PetFormProps';
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/atoms/avatar';
 
 const speciesMapping = {
@@ -99,8 +99,8 @@ interface PetFormValues {
   name: string;
   species: string;
   customSpecies?: string;
-  age: number;
-  weight: number;
+  age?: number;
+  weight?: number;
   sex: string;
   temperament: string;
   additionalNotes: string;
@@ -112,37 +112,100 @@ interface PetFormValues {
   surgeries: Surgery[];
 }
 
-interface PetFormProps {
-  mode: 'create' | 'edit';
-  onSubmit: (data: any) => Promise<any> | void;
-  isSubmitting: boolean;
-  onCancel?: () => void;
-}
-
-const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting, onCancel }) => {
+const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, onCancel }) => {
   const [isMedicalHistoryOpen, setIsMedicalHistoryOpen] = useState(false);
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
   const [petPhotoPreview, setPetPhotoPreview] = useState<string | null>(null);
   const [petPhotoFile, setPetPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const { register, handleSubmit, control, watch, formState: { errors }, setValue } = useForm<PetFormValues>({
-    defaultValues: {
-      name: '',
-      species: '',
-      customSpecies: '',
-      age: undefined,
-      weight: undefined,
-      sex: '',
-      temperament: '',
-      additionalNotes: '',
+
+  // Calculate initial values based on pet data
+  const calculateInitialValues = () => {
+    if (!pet) {
+      return {
+        name: '',
+        species: '',
+        customSpecies: '',
+        age: undefined,
+        weight: undefined,
+        sex: '',
+        temperament: '',
+        additionalNotes: '',
+        allergies: '',
+        chronicConditions: '',
+        medications: [{ id: uuidv4(), name: '', dosage: '', frequency: '' }],
+        surgeries: [{ id: uuidv4(), type: '', date: '' }],
+      };
+    }
+
+    // Convert database species to UI species
+    let species = '';
+    let customSpecies = '';
+    
+    // Map species from database to UI values
+    if (pet.species) {
+      for (const [uiSpecies, dbSpecies] of Object.entries(speciesMapping)) {
+        if (dbSpecies === pet.species) {
+          species = uiSpecies;
+          break;
+        }
+      }
+      
+      // If no match, it's likely "other"
+      if (!species) {
+        species = 'Otro';
+        customSpecies = pet.breed || '';
+      }
+    }
+
+    // Map sex from database to UI values
+    let sex = '';
+    if (pet.sex) {
+      for (const [uiSex, dbSex] of Object.entries(genderMapping)) {
+        if (dbSex === pet.sex) {
+          sex = uiSex;
+          break;
+        }
+      }
+    }
+
+    // Calculate age from date_of_birth if available
+    let age = undefined;
+    if (pet.date_of_birth) {
+      const birthDate = new Date(pet.date_of_birth);
+      const today = new Date();
+      age = today.getFullYear() - birthDate.getFullYear();
+    }
+
+    return {
+      name: pet.name || '',
+      species: species,
+      customSpecies: customSpecies,
+      age: age,
+      weight: pet.weight ? Number(pet.weight) : undefined,
+      sex: sex,
+      temperament: pet.temperament || '',
+      additionalNotes: pet.additional_notes || '',
       allergies: '',
       chronicConditions: '',
       medications: [{ id: uuidv4(), name: '', dosage: '', frequency: '' }],
       surgeries: [{ id: uuidv4(), type: '', date: '' }],
-    }
+    };
+  };
+
+  const initialValues = calculateInitialValues();
+  
+  const { register, handleSubmit, control, watch, formState: { errors }, setValue } = useForm<PetFormValues>({
+    defaultValues: initialValues
   });
+
+  // Set the photo preview if pet has a profile picture
+  useEffect(() => {
+    if (pet?.profile_picture_url) {
+      setPetPhotoPreview(pet.profile_picture_url);
+    }
+  }, [pet]);
   
   const { fields: medicationFields, append: appendMedication, remove: removeMedication } = 
     useFieldArray({ control, name: "medications" });
@@ -199,9 +262,19 @@ const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting,
       weight: data.weight || null,
       sex: data.sex ? genderMapping[data.sex] : null,
       temperament: data.temperament || '',
-      petPhotoFile: petPhotoFile, // Add the pet photo file
     };
     
+    // If editing, include the ID
+    if (mode === 'edit' && pet) {
+      transformedData.id = pet.id;
+    }
+    
+    // Only add petPhotoFile if a new photo was selected
+    if (petPhotoFile) {
+      transformedData.petPhotoFile = petPhotoFile;
+    }
+    
+    // Calculate date of birth from age
     if (data.age) {
       const today = new Date();
       const birthYear = today.getFullYear() - data.age;
@@ -231,7 +304,7 @@ const PetForm: React.FC<ImportedPetFormProps> = ({ mode, onSubmit, isSubmitting,
     try {
       console.log('Submitting pet data:', transformedData);
       const result = await onSubmit(transformedData);
-      console.log('Pet creation result:', result);
+      console.log('Pet submission result:', result);
       return result;
     } catch (error) {
       console.error('Error submitting pet data:', error);

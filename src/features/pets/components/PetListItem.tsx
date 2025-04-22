@@ -18,10 +18,13 @@ const PetListItem: React.FC<PetListItemProps> = ({ pet, onClick }) => {
     
     switch (species.toLowerCase()) {
       case 'gato':
+      case 'cat':
         return <Cat className="h-full w-full p-2 text-[#5FBFB3]" />;
       case 'perro':
+      case 'dog':
         return <Dog className="h-full w-full p-2 text-[#5FBFB3]" />;
       case 'ave':
+      case 'bird':
         return <Bird className="h-full w-full p-2 text-[#5FBFB3]" />;
       default:
         return <User className="h-full w-full p-2 text-[#5FBFB3]" />;
