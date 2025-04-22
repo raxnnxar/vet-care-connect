@@ -11,7 +11,12 @@ interface PetListItemProps {
 }
 
 const PetListItem: React.FC<PetListItemProps> = ({ pet, onEditClick }) => {
-  const getAnimalIcon = (species: string) => {
+  const getAnimalIcon = (species: string | undefined) => {
+    // Handle undefined or empty species
+    if (!species) {
+      return <User className="h-full w-full p-2 text-[#5FBFB3]" />;
+    }
+    
     switch (species.toLowerCase()) {
       case 'gato':
         return <Cat className="h-full w-full p-2 text-[#5FBFB3]" />;
