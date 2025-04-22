@@ -112,19 +112,23 @@ const OwnerProfileScreen = () => {
       if (editingPet) {
         const updatedPet = await updatePet(editingPet.id, petData);
         if (updatedPet && updatedPet.payload) {
-          setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPet.payload : p));
+          // Ensure we're working with a Pet type by explicitly typing or casting
+          const updatedPetData = updatedPet.payload as Pet;
+          setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPetData : p));
           setShowPetForm(false);
           setEditingPet(null);
           toast.success('Mascota actualizada exitosamente');
-          return updatedPet.payload;
+          return updatedPetData;
         }
       } else {
         const newPet = await createPet(petData);
         if (newPet) {
-          setUserPets(prev => [...prev, newPet]);
+          // Ensure newPet conforms to Pet type
+          const newPetData = newPet as unknown as Pet;
+          setUserPets(prev => [...prev, newPetData]);
           setShowPetForm(false);
           toast.success('Mascota agregada exitosamente');
-          return newPet;
+          return newPetData;
         }
       }
       return null;
