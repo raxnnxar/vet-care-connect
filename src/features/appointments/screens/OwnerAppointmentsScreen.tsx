@@ -6,87 +6,98 @@ import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/molecules/tabs';
 import { Calendar, Clock, MapPin } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { toast } from 'sonner';
+import { Badge } from '@/ui/atoms/badge';
 
 const OwnerAppointmentsScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>('upcoming');
 
-  const goToAppointmentDetails = (id: string) => {
-    navigate(`/owner/appointments/${id}`);
-  };
+  const { data: appointments, isLoading, error } = useQuery({
+    queryKey: ['appointments', activeTab],
+    queryFn: async () => {
+      const now = new Date();
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          pets (
+            id,
+            name,
+            profile_picture_url
+          )
+        `)
+        .order('appointment_date', { ascending: activeTab === 'upcoming' })
+        .gte('appointment_date', activeTab === 'upcoming' ? now.toISOString() : undefined)
+        .lt('appointment_date', activeTab === 'past' ? now.toISOString() : undefined);
+
+      if (error) {
+        console.error('Error fetching appointments:', error);
+        toast.error('No se pudieron cargar las citas');
+        throw error;
+      }
+
+      return data || [];
+    },
+  });
 
   const handleFindVets = () => {
     navigate('/owner/find-vets');
   };
 
-  // Sample data for appointments
-  const upcomingAppointments = [
-    {
-      id: 'appt-1',
-      date: '2025-04-25',
-      time: '15:30',
-      vetName: 'Dr. Martinez',
-      petName: 'Max',
-      location: 'Clínica Veterinaria Central',
-      status: 'confirmed'
-    },
-    {
-      id: 'appt-2',
-      date: '2025-05-03',
-      time: '10:00',
-      vetName: 'Dra. García',
-      petName: 'Luna',
-      location: 'Hospital Veterinario San Miguel',
-      status: 'pending'
-    }
-  ];
-
-  const pastAppointments = [
-    {
-      id: 'appt-3',
-      date: '2025-03-15',
-      time: '16:45',
-      vetName: 'Dr. Rodriguez',
-      petName: 'Max',
-      location: 'Clínica Veterinaria Central',
-      status: 'completed'
-    },
-    {
-      id: 'appt-4',
-      date: '2025-02-20',
-      time: '11:30',
-      vetName: 'Dra. López',
-      petName: 'Luna',
-      location: 'Hospital Veterinario San Miguel',
-      status: 'cancelled'
-    }
-  ];
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('es-ES', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    }).format(date);
+  const goToAppointmentDetails = (id: string) => {
+    navigate(`/owner/appointments/${id}`);
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      confirmed: { color: 'bg-green-100 text-green-800', text: 'Confirmada' },
-      pending: { color: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' },
-      completed: { color: 'bg-blue-100 text-blue-800', text: 'Completada' },
-      cancelled: { color: 'bg-red-100 text-red-800', text: 'Cancelada' }
+      confirmed: { variant: 'default', className: 'bg-green-100 text-green-800', text: 'Confirmada' },
+      pending: { variant: 'default', className: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' },
+      completed: { variant: 'default', className: 'bg-blue-100 text-blue-800', text: 'Completada' },
+      cancelled: { variant: 'default', className: 'bg-red-100 text-red-800', text: 'Cancelada' }
     };
     
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     
     return (
-      <span className={`text-xs px-2 py-1 rounded-full ${config.color}`}>
+      <Badge variant={config.variant as any} className={config.className}>
         {config.text}
-      </span>
+      </Badge>
     );
   };
+
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), "d 'de' MMMM',' yyyy", { locale: es });
+  };
+
+  if (error) {
+    return (
+      <LayoutBase
+        header={
+          <div className="px-4 py-3 bg-[#79D0B8]">
+            <h1 className="text-white font-medium text-lg mb-2">Mis Citas</h1>
+          </div>
+        }
+        footer={<NavbarInferior activeTab="appointments" />}
+      >
+        <div className="p-4">
+          <Card className="p-6 text-center">
+            <p className="text-gray-500 mb-4">Ocurrió un error al cargar las citas</p>
+            <Button 
+              className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
+              onClick={() => window.location.reload()}
+            >
+              Reintentar
+            </Button>
+          </Card>
+        </div>
+      </LayoutBase>
+    );
+  }
 
   return (
     <LayoutBase
@@ -105,7 +116,16 @@ const OwnerAppointmentsScreen: React.FC = () => {
           </TabsList>
           
           <TabsContent value="upcoming">
-            {upcomingAppointments.length === 0 ? (
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2].map((i) => (
+                  <Card key={i} className="p-4 animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </Card>
+                ))}
+              </div>
+            ) : appointments?.length === 0 ? (
               <Card className="p-6 text-center">
                 <p className="text-gray-500 mb-4">No tienes citas programadas</p>
                 <Button 
@@ -117,7 +137,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
               </Card>
             ) : (
               <>
-                {upcomingAppointments.map(appointment => (
+                {appointments?.map(appointment => (
                   <Card 
                     key={appointment.id} 
                     className="mb-4 cursor-pointer hover:shadow-md transition-shadow"
@@ -125,26 +145,34 @@ const OwnerAppointmentsScreen: React.FC = () => {
                   >
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">{appointment.vetName}</h3>
+                        <h3 className="font-medium">{appointment.provider_name}</h3>
                         {getStatusBadge(appointment.status)}
                       </div>
                       
-                      <p className="text-sm text-gray-500 mb-1">Para: {appointment.petName}</p>
+                      <p className="text-sm text-gray-500 mb-1">
+                        Para: {appointment.pets?.name}
+                      </p>
                       
                       <div className="mt-3 space-y-2">
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 text-[#79D0B8] mr-2" />
-                          <span className="text-sm">{formatDate(appointment.date)}</span>
+                          <span className="text-sm">
+                            {formatDate(appointment.appointment_date)}
+                          </span>
                         </div>
                         
                         <div className="flex items-center">
                           <Clock className="h-4 w-4 text-[#79D0B8] mr-2" />
-                          <span className="text-sm">{appointment.time}</span>
+                          <span className="text-sm">
+                            {format(new Date(appointment.appointment_date), 'HH:mm')}
+                          </span>
                         </div>
                         
                         <div className="flex items-center">
                           <MapPin className="h-4 w-4 text-[#79D0B8] mr-2" />
-                          <span className="text-sm">{appointment.location}</span>
+                          <span className="text-sm">
+                            {appointment.clinic_name || appointment.location}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -162,12 +190,21 @@ const OwnerAppointmentsScreen: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="past">
-            {pastAppointments.length === 0 ? (
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2].map((i) => (
+                  <Card key={i} className="p-4 animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </Card>
+                ))}
+              </div>
+            ) : appointments?.length === 0 ? (
               <Card className="p-6 text-center">
                 <p className="text-gray-500">No tienes citas anteriores</p>
               </Card>
             ) : (
-              pastAppointments.map(appointment => (
+              appointments?.map(appointment => (
                 <Card 
                   key={appointment.id} 
                   className="mb-4 cursor-pointer hover:shadow-md transition-shadow"
@@ -175,26 +212,34 @@ const OwnerAppointmentsScreen: React.FC = () => {
                 >
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium">{appointment.vetName}</h3>
+                      <h3 className="font-medium">{appointment.provider_name}</h3>
                       {getStatusBadge(appointment.status)}
                     </div>
                     
-                    <p className="text-sm text-gray-500 mb-1">Para: {appointment.petName}</p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      Para: {appointment.pets?.name}
+                    </p>
                     
                     <div className="mt-3 space-y-2">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 text-[#79D0B8] mr-2" />
-                        <span className="text-sm">{formatDate(appointment.date)}</span>
+                        <span className="text-sm">
+                          {formatDate(appointment.appointment_date)}
+                        </span>
                       </div>
                       
                       <div className="flex items-center">
                         <Clock className="h-4 w-4 text-[#79D0B8] mr-2" />
-                        <span className="text-sm">{appointment.time}</span>
+                        <span className="text-sm">
+                          {format(new Date(appointment.appointment_date), 'HH:mm')}
+                        </span>
                       </div>
                       
                       <div className="flex items-center">
                         <MapPin className="h-4 w-4 text-[#79D0B8] mr-2" />
-                        <span className="text-sm">{appointment.location}</span>
+                        <span className="text-sm">
+                          {appointment.clinic_name || appointment.location}
+                        </span>
                       </div>
                     </div>
                   </div>
