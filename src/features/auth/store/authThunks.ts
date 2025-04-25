@@ -205,7 +205,7 @@ export const assignUserRole = createAsyncThunk(
 
 export const updateServiceType = createAsyncThunk(
   'auth/updateServiceType',
-  async ({ userId, serviceType }: { userId: string; serviceType: string }, { rejectWithValue, dispatch }) => {
+  async ({ userId, serviceType }: { userId: string; serviceType: ServiceTypeType }, { rejectWithValue, dispatch }) => {
     try {
       console.log(`Updating service type for user ${userId} to ${serviceType}`);
       

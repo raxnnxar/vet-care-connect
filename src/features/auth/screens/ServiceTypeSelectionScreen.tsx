@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -20,7 +21,7 @@ const ServiceTypeSelectionScreen: React.FC = () => {
 
     try {
       const result = await dispatch(updateServiceType({ 
-        userId: user!.id,
+        userId: user.id,
         serviceType
       }));
       
@@ -48,19 +49,19 @@ const ServiceTypeSelectionScreen: React.FC = () => {
         </h1>
         <div className="space-y-4">
           <button
-            className="w-full py-3 px-5 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="w-full py-3 px-5 bg-[#79D0B8] text-white rounded-md hover:bg-[#6ABFA9] focus:outline-none focus:ring-2 focus:ring-[#79D0B8] focus:ring-opacity-50"
             onClick={() => handleServiceTypeSelection(SERVICE_TYPES.VETERINARIAN)}
           >
             Veterinario
           </button>
           <button
-            className="w-full py-3 px-5 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            className="w-full py-3 px-5 bg-[#79D0B8] text-white rounded-md hover:bg-[#6ABFA9] focus:outline-none focus:ring-2 focus:ring-[#79D0B8] focus:ring-opacity-50"
             onClick={() => handleServiceTypeSelection(SERVICE_TYPES.GROOMING)}
           >
             Peluquería Canina
           </button>
           <button
-            className="w-full py-3 px-5 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
+            className="w-full py-3 px-5 bg-[#79D0B8] text-white rounded-md hover:bg-[#6ABFA9] focus:outline-none focus:ring-2 focus:ring-[#79D0B8] focus:ring-opacity-50"
             onClick={() => handleServiceTypeSelection(SERVICE_TYPES.BOARDING)}
           >
             Guardería
