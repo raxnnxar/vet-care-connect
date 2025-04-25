@@ -18,22 +18,43 @@ export const usePets = () => {
     dispatch(petsActions.resetPetState());
   }, [dispatch]);
   
+  const uploadVaccineDoc = async (petId: string, file: File): Promise<string | null> => {
+    try {
+      console.log('Uploading vaccine document for pet:', petId);
+      
+      const { data, error } = await supabase.storage
+        .from('pet-vaccine-documents')
+        .upload(`${petId}/${Date.now()}_vaccine.${file.name.split('.').pop()}`, file);
+      
+      if (error) {
+        console.error('Error uploading vaccine document:', error);
+        return null;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('pet-vaccine-documents')
+        .getPublicUrl(data.path);
+
+      return urlData.publicUrl;
+    } catch (error) {
+      console.error('Error uploading vaccine document:', error);
+      return null;
+    }
+  };
+
   return {
-    // State
     pets,
     currentPet,
     isLoading,
     error,
     
-    // Basic operations
     ...basicOperations,
     
-    // File uploads
     ...fileUploads,
     
-    // State management
     clearError,
     resetState,
+    uploadVaccineDoc,
   };
 };
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ScrollArea } from '@/ui/molecules/scroll-area';
@@ -13,7 +12,6 @@ import PetMedicalForm from './PetMedicalForm';
 import { PET_CATEGORIES, PET_GENDER } from '@/core/constants/app.constants';
 import { toast } from 'sonner';
 
-// Define the gender mapping
 export const genderMapping = {
   'Macho': PET_GENDER.MALE,
   'Hembra': PET_GENDER.FEMALE,
@@ -133,7 +131,6 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
         temperament: data.temperament || '',
       };
       
-      // Add the pet photo file if available
       if (petPhotoFile) {
         transformedData.petPhotoFile = petPhotoFile;
       }
