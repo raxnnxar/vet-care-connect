@@ -28,62 +28,98 @@ export const updateServiceType = createAsyncThunk(
     try {
       console.log(`Updating service type for user ${userId} to ${serviceType}`);
       
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ 
-          service_type: serviceType, 
-          updated_at: new Date().toISOString() 
-        })
-        .eq('id', userId);
-      
-      if (profileError) {
-        console.error('Error updating profile:', profileError);
-        throw profileError;
-      }
-
-      const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('role')
+      // First check if the user has a service_provider record
+      const { data: providerData, error: providerCheckError } = await supabase
+        .from('service_providers')
+        .select('id')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       
-      if (userError) {
-        console.error('Error fetching user role:', userError);
-        throw userError;
+      if (providerCheckError) {
+        console.error('Error checking provider:', providerCheckError);
+        throw providerCheckError;
       }
       
-      if (userData?.role === 'service_provider') {
-        if (serviceType === 'veterinarian') {
-          const { error: vetError } = await supabase.rpc('create_veterinarian', { 
-            vet_id: userId 
+      // If no service_provider record exists, create one
+      if (!providerData) {
+        const { error: createProviderError } = await supabase
+          .from('service_providers')
+          .insert({ 
+            id: userId, 
+            provider_type: serviceType,
+            created_at: new Date().toISOString() 
           });
+        
+        if (createProviderError) {
+          console.error('Error creating service provider:', createProviderError);
+          throw createProviderError;
+        }
+      } else {
+        // Update the provider_type in the existing service_provider record
+        const { error: updateProviderError } = await supabase
+          .from('service_providers')
+          .update({ 
+            provider_type: serviceType, 
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', userId);
+        
+        if (updateProviderError) {
+          console.error('Error updating provider type:', updateProviderError);
+          throw updateProviderError;
+        }
+      }
+      
+      // Create specialized provider record based on service type
+      if (serviceType === 'veterinarian') {
+        // Check if veterinarian record already exists
+        const { data: vetData, error: vetCheckError } = await supabase
+          .from('veterinarians')
+          .select('id')
+          .eq('id', userId)
+          .maybeSingle();
           
+        if (vetCheckError) {
+          console.error('Error checking veterinarian record:', vetCheckError);
+          throw vetCheckError;
+        }
+          
+        if (!vetData) {
+          const { error: vetError } = await supabase
+            .from('veterinarians')
+            .insert({ id: userId });
+            
           if (vetError) {
             console.error('Error creating veterinarian record:', vetError);
             throw vetError;
           }
-        } else if (serviceType === 'grooming') {
-          const { error: groomerError } = await supabase.rpc('create_pet_grooming', { 
-            groomer_id: userId 
-          });
+        }
+      } else if (serviceType === 'grooming') {
+        // Check if pet_grooming record already exists
+        const { data: groomData, error: groomCheckError } = await supabase
+          .from('pet_grooming')
+          .select('id')
+          .eq('id', userId)
+          .maybeSingle();
           
+        if (groomCheckError) {
+          console.error('Error checking grooming record:', groomCheckError);
+          throw groomCheckError;
+        }
+          
+        if (!groomData) {
+          const { error: groomerError } = await supabase
+            .from('pet_grooming')
+            .insert({ id: userId });
+            
           if (groomerError) {
             console.error('Error creating pet grooming record:', groomerError);
             throw groomerError;
           }
         }
-        
-        const { error: providerTypeError } = await supabase.rpc('update_provider_type', { 
-          provider_id: userId, 
-          provider_type_val: serviceType 
-        });
-        
-        if (providerTypeError) {
-          console.error('Error updating provider type:', providerTypeError);
-          throw providerTypeError;
-        }
       }
       
+      // Update the Redux store state
       dispatch(authActions.updateServiceType(serviceType));
       
       return { userId, serviceType };

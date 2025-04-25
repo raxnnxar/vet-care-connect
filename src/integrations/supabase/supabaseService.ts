@@ -1,3 +1,4 @@
+
 /**
  * Supabase service wrapper
  * 
@@ -64,17 +65,46 @@ export const supabaseService = {
     return result;
   },
   
-  async createServiceProvider(providerId: string) {
+  async createServiceProvider(providerId: string, providerType: string = 'veterinarian') {
     if (!isSupabaseConfigured) {
       console.warn('Supabase not configured: createServiceProvider');
       return { data: null, error: new Error('Supabase not configured') };
     }
     
     console.log("Creating service provider with ID:", providerId);
-    console.log("Params being sent:", { provider_id: providerId });
-    const result = await supabase.rpc('create_service_provider', { provider_id: providerId });
-    console.log("Create service provider result:", result);
-    return result;
+    
+    // First check if the record already exists
+    const { data, error: checkError } = await supabase
+      .from('service_providers')
+      .select('id')
+      .eq('id', providerId)
+      .maybeSingle();
+      
+    if (checkError) {
+      console.error("Error checking service provider:", checkError);
+      return { data: null, error: checkError };
+    }
+    
+    // If record doesn't exist, create it
+    if (!data) {
+      const { data: insertData, error } = await supabase
+        .from('service_providers')
+        .insert({ 
+          id: providerId, 
+          provider_type: providerType 
+        });
+      
+      if (error) {
+        console.error("Error creating service provider:", error);
+        return { data: insertData, error };
+      }
+      
+      console.log("Service provider created successfully");
+      return { data: insertData, error: null };
+    }
+    
+    console.log("Service provider already exists");
+    return { data, error: null };
   },
   
   async createVeterinarian(vetId: string) {
@@ -84,10 +114,36 @@ export const supabaseService = {
     }
     
     console.log("Creating veterinarian with ID:", vetId);
-    console.log("Params being sent:", { vet_id: vetId });
-    const result = await supabase.rpc('create_veterinarian', { vet_id: vetId });
-    console.log("Create veterinarian result:", result);
-    return result;
+    
+    // Check if record already exists
+    const { data, error: checkError } = await supabase
+      .from('veterinarians')
+      .select('id')
+      .eq('id', vetId)
+      .maybeSingle();
+      
+    if (checkError) {
+      console.error("Error checking veterinarian:", checkError);
+      return { data: null, error: checkError };
+    }
+    
+    // If record doesn't exist, create it
+    if (!data) {
+      const { data: insertData, error } = await supabase
+        .from('veterinarians')
+        .insert({ id: vetId });
+      
+      if (error) {
+        console.error("Error creating veterinarian:", error);
+        return { data: insertData, error };
+      }
+      
+      console.log("Veterinarian created successfully");
+      return { data: insertData, error: null };
+    }
+    
+    console.log("Veterinarian already exists");
+    return { data, error: null };
   },
   
   async createPetGrooming(groomerId: string) {
@@ -97,10 +153,36 @@ export const supabaseService = {
     }
     
     console.log("Creating pet grooming with ID:", groomerId);
-    console.log("Params being sent:", { groomer_id: groomerId });
-    const result = await supabase.rpc('create_pet_grooming', { groomer_id: groomerId });
-    console.log("Create pet grooming result:", result);
-    return result;
+    
+    // Check if record already exists
+    const { data, error: checkError } = await supabase
+      .from('pet_grooming')
+      .select('id')
+      .eq('id', groomerId)
+      .maybeSingle();
+      
+    if (checkError) {
+      console.error("Error checking pet grooming:", checkError);
+      return { data: null, error: checkError };
+    }
+    
+    // If record doesn't exist, create it
+    if (!data) {
+      const { data: insertData, error } = await supabase
+        .from('pet_grooming')
+        .insert({ id: groomerId });
+      
+      if (error) {
+        console.error("Error creating pet grooming:", error);
+        return { data: insertData, error };
+      }
+      
+      console.log("Pet grooming created successfully");
+      return { data: insertData, error: null };
+    }
+    
+    console.log("Pet grooming already exists");
+    return { data, error: null };
   },
   
   async updateProviderType(providerId: string, providerType: string) {
@@ -110,13 +192,37 @@ export const supabaseService = {
     }
     
     console.log("Updating provider type:", { providerId, providerType });
-    console.log("Params being sent:", { provider_id: providerId, provider_type_val: providerType });
-    const result = await supabase.rpc('update_provider_type', { 
-      provider_id: providerId, 
-      provider_type_val: providerType 
-    });
-    console.log("Update provider type result:", result);
-    return result;
+    
+    // Check if service provider exists
+    const { data, error: checkError } = await supabase
+      .from('service_providers')
+      .select('id, provider_type')
+      .eq('id', providerId)
+      .maybeSingle();
+      
+    if (checkError) {
+      console.error("Error checking service provider:", checkError);
+      return { data: null, error: checkError };
+    }
+    
+    // If not exists, create it
+    if (!data) {
+      return await this.createServiceProvider(providerId, providerType);
+    }
+    
+    // Update provider type
+    const { data: updateData, error } = await supabase
+      .from('service_providers')
+      .update({ provider_type: providerType })
+      .eq('id', providerId);
+      
+    if (error) {
+      console.error("Error updating provider type:", error);
+      return { data: updateData, error };
+    }
+    
+    console.log("Provider type updated successfully");
+    return { data: updateData, error: null };
   },
   
   // Auth methods
