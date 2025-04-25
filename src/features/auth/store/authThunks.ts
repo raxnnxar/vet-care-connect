@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from './authSlice';
@@ -126,7 +125,6 @@ export const signupUser = createAsyncThunk(
       
       if (error) throw error;
       
-      // Check if a profile already exists for this user
       const { data: existingProfile, error: profileCheckError } = await supabase
         .from('profiles')
         .select('*')
@@ -134,11 +132,9 @@ export const signupUser = createAsyncThunk(
         .single();
       
       if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-        // If it's an error other than "no rows returned", throw it
         throw profileCheckError;
       }
       
-      // Only insert a new profile if one doesn't exist already
       if (!existingProfile) {
         const { error: insertError } = await supabase
           .from('profiles')
@@ -209,17 +205,74 @@ export const assignUserRole = createAsyncThunk(
 
 export const updateServiceType = createAsyncThunk(
   'auth/updateServiceType',
-  async ({ userId, serviceType }: { userId: string; serviceType: string }, { rejectWithValue }) => {
+  async ({ userId, serviceType }: { userId: string; serviceType: string }, { rejectWithValue, dispatch }) => {
     try {
-      const { error } = await supabase
+      console.log(`Updating service type for user ${userId} to ${serviceType}`);
+      
+      const { error: profileError } = await supabase
         .from('profiles')
-        .update({ service_type: serviceType, updated_at: new Date().toISOString() })
+        .update({ 
+          service_type: serviceType, 
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', userId);
       
-      if (error) throw error;
+      if (profileError) {
+        console.error('Error updating profile:', profileError);
+        throw profileError;
+      }
+
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      
+      if (userError) {
+        console.error('Error fetching user role:', userError);
+        throw userError;
+      }
+      
+      if (userData?.role === 'service_provider') {
+        if (serviceType === 'veterinarian') {
+          console.log('Creating veterinarian record');
+          const { error: vetError } = await supabase.rpc('create_veterinarian', { 
+            vet_id: userId 
+          });
+          
+          if (vetError) {
+            console.error('Error creating veterinarian record:', vetError);
+            throw vetError;
+          }
+        } else if (serviceType === 'grooming') {
+          console.log('Creating pet grooming record');
+          const { error: groomerError } = await supabase.rpc('create_pet_grooming', { 
+            groomer_id: userId 
+          });
+          
+          if (groomerError) {
+            console.error('Error creating pet grooming record:', groomerError);
+            throw groomerError;
+          }
+        }
+        
+        console.log('Updating provider type');
+        const { error: providerTypeError } = await supabase.rpc('update_provider_type', { 
+          provider_id: userId, 
+          provider_type_val: serviceType 
+        });
+        
+        if (providerTypeError) {
+          console.error('Error updating provider type:', providerTypeError);
+          throw providerTypeError;
+        }
+      }
+      
+      dispatch(authActions.updateServiceType(serviceType));
       
       return { userId, serviceType };
     } catch (error: any) {
+      console.error('Error in updateServiceType thunk:', error);
       return rejectWithValue(error.message);
     }
   }
@@ -251,5 +304,3 @@ export const updateProfile = createAsyncThunk(
     }
   }
 );
-
-// Remove the duplicate exports here - they're already exported individually above

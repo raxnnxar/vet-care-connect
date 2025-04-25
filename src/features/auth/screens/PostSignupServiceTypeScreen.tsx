@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { AppDispatch, RootState } from '@/state/store';
 import { updateServiceType } from '../store/authThunks';
-import { USER_ROLES } from '@/core/constants/app.constants';
 import { SERVICE_TYPES, ServiceTypeType } from '../types/serviceTypes';
+import { ROUTES } from '@/frontend/shared/constants/routes';
 
 const PostSignupServiceTypeScreen: React.FC = () => {
   const [selectedType, setSelectedType] = useState<ServiceTypeType | null>(null);
@@ -33,7 +34,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
       console.log('Starting updateServiceType with:', { userId: user.id, serviceType });
       
       const result = await dispatch(updateServiceType({ 
-        userId: user!.id,
+        userId: user.id,
         serviceType
       }));
       
@@ -41,7 +42,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
         console.log('Service type selection successful:', result.payload);
         toast.success('Tipo de servicio seleccionado con éxito');
         
-        navigate('/profile-setup');
+        navigate(ROUTES.PROFILE_SETUP);
       } else {
         console.error('Service type selection failed:', result.error);
         toast.error('Hubo un problema al seleccionar el tipo de servicio. Por favor intenta de nuevo.');
@@ -109,7 +110,7 @@ const PostSignupServiceTypeScreen: React.FC = () => {
           </div>
           
           <button
-            onClick={() => handleServiceTypeSelection(selectedType)}
+            onClick={() => selectedType && handleServiceTypeSelection(selectedType)}
             disabled={!selectedType || isLoading}
             className={`w-full py-3 px-4 mt-8 rounded-lg text-white font-medium transition-colors ${
               selectedType && !isLoading
