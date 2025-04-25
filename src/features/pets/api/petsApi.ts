@@ -1,4 +1,3 @@
-
 import { Pet, CreatePetData, UpdatePetData, PetFilters, PetMedicalHistory } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryOptions } from '../../../core/api/apiClient';
@@ -118,13 +117,51 @@ export const petsApi: IPetsApi = {
    */
   async updatePet(id: string, petData: UpdatePetData) {
     try {
+      let updateData = { ...petData };
+      
+      // If there's medical history, handle it separately
+      if (petData.medicalHistory) {
+        const { data: medicalData, error: medicalError } = await supabase
+          .from('pet_medical_history')
+          .upsert({
+            pet_id: id,
+            ...petData.medicalHistory
+          })
+          .select();
+          
+        if (medicalError) {
+          console.error('Error updating medical history:', medicalError);
+          return { data: null, error: medicalError };
+        }
+        
+        // Remove medical history from the pet update data
+        delete updateData.medicalHistory;
+      }
+      
+      // Update the pet record if there are other changes
+      if (Object.keys(updateData).length > 0) {
+        const { data, error } = await supabase
+          .from('pets')
+          .update(updateData)
+          .eq('id', id)
+          .select()
+          .single();
+          
+        if (error) {
+          return { data: null, error };
+        }
+        
+        return { data, error: null };
+      }
+      
+      // If we only updated medical history, fetch and return the current pet data
       const { data, error } = await supabase
         .from('pets')
-        .update(petData)
+        .select('*')
         .eq('id', id)
-        .select();
-      
-      return { data: data?.[0] || null, error };
+        .single();
+        
+      return { data, error };
     } catch (error) {
       console.error('Error in updatePet:', error);
       return { data: null, error: error as Error };
@@ -316,10 +353,12 @@ export const petsApi: IPetsApi = {
         allergies: medicalHistoryData.allergies || null,
         chronic_conditions: medicalHistoryData.chronic_conditions || null,
         vaccines_document_url: medicalHistoryData.vaccines_document_url || null,
-        current_medications: medicalHistoryData.current_medications ? 
-          JSON.stringify(medicalHistoryData.current_medications) : null,
-        previous_surgeries: medicalHistoryData.previous_surgeries ? 
-          JSON.stringify(medicalHistoryData.previous_surgeries) : null
+        current_medications: 
+          medicalHistoryData.current_medications ? 
+            JSON.stringify(medicalHistoryData.current_medications) : null,
+        previous_surgeries: 
+          medicalHistoryData.previous_surgeries ? 
+            JSON.stringify(medicalHistoryData.previous_surgeries) : null
       };
       
       const { data, error } = await supabase
