@@ -8,6 +8,7 @@ export const profileImageService = {
       const fileExt = file.name.split('.').pop();
       const filePath = `${userId}/profile-${Date.now()}.${fileExt}`;
       
+      // Use the standardized "profile_pictures" bucket
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('profile_pictures')
         .upload(filePath, file, {
@@ -25,14 +26,23 @@ export const profileImageService = {
         .from('profile_pictures')
         .getPublicUrl(filePath);
       
-      // Update the pet_owners table with the new profile picture URL
-      const { error: updateError } = await supabase
+      // Update both profiles and pet_owners tables with the new profile picture URL
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ profile_picture_url: publicUrl })
+        .eq('id', userId);
+      
+      if (profileError) {
+        console.error('Error updating profile picture URL:', profileError);
+      }
+      
+      const { error: petOwnerError } = await supabase
         .from('pet_owners')
         .update({ profile_picture_url: publicUrl })
         .eq('id', userId);
       
-      if (updateError) {
-        console.error('Error updating profile picture URL:', updateError);
+      if (petOwnerError) {
+        console.error('Error updating pet owner profile picture URL:', petOwnerError);
         toast.error('Error al actualizar la imagen de perfil');
         return null;
       }

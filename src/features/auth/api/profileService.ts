@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -17,7 +16,7 @@ export const profileService = {
       const fileExt = imageFile.name.split('.').pop();
       const filePath = `${userId}/profile-image.${fileExt}`;
       
-      // Upload image to Supabase Storage
+      // Use the standardized "profile_pictures" bucket
       const { data, error } = await supabase.storage
         .from('profile_pictures')
         .upload(filePath, imageFile, {
@@ -31,7 +30,6 @@ export const profileService = {
         return null;
       }
       
-      // Get the public URL of the uploaded image
       const { data: publicUrlData } = supabase.storage
         .from('profile_pictures')
         .getPublicUrl(filePath);

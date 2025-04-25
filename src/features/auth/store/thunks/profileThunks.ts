@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from '../authSlice';
@@ -143,12 +142,20 @@ export const updateProfile = createAsyncThunk(
         updateData.profile_picture_url = profileImage;
       }
       
-      const { error } = await supabase
+      // Update both profiles and pet_owners tables
+      const { error: profileError } = await supabase
         .from('profiles')
         .update(updateData)
         .eq('id', userId);
       
-      if (error) throw error;
+      if (profileError) throw profileError;
+      
+      const { error: petOwnerError } = await supabase
+        .from('pet_owners')
+        .update(updateData)
+        .eq('id', userId);
+      
+      if (petOwnerError) throw petOwnerError;
       
       return { userId, phone, profileImage };
     } catch (error: any) {
