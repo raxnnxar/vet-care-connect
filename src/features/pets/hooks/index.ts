@@ -1,3 +1,4 @@
 
-// Export all hooks from this directory
 export * from './usePets';
+export * from './useBasicPetOperations';
+export * from './usePetFileUploads';
