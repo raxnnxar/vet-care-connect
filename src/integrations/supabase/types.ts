@@ -338,26 +338,50 @@ export type Database = {
       }
       veterinarians: {
         Row: {
+          animals_treated: Json | null
           availability: Json | null
           bio: string | null
+          certificate_urls: Json | null
+          certifications: Json | null
+          education: Json | null
+          emergency_services: boolean | null
           id: string
+          languages_spoken: Json | null
           license_number: string | null
+          profile_image_url: string | null
+          services_offered: Json | null
           specialization: string | null
           years_of_experience: number | null
         }
         Insert: {
+          animals_treated?: Json | null
           availability?: Json | null
           bio?: string | null
+          certificate_urls?: Json | null
+          certifications?: Json | null
+          education?: Json | null
+          emergency_services?: boolean | null
           id: string
+          languages_spoken?: Json | null
           license_number?: string | null
+          profile_image_url?: string | null
+          services_offered?: Json | null
           specialization?: string | null
           years_of_experience?: number | null
         }
         Update: {
+          animals_treated?: Json | null
           availability?: Json | null
           bio?: string | null
+          certificate_urls?: Json | null
+          certifications?: Json | null
+          education?: Json | null
+          emergency_services?: boolean | null
           id?: string
+          languages_spoken?: Json | null
           license_number?: string | null
+          profile_image_url?: string | null
+          services_offered?: Json | null
           specialization?: string | null
           years_of_experience?: number | null
         }

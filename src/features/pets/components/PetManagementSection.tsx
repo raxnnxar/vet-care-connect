@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/ui/molecules/dialog';
+import { usePets } from '../hooks';
 
 interface PetManagementSectionProps {
   pets: Pet[];
@@ -31,6 +32,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [lastCreatedPet, setLastCreatedPet] = useState<Pet | null>(null);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const { createPet, updatePet } = usePets();
 
   const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
     try {
@@ -63,6 +65,31 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     } catch (error) {
       console.error('Error al agregar la mascota:', error);
       toast.error('Error al agregar la mascota');
+      return null;
+    }
+  };
+
+  const handlePetUpdate = async (petData: any): Promise<Pet | null> => {
+    try {
+      if (!petData || !petData.id) {
+        toast.error('Datos de mascota inválidos');
+        return null;
+      }
+      
+      console.log('Updating pet data:', petData);
+      
+      const updatedPet = await updatePet(petData.id, petData);
+      
+      if (!updatedPet) {
+        toast.error('Error al actualizar la mascota');
+        return null;
+      }
+      
+      toast.success('Mascota actualizada con éxito');
+      return updatedPet as Pet;
+    } catch (error) {
+      console.error('Error al actualizar la mascota:', error);
+      toast.error('Error al actualizar la mascota');
       return null;
     }
   };
@@ -150,6 +177,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
           pet={selectedPet}
           isOpen={!!selectedPet}
           onClose={() => setSelectedPet(null)}
+          onPetUpdate={handlePetUpdate}
         />
       )}
     </div>
