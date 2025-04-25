@@ -9,6 +9,15 @@ import { PetFormProps } from '@/features/pets/types/PetFormProps';
 import { Pet } from '@/features/pets/types';
 import PetPhotoUpload from './PetPhotoUpload';
 import PetBasicInfo, { speciesMapping } from './PetBasicInfo';
+import PetMedicalForm from './PetMedicalForm';
+import { PET_CATEGORIES, PET_GENDER } from '@/core/constants/app.constants';
+import { toast } from 'sonner';
+
+// Define the gender mapping
+export const genderMapping = {
+  'Macho': PET_GENDER.MALE,
+  'Hembra': PET_GENDER.FEMALE,
+};
 
 interface PetFormValues {
   name: string;

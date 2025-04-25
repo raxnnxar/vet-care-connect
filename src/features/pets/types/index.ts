@@ -44,7 +44,7 @@ export interface CreatePetData {
   additional_notes?: string;
   owner_id: string;
   medicalHistory?: PetMedicalHistory;
-  petPhotoFile?: File; // Add this new property
+  petPhotoFile?: File;
 }
 
 /**
@@ -60,7 +60,7 @@ export interface UpdatePetData {
   date_of_birth?: string;
   additional_notes?: string;
   profile_picture_url?: string;
-  medicalHistory?: PetMedicalHistory; // Add this property
+  medicalHistory?: PetMedicalHistory; // Added this field
 }
 
 /**
