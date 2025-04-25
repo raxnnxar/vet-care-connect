@@ -1,3 +1,4 @@
+
 import { Pet, CreatePetData, UpdatePetData, PetFilters, PetMedicalHistory } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryOptions } from '../../../core/api/apiClient';
@@ -211,11 +212,21 @@ export const petsApi: IPetsApi = {
    */
   async uploadVaccineDocument(petId: string, file: File) {
     try {
+      console.log('API: Uploading vaccine document for pet ID:', petId);
+      
+      if (!petId) {
+        throw new Error('Pet ID is required');
+      }
+      
+      if (!file) {
+        throw new Error('File is required');
+      }
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${petId}/${Date.now()}_vaccine.${fileExt}`;
       const filePath = fileName;
 
-      console.log('Attempting to upload vaccine document to path:', filePath);
+      console.log('API: Attempting to upload vaccine document to path:', filePath);
 
       // Upload the file to Supabase storage
       const { data, error } = await supabase.storage
@@ -226,33 +237,62 @@ export const petsApi: IPetsApi = {
         });
 
       if (error) {
-        console.error('Error uploading vaccine document:', error);
+        console.error('API: Error uploading vaccine document:', error);
         throw error;
       }
 
-      console.log('Vaccine document uploaded successfully');
+      console.log('API: Vaccine document uploaded successfully');
 
       // Get the public URL for the uploaded file
       const { data: publicUrlData } = supabase.storage
         .from('pet-vaccine-documents')
         .getPublicUrl(filePath);
 
-      console.log('Public URL for vaccine document:', publicUrlData.publicUrl);
+      console.log('API: Public URL for vaccine document:', publicUrlData.publicUrl);
 
-      // Update the pet medical history record with the vaccine document URL
-      const { error: updateError } = await supabase
+      // Check if a medical history record exists for this pet
+      const { data: existingRecord, error: fetchError } = await supabase
         .from('pet_medical_history')
-        .update({ vaccines_document_url: publicUrlData.publicUrl })
-        .eq('pet_id', petId);
+        .select('id')
+        .eq('pet_id', petId)
+        .maybeSingle();
+        
+      if (fetchError) {
+        console.error('API: Error checking for existing medical history:', fetchError);
+      }
+      
+      let updateError = null;
+      
+      if (existingRecord) {
+        // Update existing record
+        console.log('API: Updating existing medical history record');
+        const { error } = await supabase
+          .from('pet_medical_history')
+          .update({ vaccines_document_url: publicUrlData.publicUrl })
+          .eq('pet_id', petId);
+          
+        updateError = error;
+      } else {
+        // Create new record
+        console.log('API: Creating new medical history record');
+        const { error } = await supabase
+          .from('pet_medical_history')
+          .insert({ 
+            pet_id: petId, 
+            vaccines_document_url: publicUrlData.publicUrl 
+          });
+          
+        updateError = error;
+      }
 
       if (updateError) {
-        console.error('Error updating pet medical history with vaccine document URL:', updateError);
+        console.error('API: Error updating pet medical history with vaccine document URL:', updateError);
         throw updateError;
       }
 
       return { data: { publicUrl: publicUrlData.publicUrl }, error: null };
     } catch (error) {
-      console.error('Error in uploadVaccineDocument:', error);
+      console.error('API: Error in uploadVaccineDocument:', error);
       return { data: null, error: error as Error };
     }
   },
@@ -262,8 +302,19 @@ export const petsApi: IPetsApi = {
    */
   async createPetMedicalHistory(petId: string, medicalHistoryData: PetMedicalHistory) {
     try {
-      // Prepare the data for insertion
-      const insertData = {
+      // Check if a record already exists
+      const { data: existingRecord, error: checkError } = await supabase
+        .from('pet_medical_history')
+        .select('id')
+        .eq('pet_id', petId)
+        .maybeSingle();
+        
+      if (checkError) {
+        console.error('Error checking existing medical history:', checkError);
+      }
+      
+      // Prepare the data for insertion or update
+      const recordData = {
         pet_id: petId,
         allergies: medicalHistoryData.allergies || null,
         chronic_conditions: medicalHistoryData.chronic_conditions || null,
@@ -274,13 +325,27 @@ export const petsApi: IPetsApi = {
           JSON.stringify(medicalHistoryData.previous_surgeries) : null
       };
       
-      const { data, error } = await supabase
-        .from('pet_medical_history')
-        .insert(insertData)
-        .select();
+      let result;
+      
+      if (existingRecord) {
+        // Update existing record
+        result = await supabase
+          .from('pet_medical_history')
+          .update(recordData)
+          .eq('pet_id', petId)
+          .select();
+      } else {
+        // Create new record
+        result = await supabase
+          .from('pet_medical_history')
+          .insert(recordData)
+          .select();
+      }
+      
+      const { data, error } = result;
       
       if (error) {
-        console.error('Error creating pet medical history:', error);
+        console.error('Error creating/updating pet medical history:', error);
         return { data: null, error };
       }
       

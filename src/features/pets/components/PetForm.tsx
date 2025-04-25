@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload } from 'lucide-react';
+import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload, AlertTriangle } from 'lucide-react';
 import { Input } from '@/ui/atoms/input';
 import { Label } from '@/ui/atoms/label';
 import { Textarea } from '@/ui/atoms/textarea';
@@ -119,6 +119,7 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
   const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
   const [petPhotoPreview, setPetPhotoPreview] = useState<string | null>(null);
   const [petPhotoFile, setPetPhotoFile] = useState<File | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const vaccineDocInputRef = useRef<HTMLInputElement>(null);
   const { uploadVaccineDoc } = usePets();
@@ -232,15 +233,41 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
   const selectedSpecies = watch('species');
   
   const handleFileUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0 || !pet?.id) {
-      toast.error("No se ha seleccionado ningún archivo o no hay mascota asociada");
+    setUploadError(null);
+    
+    if (!files || files.length === 0) {
+      setUploadError("No se ha seleccionado ningún archivo");
+      toast.error("No se ha seleccionado ningún archivo");
+      return;
+    }
+    
+    if (!pet?.id) {
+      setUploadError("No hay mascota asociada. Por favor, guarde la mascota primero.");
+      toast.error("No hay mascota asociada. Por favor, guarde la mascota primero.");
       return;
     }
     
     const file = files[0];
+    
+    const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSizeInBytes) {
+      setUploadError("El archivo es demasiado grande. El tamaño máximo es 5MB.");
+      toast.error("El archivo es demasiado grande. El tamaño máximo es 5MB.");
+      return;
+    }
+    
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError("Tipo de archivo no permitido. Use PDF o imágenes (JPG, PNG).");
+      toast.error("Tipo de archivo no permitido. Use PDF o imágenes (JPG, PNG).");
+      return;
+    }
+    
     setUploadingDocument(true);
     
     try {
+      console.log('Uploading vaccine document for pet ID:', pet.id);
+      
       const petId = pet.id;
       
       const documentUrl = await uploadVaccineDoc(petId, file);
@@ -249,10 +276,12 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
         setUploadedDocumentUrl(documentUrl);
         toast.success("Documento subido exitosamente");
       } else {
+        setUploadError("Error al subir el documento al servidor");
         toast.error("Error al subir el documento");
       }
     } catch (error) {
       console.error("Error uploading document:", error);
+      setUploadError("Error al subir el documento. Intenta nuevamente.");
       toast.error("Error al subir el documento. Intenta nuevamente.");
     } finally {
       setUploadingDocument(false);
@@ -595,8 +624,17 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
                     >
                       <Upload className="h-8 w-8" />
                       <span>{uploadingDocument ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}</span>
+                      <span className="text-xs text-muted-foreground">Máximo 5MB</span>
                     </Label>
                   </div>
+                  
+                  {uploadError && (
+                    <div className="bg-red-50 text-red-700 p-2 rounded-md flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      <span className="text-sm">{uploadError}</span>
+                    </div>
+                  )}
+                  
                   {uploadedDocumentUrl && (
                     <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
                       <FilePlus className="h-4 w-4" />

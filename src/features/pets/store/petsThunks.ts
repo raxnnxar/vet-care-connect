@@ -216,17 +216,41 @@ export const uploadVaccineDocument = createAsyncThunk(
     try {
       console.log('Uploading vaccine document for pet:', petId);
       
+      // Check if pet ID exists
+      if (!petId) {
+        console.error('Missing pet ID for vaccine document upload');
+        return rejectWithValue(new Error('Missing pet ID'));
+      }
+      
+      // Validate file
+      if (!file) {
+        console.error('No file provided for vaccine document upload');
+        return rejectWithValue(new Error('No file provided'));
+      }
+      
       // Create a unique file path
       const fileExt = file.name.split('.').pop();
       const filePath = `${petId}/${Date.now()}_vaccine.${fileExt}`;
       
-      // Check if the storage bucket exists
+      console.log('Attempting to upload vaccine document with path:', filePath);
+      
+      // First, check if the bucket exists
       const { data: buckets } = await supabase.storage.listBuckets();
+      console.log('Available buckets:', buckets);
+      
       const bucketExists = buckets?.some(bucket => bucket.name === 'pet-vaccine-documents');
       
       if (!bucketExists) {
         console.error('Bucket pet-vaccine-documents does not exist');
-        return rejectWithValue(new Error('Storage bucket for vaccine documents does not exist'));
+        
+        // Create the bucket if it doesn't exist (this requires admin privileges)
+        try {
+          // Instead, we'll try to use the bucket anyway and handle any errors
+          console.log('Attempting to use bucket even though it may not exist');
+        } catch (bucketError) {
+          console.error('Error with bucket:', bucketError);
+          return rejectWithValue(new Error('Storage bucket for vaccine documents not available'));
+        }
       }
       
       // Upload the file to Supabase storage
@@ -252,16 +276,45 @@ export const uploadVaccineDocument = createAsyncThunk(
       const documentUrl = publicUrlData.publicUrl;
       console.log('Uploaded document URL:', documentUrl);
       
-      // Update the pet_medical_history record with the vaccine document URL
-      const { error: updateError } = await supabase
+      // First check if a pet_medical_history record already exists for this pet
+      const { data: existingRecord, error: fetchError } = await supabase
         .from('pet_medical_history')
-        .update({ 
-          vaccines_document_url: documentUrl
-        })
-        .eq('pet_id', petId);
+        .select('id')
+        .eq('pet_id', petId)
+        .maybeSingle();
+      
+      if (fetchError) {
+        console.error('Error checking for existing medical history:', fetchError);
+      }
+      
+      let updateError = null;
+      
+      if (existingRecord) {
+        // Update the existing record
+        console.log('Updating existing pet medical history with vaccine document URL');
+        const { error } = await supabase
+          .from('pet_medical_history')
+          .update({ 
+            vaccines_document_url: documentUrl,
+          })
+          .eq('pet_id', petId);
+        
+        updateError = error;
+      } else {
+        // Create a new medical history record
+        console.log('Creating new pet medical history with vaccine document URL');
+        const { error } = await supabase
+          .from('pet_medical_history')
+          .insert({ 
+            pet_id: petId,
+            vaccines_document_url: documentUrl 
+          });
+        
+        updateError = error;
+      }
       
       if (updateError) {
-        console.error('Error updating pet medical history with vaccine document URL:', updateError);
+        console.error('Error updating/creating pet medical history with vaccine document URL:', updateError);
         throw updateError;
       }
       

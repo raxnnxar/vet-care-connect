@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../state/store';
 import {
@@ -32,7 +31,6 @@ export const usePets = () => {
   
   const createPet = useCallback(async (petData: CreatePetData): Promise<Pet | null> => {
     try {
-      // Inject the owner_id if available and not provided
       if (user?.id && !petData.owner_id) {
         petData.owner_id = user.id;
       }
@@ -40,14 +38,12 @@ export const usePets = () => {
       console.log('Creating pet with owner ID:', petData.owner_id);
       console.log('Creating pet with data:', petData);
       
-      // Check if the user exists in the pet_owners table first
       const { data: ownerExists, error: ownerCheckError } = await supabase
         .from('pet_owners')
         .select('id')
         .eq('id', petData.owner_id)
         .single();
       
-      // If owner doesn't exist, create an entry in the pet_owners table first
       if (!ownerExists || ownerCheckError) {
         console.log('Owner not found in pet_owners table, creating entry...');
         const { error: createOwnerError } = await supabase
@@ -62,19 +58,15 @@ export const usePets = () => {
         console.log('Owner record created successfully');
       }
       
-      // Extract the photo file from the data
       const petPhotoFile = petData.petPhotoFile;
       const petDataForSubmit = { ...petData };
       delete petDataForSubmit.petPhotoFile;
       
-      // Call the addPet thunk and properly handle the promise
       const resultAction = await dispatch(addPet(petDataForSubmit));
       
-      // Extract the pet data from the resolved action
       if (addPet.fulfilled.match(resultAction)) {
         console.log('Pet created successfully:', resultAction.payload);
         
-        // If we have a photo file, upload it
         if (petPhotoFile && resultAction.payload?.id) {
           console.log('Uploading pet photo for:', resultAction.payload.id);
           const photoResult = await dispatch(uploadPetProfilePicture({
@@ -84,7 +76,6 @@ export const usePets = () => {
           
           if (uploadPetProfilePicture.fulfilled.match(photoResult)) {
             console.log('Photo uploaded successfully:', photoResult.payload);
-            // Update the pet object with the photo URL
             const petWithPhoto = {
               ...resultAction.payload,
               profile_picture_url: photoResult.payload.url
@@ -93,7 +84,6 @@ export const usePets = () => {
           }
         }
         
-        // Return the pet data directly
         return resultAction.payload as Pet;
       } else {
         console.error('Failed to create pet:', resultAction.error);
@@ -112,10 +102,8 @@ export const usePets = () => {
       console.log('Updating pet with ID:', id);
       console.log('Update data:', petData);
       
-      // Clean up data before sending to Supabase
       const cleanPetData = { ...petData };
       
-      // Remove non-database fields
       if ('petPhotoFile' in cleanPetData) {
         delete cleanPetData.petPhotoFile;
       }
@@ -158,7 +146,6 @@ export const usePets = () => {
   
   const uploadProfilePicture = useCallback(async (petId: string, file: File): Promise<string | null> => {
     try {
-      // Pass the arguments in the format expected by the thunk
       const resultAction = await dispatch(uploadPetProfilePicture({ petId, file }));
       
       if (uploadPetProfilePicture.fulfilled.match(resultAction)) {
@@ -175,18 +162,29 @@ export const usePets = () => {
   
   const uploadVaccineDoc = useCallback(async (petId: string, file: File): Promise<string | null> => {
     try {
+      if (!petId) {
+        console.error('Missing pet ID for vaccine document upload');
+        toast.error('Error: ID de mascota no disponible');
+        return null;
+      }
+      
       console.log('Uploading vaccine document for pet:', petId);
+      console.log('File to upload:', file.name, file.type, file.size);
+      
       const resultAction = await dispatch(uploadVaccineDocument({ petId, file }));
       
       if (uploadVaccineDocument.fulfilled.match(resultAction)) {
         const { url } = resultAction.payload;
         console.log('Vaccine document uploaded successfully, URL:', url);
         return url;
+      } else {
+        console.error('Vaccine document upload failed:', resultAction.error);
+        toast.error('Error al subir el documento de vacunas: ' + (resultAction.error?.message || 'Error desconocido'));
+        return null;
       }
-      return null;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading vaccine document:', error);
-      toast.error('Error al subir el documento de vacunas');
+      toast.error('Error al subir el documento de vacunas: ' + (error?.message || 'Error desconocido'));
       return null;
     }
   }, [dispatch]);
@@ -200,13 +198,11 @@ export const usePets = () => {
   }, [dispatch]);
   
   return {
-    // State
     pets,
     currentPet,
     isLoading,
     error,
     
-    // Actions
     getAllPets,
     getPetById,
     createPet,
