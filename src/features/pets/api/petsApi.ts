@@ -1,4 +1,3 @@
-
 import { Pet, CreatePetData, UpdatePetData, PetFilters, PetMedicalHistory } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryOptions } from '../../../core/api/apiClient';
@@ -59,10 +58,12 @@ export const petsApi: IPetsApi = {
    */
   async createPet(petData: CreatePetData) {
     try {
-      // Extract the medical history if present
+      console.log('Creating pet with data:', petData);
+      
+      // Remove medicalHistory from pet creation data
       const { medicalHistory, ...petDetails } = petData;
       
-      // First, insert the pet record
+      // First, insert the pet record only
       const { data: newPetData, error: petError } = await supabase
         .from('pets')
         .insert(petDetails)
@@ -74,30 +75,7 @@ export const petsApi: IPetsApi = {
         return { data: null, error: petError };
       }
       
-      // If we have medical history data, insert it as well
-      if (medicalHistory && Object.keys(medicalHistory).some(key => !!medicalHistory[key as keyof PetMedicalHistory])) {
-        // Create the medical history record with the new pet ID
-        const medicalHistoryData = {
-          pet_id: newPetData.id,
-          allergies: medicalHistory.allergies || null,
-          chronic_conditions: medicalHistory.chronic_conditions || null,
-          vaccines_document_url: medicalHistory.vaccines_document_url || null,
-          current_medications: medicalHistory.current_medications ? 
-            JSON.stringify(medicalHistory.current_medications) : null,
-          previous_surgeries: medicalHistory.previous_surgeries ? 
-            JSON.stringify(medicalHistory.previous_surgeries) : null
-        };
-        
-        const { error: medicalHistoryError } = await supabase
-          .from('pet_medical_history')
-          .insert(medicalHistoryData);
-        
-        if (medicalHistoryError) {
-          console.error('Error creating pet medical history:', medicalHistoryError);
-          toast.error('Se guardó la mascota, pero hubo un error al guardar el historial médico');
-        }
-      }
-      
+      console.log('Pet created successfully:', newPetData);
       return { data: newPetData, error: null };
     } catch (error) {
       console.error('Error in createPet:', error);
@@ -302,18 +280,7 @@ export const petsApi: IPetsApi = {
    */
   async createPetMedicalHistory(petId: string, medicalHistoryData: PetMedicalHistory) {
     try {
-      // Check if a record already exists
-      const { data: existingRecord, error: checkError } = await supabase
-        .from('pet_medical_history')
-        .select('id')
-        .eq('pet_id', petId)
-        .maybeSingle();
-        
-      if (checkError) {
-        console.error('Error checking existing medical history:', checkError);
-      }
-      
-      // Prepare the data for insertion or update
+      // Prepare the data for insertion
       const recordData = {
         pet_id: petId,
         allergies: medicalHistoryData.allergies || null,
@@ -325,27 +292,13 @@ export const petsApi: IPetsApi = {
           JSON.stringify(medicalHistoryData.previous_surgeries) : null
       };
       
-      let result;
-      
-      if (existingRecord) {
-        // Update existing record
-        result = await supabase
-          .from('pet_medical_history')
-          .update(recordData)
-          .eq('pet_id', petId)
-          .select();
-      } else {
-        // Create new record
-        result = await supabase
-          .from('pet_medical_history')
-          .insert(recordData)
-          .select();
-      }
-      
-      const { data, error } = result;
+      const { data, error } = await supabase
+        .from('pet_medical_history')
+        .insert(recordData)
+        .select();
       
       if (error) {
-        console.error('Error creating/updating pet medical history:', error);
+        console.error('Error creating pet medical history:', error);
         return { data: null, error };
       }
       
