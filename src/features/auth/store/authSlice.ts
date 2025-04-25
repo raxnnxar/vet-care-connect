@@ -64,6 +64,18 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.error = null;
     },
+    // Add the missing updateServiceType action
+    updateServiceType(state, action: PayloadAction<ServiceTypeType>) {
+      if (state.user) {
+        state.user = {
+          ...state.user,
+          serviceType: action.payload,
+          service_type: action.payload
+        };
+      }
+      state.isLoading = false;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
