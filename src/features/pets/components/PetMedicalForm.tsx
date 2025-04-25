@@ -1,18 +1,16 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { 
-  Plus, Minus, FilePlus, AlertTriangle, 
-  Upload, Syringe 
-} from 'lucide-react';
-import { Input } from '@/ui/atoms/input';
-import { Label } from '@/ui/atoms/label';
-import { Textarea } from '@/ui/atoms/textarea';
+import { Syringe } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { usePets } from '../hooks/usePets';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { Pet, UpdatePetData, PetMedicalHistory } from '../types';
+import VaccineUploadSection from './medical/VaccineUploadSection';
+import MedicationsSection from './medical/MedicationsSection';
+import SurgeriesSection from './medical/SurgeriesSection';
+import MedicalConditionsSection from './medical/MedicalConditionsSection';
 
 interface PetMedicalFormProps {
   pet: Pet;
@@ -41,7 +39,6 @@ const PetMedicalForm: React.FC<PetMedicalFormProps> = ({ pet, onComplete, onSkip
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const vaccineDocInputRef = useRef<HTMLInputElement>(null);
   const { uploadVaccineDoc, updatePet } = usePets();
 
   const { register, handleSubmit, control, formState: { isSubmitting } } = useForm<MedicalFormValues>({
@@ -145,185 +142,28 @@ const PetMedicalForm: React.FC<PetMedicalFormProps> = ({ pet, onComplete, onSkip
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="vaccineDocument" className="font-medium text-base">
-            Registro de vacunas
-          </Label>
-          <div className="flex flex-col gap-2">
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
-              <input
-                id="vaccineDocument"
-                ref={vaccineDocInputRef}
-                type="file"
-                accept=".pdf,.png,.jpg,.jpeg"
-                onChange={(e) => handleFileUpload(e.target.files)}
-                className="hidden"
-                disabled={uploadingDocument}
-              />
-              <Label 
-                htmlFor="vaccineDocument" 
-                className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
-              >
-                <Upload className="h-8 w-8" />
-                <span>
-                  {uploadingDocument ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}
-                </span>
-                <span className="text-xs text-muted-foreground">Máximo 5MB</span>
-              </Label>
-            </div>
-            
-            {uploadError && (
-              <div className="bg-red-50 text-red-700 p-2 rounded-md flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="text-sm">{uploadError}</span>
-              </div>
-            )}
-            
-            {uploadedDocumentUrl && (
-              <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
-                <FilePlus className="h-4 w-4" />
-                <a 
-                  href={uploadedDocumentUrl}
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-sm underline hover:text-green-800"
-                >
-                  Documento subido exitosamente - Ver documento
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="font-medium text-base">
-            Medicamentos actuales
-          </Label>
-          <div className="space-y-4">
-            {medicationFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2 items-start">
-                <div className="grid grid-cols-3 gap-2 flex-1">
-                  <Input
-                    {...register(`medications.${index}.name`)}
-                    placeholder="Nombre del medicamento"
-                    className="col-span-1"
-                  />
-                  <Input
-                    {...register(`medications.${index}.dosage`)}
-                    placeholder="Dosis (mg, ml, etc.)"
-                    className="col-span-1"
-                  />
-                  <Input
-                    {...register(`medications.${index}.frequency`)}
-                    placeholder="Frecuencia"
-                    className="col-span-1"
-                  />
-                </div>
-                {index > 0 && (
-                  <Button 
-                    type="button" 
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8"
-                    onClick={() => removeMedication(index)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1"
-              onClick={() => appendMedication({ 
-                id: uuidv4(), 
-                name: '', 
-                dosage: '', 
-                frequency: '' 
-              })}
-            >
-              <Plus className="h-4 w-4" />
-              <span>Agregar medicamento</span>
-            </Button>
-          </div>
-        </div>
+        <VaccineUploadSection
+          onFileUpload={handleFileUpload}
+          uploadingDocument={uploadingDocument}
+          uploadedDocumentUrl={uploadedDocumentUrl}
+          uploadError={uploadError}
+        />
         
-        <div className="space-y-2">
-          <Label htmlFor="allergies" className="font-medium text-base">
-            Alergias
-          </Label>
-          <Textarea
-            id="allergies"
-            {...register('allergies')}
-            placeholder="Alergias conocidas del animal"
-            className="min-h-[80px]"
-          />
-        </div>
+        <MedicationsSection
+          medicationFields={medicationFields}
+          register={register}
+          append={appendMedication}
+          remove={removeMedication}
+        />
         
-        <div className="space-y-2">
-          <Label htmlFor="chronicConditions" className="font-medium text-base">
-            Condiciones crónicas
-          </Label>
-          <Textarea
-            id="chronicConditions"
-            {...register('chronicConditions')}
-            placeholder="Condiciones médicas crónicas"
-            className="min-h-[80px]"
-          />
-        </div>
+        <MedicalConditionsSection register={register} />
         
-        <div className="space-y-2">
-          <Label className="font-medium text-base">
-            Cirugías previas
-          </Label>
-          <div className="space-y-4">
-            {surgeryFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2 items-start">
-                <div className="grid grid-cols-2 gap-2 flex-1">
-                  <Input
-                    {...register(`surgeries.${index}.type`)}
-                    placeholder="Tipo de cirugía"
-                    className="col-span-1"
-                  />
-                  <Input
-                    {...register(`surgeries.${index}.date`)}
-                    placeholder="Fecha (MM/YYYY)"
-                    className="col-span-1"
-                  />
-                </div>
-                {index > 0 && (
-                  <Button 
-                    type="button" 
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8"
-                    onClick={() => removeSurgery(index)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1"
-              onClick={() => appendSurgery({ 
-                id: uuidv4(), 
-                type: '', 
-                date: '' 
-              })}
-            >
-              <Plus className="h-4 w-4" />
-              <span>Agregar cirugía</span>
-            </Button>
-          </div>
-        </div>
+        <SurgeriesSection
+          surgeryFields={surgeryFields}
+          register={register}
+          append={appendSurgery}
+          remove={removeSurgery}
+        />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center pt-6">
