@@ -14,9 +14,11 @@ import AddPetButton from '../components/AddPetButton';
 import FinishSetupButton from '../components/FinishSetupButton';
 import PhoneNumberField from '../components/PhoneNumberField';
 import ProfileAddressField from '../components/ProfileAddressField';
+import ProfileImageUploader from '../components/ProfileImageUploader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
 import PetList from '../components/PetList';
 import { usePets } from '@/features/pets/hooks';
+import { profileImageService } from '../api/profileImageService';
 
 const profileSchema = z.object({
   phoneNumber: z.string().min(1, 'El número de teléfono es requerido'),
@@ -33,6 +35,9 @@ const ProfileSetupScreen = () => {
   const [isSubmittingPet, setIsSubmittingPet] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isFetchingPets, setIsFetchingPets] = useState(true);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const { getCurrentUserPets, createPet } = usePets();
 
   const form = useForm<ProfileFormValues>({
@@ -157,13 +162,29 @@ const ProfileSetupScreen = () => {
       const values = form.getValues();
       
       if (user?.id) {
-        // Update pet_owners table instead of profiles
-        console.log('Updating pet_owners with phone and address');
+        setIsUploadingImage(true);
+        let profilePictureUrl = null;
+        
+        // Upload profile image if selected
+        if (profileImageFile) {
+          try {
+            profilePictureUrl = await profileImageService.uploadProfileImage(
+              user.id,
+              profileImageFile
+            );
+          } catch (error) {
+            console.error('Error uploading profile image:', error);
+            toast.error('Error al subir la imagen de perfil');
+          }
+        }
+        
+        // Update pet_owners table
         const { error } = await supabase
           .from('pet_owners')
           .update({
             phone_number: values.phoneNumber,
-            address: values.address
+            address: values.address,
+            ...(profilePictureUrl && { profile_picture_url: profilePictureUrl }),
           })
           .eq('id', user.id);
           
@@ -173,7 +194,6 @@ const ProfileSetupScreen = () => {
         }
         
         // Also update the profiles table with the address field which it does have
-        console.log('Updating profiles with address');
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
@@ -193,6 +213,8 @@ const ProfileSetupScreen = () => {
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
       toast.error('Error al actualizar el perfil');
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -211,6 +233,14 @@ const ProfileSetupScreen = () => {
           <CardTitle className="text-2xl text-center text-primary">Completa tu perfil</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          <ProfileImageUploader
+            profileImage={profileImage}
+            setProfileImage={setProfileImage}
+            setProfileImageFile={setProfileImageFile}
+            isUploading={isUploadingImage}
+            displayName={user?.displayName}
+          />
+          
           <PhoneNumberField
             value={form.watch('phoneNumber')}
             onChange={(value) => form.setValue('phoneNumber', value)}
