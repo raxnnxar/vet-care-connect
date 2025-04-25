@@ -1,8 +1,10 @@
+
 import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '@/state/store';
 import { petsActions } from '../store/petsSlice';
 import { useBasicPetOperations } from './useBasicPetOperations';
 import { usePetFileUploads } from './usePetFileUploads';
+import { supabase } from '@/integrations/supabase/client';
 
 export const usePets = () => {
   const dispatch = useAppDispatch();
