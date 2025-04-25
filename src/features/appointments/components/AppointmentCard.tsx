@@ -15,6 +15,8 @@ interface AppointmentCardProps {
     status: string;
     pets?: {
       name: string;
+      id: string;
+      profile_picture_url?: string;
     };
   };
   onClick: (id: string) => void;
@@ -32,7 +34,12 @@ const getStatusConfig = (status: string) => {
 };
 
 const formatDate = (dateString: string) => {
-  return format(new Date(dateString), "d 'de' MMMM',' yyyy", { locale: es });
+  try {
+    return format(new Date(dateString), "d 'de' MMMM',' yyyy", { locale: es });
+  } catch (error) {
+    console.error('Error formatting date:', error, dateString);
+    return 'Fecha no válida';
+  }
 };
 
 export const AppointmentCard = ({ appointment, onClick }: AppointmentCardProps) => {
@@ -46,35 +53,35 @@ export const AppointmentCard = ({ appointment, onClick }: AppointmentCardProps) 
     >
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="font-medium">{appointment.provider_name}</h3>
+          <h3 className="font-medium">{appointment.provider_name || 'Veterinario'}</h3>
           <Badge className={statusConfig.className}>
             {statusConfig.text}
           </Badge>
         </div>
         
         <p className="text-sm text-gray-500 mb-1">
-          Para: {appointment.pets?.name}
+          Para: {appointment.pets?.name || 'Mascota'}
         </p>
         
         <div className="mt-3 space-y-2">
           <div className="flex items-center">
             <Calendar className="h-4 w-4 text-[#79D0B8] mr-2" />
             <span className="text-sm">
-              {formatDate(appointment.appointment_date)}
+              {appointment.appointment_date ? formatDate(appointment.appointment_date) : 'Fecha pendiente'}
             </span>
           </div>
           
           <div className="flex items-center">
             <Clock className="h-4 w-4 text-[#79D0B8] mr-2" />
             <span className="text-sm">
-              {format(new Date(appointment.appointment_date), 'HH:mm')}
+              {appointment.appointment_date ? format(new Date(appointment.appointment_date), 'HH:mm') : 'Hora pendiente'}
             </span>
           </div>
           
           <div className="flex items-center">
             <MapPin className="h-4 w-4 text-[#79D0B8] mr-2" />
             <span className="text-sm">
-              {appointment.clinic_name || appointment.location}
+              {appointment.clinic_name || appointment.location || 'Ubicación pendiente'}
             </span>
           </div>
         </div>

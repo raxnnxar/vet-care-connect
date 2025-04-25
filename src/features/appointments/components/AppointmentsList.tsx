@@ -29,7 +29,7 @@ export const AppointmentsList = ({
     );
   }
 
-  if (appointments?.length === 0) {
+  if (!appointments || appointments.length === 0) {
     return (
       <Card className="p-6 text-center">
         <p className="text-gray-500 mb-4">
@@ -49,7 +49,7 @@ export const AppointmentsList = ({
 
   return (
     <>
-      {appointments?.map(appointment => (
+      {appointments.map(appointment => (
         <AppointmentCard
           key={appointment.id}
           appointment={appointment}

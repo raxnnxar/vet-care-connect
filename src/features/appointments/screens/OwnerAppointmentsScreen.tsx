@@ -8,38 +8,62 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AppointmentsList } from '../components/AppointmentsList';
-import { Button } from '@/ui/atoms/button'; // Add this import for the Button component
+import { Button } from '@/ui/atoms/button';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 const OwnerAppointmentsScreen: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('upcoming');
 
-  const { data: appointments, isLoading, error } = useQuery({
+  const { data: appointments, isLoading, error, refetch } = useQuery({
     queryKey: ['appointments', activeTab],
     queryFn: async () => {
-      const now = new Date();
-      const { data, error } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          pets (
-            id,
-            name,
-            profile_picture_url
-          )
-        `)
-        .order('appointment_date', { ascending: activeTab === 'upcoming' })
-        .gte('appointment_date', activeTab === 'upcoming' ? now.toISOString() : undefined)
-        .lt('appointment_date', activeTab === 'past' ? now.toISOString() : undefined);
+      console.log('Fetching appointments for tab:', activeTab);
+      
+      try {
+        const now = new Date();
+        const nowISOString = now.toISOString();
+        
+        console.log('Current user ID:', user?.id);
+        console.log('Current date/time:', nowISOString);
+        console.log('Filtering for', activeTab === 'upcoming' ? 'upcoming' : 'past', 'appointments');
+        
+        let query = supabase
+          .from('appointments')
+          .select(`
+            *,
+            pets (
+              id,
+              name,
+              profile_picture_url
+            )
+          `)
+          .eq('owner_id', user?.id)
+          .order('appointment_date', { ascending: activeTab === 'upcoming' });
 
-      if (error) {
-        console.error('Error fetching appointments:', error);
-        toast.error('No se pudieron cargar las citas');
+        // Apply date filtering based on tab
+        if (activeTab === 'upcoming') {
+          query = query.gte('appointment_date', nowISOString);
+        } else {
+          query = query.lt('appointment_date', nowISOString);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Error fetching appointments:', error);
+          throw error;
+        }
+        
+        console.log('Fetched appointments:', data);
+        return data || [];
+      } catch (error) {
+        console.error('Error in fetchAppointments:', error);
         throw error;
       }
-
-      return data || [];
     },
+    enabled: !!user?.id, // Only run query when user ID is available
   });
 
   const handleFindVets = () => {
@@ -48,6 +72,10 @@ const OwnerAppointmentsScreen: React.FC = () => {
 
   const goToAppointmentDetails = (id: string) => {
     navigate(`/owner/appointments/${id}`);
+  };
+
+  const handleRetry = () => {
+    refetch();
   };
 
   if (error) {
@@ -65,7 +93,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
             <p className="text-gray-500 mb-4">Ocurrió un error al cargar las citas</p>
             <Button 
               variant="default"
-              onClick={() => window.location.reload()}
+              onClick={handleRetry}
             >
               Reintentar
             </Button>
