@@ -12,35 +12,75 @@ export type Database = {
       appointments: {
         Row: {
           appointment_date: string
+          clinic_address: string | null
+          clinic_name: string | null
           created_at: string | null
+          duration: number | null
           id: string
+          location: string | null
           notes: string | null
+          owner_id: string | null
+          payment_status: string | null
           pet_id: string | null
+          price: number | null
+          provider_id: string | null
+          provider_name: string | null
+          provider_specialty: string | null
           reason: string | null
+          service_type: string | null
           status: string | null
-          vet_id: string | null
+          updated_at: string | null
         }
         Insert: {
           appointment_date: string
+          clinic_address?: string | null
+          clinic_name?: string | null
           created_at?: string | null
+          duration?: number | null
           id?: string
+          location?: string | null
           notes?: string | null
+          owner_id?: string | null
+          payment_status?: string | null
           pet_id?: string | null
+          price?: number | null
+          provider_id?: string | null
+          provider_name?: string | null
+          provider_specialty?: string | null
           reason?: string | null
+          service_type?: string | null
           status?: string | null
-          vet_id?: string | null
+          updated_at?: string | null
         }
         Update: {
           appointment_date?: string
+          clinic_address?: string | null
+          clinic_name?: string | null
           created_at?: string | null
+          duration?: number | null
           id?: string
+          location?: string | null
           notes?: string | null
+          owner_id?: string | null
+          payment_status?: string | null
           pet_id?: string | null
+          price?: number | null
+          provider_id?: string | null
+          provider_name?: string | null
+          provider_specialty?: string | null
           reason?: string | null
+          service_type?: string | null
           status?: string | null
-          vet_id?: string | null
+          updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "appointments_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "pet_owners"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "appointments_pet_id_fkey"
             columns: ["pet_id"]
@@ -49,10 +89,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "appointments_vet_id_fkey"
-            columns: ["vet_id"]
+            foreignKeyName: "appointments_provider_id_fkey"
+            columns: ["provider_id"]
             isOneToOne: false
-            referencedRelation: "veterinarians"
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_provider"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
         ]
@@ -63,7 +110,6 @@ export type Database = {
           created_at: string | null
           id: string
           pricing_info: Json | null
-          service_provider_id: string
           services_offered: Json | null
           specialization: string | null
           updated_at: string | null
@@ -74,7 +120,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           pricing_info?: Json | null
-          service_provider_id: string
           services_offered?: Json | null
           specialization?: string | null
           updated_at?: string | null
@@ -85,7 +130,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           pricing_info?: Json | null
-          service_provider_id?: string
           services_offered?: Json | null
           specialization?: string | null
           updated_at?: string | null
@@ -93,9 +137,9 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "pet_grooming_service_provider_id_fkey"
-            columns: ["service_provider_id"]
-            isOneToOne: false
+            foreignKeyName: "pet_grooming_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
             referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
