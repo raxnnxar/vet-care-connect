@@ -30,6 +30,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PetFormProps } from '@/features/pets/types/PetFormProps';
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/atoms/avatar';
 import { usePets } from '@/features/pets/hooks/usePets';
+import { supabase } from '@/integrations/supabase/client';
 
 const speciesMapping = {
   'Perro': PET_CATEGORIES.DOG,
