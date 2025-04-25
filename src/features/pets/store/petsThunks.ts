@@ -1,3 +1,4 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { petsApi } from '../api/petsApi';
 import { supabase } from '@/integrations/supabase/client';
@@ -176,6 +177,8 @@ export const uploadPetProfilePicture = createAsyncThunk(
         throw uploadError;
       }
       
+      console.log('File uploaded successfully:', uploadData);
+      
       // Get the public URL for the uploaded file
       const { data: publicUrlData } = supabase.storage
         .from('pet-profile-pictures')
@@ -198,9 +201,74 @@ export const uploadPetProfilePicture = createAsyncThunk(
         throw updateError;
       }
       
+      console.log('Pet record updated with profile picture URL');
       return { id: petId, url: imageUrl };
     } catch (error) {
       console.error('Error uploading pet profile picture:', error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const uploadVaccineDocument = createAsyncThunk(
+  'pets/uploadVaccineDocument',
+  async ({ petId, file }: { petId: string; file: File }, { rejectWithValue }) => {
+    try {
+      console.log('Uploading vaccine document for pet:', petId);
+      
+      // Create a unique file path
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${petId}/${Date.now()}_vaccine.${fileExt}`;
+      
+      // Check if the storage bucket exists
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'pet-vaccine-documents');
+      
+      if (!bucketExists) {
+        console.error('Bucket pet-vaccine-documents does not exist');
+        return rejectWithValue(new Error('Storage bucket for vaccine documents does not exist'));
+      }
+      
+      // Upload the file to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('pet-vaccine-documents')
+        .upload(filePath, file, {
+          upsert: true,
+          contentType: file.type
+        });
+      
+      if (uploadError) {
+        console.error('Error uploading vaccine document to storage:', uploadError);
+        throw uploadError;
+      }
+      
+      console.log('Vaccine document uploaded successfully:', uploadData);
+      
+      // Get the public URL for the uploaded file
+      const { data: publicUrlData } = supabase.storage
+        .from('pet-vaccine-documents')
+        .getPublicUrl(filePath);
+      
+      const documentUrl = publicUrlData.publicUrl;
+      console.log('Uploaded document URL:', documentUrl);
+      
+      // Update the pet_medical_history record with the vaccine document URL
+      const { error: updateError } = await supabase
+        .from('pet_medical_history')
+        .update({ 
+          vaccines_document_url: documentUrl
+        })
+        .eq('pet_id', petId);
+      
+      if (updateError) {
+        console.error('Error updating pet medical history with vaccine document URL:', updateError);
+        throw updateError;
+      }
+      
+      console.log('Pet medical history updated with vaccine document URL');
+      return { id: petId, url: documentUrl };
+    } catch (error) {
+      console.error('Error uploading vaccine document:', error);
       return rejectWithValue(error);
     }
   }

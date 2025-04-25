@@ -8,7 +8,8 @@ import {
   modifyPet,
   removePet,
   fetchPetsByOwner,
-  uploadPetProfilePicture
+  uploadPetProfilePicture,
+  uploadVaccineDocument
 } from '../store/petsThunks';
 import { petsActions } from '../store/petsSlice';
 import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
@@ -162,11 +163,30 @@ export const usePets = () => {
       
       if (uploadPetProfilePicture.fulfilled.match(resultAction)) {
         const { url } = resultAction.payload;
+        console.log('Profile picture uploaded successfully, URL:', url);
         return url;
       }
       return null;
     } catch (error) {
       console.error('Error uploading profile picture:', error);
+      return null;
+    }
+  }, [dispatch]);
+  
+  const uploadVaccineDoc = useCallback(async (petId: string, file: File): Promise<string | null> => {
+    try {
+      console.log('Uploading vaccine document for pet:', petId);
+      const resultAction = await dispatch(uploadVaccineDocument({ petId, file }));
+      
+      if (uploadVaccineDocument.fulfilled.match(resultAction)) {
+        const { url } = resultAction.payload;
+        console.log('Vaccine document uploaded successfully, URL:', url);
+        return url;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error uploading vaccine document:', error);
+      toast.error('Error al subir el documento de vacunas');
       return null;
     }
   }, [dispatch]);
@@ -195,6 +215,7 @@ export const usePets = () => {
     getPetsByOwner,
     getCurrentUserPets,
     uploadProfilePicture,
+    uploadVaccineDoc,
     clearError,
     resetState,
   };

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Bird, Cat, Dog, ChevronRight, User } from 'lucide-react';
-import { Avatar } from '@/ui/atoms/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
 import { Button } from '@/ui/atoms/button';
 import { Pet } from '../types';
 
@@ -38,15 +38,15 @@ const PetListItem: React.FC<PetListItemProps> = ({ pet, onClick }) => {
     >
       <Avatar className="h-14 w-14 border-2 border-[#5FBFB3]/20">
         {pet.profile_picture_url ? (
-          <img 
+          <AvatarImage 
             src={pet.profile_picture_url} 
             alt={pet.name} 
-            className="w-full h-full object-cover rounded-full"
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div className="bg-white flex items-center justify-center w-full h-full rounded-full">
+          <AvatarFallback className="bg-white flex items-center justify-center w-full h-full">
             {getAnimalIcon(pet.species)}
-          </div>
+          </AvatarFallback>
         )}
       </Avatar>
       <div className="flex-1">

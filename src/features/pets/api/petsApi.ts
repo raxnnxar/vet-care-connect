@@ -1,4 +1,3 @@
-
 import { Pet, CreatePetData, UpdatePetData, PetFilters, PetMedicalHistory } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryOptions } from '../../../core/api/apiClient';
@@ -156,20 +155,22 @@ export const petsApi: IPetsApi = {
       return { data: null, error: error as Error };
     }
   },
-
+  
   /**
    * Upload a pet profile picture
    */
   async uploadPetProfilePicture(petId: string, file: File) {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${petId}/profile.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileName = `${petId}/${Date.now()}.${fileExt}`;
+      const filePath = fileName;
 
+      // Upload the file to Supabase storage
       const { data, error } = await supabase.storage
         .from('pet-profile-pictures')
         .upload(filePath, file, {
-          upsert: true
+          upsert: true,
+          contentType: file.type
         });
 
       if (error) {
@@ -177,10 +178,14 @@ export const petsApi: IPetsApi = {
         throw error;
       }
 
+      console.log('File uploaded successfully to path:', filePath);
+
       // Get the public URL for the uploaded file
       const { data: publicUrlData } = supabase.storage
         .from('pet-profile-pictures')
         .getPublicUrl(filePath);
+
+      console.log('Public URL generated:', publicUrlData.publicUrl);
 
       // Update the pet record with the profile picture URL
       const { error: updateError } = await supabase
@@ -193,9 +198,61 @@ export const petsApi: IPetsApi = {
         throw updateError;
       }
 
+      console.log('Pet record updated with profile picture URL');
       return { data: { publicUrl: publicUrlData.publicUrl }, error: null };
     } catch (error) {
       console.error('Error in uploadPetProfilePicture:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+  
+  /**
+   * Upload a vaccine document for a pet
+   */
+  async uploadVaccineDocument(petId: string, file: File) {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${petId}/${Date.now()}_vaccine.${fileExt}`;
+      const filePath = fileName;
+
+      console.log('Attempting to upload vaccine document to path:', filePath);
+
+      // Upload the file to Supabase storage
+      const { data, error } = await supabase.storage
+        .from('pet-vaccine-documents')
+        .upload(filePath, file, {
+          upsert: true,
+          contentType: file.type
+        });
+
+      if (error) {
+        console.error('Error uploading vaccine document:', error);
+        throw error;
+      }
+
+      console.log('Vaccine document uploaded successfully');
+
+      // Get the public URL for the uploaded file
+      const { data: publicUrlData } = supabase.storage
+        .from('pet-vaccine-documents')
+        .getPublicUrl(filePath);
+
+      console.log('Public URL for vaccine document:', publicUrlData.publicUrl);
+
+      // Update the pet medical history record with the vaccine document URL
+      const { error: updateError } = await supabase
+        .from('pet_medical_history')
+        .update({ vaccines_document_url: publicUrlData.publicUrl })
+        .eq('pet_id', petId);
+
+      if (updateError) {
+        console.error('Error updating pet medical history with vaccine document URL:', updateError);
+        throw updateError;
+      }
+
+      return { data: { publicUrl: publicUrlData.publicUrl }, error: null };
+    } catch (error) {
+      console.error('Error in uploadVaccineDocument:', error);
       return { data: null, error: error as Error };
     }
   },

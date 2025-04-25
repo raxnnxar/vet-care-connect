@@ -60,6 +60,14 @@ export interface IPetsApi {
   }>;
   
   /**
+   * Upload a vaccine document for a pet
+   */
+  uploadVaccineDocument(petId: string, file: File): Promise<{
+    data: { publicUrl: string } | null;
+    error: Error | null;
+  }>;
+  
+  /**
    * Create pet medical history
    */
   createPetMedicalHistory(petId: string, medicalHistoryData: PetMedicalHistory): Promise<{

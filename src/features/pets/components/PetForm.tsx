@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { Dog, Cat, Turtle, Bird, Rabbit, Info, Calendar, Plus, Minus, FilePlus, Pill, ChevronRight, ChevronDown, Syringe, Upload } from 'lucide-react';
@@ -30,6 +29,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { PetFormProps } from '@/features/pets/types/PetFormProps';
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/atoms/avatar';
+import { usePets } from '@/features/pets/hooks/usePets';
 
 const speciesMapping = {
   'Perro': PET_CATEGORIES.DOG,
@@ -119,8 +119,9 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
   const [petPhotoPreview, setPetPhotoPreview] = useState<string | null>(null);
   const [petPhotoFile, setPetPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const vaccineDocInputRef = useRef<HTMLInputElement>(null);
+  const { uploadVaccineDoc } = usePets();
 
-  // Calculate initial values based on pet data
   const calculateInitialValues = () => {
     if (!pet) {
       return {
@@ -139,11 +140,9 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
       };
     }
 
-    // Convert database species to UI species
     let species = '';
     let customSpecies = '';
     
-    // Map species from database to UI values
     if (pet.species) {
       for (const [uiSpecies, dbSpecies] of Object.entries(speciesMapping)) {
         if (dbSpecies === pet.species) {
@@ -152,14 +151,12 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
         }
       }
       
-      // If no match, it's likely "other"
       if (!species) {
         species = 'Otro';
         customSpecies = pet.breed || '';
       }
     }
 
-    // Map sex from database to UI values
     let sex = '';
     if (pet.sex) {
       for (const [uiSex, dbSex] of Object.entries(genderMapping)) {
@@ -170,7 +167,6 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
       }
     }
 
-    // Calculate age from date_of_birth if available
     let age = undefined;
     if (pet.date_of_birth) {
       const birthDate = new Date(pet.date_of_birth);
@@ -200,10 +196,29 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
     defaultValues: initialValues
   });
 
-  // Set the photo preview if pet has a profile picture
   useEffect(() => {
     if (pet?.profile_picture_url) {
       setPetPhotoPreview(pet.profile_picture_url);
+    }
+    
+    if (pet?.id) {
+      const fetchMedicalHistory = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('pet_medical_history')
+            .select('vaccines_document_url')
+            .eq('pet_id', pet.id)
+            .single();
+            
+          if (data && data.vaccines_document_url) {
+            setUploadedDocumentUrl(data.vaccines_document_url);
+          }
+        } catch (error) {
+          console.error('Error fetching medical history:', error);
+        }
+      };
+      
+      fetchMedicalHistory();
     }
   }, [pet]);
   
@@ -216,21 +231,25 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
   const selectedSpecies = watch('species');
   
   const handleFileUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0 || !pet?.id) {
+      toast.error("No se ha seleccionado ningún archivo o no hay mascota asociada");
+      return;
+    }
     
     const file = files[0];
     setUploadingDocument(true);
     
     try {
-      const tempId = uuidv4();
-      const filePath = `${tempId}/vaccine_record.${file.name.split('.').pop()}`;
+      const petId = pet.id;
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const documentUrl = await uploadVaccineDoc(petId, file);
       
-      const fakeUrl = `https://storage.example.com/pet-vaccine-documents/${filePath}`;
-      setUploadedDocumentUrl(fakeUrl);
-      
-      toast.success("Documento subido exitosamente");
+      if (documentUrl) {
+        setUploadedDocumentUrl(documentUrl);
+        toast.success("Documento subido exitosamente");
+      } else {
+        toast.error("Error al subir el documento");
+      }
     } catch (error) {
       console.error("Error uploading document:", error);
       toast.error("Error al subir el documento. Intenta nuevamente.");
@@ -264,17 +283,14 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
       temperament: data.temperament || '',
     };
     
-    // If editing, include the ID
     if (mode === 'edit' && pet) {
       transformedData.id = pet.id;
     }
     
-    // Only add petPhotoFile if a new photo was selected
     if (petPhotoFile) {
       transformedData.petPhotoFile = petPhotoFile;
     }
     
-    // Calculate date of birth from age
     if (data.age) {
       const today = new Date();
       const birthYear = today.getFullYear() - data.age;
@@ -315,7 +331,6 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
   return (
     <ScrollArea className="max-h-[70vh] pr-4 overflow-y-auto">
       <form onSubmit={handleSubmit(processFormData)} className="space-y-4 pb-4">
-        {/* Pet Photo Upload */}
         <div className="flex flex-col items-center gap-2 mb-4">
           <div className="relative">
             <Avatar className="h-24 w-24 border-2 border-primary/30">
@@ -564,8 +579,9 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
                 </Label>
                 <div className="flex flex-col gap-2">
                   <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
-                    <Input
+                    <input
                       id="vaccineDocument"
+                      ref={vaccineDocInputRef}
                       type="file"
                       accept=".pdf,.png,.jpg,.jpeg"
                       onChange={(e) => handleFileUpload(e.target.files)}
@@ -583,7 +599,14 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
                   {uploadedDocumentUrl && (
                     <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
                       <FilePlus className="h-4 w-4" />
-                      <span className="text-sm">Documento subido exitosamente</span>
+                      <a 
+                        href={uploadedDocumentUrl}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm underline hover:text-green-800"
+                      >
+                        Documento subido exitosamente - Ver documento
+                      </a>
                     </div>
                   )}
                 </div>
