@@ -1,4 +1,3 @@
-
 /**
  * Core pet entity type
  */
@@ -36,15 +35,15 @@ export interface PetMedicalHistory {
 export interface CreatePetData {
   name: string;
   species: string;
+  owner_id?: string;
   breed?: string;
-  sex?: string;
-  weight?: number;
-  temperament?: string;
   date_of_birth?: string;
+  weight?: number;
+  sex?: string;
+  temperament?: string;
   additional_notes?: string;
-  owner_id: string;
-  medicalHistory?: PetMedicalHistory;
   petPhotoFile?: File;
+  medicalHistory?: PetMedicalHistory;
 }
 
 /**

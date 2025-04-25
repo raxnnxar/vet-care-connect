@@ -133,6 +133,7 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
         temperament: data.temperament || '',
       };
       
+      // Add the pet photo file if available
       if (petPhotoFile) {
         transformedData.petPhotoFile = petPhotoFile;
       }
