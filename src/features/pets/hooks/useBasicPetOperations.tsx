@@ -5,6 +5,7 @@ import { addPet, fetchPetById, fetchPets, fetchPetsByOwner, modifyPet, removePet
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
 import { toast } from 'sonner';
+import { Pet } from '../types';
 
 export const useBasicPetOperations = () => {
   const dispatch = useAppDispatch();
@@ -62,10 +63,13 @@ export const useBasicPetOperations = () => {
     try {
       const result = await dispatch(modifyPet({ id, petData }));
       if (result.meta.requestStatus === 'rejected') {
+        console.error('Pet update rejected:', result.payload);
         toast.error('Error al actualizar la mascota');
         return null;
       }
-      return result;
+      
+      console.log('Pet updated successfully:', result.payload);
+      return result.payload;
     } catch (error) {
       console.error('Error in updatePet:', error);
       toast.error('Error al actualizar la mascota');
