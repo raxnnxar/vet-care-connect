@@ -76,11 +76,10 @@ export const usePets = () => {
           
           if (uploadPetProfilePicture.fulfilled.match(photoResult)) {
             console.log('Photo uploaded successfully:', photoResult.payload);
-            const petWithPhoto = {
+            return {
               ...resultAction.payload,
               profile_picture_url: photoResult.payload.url
             };
-            return petWithPhoto;
           }
         }
         

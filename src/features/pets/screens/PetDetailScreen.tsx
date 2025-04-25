@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -24,7 +23,6 @@ const PetDetailScreen: React.FC = () => {
       try {
         const petData = await getPetById(id);
         if (petData) {
-          // Explicitly cast the result to Pet or handle it safely
           setPet(petData as unknown as Pet);
         } else {
           toast({
@@ -77,6 +75,13 @@ const PetDetailScreen: React.FC = () => {
 
   const goBack = () => {
     navigate(-1);
+  };
+
+  const handlePetCreated = (pet: Pet | null) => {
+    if (pet) {
+      toast.success('Mascota creada exitosamente');
+      navigate('/owner/pets');
+    }
   };
 
   if (isLoading) {

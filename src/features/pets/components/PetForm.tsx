@@ -114,6 +114,8 @@ interface PetFormValues {
 }
 
 const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, onCancel }) => {
+  const [step, setStep] = useState<'basic' | 'medical'>('basic');
+  const [createdPet, setCreatedPet] = useState<Pet | null>(null);
   const [isMedicalHistoryOpen, setIsMedicalHistoryOpen] = useState(false);
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
@@ -303,61 +305,60 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
   };
   
   const processFormData = async (data: PetFormValues) => {
-    const transformedData: any = {
-      name: data.name,
-      species: data.species === 'Otro' ? PET_CATEGORIES.OTHER : speciesMapping[data.species],
-      breed: data.species === 'Otro' ? data.customSpecies : '',
-      additional_notes: data.additionalNotes || '',
-      weight: data.weight || null,
-      sex: data.sex ? genderMapping[data.sex] : null,
-      temperament: data.temperament || '',
-    };
-    
-    if (mode === 'edit' && pet) {
-      transformedData.id = pet.id;
-    }
-    
-    if (petPhotoFile) {
-      transformedData.petPhotoFile = petPhotoFile;
-    }
-    
-    if (data.age) {
-      const today = new Date();
-      const birthYear = today.getFullYear() - data.age;
-      const approximateBirthDate = new Date(birthYear, 0, 1);
-      transformedData.date_of_birth = approximateBirthDate.toISOString().split('T')[0];
-    }
-    
-    if (isMedicalHistoryOpen) {
-      const medicalHistory = {
-        allergies: data.allergies || null,
-        chronic_conditions: data.chronicConditions || null,
-        vaccines_document_url: uploadedDocumentUrl,
-        current_medications: data.medications.filter(m => m.name.trim() !== '').map(med => ({
-          name: med.name,
-          dosage: med.dosage,
-          frequency: med.frequency
-        })),
-        previous_surgeries: data.surgeries.filter(s => s.type.trim() !== '').map(surgery => ({
-          type: surgery.type,
-          date: surgery.date
-        }))
+    try {
+      const transformedData: any = {
+        name: data.name,
+        species: data.species === 'Otro' ? PET_CATEGORIES.OTHER : speciesMapping[data.species],
+        breed: data.species === 'Otro' ? data.customSpecies : '',
+        additional_notes: data.additionalNotes || '',
+        weight: data.weight || null,
+        sex: data.sex ? genderMapping[data.sex] : null,
+        temperament: data.temperament || '',
       };
       
-      transformedData.medicalHistory = medicalHistory;
-    }
-    
-    try {
+      if (petPhotoFile) {
+        transformedData.petPhotoFile = petPhotoFile;
+      }
+      
+      if (data.age) {
+        const today = new Date();
+        const birthYear = today.getFullYear() - data.age;
+        const approximateBirthDate = new Date(birthYear, 0, 1);
+        transformedData.date_of_birth = approximateBirthDate.toISOString().split('T')[0];
+      }
+      
       console.log('Submitting pet data:', transformedData);
       const result = await onSubmit(transformedData);
-      console.log('Pet submission result:', result);
+      if (result) {
+        setCreatedPet(result);
+        setStep('medical');
+      }
       return result;
     } catch (error) {
       console.error('Error submitting pet data:', error);
+      toast.error('Error al guardar la mascota');
       return null;
     }
   };
-  
+
+  const handleMedicalComplete = () => {
+    onCancel?.();
+  };
+
+  const handleSkipMedical = () => {
+    onCancel?.();
+  };
+
+  if (step === 'medical' && createdPet) {
+    return (
+      <PetMedicalForm
+        pet={createdPet}
+        onComplete={handleMedicalComplete}
+        onSkip={handleSkipMedical}
+      />
+    );
+  }
+
   return (
     <ScrollArea className="max-h-[70vh] pr-4 overflow-y-auto">
       <form onSubmit={handleSubmit(processFormData)} className="space-y-4 pb-4">
@@ -804,9 +805,9 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium"
-              disabled={isSubmitting || uploadingDocument}
+              disabled={isSubmitting}
             >
-              {isSubmitting ? 'Guardando...' : 'Guardar mascota'}
+              {isSubmitting ? 'Guardando...' : 'Guardar y continuar'}
             </Button>
             {onCancel && (
               <Button 
