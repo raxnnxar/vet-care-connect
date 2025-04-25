@@ -27,7 +27,7 @@ export const useBasicPetOperations = () => {
     return dispatch(fetchPetsByOwner(user.id));
   }, [dispatch, user?.id]);
   
-  const createPet = useCallback(async (petData: any) => {
+  const createPet = useCallback(async (petData: any): Promise<Pet | null> => {
     try {
       if (!user?.id) {
         console.error('Cannot create pet: No user ID available');
@@ -51,7 +51,7 @@ export const useBasicPetOperations = () => {
       }
       
       console.log('Pet created successfully:', result.payload);
-      return result.payload;
+      return result.payload as Pet;
     } catch (error) {
       console.error('Error in createPet:', error);
       toast.error('Error al crear la mascota');
@@ -59,7 +59,7 @@ export const useBasicPetOperations = () => {
     }
   }, [dispatch, user?.id]);
   
-  const updatePet = useCallback(async (id: string, petData: any) => {
+  const updatePet = useCallback(async (id: string, petData: any): Promise<Pet | null> => {
     try {
       const result = await dispatch(modifyPet({ id, petData }));
       if (result.meta.requestStatus === 'rejected') {
@@ -69,7 +69,7 @@ export const useBasicPetOperations = () => {
       }
       
       console.log('Pet updated successfully:', result.payload);
-      return result.payload;
+      return result.payload as Pet;
     } catch (error) {
       console.error('Error in updatePet:', error);
       toast.error('Error al actualizar la mascota');

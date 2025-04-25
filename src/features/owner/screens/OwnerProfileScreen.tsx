@@ -77,8 +77,9 @@ const OwnerProfileScreen = () => {
       if (editingPet) {
         console.log('Updating existing pet:', editingPet.id);
         const updatedPet = await updatePet(editingPet.id, petData);
-        if (updatedPet && updatedPet.payload) {
-          const updatedPetData = updatedPet.payload as Pet;
+        
+        if (updatedPet) {
+          const updatedPetData = updatedPet as Pet;
           setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPetData : p));
           setShowPetForm(false);
           setEditingPet(null);
@@ -90,7 +91,7 @@ const OwnerProfileScreen = () => {
         console.log('Create pet result:', newPet);
         
         if (newPet) {
-          const newPetData = newPet as unknown as Pet;
+          const newPetData = newPet as Pet;
           console.log('New pet created:', newPetData);
           
           setUserPets(prev => [...prev, newPetData]);
@@ -134,8 +135,8 @@ const OwnerProfileScreen = () => {
       
       const result = await updatePet(selectedPet.id, petUpdateData);
       
-      if (result && result.payload) {
-        const updatedPet = result.payload as Pet;
+      if (result) {
+        const updatedPet = result as Pet;
         setUserPets(prev => prev.map(p => p.id === updatedPet.id ? updatedPet : p));
         return updatedPet;
       }

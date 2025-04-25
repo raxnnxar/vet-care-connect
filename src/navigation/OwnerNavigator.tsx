@@ -39,8 +39,8 @@ const OwnerNavigator = () => {
     if (!petData.id) return null;
     try {
       const result = await updatePet(petData.id, petData);
-      // Return the updated pet data or the original data if successful
-      return result?.payload as Pet || null;
+      // Return the updated pet data or null
+      return result as Pet;
     } catch (error) {
       console.error("Error updating pet:", error);
       return null;
