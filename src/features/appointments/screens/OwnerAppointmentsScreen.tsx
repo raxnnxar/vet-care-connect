@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AppointmentsList } from '../components/AppointmentsList';
+import { Button } from '@/ui/atoms/button'; // Add this import for the Button component
 
 const OwnerAppointmentsScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
           <Card className="p-6 text-center">
             <p className="text-gray-500 mb-4">Ocurrió un error al cargar las citas</p>
             <Button 
-              className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
+              variant="default"
               onClick={() => window.location.reload()}
             >
               Reintentar
