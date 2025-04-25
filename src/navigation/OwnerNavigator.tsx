@@ -26,7 +26,9 @@ const OwnerNavigator = () => {
 
   const handleCreatePet = async (petData: any): Promise<Pet | null> => {
     try {
-      return await createPet(petData);
+      const result = await createPet(petData);
+      // Make sure we return the pet data from createPet or null
+      return result as Pet;
     } catch (error) {
       console.error("Error creating pet:", error);
       return null;
@@ -36,8 +38,9 @@ const OwnerNavigator = () => {
   const handleUpdatePet = async (petData: any): Promise<Pet | null> => {
     if (!petData.id) return null;
     try {
-      await updatePet(petData.id, petData);
-      return petData;
+      const result = await updatePet(petData.id, petData);
+      // Return the updated pet data or the original data if successful
+      return result?.payload as Pet || null;
     } catch (error) {
       console.error("Error updating pet:", error);
       return null;
