@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -7,11 +8,12 @@ import { ArrowLeft, Edit, Trash2, Calendar } from 'lucide-react';
 import { usePets } from '@/features/pets/hooks/usePets';
 import { Pet } from '@/features/pets/types';
 import { useToast } from "@/hooks/use-toast";
+import { toast } from 'sonner';
 
 const PetDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const { getPetById, deletePet } = usePets();
   const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -25,7 +27,7 @@ const PetDetailScreen: React.FC = () => {
         if (petData) {
           setPet(petData as unknown as Pet);
         } else {
-          toast({
+          uiToast({
             title: "Error",
             description: "No se pudo encontrar la mascota",
             variant: "destructive"
@@ -33,7 +35,7 @@ const PetDetailScreen: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching pet details:', error);
-        toast({
+        uiToast({
           title: "Error",
           description: "No se pudo cargar los detalles de la mascota",
           variant: "destructive"
@@ -44,20 +46,20 @@ const PetDetailScreen: React.FC = () => {
     };
 
     fetchPet();
-  }, [id, getPetById, toast]);
+  }, [id, getPetById, uiToast]);
 
   const handleDeletePet = async () => {
     if (!id) return;
     try {
       await deletePet(id);
-      toast({
+      uiToast({
         title: "Éxito",
         description: "Mascota eliminada exitosamente",
       });
       navigate('/owner/pets');
     } catch (error) {
       console.error('Error deleting pet:', error);
-      toast({
+      uiToast({
         title: "Error",
         description: "No se pudo eliminar la mascota",
         variant: "destructive"

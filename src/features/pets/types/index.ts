@@ -60,6 +60,7 @@ export interface UpdatePetData {
   date_of_birth?: string;
   additional_notes?: string;
   profile_picture_url?: string;
+  medicalHistory?: PetMedicalHistory; // Add this property
 }
 
 /**

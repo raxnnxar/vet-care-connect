@@ -12,7 +12,7 @@ import { Button } from '@/ui/atoms/button';
 import { usePets } from '../hooks/usePets';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { Pet } from '../types';
+import { Pet, UpdatePetData, PetMedicalHistory } from '../types';
 
 interface PetMedicalFormProps {
   pet: Pet;
@@ -104,7 +104,7 @@ const PetMedicalForm: React.FC<PetMedicalFormProps> = ({ pet, onComplete, onSkip
 
   const onSubmit = async (data: MedicalFormValues) => {
     try {
-      const medicalHistory = {
+      const medicalHistory: PetMedicalHistory = {
         allergies: data.allergies || null,
         chronic_conditions: data.chronicConditions || null,
         vaccines_document_url: uploadedDocumentUrl,
@@ -123,7 +123,8 @@ const PetMedicalForm: React.FC<PetMedicalFormProps> = ({ pet, onComplete, onSkip
           }))
       };
 
-      await updatePet(pet.id, { medicalHistory });
+      const updateData: UpdatePetData = { medicalHistory };
+      await updatePet(pet.id, updateData);
       toast.success('Información médica guardada exitosamente');
       onComplete();
     } catch (error) {
