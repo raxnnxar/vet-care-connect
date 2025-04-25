@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { Pet } from '@/features/pets/types';
 
 const AppointmentDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,11 +29,7 @@ const AppointmentDetailScreen: React.FC = () => {
         .select(`
           *,
           pets (
-            id,
-            name,
-            species,
-            breed,
-            profile_picture_url
+            *
           )
         `)
         .eq('id', id)
@@ -125,7 +122,7 @@ const AppointmentDetailScreen: React.FC = () => {
         />
         
         {appointmentDetails.pets && (
-          <PetInfo pet={appointmentDetails.pets} />
+          <PetInfo pet={appointmentDetails.pets as Pet} />
         )}
 
         <ServiceDetails

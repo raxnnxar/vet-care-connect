@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card } from '@/ui/molecules/card';
-import { MapPin, Notes } from 'lucide-react';
+import { MapPin, FileText } from 'lucide-react';
 
 interface ServiceDetailsProps {
   serviceType?: string;
@@ -77,7 +77,7 @@ export const ServiceDetails: React.FC<ServiceDetailsProps> = ({
       {notes && (
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Notes className="h-5 w-5 text-[#79D0B8]" />
+            <FileText className="h-5 w-5 text-[#79D0B8]" />
             <h3 className="font-semibold">Notas</h3>
           </div>
           <p className="text-gray-600">{notes}</p>
