@@ -52,11 +52,13 @@ const ContactInformation: React.FC<ContactInformationProps> = ({
       if (error) {
         toast.error('Error al guardar cambios');
       } else {
-        setUserDetails(prev => ({
-          ...prev,
+        // The issue is here - we're using a function update pattern but the type doesn't support it
+        // Let's directly create and pass the new object instead
+        setUserDetails({
           phone: editedPhone,
-          address: editedAddress
-        }));
+          address: editedAddress,
+          profilePicture: userDetails.profilePicture // Keep the existing profile picture
+        });
         setIsEditing(false);
         toast.success('Cambios guardados exitosamente');
       }
