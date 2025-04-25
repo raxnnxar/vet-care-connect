@@ -67,7 +67,15 @@ const OwnerProfileScreen = () => {
 
   const handlePetFormSubmit = async (petData: any): Promise<Pet | null> => {
     try {
+      // Make sure we assign the owner ID if it's not already set
+      if (!petData.owner_id && user?.id) {
+        petData.owner_id = user.id;
+      }
+      
+      console.log('Submitting pet with data:', petData);
+      
       if (editingPet) {
+        console.log('Updating existing pet:', editingPet.id);
         const updatedPet = await updatePet(editingPet.id, petData);
         if (updatedPet && updatedPet.payload) {
           const updatedPetData = updatedPet.payload as Pet;
@@ -77,9 +85,14 @@ const OwnerProfileScreen = () => {
           return updatedPetData;
         }
       } else {
+        console.log('Creating new pet with owner_id:', petData.owner_id);
         const newPet = await createPet(petData);
+        console.log('Create pet result:', newPet);
+        
         if (newPet) {
           const newPetData = newPet as unknown as Pet;
+          console.log('New pet created:', newPetData);
+          
           setUserPets(prev => [...prev, newPetData]);
           setShowPetForm(false);
           return newPetData;

@@ -1,118 +1,99 @@
 
 import { useCallback } from 'react';
 import { useAppDispatch } from '@/state/store';
-import { fetchPets, fetchPetById, addPet, modifyPet, removePet, fetchPetsByOwner } from '../store/petsThunks';
-import { CreatePetData, UpdatePetData, PetFilters, Pet } from '../types';
-import { useAuth } from '@/features/auth/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { addPet, fetchPetById, fetchPets, fetchPetsByOwner, modifyPet, removePet } from '../store/petsThunks';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 import { toast } from 'sonner';
 
 export const useBasicPetOperations = () => {
   const dispatch = useAppDispatch();
-  const { user } = useAuth();
+  const { user } = useSelector((state: RootState) => state.auth);
   
-  const getAllPets = useCallback((filters?: PetFilters) => {
-    return dispatch(fetchPets(filters));
+  const getAllPets = useCallback(() => {
+    return dispatch(fetchPets(undefined));
   }, [dispatch]);
   
   const getPetById = useCallback((id: string) => {
     return dispatch(fetchPetById(id));
   }, [dispatch]);
   
-  const createPet = useCallback(async (petData: CreatePetData): Promise<Pet | null> => {
+  const getCurrentUserPets = useCallback(() => {
+    if (!user?.id) {
+      console.error('Cannot get pets: No user ID available');
+      return Promise.resolve({ payload: [] });
+    }
+    return dispatch(fetchPetsByOwner(user.id));
+  }, [dispatch, user?.id]);
+  
+  const createPet = useCallback(async (petData: any) => {
     try {
-      if (user?.id && !petData.owner_id) {
+      if (!user?.id) {
+        console.error('Cannot create pet: No user ID available');
+        toast.error('Error: Usuario no identificado');
+        return null;
+      }
+      
+      // Ensure the pet has an owner ID
+      if (!petData.owner_id) {
         petData.owner_id = user.id;
       }
       
-      const { data: ownerExists, error: ownerCheckError } = await supabase
-        .from('pet_owners')
-        .select('id')
-        .eq('id', petData.owner_id)
-        .maybeSingle();
+      console.log('Creating pet with data:', petData);
       
-      if (!ownerExists || ownerCheckError) {
-        const { error: createOwnerError } = await supabase
-          .from('pet_owners')
-          .insert({ id: petData.owner_id });
-          
-        if (createOwnerError) {
-          console.error('Failed to create owner record:', createOwnerError);
-          toast.error('Error al configurar el perfil de dueño');
-          return null;
-        }
+      const result = await dispatch(addPet(petData));
+      
+      if (result.meta.requestStatus === 'rejected') {
+        console.error('Pet creation rejected:', result.payload);
+        toast.error('Error al crear la mascota');
+        return null;
       }
       
-      const petPhotoFile = petData.petPhotoFile;
-      const petDataForSubmit = { ...petData };
-      delete petDataForSubmit.petPhotoFile;
-      
-      const resultAction = await dispatch(addPet(petDataForSubmit));
-      
-      if (addPet.fulfilled.match(resultAction)) {
-        return resultAction.payload as Pet;
-      }
-      
-      console.error('Failed to create pet:', resultAction.error);
-      toast.error(`Error al crear mascota: ${resultAction.error.message || 'Error desconocido'}`);
-      return null;
+      console.log('Pet created successfully:', result.payload);
+      return result.payload;
     } catch (error) {
-      console.error('Error creating pet:', error);
-      toast.error('Error al crear mascota');
+      console.error('Error in createPet:', error);
+      toast.error('Error al crear la mascota');
       return null;
     }
-  }, [dispatch, user]);
+  }, [dispatch, user?.id]);
   
-  const updatePet = useCallback(async (id: string, petData: UpdatePetData) => {
+  const updatePet = useCallback(async (id: string, petData: any) => {
     try {
-      const cleanPetData = { ...petData };
-      
-      if ('petPhotoFile' in cleanPetData) {
-        delete cleanPetData.petPhotoFile;
+      const result = await dispatch(modifyPet({ id, petData }));
+      if (result.meta.requestStatus === 'rejected') {
+        toast.error('Error al actualizar la mascota');
+        return null;
       }
-      
-      if ('medicalHistory' in cleanPetData) {
-        delete cleanPetData.medicalHistory;
-      }
-      
-      const resultAction = await dispatch(modifyPet({ id, petData: cleanPetData }));
-      
-      if (modifyPet.fulfilled.match(resultAction)) {
-        return { payload: resultAction.payload };
-      }
-      
-      console.error('Failed to update pet:', resultAction.error);
-      toast.error(`Error al actualizar mascota: ${resultAction.error.message || 'Error desconocido'}`);
-      return null;
+      return result;
     } catch (error) {
-      console.error('Error updating pet:', error);
-      toast.error('Error al actualizar mascota');
+      console.error('Error in updatePet:', error);
+      toast.error('Error al actualizar la mascota');
       return null;
     }
   }, [dispatch]);
   
-  const deletePet = useCallback((id: string) => {
-    return dispatch(removePet(id));
-  }, [dispatch]);
-  
-  const getPetsByOwner = useCallback((ownerId: string) => {
-    return dispatch(fetchPetsByOwner(ownerId));
-  }, [dispatch]);
-  
-  const getCurrentUserPets = useCallback(() => {
-    if (user?.id) {
-      return dispatch(fetchPetsByOwner(user.id));
+  const deletePet = useCallback(async (id: string) => {
+    try {
+      const result = await dispatch(removePet(id));
+      if (result.meta.requestStatus === 'rejected') {
+        toast.error('Error al eliminar la mascota');
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error in deletePet:', error);
+      toast.error('Error al eliminar la mascota');
+      return false;
     }
-    return Promise.resolve();
-  }, [dispatch, user]);
-
+  }, [dispatch]);
+  
   return {
     getAllPets,
     getPetById,
+    getCurrentUserPets,
     createPet,
     updatePet,
     deletePet,
-    getPetsByOwner,
-    getCurrentUserPets,
   };
 };

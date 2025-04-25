@@ -58,6 +58,8 @@ const ProfileSetupScreen = () => {
           setIsFetchingPets(true);
           const result = await getCurrentUserPets();
           
+          console.log('Fetched pets during profile setup:', result);
+          
           if (result && result.payload && Array.isArray(result.payload)) {
             setCurrentPets(result.payload);
           }
@@ -132,6 +134,7 @@ const ProfileSetupScreen = () => {
   };
 
   const handlePetAdded = (newPet: Pet) => {
+    console.log('New pet added during profile setup:', newPet);
     setCurrentPets(prevPets => [...prevPets, newPet]);
   };
 
