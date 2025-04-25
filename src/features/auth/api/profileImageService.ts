@@ -26,16 +26,8 @@ export const profileImageService = {
         .from('profile_pictures')
         .getPublicUrl(filePath);
       
-      // Update both profiles and pet_owners tables with the new profile picture URL
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ profile_picture_url: publicUrl })
-        .eq('id', userId);
-      
-      if (profileError) {
-        console.error('Error updating profile picture URL:', profileError);
-      }
-      
+      // Update only the pet_owners table which has the profile_picture_url column
+      // The profiles table does not have this column according to our TypeScript error
       const { error: petOwnerError } = await supabase
         .from('pet_owners')
         .update({ profile_picture_url: publicUrl })

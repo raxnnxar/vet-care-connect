@@ -142,20 +142,27 @@ export const updateProfile = createAsyncThunk(
         updateData.profile_picture_url = profileImage;
       }
       
-      // Update both profiles and pet_owners tables
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', userId);
-      
-      if (profileError) throw profileError;
-      
+      // Update only the pet_owners table since profiles doesn't have profile_picture_url
+      // We can update profiles table with other fields like phone_number if needed
       const { error: petOwnerError } = await supabase
         .from('pet_owners')
         .update(updateData)
         .eq('id', userId);
       
       if (petOwnerError) throw petOwnerError;
+      
+      // Update only relevant fields in profiles table (not profile_picture_url)
+      const profilesUpdateData = {
+        updated_at: new Date().toISOString()
+        // We're not including profile_picture_url here as it doesn't exist in the profiles table
+      };
+      
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update(profilesUpdateData)
+        .eq('id', userId);
+      
+      if (profileError) throw profileError;
       
       return { userId, phone, profileImage };
     } catch (error: any) {
