@@ -1,14 +1,12 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/ui/atoms/button';
-import { Input } from '@/ui/atoms/input';
-import { Label } from '@/ui/atoms/label';
-import { Textarea } from '@/ui/atoms/textarea';
-import { Loader2, FileMedical, Save, X } from 'lucide-react';
 import { PetMedicalHistory } from '../../types';
+import { Button } from '@/ui/atoms/button';
+import { Label } from '@/ui/atoms/label';
+import { Input } from '@/ui/atoms/input';
+import { Textarea } from '@/ui/atoms/textarea';
+import { Stethoscope, Upload, AlertTriangle, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { usePetFileUploads } from '@/features/pets/hooks/usePetFileUploads';
-import VaccineUploadSection from './VaccineUploadSection';
 
 interface PetMedicalInfoFormProps {
   petId: string;
@@ -16,102 +14,55 @@ interface PetMedicalInfoFormProps {
   onCancel: () => void;
 }
 
-interface Medication {
-  id: string;
-  name: string;
-  dosage: string;
-  frequency: string;
-}
-
-interface Surgery {
-  id: string;
-  type: string;
-  date: string;
-}
-
-const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({
-  petId,
-  onSave,
-  onCancel
-}) => {
+const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({ petId, onSave, onCancel }) => {
+  const [allergies, setAllergies] = useState<string>('');
+  const [chronicConditions, setChronicConditions] = useState<string>('');
+  const [medications, setMedications] = useState<string>('');
+  const [surgeries, setSurgeries] = useState<string>('');
+  const [vaccineFile, setVaccineFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [vaccineDocUrl, setVaccineDocUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [medications, setMedications] = useState<Medication[]>([]);
-  const [surgeries, setSurgeries] = useState<Surgery[]>([]);
-  const [allergies, setAllergies] = useState('');
-  const [chronicConditions, setChronicConditions] = useState('');
-  const [uploadingDocument, setUploadingDocument] = useState(false);
-  const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const { uploadVaccineDoc } = usePetFileUploads();
-
-  const handleFileUpload = async (files: FileList | null) => {
-    setUploadError(null);
-    if (!files || files.length === 0) {
-      setUploadError("No se ha seleccionado ningún archivo");
-      return;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setVaccineFile(files[0]);
     }
+  };
 
-    setUploadingDocument(true);
+  const parseJsonArray = (text: string) => {
+    if (!text.trim()) return [];
     try {
-      const documentUrl = await uploadVaccineDoc(petId, files[0]);
-      if (documentUrl) {
-        setUploadedDocumentUrl(documentUrl);
-        toast.success("Documento subido exitosamente");
-      } else {
-        setUploadError("Error al subir el documento");
-      }
+      // Split by newlines and filter out empty lines
+      return text
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .map(item => ({ description: item }));
     } catch (error) {
-      console.error("Error uploading document:", error);
-      setUploadError("Error al subir el documento");
-    } finally {
-      setUploadingDocument(false);
+      console.error('Error parsing text to JSON:', error);
+      return [];
     }
   };
 
-  const addMedication = () => {
-    setMedications([
-      ...medications,
-      { id: crypto.randomUUID(), name: '', dosage: '', frequency: '' }
-    ]);
-  };
-
-  const addSurgery = () => {
-    setSurgeries([
-      ...surgeries,
-      { id: crypto.randomUUID(), type: '', date: '' }
-    ]);
-  };
-
-  const updateMedication = (id: string, field: keyof Medication, value: string) => {
-    setMedications(medications.map(med => 
-      med.id === id ? { ...med, [field]: value } : med
-    ));
-  };
-
-  const updateSurgery = (id: string, field: keyof Surgery, value: string) => {
-    setSurgeries(surgeries.map(surgery => 
-      surgery.id === id ? { ...surgery, [field]: value } : surgery
-    ));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
+      // Prepare medical history data
       const medicalInfo: PetMedicalHistory = {
         allergies: allergies || null,
         chronic_conditions: chronicConditions || null,
-        vaccines_document_url: uploadedDocumentUrl,
-        current_medications: medications.length > 0 ? medications : null,
-        previous_surgeries: surgeries.length > 0 ? surgeries : null
+        current_medications: medications ? parseJsonArray(medications) : [],
+        previous_surgeries: surgeries ? parseJsonArray(surgeries) : [],
+        vaccines_document_url: vaccineDocUrl
       };
 
       await onSave(medicalInfo);
-      toast.success('Información médica guardada exitosamente');
     } catch (error) {
-      console.error('Error saving medical information:', error);
+      console.error('Error saving medical info:', error);
       toast.error('Error al guardar la información médica');
     } finally {
       setIsSubmitting(false);
@@ -119,124 +70,110 @@ const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <VaccineUploadSection 
-          onFileUpload={handleFileUpload}
-          uploadingDocument={uploadingDocument}
-          uploadedDocumentUrl={uploadedDocumentUrl}
-          uploadError={uploadError}
-        />
-
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="allergies">Alergias</Label>
-            <Textarea
-              id="allergies"
-              value={allergies}
-              onChange={(e) => setAllergies(e.target.value)}
-              placeholder="Ingrese las alergias conocidas"
-              className="mt-1"
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="vaccineDoc">Documento de vacunas</Label>
+        <div className="flex flex-col space-y-2">
+          <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
+            <input
+              id="vaccineDoc"
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg"
+              onChange={handleFileChange}
+              className="hidden"
+              disabled={uploading}
             />
-          </div>
-
-          <div>
-            <Label htmlFor="chronicConditions">Condiciones crónicas</Label>
-            <Textarea
-              id="chronicConditions"
-              value={chronicConditions}
-              onChange={(e) => setChronicConditions(e.target.value)}
-              placeholder="Ingrese las condiciones crónicas conocidas"
-              className="mt-1"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Medicamentos actuales</Label>
-            {medications.map((med, index) => (
-              <div key={med.id} className="grid grid-cols-3 gap-2">
-                <Input
-                  placeholder="Nombre"
-                  value={med.name}
-                  onChange={(e) => updateMedication(med.id, 'name', e.target.value)}
-                />
-                <Input
-                  placeholder="Dosis"
-                  value={med.dosage}
-                  onChange={(e) => updateMedication(med.id, 'dosage', e.target.value)}
-                />
-                <Input
-                  placeholder="Frecuencia"
-                  value={med.frequency}
-                  onChange={(e) => updateMedication(med.id, 'frequency', e.target.value)}
-                />
-              </div>
-            ))}
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={addMedication}
-              className="w-full"
+            <Label 
+              htmlFor="vaccineDoc" 
+              className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
             >
-              + Agregar medicamento
-            </Button>
+              <Upload className="h-8 w-8" />
+              <span>
+                {uploading ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}
+              </span>
+              <span className="text-xs text-muted-foreground">Máximo 5MB</span>
+            </Label>
           </div>
-
-          <div className="space-y-2">
-            <Label>Cirugías previas</Label>
-            {surgeries.map((surgery, index) => (
-              <div key={surgery.id} className="grid grid-cols-2 gap-2">
-                <Input
-                  placeholder="Tipo de cirugía"
-                  value={surgery.type}
-                  onChange={(e) => updateSurgery(surgery.id, 'type', e.target.value)}
-                />
-                <Input
-                  type="date"
-                  value={surgery.date}
-                  onChange={(e) => updateSurgery(surgery.id, 'date', e.target.value)}
-                />
-              </div>
-            ))}
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={addSurgery}
-              className="w-full"
-            >
-              + Agregar cirugía
-            </Button>
-          </div>
+          
+          {vaccineDocUrl && (
+            <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
+              <Check className="h-4 w-4" />
+              <a 
+                href={vaccineDocUrl}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm underline hover:text-green-800"
+              >
+                Documento subido exitosamente - Ver documento
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 justify-end mt-6">
+      <div className="space-y-2">
+        <Label htmlFor="allergies">Alergias</Label>
+        <Textarea
+          id="allergies"
+          value={allergies}
+          onChange={(e) => setAllergies(e.target.value)}
+          placeholder="Ingrese cualquier alergia conocida"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="chronicConditions">Condiciones crónicas</Label>
+        <Textarea
+          id="chronicConditions"
+          value={chronicConditions}
+          onChange={(e) => setChronicConditions(e.target.value)}
+          placeholder="Ingrese cualquier condición crónica"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="medications">Medicamentos actuales</Label>
+        <Textarea
+          id="medications"
+          value={medications}
+          onChange={(e) => setMedications(e.target.value)}
+          placeholder="Ingrese un medicamento por línea"
+          className="min-h-[80px]"
+        />
+        <p className="text-xs text-muted-foreground">
+          Ingrese cada medicamento en una línea separada
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="surgeries">Cirugías previas</Label>
+        <Textarea
+          id="surgeries"
+          value={surgeries}
+          onChange={(e) => setSurgeries(e.target.value)}
+          placeholder="Ingrese una cirugía por línea"
+          className="min-h-[80px]"
+        />
+        <p className="text-xs text-muted-foreground">
+          Ingrese cada cirugía en una línea separada
+        </p>
+      </div>
+
+      <div className="flex space-x-2 pt-4">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="flex items-center"
+        >
+          <Stethoscope className="mr-2 h-4 w-4" />
+          {isSubmitting ? 'Guardando...' : 'Guardar información médica'}
+        </Button>
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
-          disabled={isSubmitting}
-          className="w-full sm:w-auto"
         >
-          <X className="mr-2" />
           Cancelar
-        </Button>
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Guardando...
-            </>
-          ) : (
-            <>
-              <Save className="mr-2" />
-              Guardar
-            </>
-          )}
         </Button>
       </div>
     </form>

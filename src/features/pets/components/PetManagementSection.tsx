@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Pet, PetMedicalHistory } from '../types';
 import PetForm from './PetForm';
-import PetList from './PetList';
+import PetList from '@/features/auth/components/PetList';
 import PetMedicalInfoForm from './medical/PetMedicalInfoForm';
 import { toast } from 'sonner';
 import { usePets } from '../hooks';
@@ -28,7 +28,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   const [showPetForm, setShowPetForm] = useState(false);
   const [showMedicalForm, setShowMedicalForm] = useState(false);
   const [lastCreatedPet, setLastCreatedPet] = useState<Pet | null>(null);
-  const { createPet, createPetMedicalHistory } = usePets();
+  const { createPet, updatePet } = usePets();
 
   const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
     try {
@@ -69,9 +69,13 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     }
 
     try {
-      await createPetMedicalHistory(lastCreatedPet.id, medicalInfo);
+      // We'll use updatePet to update the pet with the medical history
+      await updatePet(lastCreatedPet.id, {
+        medicalHistory: medicalInfo
+      });
       setShowMedicalForm(false);
       setLastCreatedPet(null);
+      toast.success('Información médica guardada exitosamente');
     } catch (error) {
       console.error('Error saving medical information:', error);
       toast.error('Error al guardar la información médica');
