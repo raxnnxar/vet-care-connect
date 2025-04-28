@@ -42,7 +42,7 @@ const PetList: React.FC<PetListProps> = ({ pets, isLoading }) => {
           key={pet.id}
           className="bg-white/90 p-4 rounded-lg shadow-sm flex items-center gap-3"
         >
-          <div className="w-12 h-12 rounded-full bg-[#79D0B8]/30 flex items-center justify-center text-[#79D0B8] font-semibold">
+          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary font-semibold">
             {pet.name ? pet.name.substring(0, 2).toUpperCase() : 'P'}
           </div>
           <div>

@@ -56,9 +56,9 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
   return (
     <div className="flex flex-col items-center mb-6">
       <div className="relative mb-4">
-        <Avatar className="h-28 w-28 border-4 border-primary/30">
+        <Avatar className="h-28 w-28 border-4 border-white/30">
           <AvatarImage src={profileImage || undefined} alt="Foto de perfil" className="object-cover" />
-          <AvatarFallback className="bg-primary/20 text-primary text-3xl">
+          <AvatarFallback className="bg-white/40 text-white text-3xl shadow-inner">
             {displayName ? getInitials(displayName) : 'U'}
           </AvatarFallback>
         </Avatar>
@@ -66,7 +66,7 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
         <button
           type="button"
           onClick={triggerFileInput}
-          className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-2 shadow-md hover:bg-primary/90 transition-colors"
+          className="absolute bottom-0 right-0 bg-white text-primary rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
           aria-label="Cambiar foto de perfil"
         >
           <Pencil className="h-4 w-4" />
@@ -81,10 +81,10 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
           onChange={handleImageUpload}
         />
       </div>
-      <p className="text-sm text-muted-foreground">Agrega una foto de perfil</p>
+      <p className="text-sm text-white">Agrega una foto de perfil</p>
       
       {isUploading && (
-        <div className="mt-2 flex items-center text-sm text-primary">
+        <div className="mt-2 flex items-center text-sm text-white">
           <Loader2 className="h-4 w-4 mr-1 animate-spin" />
           <span>Subiendo imagen...</span>
         </div>

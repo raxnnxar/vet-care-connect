@@ -56,7 +56,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </Avatar>
         <label 
           htmlFor="profile-image-upload" 
-          className="absolute bottom-0 right-0 bg-[#5FBFB3] text-white rounded-full p-2 cursor-pointer"
+          className="absolute bottom-0 right-0 bg-white text-[#5FBFB3] rounded-full p-2 cursor-pointer shadow-md"
         >
           <Pencil size={16} />
           <input 
