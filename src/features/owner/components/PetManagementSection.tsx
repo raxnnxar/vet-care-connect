@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { toast } from 'sonner';
@@ -12,22 +13,58 @@ interface PetManagementSectionProps {
   pets: Pet[];
   isLoading: boolean;
   onPetAdded: (pet: Pet) => void;
+  
+  // These are the properties that are being passed in OwnerProfileScreen but not defined here
+  userPets?: Pet[];
+  handlePetClick?: (pet: Pet) => void;
+  handlePetUpdate?: (petData: any) => Promise<Pet | null>;
+  handlePetFormSubmit?: (petData: any) => Promise<Pet | null>;
+  selectedPet?: Pet | null;
+  setSelectedPet?: (pet: Pet | null) => void;
+  editingPet?: Pet | null;
+  setEditingPet?: (pet: Pet | null) => void;
+  showPetForm?: boolean;
+  setShowPetForm?: (show: boolean) => void;
 }
 
 const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   pets,
   isLoading,
   onPetAdded,
+  userPets,
+  handlePetClick,
+  handlePetUpdate,
+  handlePetFormSubmit,
+  selectedPet,
+  setSelectedPet,
+  editingPet,
+  setEditingPet,
+  showPetForm,
+  setShowPetForm,
 }) => {
-  const [showPetForm, setShowPetForm] = useState(false);
-  const [showMedicalDialog, setShowMedicalDialog] = useState(false);
-  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  // Use local state if the props are not provided
+  const [localShowPetForm, setLocalShowPetForm] = useState(false);
+  const [localShowMedicalDialog, setLocalShowMedicalDialog] = useState(false);
+  const [localSelectedPet, setLocalSelectedPet] = useState<Pet | null>(null);
   const [lastCreatedPet, setLastCreatedPet] = useState<Pet | null>(null);
-  const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const [localEditingPet, setLocalEditingPet] = useState<Pet | null>(null);
   const { createPet, updatePet } = usePets();
 
-  const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
+  // Use the prop handlers if provided, otherwise use local handlers
+  const actualShowPetForm = showPetForm !== undefined ? showPetForm : localShowPetForm;
+  const actualSetShowPetForm = setShowPetForm || setLocalShowPetForm;
+  const actualSelectedPet = selectedPet !== undefined ? selectedPet : localSelectedPet;
+  const actualSetSelectedPet = setSelectedPet || setLocalSelectedPet;
+  const actualEditingPet = editingPet !== undefined ? editingPet : localEditingPet;
+  const actualSetEditingPet = setEditingPet || setLocalEditingPet;
+  const actualPets = userPets || pets;
+
+  const handleLocalPetSubmit = async (petData: any): Promise<Pet | null> => {
     try {
+      if (handlePetFormSubmit) {
+        return await handlePetFormSubmit(petData);
+      }
+      
       if (!petData) {
         toast.error('Datos de mascota inválidos');
         return null;
@@ -42,8 +79,8 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
       
       setLastCreatedPet(newPet as Pet);
       onPetAdded(newPet as Pet);
-      setShowPetForm(false);
-      setShowMedicalDialog(true);
+      actualSetShowPetForm(false);
+      setLocalShowMedicalDialog(true);
       
       toast.success('Mascota agregada con éxito');
       return newPet as Pet;
@@ -54,8 +91,12 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     }
   };
 
-  const handlePetUpdate = async (petData: any): Promise<Pet | null> => {
+  const handleLocalPetUpdate = async (petData: any): Promise<Pet | null> => {
     try {
+      if (handlePetUpdate) {
+        return await handlePetUpdate(petData);
+      }
+      
       if (!petData || !petData.id) {
         toast.error('Datos de mascota inválidos');
         return null;
@@ -77,8 +118,12 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     }
   };
 
-  const handlePetClick = (pet: Pet) => {
-    setSelectedPet(pet);
+  const handleLocalPetClick = (pet: Pet) => {
+    if (handlePetClick) {
+      handlePetClick(pet);
+    } else {
+      actualSetSelectedPet(pet);
+    }
   };
 
   return (
@@ -86,7 +131,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
       <h3 className="text-lg font-medium">Tus mascotas</h3>
       
       <PetList 
-        pets={pets} 
+        pets={actualPets} 
         isLoading={isLoading} 
       />
       
@@ -94,28 +139,28 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
         variant="outline" 
         className="w-full mt-4"
         onClick={() => {
-          setEditingPet(null);
-          setShowPetForm(true);
+          actualSetEditingPet(null);
+          actualSetShowPetForm(true);
         }}
       >
         Añadir mascota
       </Button>
 
-      {showPetForm && (
+      {actualShowPetForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-lg transform transition-all animate-scale-in">
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4">
-                {editingPet ? 'Editar mascota' : 'Agregar mascota'}
+                {actualEditingPet ? 'Editar mascota' : 'Agregar mascota'}
               </h2>
               <PetForm
-                mode={editingPet ? 'edit' : 'create'}
-                pet={editingPet}
-                onSubmit={handlePetSubmit}
+                mode={actualEditingPet ? 'edit' : 'create'}
+                pet={actualEditingPet}
+                onSubmit={handleLocalPetSubmit}
                 isSubmitting={false}
                 onCancel={() => {
-                  setShowPetForm(false);
-                  setEditingPet(null);
+                  actualSetShowPetForm(false);
+                  actualSetEditingPet(null);
                 }}
               />
             </div>
@@ -126,20 +171,20 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
       {lastCreatedPet && (
         <MedicalDialog
           pet={lastCreatedPet}
-          open={showMedicalDialog}
+          open={localShowMedicalDialog}
           onClose={() => {
-            setShowMedicalDialog(false);
+            setLocalShowMedicalDialog(false);
             setLastCreatedPet(null);
           }}
         />
       )}
 
-      {selectedPet && (
+      {actualSelectedPet && (
         <PetDetailModal
-          pet={selectedPet}
-          isOpen={!!selectedPet}
-          onClose={() => setSelectedPet(null)}
-          onPetUpdate={handlePetUpdate}
+          pet={actualSelectedPet}
+          isOpen={!!actualSelectedPet}
+          onClose={() => actualSetSelectedPet(null)}
+          onPetUpdate={handleLocalPetUpdate}
         />
       )}
     </div>
