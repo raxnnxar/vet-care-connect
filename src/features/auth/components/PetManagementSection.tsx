@@ -16,7 +16,6 @@ import {
   DialogFooter,
 } from '@/ui/molecules/dialog';
 import { Button } from '@/ui/atoms/button';
-import { Check } from 'lucide-react';
 
 interface PetManagementSectionProps {
   pets: Pet[];
@@ -60,6 +59,9 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
       setLastCreatedPet(petObj);
       onPetAdded(petObj);
       setShowPetForm(false);
+      
+      // Show the medical info dialog
+      setShowMedicalDialog(true);
       
       toast.success('Mascota agregada con éxito');
       return petObj;
@@ -119,21 +121,14 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
           setLastCreatedPet(null);
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent>
           <DialogHeader>
-            <div className="flex flex-col items-center text-center mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
-                <Check className="h-6 w-6 text-green-600" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold">
-                ¡Mascota agregada con éxito!
-              </DialogTitle>
-              <DialogDescription className="mt-2 text-center">
-                ¿Deseas agregar información médica para tu mascota ahora?
-              </DialogDescription>
-            </div>
+            <DialogTitle>¡Mascota agregada con éxito!</DialogTitle>
+            <DialogDescription>
+              ¿Deseas agregar información médica para tu mascota ahora?
+            </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex flex-col gap-3 sm:gap-2 pt-4">
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-center gap-2">
             <Button 
               variant="default" 
               className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
@@ -146,7 +141,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
               className="w-full" 
               onClick={() => setLastCreatedPet(null)}
             >
-              Ahora no
+              Omitir por ahora
             </Button>
           </DialogFooter>
         </DialogContent>
