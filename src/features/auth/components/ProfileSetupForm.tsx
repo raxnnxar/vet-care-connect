@@ -65,7 +65,6 @@ const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({
         onChange={(value) => form.setValue('phoneNumber', value)}
         label="Número de teléfono"
         placeholder="Ingresa tu número de teléfono"
-        helpText="Esto lo pedimos para prevenir el abandono de mascotas y poder contactar con los dueños en caso de ser necesario."
       />
       
       <ProfileAddressField
@@ -73,15 +72,11 @@ const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({
         onChange={(value) => form.setValue('address', value)}
         label="Dirección"
         placeholder="Ingresa tu dirección"
-        helpText="Esto lo pedimos para prevenir el abandono de mascotas y poder contactar con los dueños en caso de ser necesario."
       />
-
-      <div className="mt-8">
-        <FinishSetupButton
-          onClick={handleSubmit}
-          disabled={!isFormValid || isLoading}
-        />
-      </div>
+      
+      <p className="text-white text-sm">
+        Esta información previene el abandono de mascotas y nos ayuda a contactar a los dueños en caso de ser necesario.
+      </p>
     </div>
   );
 };

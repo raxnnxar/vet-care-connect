@@ -6,11 +6,11 @@ import { useAppSelector } from '@/state/store';
 import { supabase } from '@/integrations/supabase/client';
 import { ROUTES } from '@/frontend/shared/constants/routes';
 import { Pet } from '@/features/pets/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
 import { usePets } from '@/features/pets/hooks';
 import { profileImageService } from '../api/profileImageService';
 import PetManagementSection from '../components/PetManagementSection';
 import ProfileSetupForm, { ProfileFormValues } from '../components/ProfileSetupForm';
+import FinishSetupButton from '../components/FinishSetupButton';
 
 const ProfileSetupScreen = () => {
   const navigate = useNavigate();
@@ -138,23 +138,26 @@ const ProfileSetupScreen = () => {
     setCurrentPets(prevPets => [...prevPets, newPet]);
   };
 
+  const isFormValid = true; // Simplificado para este ejemplo, ajustar según tus necesidades reales
+
   if (isProfileLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      <div className="flex items-center justify-center h-screen bg-[#79D0B8]">
+        <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-md">
-      <Card className="shadow-md animate-fade-in">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center text-primary">
+    <div className="min-h-screen bg-[#79D0B8] py-8 px-4 flex flex-col">
+      <div className="container mx-auto max-w-md flex-grow">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-semibold text-white">
             Completa tu perfil
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
+          </h2>
+        </div>
+        
+        <div className="space-y-8 mb-24">
           <ProfileSetupForm
             initialValues={{
               phoneNumber: '',
@@ -174,8 +177,21 @@ const ProfileSetupScreen = () => {
             isLoading={isFetchingPets}
             onPetAdded={handlePetAdded}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+      
+      {/* Botón fijo en la parte inferior */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#79D0B8] shadow-lg">
+        <div className="container mx-auto max-w-md">
+          <FinishSetupButton
+            onClick={() => handleProfileSubmit({
+              phoneNumber: '',  // Deberías obtener los valores reales del formulario aquí
+              address: ''
+            })}
+            disabled={!isFormValid || isUploadingImage}
+          />
+        </div>
+      </div>
     </div>
   );
 };

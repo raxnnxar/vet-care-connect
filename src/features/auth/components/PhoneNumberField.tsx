@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/ui/atoms/input';
 
-export interface PhoneNumberFieldProps {
+interface PhoneNumberFieldProps {
   value: string;
   onChange: (value: string) => void;
   label: string;
@@ -10,32 +10,36 @@ export interface PhoneNumberFieldProps {
   helpText?: string;
 }
 
-const PhoneNumberField = ({
+const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
   value,
   onChange,
   label,
   placeholder,
-  helpText
-}: PhoneNumberFieldProps) => {
+  helpText,
+}) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow numbers and basic phone formatting characters
-    const formattedValue = e.target.value.replace(/[^\d+\-() ]/g, '');
-    onChange(formattedValue);
+    let inputValue = e.target.value;
+    
+    // Filter non-numeric characters
+    inputValue = inputValue.replace(/[^0-9]/g, '');
+    
+    onChange(inputValue);
   };
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label htmlFor="phoneNumber" className="block text-white font-medium">
+        {label}
+      </label>
       <Input
+        id="phoneNumber"
         type="tel"
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className="w-full p-2 border rounded"
+        className="bg-white/90 border-white"
       />
-      {helpText && (
-        <p className="text-xs text-gray-500">{helpText}</p>
-      )}
+      {helpText && <p className="text-white/80 text-sm">{helpText}</p>}
     </div>
   );
 };

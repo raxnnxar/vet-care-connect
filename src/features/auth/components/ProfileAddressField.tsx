@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/ui/atoms/input';
 
-export interface ProfileAddressFieldProps {
+interface ProfileAddressFieldProps {
   value: string;
   onChange: (value: string) => void;
   label: string;
@@ -10,30 +10,27 @@ export interface ProfileAddressFieldProps {
   helpText?: string;
 }
 
-const ProfileAddressField = ({
+const ProfileAddressField: React.FC<ProfileAddressFieldProps> = ({
   value,
   onChange,
   label,
   placeholder,
-  helpText
-}: ProfileAddressFieldProps) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
-  };
-
+  helpText,
+}) => {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label htmlFor="address" className="block text-white font-medium">
+        {label}
+      </label>
       <Input
+        id="address"
         type="text"
         value={value}
-        onChange={handleChange}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full"
+        className="bg-white/90 border-white"
       />
-      {helpText && (
-        <p className="text-xs text-gray-500">{helpText}</p>
-      )}
+      {helpText && <p className="text-white/80 text-sm">{helpText}</p>}
     </div>
   );
 };

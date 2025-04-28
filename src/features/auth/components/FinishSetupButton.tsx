@@ -14,8 +14,8 @@ const FinishSetupButton = ({ onClick, disabled = false }: FinishSetupButtonProps
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "w-full py-3 text-white transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]",
-        disabled ? "bg-gray-400" : "bg-[#79D0B8] hover:bg-[#5FBFB3]"
+        "w-full py-3 text-[#79D0B8] bg-white transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]",
+        disabled ? "bg-gray-200 text-gray-400" : ""
       )}
     >
       Finalizar configuración

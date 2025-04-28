@@ -78,7 +78,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">Tus mascotas</h3>
+      <h3 className="text-lg font-medium text-white">Tus mascotas</h3>
       
       <PetList 
         pets={pets} 
