@@ -35,6 +35,9 @@ interface MedicalFormValues {
 
 const MedicalForm: React.FC<MedicalFormProps> = ({ pet, onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingDocument, setUploadingDocument] = useState(false);
+  const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const { uploadVaccineDoc, updatePet } = usePets();
   
   const { register, handleSubmit, control } = useForm<MedicalFormValues>({
@@ -52,25 +55,46 @@ const MedicalForm: React.FC<MedicalFormProps> = ({ pet, onClose, onSuccess }) =>
   const { fields: surgeryFields, append: appendSurgery, remove: removeSurgery } = 
     useFieldArray({ control, name: "surgeries" });
 
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) {
+      setUploadError('No se seleccionó ningún archivo');
+      return;
+    }
+
+    const file = files[0];
+    const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+    
+    if (file.size > maxSizeInBytes) {
+      setUploadError('El archivo es demasiado grande. Máximo 5MB.');
+      return;
+    }
+
+    setUploadingDocument(true);
+    setUploadError(null);
+    
+    try {
+      const documentUrl = await uploadVaccineDoc(pet.id, file);
+      if (documentUrl) {
+        setUploadedDocumentUrl(documentUrl);
+      } else {
+        setUploadError('Error al subir el documento');
+      }
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      setUploadError('Error al subir el documento');
+    } finally {
+      setUploadingDocument(false);
+    }
+  };
+
   const onSubmit = async (data: MedicalFormValues) => {
     try {
       setIsSubmitting(true);
       
-      let vaccineDocumentUrl = null;
-      
-      // Handle vaccine document upload if present
-      if (data.vaccineDocument?.[0]) {
-        vaccineDocumentUrl = await uploadVaccineDoc(pet.id, data.vaccineDocument[0]);
-        if (!vaccineDocumentUrl) {
-          toast.error('Error al subir el documento de vacunas');
-          return;
-        }
-      }
-
       // Format data for medical history update
       const medicalHistory = {
         pet_id: pet.id,
-        vaccines_document_url: vaccineDocumentUrl,
+        vaccines_document_url: uploadedDocumentUrl,
         current_medications: data.medications.filter(m => m.name.trim() !== ''),
         previous_surgeries: data.surgeries.filter(s => s.type.trim() !== ''),
         allergies: data.allergies,
@@ -93,7 +117,12 @@ const MedicalForm: React.FC<MedicalFormProps> = ({ pet, onClose, onSuccess }) =>
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-4">
-        <VaccineUploadSection register={register} />
+        <VaccineUploadSection
+          onFileUpload={handleFileUpload}
+          uploadingDocument={uploadingDocument}
+          uploadedDocumentUrl={uploadedDocumentUrl}
+          uploadError={uploadError}
+        />
         
         <MedicationsSection
           medicationFields={medicationFields}
