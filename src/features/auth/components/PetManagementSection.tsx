@@ -6,6 +6,7 @@ import AddPetButton from './AddPetButton';
 import PetList from './PetList';
 import { toast } from 'sonner';
 import { usePets } from '@/features/pets/hooks';
+import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
 import {
   Dialog,
   DialogContent,
@@ -29,8 +30,8 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
 }) => {
   const [showPetForm, setShowPetForm] = useState(false);
   const [isSubmittingPet, setIsSubmittingPet] = useState(false);
-  const [showMedicalInfoDialog, setShowMedicalInfoDialog] = useState(false);
   const [lastCreatedPet, setLastCreatedPet] = useState<Pet | null>(null);
+  const [showMedicalDialog, setShowMedicalDialog] = useState(false);
   const { createPet } = usePets();
 
   const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
@@ -54,15 +55,16 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
       console.log('Pet created successfully:', newPet);
       
       // Store the created pet to reference in the medical dialog
-      setLastCreatedPet(newPet as Pet);
-      onPetAdded(newPet as Pet);
+      const petObj = newPet as Pet;
+      setLastCreatedPet(petObj);
+      onPetAdded(petObj);
       setShowPetForm(false);
       
       // Show the medical info dialog
-      setShowMedicalInfoDialog(true);
+      setShowMedicalDialog(true);
       
       toast.success('Mascota agregada con éxito');
-      return newPet as Pet;
+      return petObj;
     } catch (error) {
       console.error('Error al agregar la mascota:', error);
       toast.error('Error al agregar la mascota');
@@ -72,19 +74,14 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     }
   };
 
-  const handleGoToMedicalInfo = () => {
-    setShowMedicalInfoDialog(false);
-    // Here we'd normally navigate to the medical info screen or show the medical info form
-    // For profile setup, we'll show the medical info form directly
-    if (lastCreatedPet) {
-      // We'll leave the medical form logic to PetForm component which will show the medical form
-      // after pet creation in step === 'medical'
-      setLastCreatedPet(null);
-    }
+  const handleShowMedicalForm = () => {
+    console.log("Opening medical dialog for pet:", lastCreatedPet);
+    setShowMedicalDialog(true);
   };
 
-  const handleSkipMedicalInfo = () => {
-    setShowMedicalInfoDialog(false);
+  const handleCloseMedicalDialog = () => {
+    console.log("Closing medical dialog");
+    setShowMedicalDialog(false);
     setLastCreatedPet(null);
   };
 
@@ -118,7 +115,12 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
         </div>
       )}
 
-      <Dialog open={showMedicalInfoDialog} onOpenChange={setShowMedicalInfoDialog}>
+      {/* Success dialog after adding a pet */}
+      <Dialog open={!!lastCreatedPet && !showMedicalDialog} onOpenChange={(open) => {
+        if (!open) {
+          setLastCreatedPet(null);
+        }
+      }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>¡Mascota agregada con éxito!</DialogTitle>
@@ -130,20 +132,29 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
             <Button 
               variant="default" 
               className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
-              onClick={handleGoToMedicalInfo}
+              onClick={handleShowMedicalForm}
             >
               Agregar información médica
             </Button>
             <Button 
               variant="outline" 
               className="w-full" 
-              onClick={handleSkipMedicalInfo}
+              onClick={() => setLastCreatedPet(null)}
             >
               Omitir por ahora
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Medical form dialog */}
+      {lastCreatedPet && (
+        <MedicalDialog
+          pet={lastCreatedPet}
+          open={showMedicalDialog}
+          onClose={handleCloseMedicalDialog}
+        />
+      )}
     </div>
   );
 };
