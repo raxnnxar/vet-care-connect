@@ -17,26 +17,12 @@ import MedicationsSection from './MedicationsSection';
 import SurgeriesSection from './SurgeriesSection';
 import MedicalConditionsSection from './MedicalConditionsSection';
 import MedicalDialogHeader from './MedicalDialogHeader';
+import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface MedicalDialogProps {
   pet: Pet;
   onClose: () => void;
   open: boolean;
-}
-
-interface MedicalFormValues {
-  vaccineDocument?: FileList;
-  medications: Array<{
-    name: string;
-    dosage: string;
-    frequency: string;
-  }>;
-  surgeries: Array<{
-    type: string;
-    date: string;
-  }>;
-  allergies: string;
-  chronicConditions: string;
 }
 
 const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => {

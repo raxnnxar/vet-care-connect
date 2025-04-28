@@ -4,12 +4,13 @@ import { Plus, Minus } from 'lucide-react';
 import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { Button } from '@/ui/atoms/button';
-import { UseFieldArrayReturn } from 'react-hook-form';
+import { UseFieldArrayReturn, useFieldArray } from 'react-hook-form';
+import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface MedicationsSectionProps {
   medicationFields: any[];
-  appendMedication: UseFieldArrayReturn['append'];
-  removeMedication: UseFieldArrayReturn['remove'];
+  appendMedication: UseFieldArrayReturn<MedicalFormValues, "medications">['append'];
+  removeMedication: UseFieldArrayReturn<MedicalFormValues, "medications">['remove'];
   register: any;
 }
 

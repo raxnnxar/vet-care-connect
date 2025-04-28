@@ -2,9 +2,11 @@
 import React from 'react';
 import { Label } from '@/ui/atoms/label';
 import { Textarea } from '@/ui/atoms/textarea';
+import { UseFormRegister } from 'react-hook-form';
+import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface MedicalConditionsSectionProps {
-  register: any;
+  register: UseFormRegister<MedicalFormValues>;
 }
 
 const MedicalConditionsSection = ({ register }: MedicalConditionsSectionProps) => {

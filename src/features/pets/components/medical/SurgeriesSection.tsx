@@ -5,11 +5,12 @@ import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { Button } from '@/ui/atoms/button';
 import { UseFieldArrayReturn } from 'react-hook-form';
+import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface SurgeriesSectionProps {
   surgeryFields: any[];
-  appendSurgery: UseFieldArrayReturn['append'];
-  removeSurgery: UseFieldArrayReturn['remove'];
+  appendSurgery: UseFieldArrayReturn<MedicalFormValues, "surgeries">['append'];
+  removeSurgery: UseFieldArrayReturn<MedicalFormValues, "surgeries">['remove'];
   register: any;
 }
 
