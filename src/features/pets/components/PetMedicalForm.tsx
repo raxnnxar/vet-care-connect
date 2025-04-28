@@ -4,8 +4,6 @@ import { Syringe } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Pet } from '../types';
 import MedicalDialog from './medical/MedicalDialog';
-import { Alert, AlertTitle, AlertDescription } from '@/ui/molecules/alert';
-import { Check } from 'lucide-react';
 
 interface PetMedicalFormProps {
   pet: Pet;
@@ -23,16 +21,6 @@ const PetMedicalForm: React.FC<PetMedicalFormProps> = ({ pet, onComplete, onSkip
 
   return (
     <>
-      <div className="text-center mb-6">
-        <Alert variant="success" className="mb-4">
-          <Check className="h-4 w-4" />
-          <AlertTitle>¡Mascota agregada con éxito!</AlertTitle>
-          <AlertDescription>
-            ¿Deseas agregar información médica para {pet.name}?
-          </AlertDescription>
-        </Alert>
-      </div>
-
       <div className="flex flex-col sm:flex-row gap-3 justify-center pt-6">
         <Button 
           type="button" 
@@ -41,14 +29,6 @@ const PetMedicalForm: React.FC<PetMedicalFormProps> = ({ pet, onComplete, onSkip
         >
           <Syringe className="h-4 w-4" />
           Agregar información médica
-        </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onSkip}
-          className="w-full text-center"
-        >
-          Ahora no
         </Button>
       </div>
 

@@ -80,7 +80,6 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
         <DialogHeader className="mb-4">
           <MedicalDialogHeader 
             petName={pet.name}
-            onSkipMedical={onClose}
           />
         </DialogHeader>
 
