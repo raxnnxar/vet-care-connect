@@ -1,101 +1,95 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
 import PetForm from '@/features/pets/components/PetForm';
-import PetListItem from '@/features/pets/components/PetListItem';
+import PetList from '@/features/auth/components/PetList';
 import PetDetailModal from '@/features/pets/components/PetDetailModal';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/ui/molecules/dialog';
+import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
+import { usePets } from '@/features/pets/hooks';
 
 interface PetManagementSectionProps {
-  userPets: Pet[];
-  handlePetClick: (pet: Pet) => void;
-  handlePetUpdate: (petData: any) => Promise<Pet | null>;
-  handlePetFormSubmit: (petData: any) => Promise<Pet | null>;
-  selectedPet: Pet | null;
-  setSelectedPet: (pet: Pet | null) => void;
-  editingPet: Pet | null;
-  setEditingPet: (pet: Pet | null) => void;
-  showPetForm: boolean;
-  setShowPetForm: (show: boolean) => void;
+  pets: Pet[];
+  isLoading: boolean;
+  onPetAdded: (pet: Pet) => void;
 }
 
 const PetManagementSection: React.FC<PetManagementSectionProps> = ({
-  userPets,
-  handlePetClick,
-  handlePetUpdate,
-  handlePetFormSubmit,
-  selectedPet,
-  setSelectedPet,
-  editingPet,
-  setEditingPet,
-  showPetForm,
-  setShowPetForm,
+  pets,
+  isLoading,
+  onPetAdded,
 }) => {
-  const [showMedicalInfoDialog, setShowMedicalInfoDialog] = useState(false);
+  const [showPetForm, setShowPetForm] = useState(false);
+  const [showMedicalDialog, setShowMedicalDialog] = useState(false);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [lastCreatedPet, setLastCreatedPet] = useState<Pet | null>(null);
+  const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const { createPet, updatePet } = usePets();
 
-  const handleFormSubmit = async (petData: any): Promise<Pet | null> => {
+  const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
     try {
-      const result = await handlePetFormSubmit(petData);
-      
-      if (result) {
-        // Only show the dialog for new pets, not for edits
-        if (!editingPet) {
-          setLastCreatedPet(result);
-          setShowMedicalInfoDialog(true);
-        }
+      if (!petData) {
+        toast.error('Datos de mascota inválidos');
+        return null;
       }
       
-      return result;
+      const newPet = await createPet(petData);
+      
+      if (!newPet) {
+        toast.error('Error al crear la mascota');
+        return null;
+      }
+      
+      setLastCreatedPet(newPet as Pet);
+      onPetAdded(newPet as Pet);
+      setShowPetForm(false);
+      setShowMedicalDialog(true);
+      
+      toast.success('Mascota agregada con éxito');
+      return newPet as Pet;
     } catch (error) {
-      console.error('Error submitting pet form:', error);
+      console.error('Error al agregar la mascota:', error);
+      toast.error('Error al agregar la mascota');
       return null;
     }
   };
 
-  const handleGoToMedicalInfo = () => {
-    setShowMedicalInfoDialog(false);
-    if (lastCreatedPet) {
-      // In a real implementation, this would navigate to the medical screen
-      // or show the medical form for the pet
-      setEditingPet(lastCreatedPet);
-      setShowPetForm(true); // This would ideally navigate to a medical-specific form instead
-      setLastCreatedPet(null);
+  const handlePetUpdate = async (petData: any): Promise<Pet | null> => {
+    try {
+      if (!petData || !petData.id) {
+        toast.error('Datos de mascota inválidos');
+        return null;
+      }
+      
+      const updatedPet = await updatePet(petData.id, petData);
+      
+      if (!updatedPet) {
+        toast.error('Error al actualizar la mascota');
+        return null;
+      }
+      
+      toast.success('Mascota actualizada con éxito');
+      return updatedPet as Pet;
+    } catch (error) {
+      console.error('Error al actualizar la mascota:', error);
+      toast.error('Error al actualizar la mascota');
+      return null;
     }
   };
 
-  const handleSkipMedicalInfo = () => {
-    setShowMedicalInfoDialog(false);
-    setLastCreatedPet(null);
+  const handlePetClick = (pet: Pet) => {
+    setSelectedPet(pet);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-      <h3 className="text-lg font-medium mb-4">Mis Mascotas</h3>
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Tus mascotas</h3>
       
-      {userPets.length > 0 ? (
-        <div className="grid gap-4">
-          {userPets.map(pet => (
-            <PetListItem 
-              key={pet.id} 
-              pet={pet}
-              onClick={handlePetClick}
-            />
-          ))}
-        </div>
-      ) : (
-        <p className="text-center text-gray-500">No tienes mascotas registradas</p>
-      )}
-
+      <PetList 
+        pets={pets} 
+        isLoading={isLoading} 
+      />
+      
       <Button 
         variant="outline" 
         className="w-full mt-4"
@@ -107,15 +101,6 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
         Añadir mascota
       </Button>
 
-      {selectedPet && (
-        <PetDetailModal
-          pet={selectedPet}
-          isOpen={!!selectedPet}
-          onClose={() => setSelectedPet(null)}
-          onPetUpdate={handlePetUpdate}
-        />
-      )}
-
       {showPetForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-lg transform transition-all animate-scale-in">
@@ -126,7 +111,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
               <PetForm
                 mode={editingPet ? 'edit' : 'create'}
                 pet={editingPet}
-                onSubmit={handleFormSubmit}
+                onSubmit={handlePetSubmit}
                 isSubmitting={false}
                 onCancel={() => {
                   setShowPetForm(false);
@@ -138,32 +123,25 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
         </div>
       )}
 
-      <Dialog open={showMedicalInfoDialog} onOpenChange={setShowMedicalInfoDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>¡Mascota agregada con éxito!</DialogTitle>
-            <DialogDescription>
-              ¿Deseas agregar información médica para tu mascota ahora?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex flex-col sm:flex-row sm:justify-center gap-2">
-            <Button 
-              variant="default"
-              className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
-              onClick={handleGoToMedicalInfo}
-            >
-              Agregar información médica
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={handleSkipMedicalInfo}
-            >
-              Omitir por ahora
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {lastCreatedPet && (
+        <MedicalDialog
+          pet={lastCreatedPet}
+          open={showMedicalDialog}
+          onClose={() => {
+            setShowMedicalDialog(false);
+            setLastCreatedPet(null);
+          }}
+        />
+      )}
+
+      {selectedPet && (
+        <PetDetailModal
+          pet={selectedPet}
+          isOpen={!!selectedPet}
+          onClose={() => setSelectedPet(null)}
+          onPetUpdate={handlePetUpdate}
+        />
+      )}
     </div>
   );
 };
