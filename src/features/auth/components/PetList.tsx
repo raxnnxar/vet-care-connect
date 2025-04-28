@@ -48,9 +48,7 @@ const PetList: React.FC<PetListProps> = ({ pets, isLoading }) => {
           <div>
             <h4 className="font-medium text-gray-800">{pet.name}</h4>
             <p className="text-sm text-gray-500">
-              {pet.species === 'custom'
-                ? pet.custom_species
-                : pet.species}
+              {pet.species}
             </p>
           </div>
         </div>
