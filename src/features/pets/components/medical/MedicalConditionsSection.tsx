@@ -12,26 +12,24 @@ const MedicalConditionsSection = ({ register }: MedicalConditionsSectionProps) =
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="allergies" className="font-medium text-base">
+        <Label htmlFor="allergies">
           Alergias
         </Label>
         <Textarea
           id="allergies"
+          placeholder="Alergias conocidas"
           {...register('allergies')}
-          placeholder="Alergias conocidas del animal"
-          className="min-h-[80px]"
         />
       </div>
-      
+
       <div className="space-y-2">
-        <Label htmlFor="chronicConditions" className="font-medium text-base">
+        <Label htmlFor="chronicConditions">
           Condiciones crónicas
         </Label>
         <Textarea
           id="chronicConditions"
-          {...register('chronicConditions')}
           placeholder="Condiciones médicas crónicas"
-          className="min-h-[80px]"
+          {...register('chronicConditions')}
         />
       </div>
     </>

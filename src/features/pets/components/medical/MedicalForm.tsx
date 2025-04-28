@@ -1,14 +1,16 @@
 
 import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Stethoscope, Plus, Minus, Upload } from 'lucide-react';
+import { Stethoscope } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
-import { Input } from '@/ui/atoms/input';
-import { Label } from '@/ui/atoms/label';
-import { Textarea } from '@/ui/atoms/textarea';
 import { toast } from 'sonner';
 import { Pet } from '../../types';
 import { usePets } from '../../hooks';
+import MedicationsSection from './MedicationsSection';
+import SurgeriesSection from './SurgeriesSection';
+import MedicalConditionsSection from './MedicalConditionsSection';
+import VaccineUploadSection from './VaccineUploadSection';
+import { DialogFooter } from '@/ui/molecules/dialog';
 
 interface MedicalFormProps {
   pet: Pet;
@@ -33,9 +35,9 @@ interface MedicalFormValues {
 
 const MedicalForm: React.FC<MedicalFormProps> = ({ pet, onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { updatePet, uploadVaccineDoc } = usePets();
-
-  const { register, handleSubmit, control, formState: { errors } } = useForm<MedicalFormValues>({
+  const { uploadVaccineDoc, updatePet } = usePets();
+  
+  const { register, handleSubmit, control } = useForm<MedicalFormValues>({
     defaultValues: {
       medications: [{ name: '', dosage: '', frequency: '' }],
       surgeries: [{ type: '', date: '' }],
@@ -89,114 +91,31 @@ const MedicalForm: React.FC<MedicalFormProps> = ({ pet, onClose, onSuccess }) =>
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-4">
-        <div>
-          <Label htmlFor="vaccineDocument">Documento de vacunas</Label>
-          <div className="flex items-center gap-2 mt-1">
-            <Input
-              id="vaccineDocument"
-              type="file"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-              {...register('vaccineDocument')}
-            />
-            <Upload className="h-4 w-4 text-gray-500" />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Medicamentos actuales</Label>
-          {medicationFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2">
-              <Input
-                placeholder="Nombre"
-                {...register(`medications.${index}.name`)}
-              />
-              <Input
-                placeholder="Dosis"
-                {...register(`medications.${index}.dosage`)}
-              />
-              <Input
-                placeholder="Frecuencia"
-                {...register(`medications.${index}.frequency`)}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removeMedication(index)}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => appendMedication({ name: '', dosage: '', frequency: '' })}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Agregar medicamento
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Cirugías previas</Label>
-          {surgeryFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2">
-              <Input
-                placeholder="Tipo de cirugía"
-                {...register(`surgeries.${index}.type`)}
-              />
-              <Input
-                type="date"
-                {...register(`surgeries.${index}.date`)}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removeSurgery(index)}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => appendSurgery({ type: '', date: '' })}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Agregar cirugía
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="allergies">Alergias</Label>
-          <Textarea
-            id="allergies"
-            placeholder="Alergias conocidas"
-            {...register('allergies')}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="chronicConditions">Condiciones crónicas</Label>
-          <Textarea
-            id="chronicConditions"
-            placeholder="Condiciones médicas crónicas"
-            {...register('chronicConditions')}
-          />
-        </div>
+        <VaccineUploadSection register={register} />
+        
+        <MedicationsSection
+          medicationFields={medicationFields}
+          register={register}
+          append={appendMedication}
+          remove={removeMedication}
+        />
+        
+        <MedicalConditionsSection register={register} />
+        
+        <SurgeriesSection
+          surgeryFields={surgeryFields}
+          register={register}
+          append={appendSurgery}
+          remove={removeSurgery}
+        />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4">
+      <DialogFooter className="flex flex-col sm:flex-row gap-3">
         <Button 
           type="submit" 
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
           disabled={isSubmitting}
         >
           <Stethoscope className="h-4 w-4 mr-2" />
@@ -208,9 +127,9 @@ const MedicalForm: React.FC<MedicalFormProps> = ({ pet, onClose, onSuccess }) =>
           onClick={onClose}
           className="w-full sm:w-auto"
         >
-          Cancelar
+          Omitir por ahora
         </Button>
-      </div>
+      </DialogFooter>
     </form>
   );
 };
