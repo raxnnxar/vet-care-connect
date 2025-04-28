@@ -4,14 +4,14 @@ import { Plus, Minus } from 'lucide-react';
 import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { Button } from '@/ui/atoms/button';
-import { UseFieldArrayReturn, useFieldArray } from 'react-hook-form';
+import { UseFormRegister, UseFieldArrayReturn } from 'react-hook-form';
 import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface MedicationsSectionProps {
   medicationFields: any[];
   appendMedication: UseFieldArrayReturn<MedicalFormValues, "medications">['append'];
   removeMedication: UseFieldArrayReturn<MedicalFormValues, "medications">['remove'];
-  register: any;
+  register: UseFormRegister<MedicalFormValues>;
 }
 
 const MedicationsSection = ({ 
@@ -24,7 +24,7 @@ const MedicationsSection = ({
     <div className="space-y-2">
       <Label className="font-medium text-base">Medicamentos actuales</Label>
       {medicationFields.map((field, index) => (
-        <div key={field.id} className="flex gap-2">
+        <div key={field.id} className="grid grid-cols-3 gap-2 mb-2">
           <Input
             placeholder="Nombre"
             {...register(`medications.${index}.name`)}
@@ -33,18 +33,21 @@ const MedicationsSection = ({
             placeholder="Dosis"
             {...register(`medications.${index}.dosage`)}
           />
-          <Input
-            placeholder="Frecuencia"
-            {...register(`medications.${index}.frequency`)}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => removeMedication(index)}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
+          <div className="flex">
+            <Input
+              placeholder="Frecuencia"
+              {...register(`medications.${index}.frequency`)}
+              className="flex-grow"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => removeMedication(index)}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       ))}
       <Button

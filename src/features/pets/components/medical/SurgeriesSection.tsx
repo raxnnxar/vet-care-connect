@@ -4,14 +4,14 @@ import { Plus, Minus } from 'lucide-react';
 import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { Button } from '@/ui/atoms/button';
-import { UseFieldArrayReturn } from 'react-hook-form';
+import { UseFormRegister, UseFieldArrayReturn } from 'react-hook-form';
 import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface SurgeriesSectionProps {
   surgeryFields: any[];
   appendSurgery: UseFieldArrayReturn<MedicalFormValues, "surgeries">['append'];
   removeSurgery: UseFieldArrayReturn<MedicalFormValues, "surgeries">['remove'];
-  register: any;
+  register: UseFormRegister<MedicalFormValues>;
 }
 
 const SurgeriesSection = ({ 

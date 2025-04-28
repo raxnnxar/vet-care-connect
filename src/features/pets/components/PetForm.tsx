@@ -1,32 +1,22 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ScrollArea } from '@/ui/molecules/scroll-area';
-import { Button } from '@/ui/atoms/button';
-import { Label } from '@/ui/atoms/label';
-import { Textarea } from '@/ui/atoms/textarea';
-import { PetFormProps } from '@/features/pets/types/PetFormProps';
 import { Pet } from '@/features/pets/types';
 import PetPhotoUpload from './PetPhotoUpload';
 import PetBasicInfo, { speciesMapping } from './PetBasicInfo';
-import PetMedicalForm from './PetMedicalForm';
 import { PET_CATEGORIES, PET_GENDER } from '@/core/constants/app.constants';
 import { toast } from 'sonner';
+import { PetFormProps } from '@/features/pets/types/PetFormProps';
+import { PetFormValues } from '@/features/pets/types/formTypes';
+import FormActionButtons from './form/FormActionButtons';
+import FormSteps from './form/FormSteps';
+import NotesSection from './form/NotesSection';
 
 export const genderMapping = {
   'Macho': PET_GENDER.MALE,
   'Hembra': PET_GENDER.FEMALE,
 };
-
-interface PetFormValues {
-  name: string;
-  species: string;
-  customSpecies?: string;
-  age?: number;
-  weight?: number;
-  sex: string;
-  temperament: string;
-  additionalNotes: string;
-}
 
 const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, onCancel }) => {
   const [step, setStep] = useState<'basic' | 'medical'>('basic');
@@ -156,14 +146,9 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
     }
   };
 
+  // If we're on the medical step, render the medical form
   if (step === 'medical' && createdPet) {
-    return (
-      <PetMedicalForm
-        pet={createdPet}
-        onComplete={onCancel}
-        onSkip={onCancel}
-      />
-    );
+    return <FormSteps step={step} createdPet={createdPet} onComplete={onCancel || (() => {})} />;
   }
 
   return (
@@ -181,39 +166,12 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
           selectedSpecies={selectedSpecies}
         />
         
-        <div className="space-y-2">
-          <Label htmlFor="additionalNotes" className="font-medium text-base">
-            Notas adicionales
-          </Label>
-          <Textarea
-            id="additionalNotes"
-            {...register('additionalNotes')}
-            placeholder="Información adicional relevante sobre tu mascota"
-            className="min-h-[100px]"
-          />
-        </div>
+        <NotesSection register={register} />
         
-        <div className="sticky bottom-0 pt-4 bg-white bg-opacity-95 mt-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button 
-              type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 text-white py-4 px-6 text-base font-medium"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Guardando...' : 'Guardar y continuar'}
-            </Button>
-            {onCancel && (
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="w-full text-center"
-                onClick={onCancel}
-              >
-                Cancelar
-              </Button>
-            )}
-          </div>
-        </div>
+        <FormActionButtons 
+          isSubmitting={isSubmitting} 
+          onCancel={onCancel}
+        />
       </form>
     </ScrollArea>
   );
