@@ -147,7 +147,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Medical form dialog */}
+      {/* Medical Dialog */}
       {lastCreatedPet && (
         <MedicalDialog
           pet={lastCreatedPet}
