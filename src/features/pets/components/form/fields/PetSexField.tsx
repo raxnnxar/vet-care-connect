@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui/molecules/select';
-import { Control } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 import { PetFormValues } from '@/features/pets/types/formTypes';
 
 interface PetSexFieldProps {

@@ -13,6 +13,7 @@ import { PET_CATEGORIES } from '@/core/constants/app.constants';
 import { Controller, Control, FieldErrors } from 'react-hook-form';
 import { PetFormValues } from '@/features/pets/types/formTypes';
 
+// Define speciesMapping only once
 export const speciesMapping = {
   'Perro': PET_CATEGORIES.DOG,
   'Gato': PET_CATEGORIES.CAT,
@@ -101,4 +102,4 @@ const PetSpeciesField: React.FC<PetSpeciesFieldProps> = ({ control, errors }) =>
 };
 
 export default PetSpeciesField;
-export { speciesMapping };
+// Remove the duplicate export { speciesMapping }; line that was here
