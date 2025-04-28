@@ -25,6 +25,7 @@ const OwnerProfileScreen = () => {
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const { getCurrentUserPets, createPet, updatePet } = usePets();
   const [userPets, setUserPets] = useState<Pet[]>([]);
+  const [isLoadingPets, setIsLoadingPets] = useState(true); // Add loading state
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -45,6 +46,7 @@ const OwnerProfileScreen = () => {
           setEditedAddress(data.address || '');
         }
 
+        setIsLoadingPets(true); // Start loading pets
         try {
           const petsResult = await getCurrentUserPets();
           
@@ -54,6 +56,8 @@ const OwnerProfileScreen = () => {
         } catch (error) {
           console.error('Error fetching pets:', error);
           setUserPets([]);
+        } finally {
+          setIsLoadingPets(false); // End loading regardless of result
         }
       }
     };
@@ -147,6 +151,11 @@ const OwnerProfileScreen = () => {
     }
   };
 
+  // Handler for when a pet is added - update userPets array
+  const handlePetAdded = (pet: Pet) => {
+    setUserPets(prev => [...prev, pet]);
+  };
+
   return (
     <LayoutBase
       header={
@@ -176,6 +185,9 @@ const OwnerProfileScreen = () => {
         />
 
         <PetManagementSection
+          pets={userPets}
+          isLoading={isLoadingPets}
+          onPetAdded={handlePetAdded}
           userPets={userPets}
           handlePetClick={handlePetClick}
           handlePetUpdate={handlePetUpdate}

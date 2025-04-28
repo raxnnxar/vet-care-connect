@@ -10,11 +10,12 @@ import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
 import { usePets } from '@/features/pets/hooks';
 
 interface PetManagementSectionProps {
-  pets: Pet[];
-  isLoading: boolean;
-  onPetAdded: (pet: Pet) => void;
+  // These are now optional because they can be provided as direct props or through userPets
+  pets?: Pet[];
+  isLoading?: boolean;
+  onPetAdded?: (pet: Pet) => void;
   
-  // These are the properties that are being passed in OwnerProfileScreen but not defined here
+  // Optional properties specific to the OwnerProfileScreen usage
   userPets?: Pet[];
   handlePetClick?: (pet: Pet) => void;
   handlePetUpdate?: (petData: any) => Promise<Pet | null>;
@@ -28,9 +29,9 @@ interface PetManagementSectionProps {
 }
 
 const PetManagementSection: React.FC<PetManagementSectionProps> = ({
-  pets,
-  isLoading,
-  onPetAdded,
+  pets = [],
+  isLoading = false,
+  onPetAdded = () => {},
   userPets,
   handlePetClick,
   handlePetUpdate,
