@@ -16,6 +16,8 @@ import {
   DialogFooter,
 } from '@/ui/molecules/dialog';
 import { Button } from '@/ui/atoms/button';
+import { Alert, AlertTitle, AlertDescription } from '@/ui/molecules/alert';
+import { Check } from 'lucide-react';
 
 interface PetManagementSectionProps {
   pets: Pet[];
@@ -32,6 +34,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   const [isSubmittingPet, setIsSubmittingPet] = useState(false);
   const [lastCreatedPet, setLastCreatedPet] = useState<Pet | null>(null);
   const [showMedicalDialog, setShowMedicalDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { createPet } = usePets();
 
   const handlePetSubmit = async (petData: any): Promise<Pet | null> => {
@@ -60,8 +63,8 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
       onPetAdded(petObj);
       setShowPetForm(false);
       
-      // Show the medical info dialog
-      setShowMedicalDialog(true);
+      // Show the success dialog
+      setShowSuccessDialog(true);
       
       toast.success('Mascota agregada con éxito');
       return petObj;
@@ -76,12 +79,18 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
 
   const handleShowMedicalForm = () => {
     console.log("Opening medical dialog for pet:", lastCreatedPet);
+    setShowSuccessDialog(false);
     setShowMedicalDialog(true);
   };
 
   const handleCloseMedicalDialog = () => {
     console.log("Closing medical dialog");
     setShowMedicalDialog(false);
+    setLastCreatedPet(null);
+  };
+  
+  const handleSkipMedical = () => {
+    setShowSuccessDialog(false);
     setLastCreatedPet(null);
   };
 
@@ -116,34 +125,33 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
       )}
 
       {/* Success dialog after adding a pet */}
-      <Dialog open={!!lastCreatedPet && !showMedicalDialog} onOpenChange={(open) => {
-        if (!open) {
-          setLastCreatedPet(null);
-        }
-      }}>
-        <DialogContent>
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>¡Mascota agregada con éxito!</DialogTitle>
-            <DialogDescription>
-              ¿Deseas agregar información médica para tu mascota ahora?
-            </DialogDescription>
+            <Alert variant="success" className="mb-4">
+              <Check className="h-4 w-4" />
+              <AlertTitle>¡Mascota agregada con éxito!</AlertTitle>
+              <AlertDescription>
+                ¿Deseas agregar información médica para {lastCreatedPet?.name}?
+              </AlertDescription>
+            </Alert>
           </DialogHeader>
-          <DialogFooter className="flex flex-col sm:flex-row sm:justify-center gap-2">
+          <div className="flex flex-col items-center justify-center">
+            <Button 
+              variant="outline" 
+              onClick={handleSkipMedical}
+              className="w-full sm:w-auto mb-4"
+            >
+              Ahora no
+            </Button>
             <Button 
               variant="default" 
-              className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
+              className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
               onClick={handleShowMedicalForm}
             >
               Agregar información médica
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={() => setLastCreatedPet(null)}
-            >
-              Omitir por ahora
-            </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 

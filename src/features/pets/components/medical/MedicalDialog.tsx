@@ -10,13 +10,14 @@ import {
 } from '@/ui/molecules/dialog';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/ui/atoms/button';
-import { Syringe, Plus, Minus, FilePlus } from 'lucide-react';
+import { Syringe, Plus, Minus, FilePlus, Check } from 'lucide-react';
 import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { Textarea } from '@/ui/atoms/textarea';
 import { toast } from 'sonner';
 import { usePets } from '../../hooks';
 import { DialogFooter } from '@/ui/molecules/dialog';
+import { Alert, AlertTitle, AlertDescription } from '@/ui/molecules/alert';
 
 interface MedicalDialogProps {
   pet: Pet;
@@ -136,7 +137,23 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
+        <DialogHeader className="mb-4">
+          <Alert variant="success" className="mb-4">
+            <Check className="h-4 w-4" />
+            <AlertTitle>¡Mascota agregada con éxito!</AlertTitle>
+            <AlertDescription>
+              ¿Deseas agregar información médica para {pet.name}?
+            </AlertDescription>
+          </Alert>
+          
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            className="w-full sm:w-auto mx-auto mb-6"
+          >
+            Ahora no
+          </Button>
+          
           <DialogTitle>Información médica para {pet.name}</DialogTitle>
           <DialogDescription>
             Agrega información médica importante para tu mascota
@@ -150,7 +167,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
               Registro de vacunas
             </Label>
             <div className="flex flex-col gap-2">
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center hover:border-primary transition-colors">
                 <input
                   id="vaccineDocument"
                   type="file"
@@ -161,13 +178,13 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
                 />
                 <Label 
                   htmlFor="vaccineDocument" 
-                  className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
+                  className="cursor-pointer flex flex-col items-center gap-2 text-gray-500"
                 >
-                  <FilePlus className="h-8 w-8" />
-                  <span>
-                    {uploadingDocument ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}
+                  <FilePlus className="h-8 w-8 text-gray-400" />
+                  <span className="text-base">
+                    Subir documento de vacunas (PDF/Imagen)
                   </span>
-                  <span className="text-xs text-muted-foreground">Máximo 5MB</span>
+                  <span className="text-xs text-gray-400">Máximo 5MB</span>
                 </Label>
               </div>
               
@@ -195,7 +212,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
         
           {/* Medications Section */}
           <div className="space-y-2">
-            <Label>Medicamentos actuales</Label>
+            <Label className="font-medium text-base">Medicamentos actuales</Label>
             {medicationFields.map((field, index) => (
               <div key={field.id} className="flex gap-2">
                 <Input
@@ -224,38 +241,41 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
               type="button"
               variant="outline"
               onClick={() => appendMedication({ name: '', dosage: '', frequency: '' })}
+              className="flex items-center gap-2"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4" />
               Agregar medicamento
             </Button>
           </div>
           
           {/* Medical Conditions Section */}
           <div className="space-y-2">
-            <Label htmlFor="allergies">
+            <Label htmlFor="allergies" className="font-medium text-base">
               Alergias
             </Label>
             <Textarea
               id="allergies"
               placeholder="Alergias conocidas"
               {...register('allergies')}
+              className="min-h-24"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="chronicConditions">
+            <Label htmlFor="chronicConditions" className="font-medium text-base">
               Condiciones crónicas
             </Label>
             <Textarea
               id="chronicConditions"
               placeholder="Condiciones médicas crónicas"
               {...register('chronicConditions')}
+              className="min-h-24"
             />
           </div>
           
           {/* Surgeries Section */}
           <div className="space-y-2">
-            <Label>Cirugías previas</Label>
+            <Label className="font-medium text-base">Cirugías previas</Label>
             {surgeryFields.map((field, index) => (
               <div key={field.id} className="flex gap-2">
                 <Input
@@ -280,13 +300,14 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
               type="button"
               variant="outline"
               onClick={() => appendSurgery({ type: '', date: '' })}
+              className="flex items-center gap-2"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4" />
               Agregar cirugía
             </Button>
           </div>
 
-          <DialogFooter className="flex flex-col sm:flex-row gap-3">
+          <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button 
               type="submit" 
               className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
@@ -294,14 +315,6 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
             >
               <Syringe className="h-4 w-4 mr-2" />
               {isSubmitting ? 'Guardando...' : 'Guardar información médica'}
-            </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose}
-              className="w-full sm:w-auto"
-            >
-              Omitir por ahora
             </Button>
           </DialogFooter>
         </form>
