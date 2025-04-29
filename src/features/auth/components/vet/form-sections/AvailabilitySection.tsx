@@ -2,7 +2,6 @@
 import React from 'react';
 import { Control, Controller, FieldErrors, useFieldArray } from 'react-hook-form';
 import { VeterinarianProfile, DaySchedule } from '../../../types/veterinarianTypes';
-import { Label } from '@/ui/atoms/label';
 import { Switch } from '@/ui/atoms/switch';
 import {
   Select,
@@ -41,7 +40,9 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold mb-6">Disponibilidad</h2>
+      <p className="text-gray-500 text-sm">
+        Establece tu horario de disponibilidad para que los dueños de mascotas puedan programar citas contigo
+      </p>
       
       <div className="overflow-hidden bg-white rounded-lg border">
         <table className="min-w-full divide-y divide-gray-200">

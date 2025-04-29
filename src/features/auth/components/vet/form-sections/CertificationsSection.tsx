@@ -160,25 +160,21 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Certificaciones</h2>
-        <Button 
-          type="button" 
-          onClick={() => setIsDialogOpen(true)} 
-          variant="outline"
-          size="sm"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Añadir Certificación
-        </Button>
-      </div>
-
       {fields.length === 0 ? (
-        <div className="text-center p-6 border border-dashed rounded-lg bg-gray-50">
-          <p className="text-gray-500">
+        <div className="text-center p-8 border border-dashed rounded-lg bg-gray-50 flex flex-col items-center justify-center">
+          <p className="text-gray-500 mb-6">
             No has añadido ninguna certificación. 
             Las certificaciones muestran tu especialización y dedicación profesional.
           </p>
+          <Button 
+            type="button" 
+            onClick={() => setIsDialogOpen(true)} 
+            variant="outline"
+            className="mx-auto"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Añadir Certificación
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
@@ -283,6 +279,18 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({
               </CardFooter>
             </Card>
           ))}
+
+          <div className="flex justify-end mt-4">
+            <Button 
+              type="button" 
+              onClick={() => setIsDialogOpen(true)} 
+              variant="outline"
+              size="sm"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Añadir Certificación
+            </Button>
+          </div>
         </div>
       )}
 

@@ -1,5 +1,6 @@
 
 import React, { ReactNode } from 'react';
+import { Separator } from '@/ui/atoms/separator';
 
 interface FormSectionProps {
   title: string;
@@ -9,9 +10,8 @@ interface FormSectionProps {
 const FormSection: React.FC<FormSectionProps> = ({ title, children }) => {
   return (
     <div className="mb-12 pt-4 bg-white rounded-xl p-6 shadow-sm">
-      <div className="border-b border-gray-200 pb-3 mb-6">
-        <h3 className="text-2xl font-semibold text-gray-800">{title}</h3>
-      </div>
+      <h3 className="text-2xl font-semibold text-gray-800">{title}</h3>
+      <Separator className="my-4" />
       <div className="mt-6">
         {children}
       </div>

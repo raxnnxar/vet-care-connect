@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Control, Controller, FieldErrors, useFieldArray } from 'react-hook-form';
 import { VeterinarianProfile, ServiceOffered } from '../../../types/veterinarianTypes';
@@ -80,6 +81,10 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   return (
     <div className="space-y-6">
+      <p className="text-gray-500 text-sm">
+        Detalla los servicios veterinarios que ofreces para que los dueños de mascotas sepan qué esperar
+      </p>
+      
       {fields.length === 0 ? (
         <div className="text-center p-8 border border-dashed rounded-lg bg-gray-50 flex flex-col items-center justify-center">
           <p className="text-gray-500 mb-6">

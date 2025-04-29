@@ -34,17 +34,9 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-baseline">
-        <div>
-          <h3 className="text-xl font-semibold text-gray-800">Idiomas</h3>
-          <p className="text-gray-500 text-sm mt-1">
-            Selecciona los idiomas que hablas para que los dueños de mascotas puedan comunicarse contigo
-          </p>
-        </div>
-        {errors.languages_spoken && (
-          <p className="text-sm text-red-500">Debes seleccionar al menos un idioma</p>
-        )}
-      </div>
+      <p className="text-gray-500 text-sm">
+        Selecciona los idiomas que hablas para que los dueños de mascotas puedan comunicarse contigo
+      </p>
       
       <Controller
         name="languages_spoken"
@@ -125,6 +117,10 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                   </Command>
                 </PopoverContent>
               </Popover>
+
+              {errors.languages_spoken && (
+                <p className="text-sm text-red-500 mt-2">Debes seleccionar al menos un idioma</p>
+              )}
 
               <div className="flex flex-wrap gap-2 mt-4">
                 {languagesValue.map((langValue: string) => {

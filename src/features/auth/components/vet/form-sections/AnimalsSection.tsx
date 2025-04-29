@@ -34,17 +34,9 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-baseline">
-        <div>
-          <h3 className="text-xl font-semibold text-gray-800">Animales</h3>
-          <p className="text-gray-500 text-sm mt-1">
-            Selecciona los tipos de animales que atiendes en tu práctica
-          </p>
-        </div>
-        {errors.animals_treated && (
-          <p className="text-sm text-red-500">Debes seleccionar al menos un tipo de animal</p>
-        )}
-      </div>
+      <p className="text-gray-500 text-sm">
+        Selecciona los tipos de animales que atiendes en tu práctica
+      </p>
       
       <Controller
         name="animals_treated"
@@ -128,6 +120,10 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                   </Command>
                 </PopoverContent>
               </Popover>
+
+              {errors.animals_treated && (
+                <p className="text-sm text-red-500 mt-2">Debes seleccionar al menos un tipo de animal</p>
+              )}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
                 {animalsValue.map((animalValue: string) => {
