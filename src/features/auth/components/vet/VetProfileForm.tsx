@@ -10,8 +10,9 @@ import CertificationsSection from './form-sections/CertificationsSection';
 import AvailabilitySection from './form-sections/AvailabilitySection';
 import ServicesSection from './form-sections/ServicesSection';
 import AnimalsSection from './form-sections/AnimalsSection';
-import { Button } from '@/ui/atoms/button';
-import { Save } from 'lucide-react';
+import ProfileImageSection from './form/ProfileImageSection';
+import FormSection from './form/FormSection';
+import FormFooter from './form/FormFooter';
 
 const veterinarianSchema = z.object({
   specialization: z.string().min(1, 'La especialización es requerida'),
@@ -88,33 +89,23 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
     }
   };
 
-  const renderSectionHeader = (title: string) => (
-    <div className="border-b border-gray-200 pb-2 mb-6">
-      <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
-    </div>
-  );
-
   return (
     <form onSubmit={handleSubmit(processSubmit)} className="bg-white rounded-xl shadow-lg px-6 py-8">
       <div className="space-y-12">
         {/* Profile Image Section */}
-        <div className="flex flex-col items-center mb-8">
-          <BasicInfoSection 
-            control={control} 
-            errors={errors}
-            profileImageUrl={profileImageUrl}
-            setProfileImageFile={setProfileImageFile}
-            licenseDocumentUrl={licenseDocumentUrl}
-            setLicenseDocumentFile={setLicenseDocumentFile}
-            setValue={setValue}
-            userId={userId}
-            renderHeader={false}
-          />
-        </div>
+        <ProfileImageSection 
+          control={control} 
+          errors={errors}
+          profileImageUrl={profileImageUrl}
+          setProfileImageFile={setProfileImageFile}
+          licenseDocumentUrl={licenseDocumentUrl}
+          setLicenseDocumentFile={setLicenseDocumentFile}
+          setValue={setValue}
+          userId={userId}
+        />
 
         {/* Basic Information Section */}
-        <div className="space-y-6">
-          {renderSectionHeader("Información Básica")}
+        <FormSection title="Información Básica">
           <BasicInfoSection 
             control={control} 
             errors={errors}
@@ -127,88 +118,60 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
             renderHeader={false}
             skipProfileImage={true}
           />
-        </div>
+        </FormSection>
 
         {/* Education Section */}
-        <div className="space-y-6">
-          {renderSectionHeader("Educación")}
+        <FormSection title="Educación">
           <EducationSection 
             control={control} 
             errors={errors}
             setValue={setValue}
             userId={userId}
           />
-        </div>
+        </FormSection>
 
         {/* Certifications Section */}
-        <div className="space-y-6">
-          {renderSectionHeader("Certificaciones")}
+        <FormSection title="Certificaciones">
           <CertificationsSection 
             control={control} 
             errors={errors} 
             setValue={setValue}
             userId={userId}
           />
-        </div>
+        </FormSection>
 
         {/* Availability Section */}
-        <div className="space-y-6">
-          {renderSectionHeader("Disponibilidad")}
+        <FormSection title="Disponibilidad">
           <AvailabilitySection 
             control={control} 
             errors={errors} 
           />
-        </div>
+        </FormSection>
 
         {/* Services Section */}
-        <div className="space-y-6">
-          {renderSectionHeader("Servicios")}
+        <FormSection title="Servicios">
           <ServicesSection 
             control={control} 
             errors={errors} 
             setValue={setValue} 
           />
-        </div>
+        </FormSection>
 
         {/* Animals Section */}
-        <div className="space-y-6">
-          {renderSectionHeader("Animales")}
+        <FormSection title="Animales">
           <AnimalsSection 
             control={control} 
             errors={errors}
           />
-        </div>
+        </FormSection>
       </div>
 
       {/* Form Footer with Submit Button */}
-      <div className="mt-12 pt-6 border-t border-gray-200">
-        <div className="flex justify-between items-center">
-          <div>
-            {Object.keys(errors).length > 0 && (
-              <p className="text-red-500 text-sm">
-                Hay campos con errores. Por favor revisa todas las secciones.
-              </p>
-            )}
-          </div>
-          <Button 
-            type="submit" 
-            disabled={isSubmitting || !isValid} 
-            className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                Guardando...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Guardar Perfil
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
+      <FormFooter 
+        isSubmitting={isSubmitting} 
+        isValid={isValid} 
+        hasErrors={Object.keys(errors).length > 0} 
+      />
     </form>
   );
 };
