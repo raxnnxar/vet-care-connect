@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -8,21 +9,27 @@ import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
 import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
 import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
 import ProfileSetupScreen from '../features/auth/screens/ProfileSetupScreen';
+import VetProfileSetupScreen from '../features/auth/screens/VetProfileSetupScreen';
 import { ROUTES } from '@/frontend/shared/constants/routes';
+import { supabase } from '@/integrations/supabase/client';
+import { useUser } from '@/contexts/UserContext';
 
 const AppNavigator = () => {
   const { user } = useSelector((state: any) => state.auth);
+  const { userRole, providerType } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (user) {
       console.log('Current user state in AppNavigator:', user);
+      console.log('Current role info:', { userRole, providerType });
       console.log('Current path:', location.pathname);
       
       // Skip navigation logic if user is already on profile setup or post-signup screens
       if (
         location.pathname === ROUTES.PROFILE_SETUP || 
+        location.pathname === ROUTES.VET_PROFILE_SETUP ||
         location.pathname === ROUTES.POST_SIGNUP_ROLE || 
         location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE
       ) {
@@ -42,20 +49,33 @@ const AppNavigator = () => {
       }
       
       // If user has no role yet, direct them to role selection
-      if (!user.role) {
+      if (!userRole) {
         console.log('User has no role, redirecting to role selection');
         navigate(ROUTES.POST_SIGNUP_ROLE);
         return;
       }
       
+      // If user is a service provider but no provider type yet, redirect to provider type selection
+      if (userRole === 'service_provider' && !providerType) {
+        console.log('Service provider has no type, redirecting to service type selection');
+        navigate(ROUTES.POST_SIGNUP_SERVICE_TYPE);
+        return;
+      }
+      
       // If user is on the root path, redirect based on role
       if (location.pathname === '/') {
-        if (user.role === 'pet_owner') {
+        if (userRole === 'pet_owner') {
           console.log('Redirecting pet owner to owner home');
           navigate(ROUTES.OWNER);
-        } else if (user.role === 'service_provider') {
-          console.log('Redirecting service provider to vet home');
-          navigate(ROUTES.VET);
+        } else if (userRole === 'service_provider') {
+          if (providerType === 'veterinarian') {
+            console.log('Redirecting vet to vet home');
+            navigate(ROUTES.VET);
+          } else {
+            console.log('Redirecting service provider to appropriate home page');
+            // For now, we only have vet screens implemented
+            navigate(ROUTES.VET);
+          }
         }
       }
     } else {
@@ -73,7 +93,7 @@ const AppNavigator = () => {
         navigate(ROUTES.LOGIN);
       }
     }
-  }, [user, navigate, location.pathname]);
+  }, [user, userRole, providerType, navigate, location.pathname]);
 
   return (
     <Routes>
@@ -81,6 +101,7 @@ const AppNavigator = () => {
       <Route path={ROUTES.POST_SIGNUP_ROLE} element={<PostSignupRoleScreen />} />
       <Route path={ROUTES.POST_SIGNUP_SERVICE_TYPE} element={<PostSignupServiceTypeScreen />} />
       <Route path={ROUTES.PROFILE_SETUP} element={<ProfileSetupScreen />} />
+      <Route path={ROUTES.VET_PROFILE_SETUP} element={<VetProfileSetupScreen />} />
       
       {/* Nested navigators */}
       <Route path={`${ROUTES.OWNER}/*`} element={<OwnerNavigator />} />

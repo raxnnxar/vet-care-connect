@@ -341,12 +341,12 @@ export type Database = {
           animals_treated: Json | null
           availability: Json | null
           bio: string | null
-          certificate_urls: Json | null
           certifications: Json | null
           education: Json | null
           emergency_services: boolean | null
           id: string
           languages_spoken: Json | null
+          license_document_url: string | null
           license_number: string | null
           profile_image_url: string | null
           services_offered: Json | null
@@ -357,12 +357,12 @@ export type Database = {
           animals_treated?: Json | null
           availability?: Json | null
           bio?: string | null
-          certificate_urls?: Json | null
           certifications?: Json | null
           education?: Json | null
           emergency_services?: boolean | null
           id: string
           languages_spoken?: Json | null
+          license_document_url?: string | null
           license_number?: string | null
           profile_image_url?: string | null
           services_offered?: Json | null
@@ -373,12 +373,12 @@ export type Database = {
           animals_treated?: Json | null
           availability?: Json | null
           bio?: string | null
-          certificate_urls?: Json | null
           certifications?: Json | null
           education?: Json | null
           emergency_services?: boolean | null
           id?: string
           languages_spoken?: Json | null
+          license_document_url?: string | null
           license_number?: string | null
           profile_image_url?: string | null
           services_offered?: Json | null

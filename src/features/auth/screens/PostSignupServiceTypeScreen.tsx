@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,7 +42,12 @@ const PostSignupServiceTypeScreen: React.FC = () => {
         console.log('Service type selection successful:', result.payload);
         toast.success('Tipo de servicio seleccionado con éxito');
         
-        navigate(ROUTES.PROFILE_SETUP);
+        // Direct to the appropriate profile setup screen based on service type
+        if (serviceType === SERVICE_TYPES.VETERINARIAN) {
+          navigate(ROUTES.VET_PROFILE_SETUP);
+        } else {
+          navigate(ROUTES.PROFILE_SETUP);
+        }
       } else {
         console.error('Service type selection failed:', result.error);
         toast.error('Hubo un problema al seleccionar el tipo de servicio. Por favor intenta de nuevo.');

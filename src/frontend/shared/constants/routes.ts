@@ -1,3 +1,4 @@
+
 /**
  * Application route definitions
  * Consolidated source of truth for all routes in the application
@@ -13,6 +14,7 @@ export const ROUTES = {
   POST_SIGNUP_ROLE: '/post-signup-role',
   POST_SIGNUP_SERVICE_TYPE: '/post-signup-service-type',
   PROFILE_SETUP: '/profile-setup',
+  VET_PROFILE_SETUP: '/vet-profile-setup',
   
   // Owner routes
   OWNER: '/owner',
