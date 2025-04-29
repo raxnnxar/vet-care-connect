@@ -16,12 +16,9 @@ const EmergencyServicesSection: React.FC<EmergencyServicesSectionProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div>
-        <h3 className="text-xl font-semibold text-gray-800">Servicios de Emergencia</h3>
-        <p className="text-gray-500 text-sm mt-1">
-          Indica si ofreces servicios de emergencia fuera de tu horario regular de atención
-        </p>
-      </div>
+      <p className="text-gray-500 text-sm">
+        Indica si ofreces servicios de emergencia fuera de tu horario regular de atención
+      </p>
       
       <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100">
         <div>

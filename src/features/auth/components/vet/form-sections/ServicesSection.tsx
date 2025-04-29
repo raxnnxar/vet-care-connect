@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Control, Controller, FieldErrors, useFieldArray } from 'react-hook-form';
 import { VeterinarianProfile, ServiceOffered } from '../../../types/veterinarianTypes';
@@ -81,21 +80,6 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium text-gray-700">Servicios Ofrecidos</h2>
-        {fields.length > 0 && (
-          <Button 
-            type="button" 
-            onClick={() => setIsDialogOpen(true)} 
-            variant="outline"
-            size="sm"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Añadir Servicio
-          </Button>
-        )}
-      </div>
-
       {fields.length === 0 ? (
         <div className="text-center p-8 border border-dashed rounded-lg bg-gray-50 flex flex-col items-center justify-center">
           <p className="text-gray-500 mb-6">
@@ -113,35 +97,49 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {fields.map((field, index) => (
-            <Card key={field.id}>
-              <CardHeader className="bg-gray-50 pb-3">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <Stethoscope className="h-4 w-4 mr-2 text-gray-500" />
-                    {field.name}
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <p className="text-gray-600 text-sm">{field.description}</p>
-              </CardContent>
-              <CardFooter className="flex justify-end border-t bg-gray-50 py-2">
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  onClick={() => remove(index)}
-                  size="sm"
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8"
-                >
-                  <Trash2 className="mr-1 h-3 w-3" />
-                  Eliminar
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {fields.map((field, index) => (
+              <Card key={field.id}>
+                <CardHeader className="bg-gray-50 pb-3">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg font-medium flex items-center">
+                      <Stethoscope className="h-4 w-4 mr-2 text-gray-500" />
+                      {field.name}
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <p className="text-gray-600 text-sm">{field.description}</p>
+                </CardContent>
+                <CardFooter className="flex justify-end border-t bg-gray-50 py-2">
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    onClick={() => remove(index)}
+                    size="sm"
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8"
+                  >
+                    <Trash2 className="mr-1 h-3 w-3" />
+                    Eliminar
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex justify-end mt-4">
+            <Button 
+              type="button" 
+              onClick={() => setIsDialogOpen(true)} 
+              variant="outline"
+              size="sm"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Añadir Servicio
+            </Button>
+          </div>
+        </>
       )}
 
       {/* Add Service Dialog */}
