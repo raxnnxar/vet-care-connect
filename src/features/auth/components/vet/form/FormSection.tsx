@@ -1,6 +1,5 @@
 
 import React, { ReactNode } from 'react';
-import SectionHeader from './SectionHeader';
 
 interface FormSectionProps {
   title: string;
@@ -10,7 +9,9 @@ interface FormSectionProps {
 const FormSection: React.FC<FormSectionProps> = ({ title, children }) => {
   return (
     <div className="mb-12 pt-4 bg-white rounded-xl p-6 shadow-sm">
-      <SectionHeader title={title} />
+      <div className="border-b border-gray-200 pb-3 mb-6">
+        <h3 className="text-2xl font-semibold text-gray-800">{title}</h3>
+      </div>
       <div className="mt-6">
         {children}
       </div>

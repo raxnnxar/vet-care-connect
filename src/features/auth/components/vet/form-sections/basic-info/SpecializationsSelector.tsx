@@ -77,11 +77,16 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
             variant="outline" 
             role="combobox"
             aria-expanded={open}
+            type="button" // Explicitly set type to prevent form submission
             className={cn(
               "w-full justify-between text-left font-normal bg-white",
               !specializationsValue.length && "text-muted-foreground",
               errors.specializations ? "border-red-500" : ""
             )}
+            onClick={(e) => {
+              e.preventDefault(); // Prevent any navigation
+              setOpen(!open);
+            }}
           >
             <span>
               {specializationsValue.length
@@ -91,7 +96,7 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
             <span className="ml-2">▼</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 max-h-[300px] overflow-auto" align="start">
+        <PopoverContent className="w-full p-0 max-h-[300px] overflow-auto bg-white" align="start">
           <Command>
             <CommandInput 
               placeholder="Buscar especialización..." 
@@ -107,7 +112,10 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
                   <CommandItem
                     key={spec.value}
                     value={spec.value}
-                    onSelect={() => handleSelectSpecialization(spec.value)}
+                    onSelect={(value) => {
+                      handleSelectSpecialization(value);
+                      return false; // Prevent default behavior
+                    }}
                     className="flex items-center gap-2 py-3 cursor-pointer"
                   >
                     <div 

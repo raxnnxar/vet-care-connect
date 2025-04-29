@@ -82,24 +82,35 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Servicios Ofrecidos</h2>
-        <Button 
-          type="button" 
-          onClick={() => setIsDialogOpen(true)} 
-          variant="outline"
-          size="sm"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Añadir Servicio
-        </Button>
+        <h2 className="text-lg font-medium text-gray-700">Servicios Ofrecidos</h2>
+        {fields.length > 0 && (
+          <Button 
+            type="button" 
+            onClick={() => setIsDialogOpen(true)} 
+            variant="outline"
+            size="sm"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Añadir Servicio
+          </Button>
+        )}
       </div>
 
       {fields.length === 0 ? (
-        <div className="text-center p-6 border border-dashed rounded-lg bg-gray-50">
-          <p className="text-gray-500">
+        <div className="text-center p-8 border border-dashed rounded-lg bg-gray-50 flex flex-col items-center justify-center">
+          <p className="text-gray-500 mb-6">
             No has añadido ningún servicio. 
             Detalla los servicios que ofreces para que los dueños de mascotas sepan qué esperar.
           </p>
+          <Button 
+            type="button" 
+            onClick={() => setIsDialogOpen(true)} 
+            variant="outline"
+            className="mx-auto"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Añadir Servicio
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
