@@ -38,7 +38,29 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
   });
 
   // Ensure specializations is always an array
-  const specializationsValue = Array.isArray(specializationsField.value) ? specializationsField.value : [];
+  const specializationsValue = Array.isArray(specializationsField.value) 
+    ? specializationsField.value 
+    : [];
+
+  const handleSelectSpecialization = (value: string) => {
+    const isSelected = specializationsValue.includes(value);
+    let newValues: string[];
+    
+    if (isSelected) {
+      newValues = specializationsValue.filter((val: string) => val !== value);
+    } else {
+      newValues = [...specializationsValue, value];
+    }
+    
+    specializationsField.onChange(newValues);
+    setSpecializationSearchValue('');
+    // Don't close the popover to allow multiple selections
+  };
+
+  const handleRemoveSpecialization = (value: string) => {
+    const newValues = specializationsValue.filter((val: string) => val !== value);
+    specializationsField.onChange(newValues);
+  };
 
   return (
     <div className="space-y-2">
@@ -53,8 +75,10 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
         <PopoverTrigger asChild>
           <Button 
             variant="outline" 
+            role="combobox"
+            aria-expanded={open}
             className={cn(
-              "w-full justify-start text-left font-normal",
+              "w-full justify-between text-left font-normal bg-white",
               !specializationsValue.length && "text-muted-foreground",
               errors.specializations ? "border-red-500" : ""
             )}
@@ -64,40 +88,31 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
                 ? `${specializationsValue.length} especialización${specializationsValue.length > 1 ? 'es' : ''} seleccionada${specializationsValue.length > 1 ? 's' : ''}`
                 : "Selecciona especializaciones"}
             </span>
+            <span className="ml-2">▼</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
+        <PopoverContent className="w-full p-0 max-h-[300px] overflow-auto" align="start">
           <Command>
             <CommandInput 
               placeholder="Buscar especialización..." 
               value={specializationSearchValue}
               onValueChange={setSpecializationSearchValue}
+              className="border-none focus:ring-0"
             />
             <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
-            <CommandGroup className="max-h-64 overflow-auto">
+            <CommandGroup className="max-h-[250px] overflow-auto">
               {SPECIALIZATIONS.map((spec) => {
                 const isSelected = specializationsValue.includes(spec.value);
                 return (
                   <CommandItem
                     key={spec.value}
-                    onSelect={() => {
-                      let newValues: string[] = [];
-                      
-                      if (isSelected) {
-                        newValues = specializationsValue.filter(
-                          (val: string) => val !== spec.value
-                        );
-                      } else {
-                        newValues = [...specializationsValue, spec.value];
-                      }
-                      
-                      specializationsField.onChange(newValues);
-                      setSpecializationSearchValue('');
-                    }}
+                    value={spec.value}
+                    onSelect={() => handleSelectSpecialization(spec.value)}
+                    className="flex items-center gap-2 py-3 cursor-pointer"
                   >
                     <div 
                       className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
                         isSelected ? "bg-primary text-primary-foreground" : "opacity-50"
                       )}
                     >
@@ -126,10 +141,7 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
               {spec?.label || specValue}
               <button
                 type="button"
-                onClick={() => {
-                  const newValues = specializationsValue.filter((val: string) => val !== specValue);
-                  specializationsField.onChange(newValues);
-                }}
+                onClick={() => handleRemoveSpecialization(specValue)}
                 className="ml-2 rounded-full hover:bg-[#3D8A8C]"
               >
                 <X className="h-3 w-3" />
