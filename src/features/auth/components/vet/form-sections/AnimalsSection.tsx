@@ -30,6 +30,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
   errors,
 }) => {
   const [animalSearchValue, setAnimalSearchValue] = React.useState('');
+  const [open, setOpen] = React.useState(false);
 
   return (
     <div className="space-y-6">
@@ -50,7 +51,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
         control={control}
         render={({ field }) => (
           <>
-            <Popover>
+            <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button 
                   variant="outline" 
@@ -65,7 +66,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                     <Cat className="h-4 w-4 text-gray-500" />
                   </div>
                   <span className="ml-2">
-                    {field.value?.length
+                    {Array.isArray(field.value) && field.value.length
                       ? `${field.value.length} tipo${field.value.length > 1 ? 's' : ''} de animal${field.value.length > 1 ? 'es' : ''} seleccionado${field.value.length > 1 ? 's' : ''}`
                       : "Selecciona los tipos de animales"}
                   </span>
@@ -80,8 +81,8 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                   />
                   <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
                   <CommandGroup className="max-h-64 overflow-auto">
-                    {ANIMAL_TYPES.map((animal) => {
-                      const isSelected = field.value?.includes(animal.value);
+                    {Array.isArray(ANIMAL_TYPES) && ANIMAL_TYPES.map((animal) => {
+                      const isSelected = Array.isArray(field.value) && field.value.includes(animal.value);
                       return (
                         <CommandItem
                           key={animal.value}
@@ -89,11 +90,12 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                             let newValues: string[];
                             
                             if (isSelected) {
-                              newValues = field.value?.filter(
-                                (val: string) => val !== animal.value
-                              ) || [];
+                              newValues = Array.isArray(field.value) ? 
+                                field.value.filter(
+                                  (val: string) => val !== animal.value
+                                ) : [];
                             } else {
-                              newValues = [...(field.value || []), animal.value];
+                              newValues = [...(Array.isArray(field.value) ? field.value : []), animal.value];
                             }
                             
                             field.onChange(newValues);
@@ -118,7 +120,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
             </Popover>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
-              {field.value?.map((animalValue: string) => {
+              {Array.isArray(field.value) && field.value.map((animalValue: string) => {
                 const animal = ANIMAL_TYPES.find(a => a.value === animalValue);
                 return (
                   <Badge key={animalValue} className="py-1 px-3 bg-[#FF8A65] hover:bg-[#FF7043]">

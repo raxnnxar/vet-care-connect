@@ -44,6 +44,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
   userId,
 }) => {
   const [specializationSearchValue, setSpecializationSearchValue] = React.useState('');
+  const [open, setOpen] = React.useState(false);
   
   const { field: specializationsField } = useController({
     name: 'specializations',
@@ -98,7 +99,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
           Selecciona todas las especializaciones que apliquen a tu práctica veterinaria
         </p>
         
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button 
               variant="outline" 
@@ -124,20 +125,22 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               />
               <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
               <CommandGroup className="max-h-64 overflow-auto">
-                {SPECIALIZATIONS.map((spec) => {
-                  const isSelected = specializationsField.value?.includes(spec.value);
+                {Array.isArray(SPECIALIZATIONS) && SPECIALIZATIONS.map((spec) => {
+                  const isSelected = Array.isArray(specializationsField.value) && 
+                    specializationsField.value.includes(spec.value);
                   return (
                     <CommandItem
                       key={spec.value}
                       onSelect={() => {
-                        let newValues: string[];
+                        let newValues: string[] = [];
                         
                         if (isSelected) {
-                          newValues = specializationsField.value?.filter(
-                            (val: string) => val !== spec.value
-                          ) || [];
+                          newValues = Array.isArray(specializationsField.value) ? 
+                            specializationsField.value.filter(
+                              (val: string) => val !== spec.value
+                            ) : [];
                         } else {
-                          newValues = [...(specializationsField.value || []), spec.value];
+                          newValues = [...(Array.isArray(specializationsField.value) ? specializationsField.value : []), spec.value];
                         }
                         
                         specializationsField.onChange(newValues);
@@ -168,7 +171,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         )}
         
         <div className="flex flex-wrap gap-2 mt-2">
-          {specializationsField.value?.map((specValue: string) => {
+          {Array.isArray(specializationsField.value) && specializationsField.value.map((specValue: string) => {
             const spec = SPECIALIZATIONS.find(s => s.value === specValue);
             return (
               <Badge key={specValue} className="py-1 px-3 bg-[#4DA6A8] hover:bg-[#3D8A8C] text-white">

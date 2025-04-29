@@ -30,6 +30,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
   errors,
 }) => {
   const [languageSearchValue, setLanguageSearchValue] = React.useState('');
+  const [open, setOpen] = React.useState(false);
 
   return (
     <div className="space-y-6">
@@ -50,7 +51,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
         control={control}
         render={({ field }) => (
           <>
-            <Popover>
+            <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button 
                   variant="outline" 
@@ -62,7 +63,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                 >
                   <Languages className="mr-2 h-4 w-4 text-gray-500" />
                   <span>
-                    {field.value?.length
+                    {Array.isArray(field.value) && field.value.length
                       ? `${field.value.length} idioma${field.value.length > 1 ? 's' : ''} seleccionado${field.value.length > 1 ? 's' : ''}`
                       : "Selecciona idiomas"}
                   </span>
@@ -77,8 +78,8 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                   />
                   <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
                   <CommandGroup className="max-h-64 overflow-auto">
-                    {LANGUAGES.map((language) => {
-                      const isSelected = field.value?.includes(language.value);
+                    {Array.isArray(LANGUAGES) && LANGUAGES.map((language) => {
+                      const isSelected = Array.isArray(field.value) && field.value.includes(language.value);
                       return (
                         <CommandItem
                           key={language.value}
@@ -86,11 +87,12 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                             let newValues: string[];
                             
                             if (isSelected) {
-                              newValues = field.value?.filter(
-                                (val: string) => val !== language.value
-                              ) || [];
+                              newValues = Array.isArray(field.value) ? 
+                                field.value.filter(
+                                  (val: string) => val !== language.value
+                                ) : [];
                             } else {
-                              newValues = [...(field.value || []), language.value];
+                              newValues = [...(Array.isArray(field.value) ? field.value : []), language.value];
                             }
                             
                             field.onChange(newValues);
@@ -115,7 +117,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
             </Popover>
 
             <div className="flex flex-wrap gap-2 mt-4">
-              {field.value?.map((langValue: string) => {
+              {Array.isArray(field.value) && field.value.map((langValue: string) => {
                 const language = LANGUAGES.find(l => l.value === langValue);
                 return (
                   <Badge key={langValue} className="py-1 px-3 bg-[#79D0B8] hover:bg-[#5FBFB3]">
