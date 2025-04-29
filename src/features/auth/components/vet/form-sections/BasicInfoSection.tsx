@@ -51,6 +51,9 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
     control,
   });
 
+  // Ensure specializations is always an array
+  const specializationsValue = Array.isArray(specializationsField.value) ? specializationsField.value : [];
+
   const handleLicenseDocumentChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
       return;
@@ -105,13 +108,13 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               variant="outline" 
               className={cn(
                 "w-full justify-start text-left font-normal",
-                !specializationsField.value?.length && "text-muted-foreground",
+                !specializationsValue.length && "text-muted-foreground",
                 errors.specializations ? "border-red-500" : ""
               )}
             >
               <span>
-                {specializationsField.value?.length
-                  ? `${specializationsField.value.length} especialización${specializationsField.value.length > 1 ? 'es' : ''} seleccionada${specializationsField.value.length > 1 ? 's' : ''}`
+                {specializationsValue.length
+                  ? `${specializationsValue.length} especialización${specializationsValue.length > 1 ? 'es' : ''} seleccionada${specializationsValue.length > 1 ? 's' : ''}`
                   : "Selecciona especializaciones"}
               </span>
             </Button>
@@ -125,9 +128,8 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               />
               <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
               <CommandGroup className="max-h-64 overflow-auto">
-                {Array.isArray(SPECIALIZATIONS) && SPECIALIZATIONS.map((spec) => {
-                  const isSelected = Array.isArray(specializationsField.value) && 
-                    specializationsField.value.includes(spec.value);
+                {SPECIALIZATIONS.map((spec) => {
+                  const isSelected = specializationsValue.includes(spec.value);
                   return (
                     <CommandItem
                       key={spec.value}
@@ -135,12 +137,11 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                         let newValues: string[] = [];
                         
                         if (isSelected) {
-                          newValues = Array.isArray(specializationsField.value) ? 
-                            specializationsField.value.filter(
-                              (val: string) => val !== spec.value
-                            ) : [];
+                          newValues = specializationsValue.filter(
+                            (val: string) => val !== spec.value
+                          );
                         } else {
-                          newValues = [...(Array.isArray(specializationsField.value) ? specializationsField.value : []), spec.value];
+                          newValues = [...specializationsValue, spec.value];
                         }
                         
                         specializationsField.onChange(newValues);
@@ -171,7 +172,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         )}
         
         <div className="flex flex-wrap gap-2 mt-2">
-          {Array.isArray(specializationsField.value) && specializationsField.value.map((specValue: string) => {
+          {specializationsValue.map((specValue: string) => {
             const spec = SPECIALIZATIONS.find(s => s.value === specValue);
             return (
               <Badge key={specValue} className="py-1 px-3 bg-[#4DA6A8] hover:bg-[#3D8A8C] text-white">
@@ -179,7 +180,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    const newValues = specializationsField.value.filter((val: string) => val !== specValue);
+                    const newValues = specializationsValue.filter((val: string) => val !== specValue);
                     specializationsField.onChange(newValues);
                   }}
                   className="ml-2 rounded-full hover:bg-[#3D8A8C]"
