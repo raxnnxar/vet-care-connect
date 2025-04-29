@@ -58,12 +58,17 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button 
-                    variant="outline" 
+                    variant="outline"
+                    type="button"
                     className={cn(
                       "w-full justify-start text-left font-normal",
                       !animalsValue.length && "text-muted-foreground",
                       errors.animals_treated && "border-red-500"
                     )}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setOpen(!open);
+                    }}
                   >
                     <div className="flex items-center gap-1">
                       <Dog className="h-4 w-4 text-gray-500" />
@@ -76,8 +81,8 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                     </span>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
+                <PopoverContent className="w-full p-0 bg-white z-50" align="start">
+                  <Command shouldFilter={true}>
                     <CommandInput 
                       placeholder="Buscar animal..." 
                       value={animalSearchValue}
@@ -90,7 +95,8 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                         return (
                           <CommandItem
                             key={animal.value}
-                            onSelect={() => {
+                            value={animal.value}
+                            onSelect={(value) => {
                               let newValues: string[];
                               
                               if (isSelected) {
@@ -103,6 +109,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                               
                               field.onChange(newValues);
                               setAnimalSearchValue('');
+                              return false; // Prevent default behavior
                             }}
                           >
                             <div 

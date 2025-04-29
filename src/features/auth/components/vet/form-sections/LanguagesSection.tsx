@@ -58,12 +58,17 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button 
-                    variant="outline" 
+                    variant="outline"
+                    type="button"
                     className={cn(
                       "w-full justify-start text-left font-normal",
                       !languagesValue.length && "text-muted-foreground",
                       errors.languages_spoken && "border-red-500"
                     )}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setOpen(!open);
+                    }}
                   >
                     <Languages className="mr-2 h-4 w-4 text-gray-500" />
                     <span>
@@ -73,8 +78,8 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                     </span>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
+                <PopoverContent className="w-full p-0 bg-white z-50" align="start">
+                  <Command shouldFilter={true}>
                     <CommandInput 
                       placeholder="Buscar idioma..." 
                       value={languageSearchValue}
@@ -87,7 +92,8 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                         return (
                           <CommandItem
                             key={language.value}
-                            onSelect={() => {
+                            value={language.value}
+                            onSelect={(value) => {
                               let newValues: string[];
                               
                               if (isSelected) {
@@ -100,6 +106,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                               
                               field.onChange(newValues);
                               setLanguageSearchValue('');
+                              return false; // Prevent default behavior
                             }}
                           >
                             <div 
