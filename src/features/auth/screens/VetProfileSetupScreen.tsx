@@ -8,6 +8,55 @@ import { ROUTES } from '@/frontend/shared/constants/routes';
 import { supabase } from '@/integrations/supabase/client';
 import { VeterinarianProfile, AvailabilitySchedule, EducationEntry, CertificationEntry, ServiceOffered } from '../types/veterinarianTypes';
 import VetProfileForm from '../components/vet/VetProfileForm';
+import { Json } from '@/integrations/supabase/types';
+
+// Helper functions to safely convert JSON data to typed objects
+const parseAvailability = (json: any): AvailabilitySchedule => {
+  if (!json || typeof json !== 'object') return {} as AvailabilitySchedule;
+  return json as AvailabilitySchedule;
+};
+
+const parseEducation = (json: any): EducationEntry[] => {
+  if (!json || !Array.isArray(json)) return [];
+  return json.map(entry => ({
+    id: String(entry?.id || ''),
+    degree: String(entry?.degree || ''),
+    institution: String(entry?.institution || ''),
+    year: Number(entry?.year || new Date().getFullYear()),
+    document_url: entry?.document_url ? String(entry.document_url) : undefined
+  }));
+};
+
+const parseCertifications = (json: any): CertificationEntry[] => {
+  if (!json || !Array.isArray(json)) return [];
+  return json.map(entry => ({
+    id: String(entry?.id || ''),
+    title: String(entry?.title || ''),
+    organization: String(entry?.organization || ''),
+    issue_date: String(entry?.issue_date || ''),
+    expiry_date: entry?.expiry_date ? String(entry.expiry_date) : undefined,
+    document_url: entry?.document_url ? String(entry.document_url) : undefined
+  }));
+};
+
+const parseAnimals = (json: any): string[] => {
+  if (!json || !Array.isArray(json)) return [];
+  return json.map(item => String(item || ''));
+};
+
+const parseServices = (json: any): ServiceOffered[] => {
+  if (!json || !Array.isArray(json)) return [];
+  return json.map(entry => ({
+    id: String(entry?.id || ''),
+    name: String(entry?.name || ''),
+    description: String(entry?.description || '')
+  }));
+};
+
+const parseLanguages = (json: any): string[] => {
+  if (!json || !Array.isArray(json)) return ['spanish'];
+  return json.map(item => String(item || ''));
+};
 
 const VetProfileSetupScreen = () => {
   const navigate = useNavigate();
@@ -55,29 +104,21 @@ const VetProfileSetupScreen = () => {
         }
 
         if (vetData) {
-          // Convert JSON data from database to strongly-typed objects
-          const availability = (vetData.availability || {}) as AvailabilitySchedule;
-          const education = Array.isArray(vetData.education) ? vetData.education as EducationEntry[] : [];
-          const certifications = Array.isArray(vetData.certifications) ? vetData.certifications as CertificationEntry[] : [];
-          const animals_treated = Array.isArray(vetData.animals_treated) ? vetData.animals_treated as string[] : [];
-          const services_offered = Array.isArray(vetData.services_offered) ? vetData.services_offered as ServiceOffered[] : [];
-          const languages_spoken = Array.isArray(vetData.languages_spoken) ? vetData.languages_spoken as string[] : ['spanish'];
-          
-          // Create a properly typed object
+          // Safely parse and convert JSON data from database to strongly-typed objects
           const typedProfile: VeterinarianProfile = {
             specialization: vetData.specialization || 'general',
             license_number: vetData.license_number || '',
             license_document_url: vetData.license_document_url,
             years_of_experience: vetData.years_of_experience || 0,
             bio: vetData.bio || '',
-            availability,
-            education,
-            certifications,
-            animals_treated,
-            services_offered,
+            availability: parseAvailability(vetData.availability),
+            education: parseEducation(vetData.education),
+            certifications: parseCertifications(vetData.certifications),
+            animals_treated: parseAnimals(vetData.animals_treated),
+            services_offered: parseServices(vetData.services_offered),
             profile_image_url: vetData.profile_image_url,
-            languages_spoken,
-            emergency_services: vetData.emergency_services || false
+            languages_spoken: parseLanguages(vetData.languages_spoken),
+            emergency_services: !!vetData.emergency_services
           };
           
           setInitialData(typedProfile);
