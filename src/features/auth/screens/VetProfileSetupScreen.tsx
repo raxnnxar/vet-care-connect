@@ -14,7 +14,7 @@ const VetProfileSetupScreen = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialDataLoading, setIsInitialDataLoading] = useState(true);
-  const [initialData, setInitialData] = useState<Partial<VeterinarianProfile> | null>(null);
+  const [initialData, setInitialData] = useState<VeterinarianProfile | null>(null);
 
   // Default values for a new vet profile
   const defaultProfile: VeterinarianProfile = {
@@ -56,22 +56,31 @@ const VetProfileSetupScreen = () => {
 
         if (vetData) {
           // Convert JSON data from database to strongly-typed objects
-          const availability = vetData.availability as unknown as AvailabilitySchedule || {};
-          const education = Array.isArray(vetData.education) ? vetData.education as unknown as EducationEntry[] : [];
-          const certifications = Array.isArray(vetData.certifications) ? vetData.certifications as unknown as CertificationEntry[] : [];
-          const animals_treated = Array.isArray(vetData.animals_treated) ? vetData.animals_treated as unknown as string[] : [];
-          const services_offered = Array.isArray(vetData.services_offered) ? vetData.services_offered as unknown as ServiceOffered[] : [];
-          const languages_spoken = Array.isArray(vetData.languages_spoken) ? vetData.languages_spoken as unknown as string[] : ['spanish'];
+          const availability = (vetData.availability || {}) as AvailabilitySchedule;
+          const education = Array.isArray(vetData.education) ? vetData.education as EducationEntry[] : [];
+          const certifications = Array.isArray(vetData.certifications) ? vetData.certifications as CertificationEntry[] : [];
+          const animals_treated = Array.isArray(vetData.animals_treated) ? vetData.animals_treated as string[] : [];
+          const services_offered = Array.isArray(vetData.services_offered) ? vetData.services_offered as ServiceOffered[] : [];
+          const languages_spoken = Array.isArray(vetData.languages_spoken) ? vetData.languages_spoken as string[] : ['spanish'];
           
-          setInitialData({
-            ...vetData,
+          // Create a properly typed object
+          const typedProfile: VeterinarianProfile = {
+            specialization: vetData.specialization || 'general',
+            license_number: vetData.license_number || '',
+            license_document_url: vetData.license_document_url,
+            years_of_experience: vetData.years_of_experience || 0,
+            bio: vetData.bio || '',
             availability,
             education,
             certifications,
             animals_treated,
             services_offered,
-            languages_spoken
-          });
+            profile_image_url: vetData.profile_image_url,
+            languages_spoken,
+            emergency_services: vetData.emergency_services || false
+          };
+          
+          setInitialData(typedProfile);
         } else {
           // Check if the user has a service_provider record
           const { data: providerData, error: providerError } = await supabase
@@ -119,23 +128,41 @@ const VetProfileSetupScreen = () => {
     setIsLoading(true);
 
     try {
+      // Ensure all required fields have values
+      const completeProfile: VeterinarianProfile = {
+        ...profileData,
+        // Provide defaults for required fields that might be missing
+        specialization: profileData.specialization || 'general',
+        license_number: profileData.license_number || '',
+        years_of_experience: profileData.years_of_experience || 0,
+        bio: profileData.bio || '',
+        // Ensure arrays and objects are properly initialized
+        availability: profileData.availability || {},
+        education: profileData.education || [],
+        certifications: profileData.certifications || [],
+        animals_treated: profileData.animals_treated || [],
+        services_offered: profileData.services_offered || [],
+        languages_spoken: profileData.languages_spoken || ['spanish'],
+        emergency_services: profileData.emergency_services || false
+      };
+
       // Update veterinarian record - convert types to match database requirements
       const { error: updateError } = await supabase
         .from('veterinarians')
         .update({
-          specialization: profileData.specialization,
-          license_number: profileData.license_number,
-          license_document_url: profileData.license_document_url,
-          years_of_experience: profileData.years_of_experience,
-          bio: profileData.bio,
-          availability: profileData.availability as any,
-          education: profileData.education as any,
-          certifications: profileData.certifications as any,
-          animals_treated: profileData.animals_treated as any,
-          services_offered: profileData.services_offered as any,
-          profile_image_url: profileData.profile_image_url,
-          languages_spoken: profileData.languages_spoken as any,
-          emergency_services: profileData.emergency_services
+          specialization: completeProfile.specialization,
+          license_number: completeProfile.license_number,
+          license_document_url: completeProfile.license_document_url,
+          years_of_experience: completeProfile.years_of_experience,
+          bio: completeProfile.bio,
+          availability: completeProfile.availability as any,
+          education: completeProfile.education as any,
+          certifications: completeProfile.certifications as any,
+          animals_treated: completeProfile.animals_treated as any,
+          services_offered: completeProfile.services_offered as any,
+          profile_image_url: completeProfile.profile_image_url,
+          languages_spoken: completeProfile.languages_spoken as any,
+          emergency_services: completeProfile.emergency_services
         })
         .eq('id', user.id);
 
