@@ -232,7 +232,7 @@ const VetProfileSetupScreen = () => {
 
   if (isInitialDataLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#79D0B8] p-4">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#79D0B8] to-[#5FBFB3] p-4">
         <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-white font-medium">Cargando datos del perfil...</p>
       </div>
@@ -240,7 +240,7 @@ const VetProfileSetupScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#79D0B8] py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#79D0B8] to-[#5FBFB3] py-8 px-4">
       <div className="container mx-auto max-w-3xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Configura tu perfil profesional</h1>
