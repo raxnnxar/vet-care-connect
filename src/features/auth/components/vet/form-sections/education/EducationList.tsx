@@ -6,7 +6,7 @@ import EducationCard from './EducationCard';
 import { EducationEntry } from '../../../../types/veterinarianTypes';
 
 interface EducationListProps {
-  fields: Array<EducationEntry>;
+  fields: EducationEntry[];
   onAddClick: () => void;
   onRemove: (index: number) => void;
   onUpload: (educationId: string, file: File) => void;

@@ -5,8 +5,10 @@ import { EducationEntry } from '../../../../types/veterinarianTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useFieldArray } from 'react-hook-form';
+import { Control } from 'react-hook-form';
+import { VeterinarianProfile } from '../../../../types/veterinarianTypes';
 
-export const useEducationForm = (control, setValue, userId) => {
+export const useEducationForm = (control: Control<VeterinarianProfile>, setValue: any, userId: string) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState<Record<string, boolean>>({});
   const [newEducationFile, setNewEducationFile] = useState<File | null>(null);
@@ -21,6 +23,9 @@ export const useEducationForm = (control, setValue, userId) => {
     control,
     name: 'education'
   });
+
+  // Make sure fields array is properly typed as EducationEntry[]
+  const educationFields = fields as unknown as EducationEntry[];
 
   const validateNewEducation = () => {
     const errors: Record<string, string> = {};
@@ -83,7 +88,7 @@ export const useEducationForm = (control, setValue, userId) => {
         .from('vet-documents')
         .getPublicUrl(filePath);
       
-      const index = fields.findIndex(f => f.id === educationId);
+      const index = educationFields.findIndex(f => f.id === educationId);
       
       if (index !== -1) {
         setValue(`education.${index}.document_url`, urlData.publicUrl);
@@ -106,7 +111,7 @@ export const useEducationForm = (control, setValue, userId) => {
   };
 
   return {
-    fields,
+    fields: educationFields,
     isDialogOpen,
     setIsDialogOpen,
     isUploading,
