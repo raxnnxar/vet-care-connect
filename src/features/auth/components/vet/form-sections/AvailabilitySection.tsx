@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Control, Controller, FieldErrors } from 'react-hook-form';
+import { Control, Controller, FieldErrors, useFieldArray } from 'react-hook-form';
 import { VeterinarianProfile, DaySchedule } from '../../../types/veterinarianTypes';
 import { Label } from '@/ui/atoms/label';
 import { Switch } from '@/ui/atoms/switch';
@@ -66,12 +66,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Controller
-                    name={`availability.${day.id}.isAvailable`}
+                    name={`availability.${day.id}.isAvailable` as any}
                     control={control}
                     defaultValue={false}
                     render={({ field }) => (
                       <Switch
-                        checked={field.value}
+                        checked={Boolean(field.value)}
                         onCheckedChange={field.onChange}
                         id={`${day.id}-available`}
                       />
@@ -80,26 +80,27 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Controller
-                    name={`availability.${day.id}`}
+                    name={`availability.${day.id}` as any}
                     control={control}
                     defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
                     render={({ field }) => {
-                      const isAvailable = field.value?.isAvailable;
+                      const daySchedule = field.value as DaySchedule;
+                      const isAvailable = daySchedule?.isAvailable;
                       
                       return (
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <Select
                               disabled={!isAvailable}
-                              value={field.value?.startTime || '09:00'}
+                              value={daySchedule?.startTime || '09:00'}
                               onValueChange={(value) => {
                                 field.onChange({
-                                  ...field.value,
+                                  ...daySchedule,
                                   startTime: value,
                                   // Ensure end time is after start time
-                                  endTime: field.value?.endTime && value >= field.value.endTime
+                                  endTime: daySchedule?.endTime && value >= daySchedule.endTime
                                     ? value
-                                    : field.value?.endTime || '18:00'
+                                    : daySchedule?.endTime || '18:00'
                                 });
                               }}
                             >
@@ -114,7 +115,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                   <SelectItem 
                                     key={hour} 
                                     value={hour}
-                                    disabled={field.value?.endTime && hour >= field.value.endTime}
+                                    disabled={daySchedule?.endTime && hour >= daySchedule.endTime}
                                   >
                                     {hour}
                                   </SelectItem>
@@ -125,10 +126,10 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                           <div>
                             <Select
                               disabled={!isAvailable}
-                              value={field.value?.endTime || '18:00'}
+                              value={daySchedule?.endTime || '18:00'}
                               onValueChange={(value) => {
                                 field.onChange({
-                                  ...field.value,
+                                  ...daySchedule,
                                   endTime: value
                                 });
                               }}
@@ -144,7 +145,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                   <SelectItem 
                                     key={hour} 
                                     value={hour}
-                                    disabled={field.value?.startTime && hour <= field.value.startTime}
+                                    disabled={daySchedule?.startTime && hour <= daySchedule.startTime}
                                   >
                                     {hour}
                                   </SelectItem>

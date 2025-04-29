@@ -6,9 +6,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
 import { ROUTES } from '@/frontend/shared/constants/routes';
 import { supabase } from '@/integrations/supabase/client';
-import { VeterinarianProfile } from '../types/veterinarianTypes';
+import { VeterinarianProfile, AvailabilitySchedule, EducationEntry, CertificationEntry, ServiceOffered } from '../types/veterinarianTypes';
 import VetProfileForm from '../components/vet/VetProfileForm';
-import { v4 as uuidv4 } from 'uuid';
 
 const VetProfileSetupScreen = () => {
   const navigate = useNavigate();
@@ -23,12 +22,12 @@ const VetProfileSetupScreen = () => {
     license_number: '',
     years_of_experience: 0,
     bio: '',
-    availability: {},
-    education: [],
-    certifications: [],
-    animals_treated: [],
-    services_offered: [],
-    languages_spoken: ['spanish'],
+    availability: {} as AvailabilitySchedule,
+    education: [] as EducationEntry[],
+    certifications: [] as CertificationEntry[],
+    animals_treated: [] as string[],
+    services_offered: [] as ServiceOffered[],
+    languages_spoken: ['spanish'] as string[],
     emergency_services: false
   };
 
@@ -56,14 +55,22 @@ const VetProfileSetupScreen = () => {
         }
 
         if (vetData) {
+          // Convert JSON data from database to strongly-typed objects
+          const availability = vetData.availability as unknown as AvailabilitySchedule || {};
+          const education = Array.isArray(vetData.education) ? vetData.education as unknown as EducationEntry[] : [];
+          const certifications = Array.isArray(vetData.certifications) ? vetData.certifications as unknown as CertificationEntry[] : [];
+          const animals_treated = Array.isArray(vetData.animals_treated) ? vetData.animals_treated as unknown as string[] : [];
+          const services_offered = Array.isArray(vetData.services_offered) ? vetData.services_offered as unknown as ServiceOffered[] : [];
+          const languages_spoken = Array.isArray(vetData.languages_spoken) ? vetData.languages_spoken as unknown as string[] : ['spanish'];
+          
           setInitialData({
             ...vetData,
-            availability: vetData.availability || {},
-            education: vetData.education || [],
-            certifications: vetData.certifications || [],
-            animals_treated: vetData.animals_treated || [],
-            services_offered: vetData.services_offered || [],
-            languages_spoken: vetData.languages_spoken || ['spanish']
+            availability,
+            education,
+            certifications,
+            animals_treated,
+            services_offered,
+            languages_spoken
           });
         } else {
           // Check if the user has a service_provider record
@@ -112,7 +119,7 @@ const VetProfileSetupScreen = () => {
     setIsLoading(true);
 
     try {
-      // Update veterinarian record
+      // Update veterinarian record - convert types to match database requirements
       const { error: updateError } = await supabase
         .from('veterinarians')
         .update({
@@ -121,13 +128,13 @@ const VetProfileSetupScreen = () => {
           license_document_url: profileData.license_document_url,
           years_of_experience: profileData.years_of_experience,
           bio: profileData.bio,
-          availability: profileData.availability,
-          education: profileData.education,
-          certifications: profileData.certifications,
-          animals_treated: profileData.animals_treated,
-          services_offered: profileData.services_offered,
+          availability: profileData.availability as any,
+          education: profileData.education as any,
+          certifications: profileData.certifications as any,
+          animals_treated: profileData.animals_treated as any,
+          services_offered: profileData.services_offered as any,
           profile_image_url: profileData.profile_image_url,
-          languages_spoken: profileData.languages_spoken,
+          languages_spoken: profileData.languages_spoken as any,
           emergency_services: profileData.emergency_services
         })
         .eq('id', user.id);
