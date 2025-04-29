@@ -350,7 +350,7 @@ export type Database = {
           license_number: string | null
           profile_image_url: string | null
           services_offered: Json | null
-          specialization: string | null
+          specialization: Json | null
           years_of_experience: number | null
         }
         Insert: {
@@ -366,7 +366,7 @@ export type Database = {
           license_number?: string | null
           profile_image_url?: string | null
           services_offered?: Json | null
-          specialization?: string | null
+          specialization?: Json | null
           years_of_experience?: number | null
         }
         Update: {
@@ -382,7 +382,7 @@ export type Database = {
           license_number?: string | null
           profile_image_url?: string | null
           services_offered?: Json | null
-          specialization?: string | null
+          specialization?: Json | null
           years_of_experience?: number | null
         }
         Relationships: [

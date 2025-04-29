@@ -1,7 +1,7 @@
 
 export interface VeterinarianProfile {
   id?: string;
-  specialization: string;
+  specializations: string[];
   license_number: string;
   license_document_url?: string;
   years_of_experience: number;
@@ -65,6 +65,11 @@ export interface Language {
   label: string;
 }
 
+export interface Specialization {
+  value: string;
+  label: string;
+}
+
 export const ANIMAL_TYPES: AnimalType[] = [
   { value: 'dog', label: 'Perros' },
   { value: 'cat', label: 'Gatos' },
@@ -92,17 +97,24 @@ export const LANGUAGES: Language[] = [
   { value: 'arabic', label: 'Árabe' }
 ];
 
-export const SPECIALIZATIONS = [
+export const SPECIALIZATIONS: Specialization[] = [
   { value: 'general', label: 'Medicina general' },
+  { value: 'internal_medicine', label: 'Medicina Interna' },
   { value: 'surgery', label: 'Cirugía' },
   { value: 'dermatology', label: 'Dermatología' },
+  { value: 'ophthalmology', label: 'Oftalmología' },
+  { value: 'dentistry', label: 'Odontología' },
+  { value: 'anesthesiology', label: 'Anestesiología' },
+  { value: 'oncology', label: 'Oncología' },
   { value: 'cardiology', label: 'Cardiología' },
   { value: 'neurology', label: 'Neurología' },
-  { value: 'oncology', label: 'Oncología' },
-  { value: 'ophthalmology', label: 'Oftalmología' },
-  { value: 'orthopedics', label: 'Ortopedia' },
-  { value: 'dentistry', label: 'Odontología' },
-  { value: 'internal_medicine', label: 'Medicina interna' },
-  { value: 'exotic_animals', label: 'Animales exóticos' },
-  { value: 'reproduction', label: 'Reproducción' }
+  { value: 'exotic_animals', label: 'Medicina de Animales Exóticos' },
+  { value: 'large_animals', label: 'Medicina de Animales Grandes' },
+  { value: 'emergency_care', label: 'Emergencias y Cuidados Críticos' },
+  { value: 'rehabilitation', label: 'Rehabilitación y Fisioterapia' },
+  { value: 'ethology', label: 'Etología' },
+  { value: 'pathology', label: 'Patología' },
+  { value: 'sports_medicine', label: 'Medicina deportiva para animales' },
+  { value: 'nutrition', label: 'Nutriología' },
+  { value: 'preventive_medicine', label: 'Medicina preventiva y bienestar animal' }
 ];

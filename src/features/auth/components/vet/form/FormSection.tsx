@@ -9,7 +9,7 @@ interface FormSectionProps {
 
 const FormSection: React.FC<FormSectionProps> = ({ title, children }) => {
   return (
-    <div className="space-y-6">
+    <div className="mb-12 pt-4 bg-white rounded-xl p-6 shadow-sm">
       <SectionHeader title={title} />
       {children}
     </div>

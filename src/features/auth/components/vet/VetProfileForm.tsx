@@ -10,12 +10,14 @@ import CertificationsSection from './form-sections/CertificationsSection';
 import AvailabilitySection from './form-sections/AvailabilitySection';
 import ServicesSection from './form-sections/ServicesSection';
 import AnimalsSection from './form-sections/AnimalsSection';
+import LanguagesSection from './form-sections/LanguagesSection';
 import ProfileImageSection from './form/ProfileImageSection';
 import FormSection from './form/FormSection';
 import FormFooter from './form/FormFooter';
+import EmergencyServicesSection from './form-sections/EmergencyServicesSection';
 
 const veterinarianSchema = z.object({
-  specialization: z.string().min(1, 'La especialización es requerida'),
+  specializations: z.array(z.string()).min(1, 'Al menos una especialización es requerida'),
   license_number: z.string().min(1, 'El número de licencia es requerido'),
   years_of_experience: z.number()
     .min(0, 'Los años de experiencia no pueden ser negativos')
@@ -71,7 +73,6 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
     formState: { errors, isValid },
     setValue,
     watch,
-    reset,
   } = useForm<VeterinarianProfile>({
     resolver: zodResolver(veterinarianSchema),
     defaultValues: initialData,
@@ -90,18 +91,16 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(processSubmit)} className="bg-white rounded-xl shadow-lg px-6 py-8">
-      <div className="space-y-12">
+    <form onSubmit={handleSubmit(processSubmit)} className="px-4">
+      <div className="space-y-8">
         {/* Profile Image Section */}
         <ProfileImageSection 
           control={control} 
           errors={errors}
           profileImageUrl={profileImageUrl}
           setProfileImageFile={setProfileImageFile}
-          licenseDocumentUrl={licenseDocumentUrl}
-          setLicenseDocumentFile={setLicenseDocumentFile}
-          setValue={setValue}
           userId={userId}
+          setValue={setValue}
         />
 
         {/* Basic Information Section */}
@@ -109,14 +108,10 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
           <BasicInfoSection 
             control={control} 
             errors={errors}
-            profileImageUrl={profileImageUrl}
-            setProfileImageFile={setProfileImageFile}
             licenseDocumentUrl={licenseDocumentUrl}
             setLicenseDocumentFile={setLicenseDocumentFile}
             setValue={setValue}
             userId={userId}
-            renderHeader={false}
-            skipProfileImage={true}
           />
         </FormSection>
 
@@ -140,14 +135,6 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
           />
         </FormSection>
 
-        {/* Availability Section */}
-        <FormSection title="Disponibilidad">
-          <AvailabilitySection 
-            control={control} 
-            errors={errors} 
-          />
-        </FormSection>
-
         {/* Services Section */}
         <FormSection title="Servicios">
           <ServicesSection 
@@ -157,9 +144,33 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
           />
         </FormSection>
 
+        {/* Languages Section */}
+        <FormSection title="Idiomas">
+          <LanguagesSection 
+            control={control} 
+            errors={errors}
+          />
+        </FormSection>
+
         {/* Animals Section */}
-        <FormSection title="Animales">
+        <FormSection title="Animales que Tratas">
           <AnimalsSection 
+            control={control} 
+            errors={errors}
+          />
+        </FormSection>
+
+        {/* Availability Section */}
+        <FormSection title="Disponibilidad">
+          <AvailabilitySection 
+            control={control} 
+            errors={errors} 
+          />
+        </FormSection>
+
+        {/* Emergency Services Section */}
+        <FormSection title="Servicios de Emergencia">
+          <EmergencyServicesSection 
             control={control} 
             errors={errors}
           />

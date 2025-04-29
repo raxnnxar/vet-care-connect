@@ -11,8 +11,8 @@ interface FormFooterProps {
 
 const FormFooter: React.FC<FormFooterProps> = ({ isSubmitting, isValid, hasErrors }) => {
   return (
-    <div className="mt-12 pt-6 border-t border-gray-200">
-      <div className="flex justify-between items-center">
+    <div className="sticky bottom-6 z-10 mt-8">
+      <div className="bg-white rounded-xl shadow-lg p-4 flex justify-between items-center">
         <div>
           {hasErrors && (
             <p className="text-red-500 text-sm">
@@ -24,6 +24,7 @@ const FormFooter: React.FC<FormFooterProps> = ({ isSubmitting, isValid, hasError
           type="submit" 
           disabled={isSubmitting || !isValid} 
           className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
+          size="lg"
         >
           {isSubmitting ? (
             <>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -57,6 +58,11 @@ const parseLanguages = (json: any): string[] => {
   return json.map(item => String(item || ''));
 };
 
+const parseSpecializations = (json: any): string[] => {
+  if (!json || !Array.isArray(json)) return ['general'];
+  return json.map(item => String(item || ''));
+};
+
 const VetProfileSetupScreen = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -66,7 +72,7 @@ const VetProfileSetupScreen = () => {
 
   // Default values for a new vet profile
   const defaultProfile: VeterinarianProfile = {
-    specialization: 'general',
+    specializations: ['general'],
     license_number: '',
     years_of_experience: 0,
     bio: '',
@@ -105,7 +111,7 @@ const VetProfileSetupScreen = () => {
         if (vetData) {
           // Safely parse and convert JSON data from database to strongly-typed objects
           const typedProfile: VeterinarianProfile = {
-            specialization: vetData.specialization || 'general',
+            specializations: parseSpecializations(vetData.specialization),
             license_number: vetData.license_number || '',
             license_document_url: vetData.license_document_url,
             years_of_experience: vetData.years_of_experience || 0,
@@ -172,7 +178,7 @@ const VetProfileSetupScreen = () => {
       const completeProfile: VeterinarianProfile = {
         ...profileData,
         // Provide defaults for required fields that might be missing
-        specialization: profileData.specialization || 'general',
+        specializations: profileData.specializations || ['general'],
         license_number: profileData.license_number || '',
         years_of_experience: profileData.years_of_experience || 0,
         bio: profileData.bio || '',
@@ -190,7 +196,7 @@ const VetProfileSetupScreen = () => {
       const { error: updateError } = await supabase
         .from('veterinarians')
         .update({
-          specialization: completeProfile.specialization,
+          specialization: completeProfile.specializations as any,
           license_number: completeProfile.license_number,
           license_document_url: completeProfile.license_document_url,
           years_of_experience: completeProfile.years_of_experience,
@@ -240,7 +246,7 @@ const VetProfileSetupScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#79D0B8] to-[#5FBFB3] py-8 px-4">
-      <div className="container mx-auto max-w-3xl">
+      <div className="container mx-auto max-w-3xl px-0">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Configura tu perfil profesional</h1>
           <p className="text-white/80 mt-2">

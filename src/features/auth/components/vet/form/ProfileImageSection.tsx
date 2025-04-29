@@ -1,43 +1,97 @@
 
 import React from 'react';
-import BasicInfoSection from '../form-sections/BasicInfoSection';
 import { Control, FieldErrors } from 'react-hook-form';
-import { VeterinarianProfile } from '../../../types/veterinarianTypes';
+import { Upload } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/ui/atoms/avatar';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
 
 interface ProfileImageSectionProps {
   control: Control<VeterinarianProfile>;
   errors: FieldErrors<VeterinarianProfile>;
-  profileImageUrl: string | undefined;
+  profileImageUrl?: string;
   setProfileImageFile: (file: File | null) => void;
-  licenseDocumentUrl: string | undefined;
-  setLicenseDocumentFile: (file: File | null) => void;
   setValue: any;
   userId: string;
 }
 
 const ProfileImageSection: React.FC<ProfileImageSectionProps> = ({
-  control,
   errors,
   profileImageUrl,
   setProfileImageFile,
-  licenseDocumentUrl,
-  setLicenseDocumentFile,
   setValue,
-  userId
+  userId,
 }) => {
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+
+    const file = e.target.files[0];
+    const fileSize = file.size / 1024 / 1024; // in MB
+    
+    if (fileSize > 5) {
+      toast.error('La imagen no debe exceder 5MB');
+      return;
+    }
+    
+    setProfileImageFile(file);
+    
+    try {
+      const filePath = `${userId}/${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage
+        .from('vet-profile-images')
+        .upload(filePath, file);
+
+      if (error) {
+        throw error;
+      }
+
+      const { data } = supabase.storage
+        .from('vet-profile-images')
+        .getPublicUrl(filePath);
+
+      setValue('profile_image_url', data.publicUrl);
+      toast.success('Imagen de perfil actualizada');
+    } catch (error: any) {
+      toast.error('Error al subir la imagen: ' + error.message);
+      console.error('Error uploading profile image:', error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center mb-8">
-      <BasicInfoSection 
-        control={control} 
-        errors={errors}
-        profileImageUrl={profileImageUrl}
-        setProfileImageFile={setProfileImageFile}
-        licenseDocumentUrl={licenseDocumentUrl}
-        setLicenseDocumentFile={setLicenseDocumentFile}
-        setValue={setValue}
-        userId={userId}
-        renderHeader={false}
-      />
+      <div className="relative">
+        <Avatar className="w-32 h-32 border-4 border-white shadow-md">
+          {profileImageUrl ? (
+            <AvatarImage src={profileImageUrl} alt="Foto de perfil" />
+          ) : (
+            <AvatarFallback className="bg-[#79D0B8]/20 text-[#79D0B8] flex items-center justify-center text-3xl">
+              VET
+            </AvatarFallback>
+          )}
+        </Avatar>
+        <input
+          id="profile-image"
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleProfileImageChange}
+        />
+        <label
+          htmlFor="profile-image"
+          className="absolute bottom-0 right-0 rounded-full bg-[#79D0B8] p-2 cursor-pointer shadow-md hover:bg-[#5FBFB3] transition-colors"
+        >
+          <Upload className="h-5 w-5 text-white" />
+        </label>
+      </div>
+      <p className="text-base text-gray-800 font-medium mt-4">
+        Foto de perfil
+      </p>
+      <p className="text-sm text-gray-500 mt-1">
+        Añade una foto profesional para generar confianza
+      </p>
     </div>
   );
 };

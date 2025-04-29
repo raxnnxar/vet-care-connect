@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
-import { VeterinarianProfile, ANIMAL_TYPES } from '../../../types/veterinarianTypes';
+import { VeterinarianProfile, LANGUAGES } from '../../../types/veterinarianTypes';
 import { Label } from '@/ui/atoms/label';
 import { Button } from '@/ui/atoms/button';
-import { Check, X, Dog, Cat } from 'lucide-react';
+import { Check, X, Languages } from 'lucide-react';
 import { Badge } from '@/ui/atoms/badge';
 import {
   Command,
@@ -20,33 +20,33 @@ import {
 } from '@/ui/molecules/popover';
 import { cn } from '@/lib/utils';
 
-interface AnimalsSectionProps {
+interface LanguagesSectionProps {
   control: Control<VeterinarianProfile>;
   errors: FieldErrors<VeterinarianProfile>;
 }
 
-const AnimalsSection: React.FC<AnimalsSectionProps> = ({
+const LanguagesSection: React.FC<LanguagesSectionProps> = ({
   control,
   errors,
 }) => {
-  const [animalSearchValue, setAnimalSearchValue] = React.useState('');
+  const [languageSearchValue, setLanguageSearchValue] = React.useState('');
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-baseline">
         <div>
-          <h3 className="text-xl font-semibold text-gray-800">Animales</h3>
+          <h3 className="text-xl font-semibold text-gray-800">Idiomas</h3>
           <p className="text-gray-500 text-sm mt-1">
-            Selecciona los tipos de animales que atiendes en tu práctica
+            Selecciona los idiomas que hablas para que los dueños de mascotas puedan comunicarse contigo
           </p>
         </div>
-        {errors.animals_treated && (
-          <p className="text-sm text-red-500">Debes seleccionar al menos un tipo de animal</p>
+        {errors.languages_spoken && (
+          <p className="text-sm text-red-500">Debes seleccionar al menos un idioma</p>
         )}
       </div>
       
       <Controller
-        name="animals_treated"
+        name="languages_spoken"
         control={control}
         render={({ field }) => (
           <>
@@ -57,47 +57,44 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                   className={cn(
                     "w-full justify-start text-left font-normal",
                     !field.value?.length && "text-muted-foreground",
-                    errors.animals_treated && "border-red-500"
+                    errors.languages_spoken && "border-red-500"
                   )}
                 >
-                  <div className="flex items-center gap-1">
-                    <Dog className="h-4 w-4 text-gray-500" />
-                    <Cat className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <span className="ml-2">
+                  <Languages className="mr-2 h-4 w-4 text-gray-500" />
+                  <span>
                     {field.value?.length
-                      ? `${field.value.length} tipo${field.value.length > 1 ? 's' : ''} de animal${field.value.length > 1 ? 'es' : ''} seleccionado${field.value.length > 1 ? 's' : ''}`
-                      : "Selecciona los tipos de animales"}
+                      ? `${field.value.length} idioma${field.value.length > 1 ? 's' : ''} seleccionado${field.value.length > 1 ? 's' : ''}`
+                      : "Selecciona idiomas"}
                   </span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
                 <Command>
                   <CommandInput 
-                    placeholder="Buscar animal..." 
-                    value={animalSearchValue}
-                    onValueChange={setAnimalSearchValue}
+                    placeholder="Buscar idioma..." 
+                    value={languageSearchValue}
+                    onValueChange={setLanguageSearchValue}
                   />
                   <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
                   <CommandGroup className="max-h-64 overflow-auto">
-                    {ANIMAL_TYPES.map((animal) => {
-                      const isSelected = field.value?.includes(animal.value);
+                    {LANGUAGES.map((language) => {
+                      const isSelected = field.value?.includes(language.value);
                       return (
                         <CommandItem
-                          key={animal.value}
+                          key={language.value}
                           onSelect={() => {
                             let newValues: string[];
                             
                             if (isSelected) {
                               newValues = field.value?.filter(
-                                (val: string) => val !== animal.value
+                                (val: string) => val !== language.value
                               ) || [];
                             } else {
-                              newValues = [...(field.value || []), animal.value];
+                              newValues = [...(field.value || []), language.value];
                             }
                             
                             field.onChange(newValues);
-                            setAnimalSearchValue('');
+                            setLanguageSearchValue('');
                           }}
                         >
                           <div 
@@ -108,7 +105,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                           >
                             {isSelected && <Check className="h-3 w-3" />}
                           </div>
-                          <span>{animal.label}</span>
+                          <span>{language.label}</span>
                         </CommandItem>
                       );
                     })}
@@ -117,19 +114,19 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
               </PopoverContent>
             </Popover>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
-              {field.value?.map((animalValue: string) => {
-                const animal = ANIMAL_TYPES.find(a => a.value === animalValue);
+            <div className="flex flex-wrap gap-2 mt-4">
+              {field.value?.map((langValue: string) => {
+                const language = LANGUAGES.find(l => l.value === langValue);
                 return (
-                  <Badge key={animalValue} className="py-1 px-3 bg-[#FF8A65] hover:bg-[#FF7043]">
-                    {animal?.label || animalValue}
+                  <Badge key={langValue} className="py-1 px-3 bg-[#79D0B8] hover:bg-[#5FBFB3]">
+                    {language?.label || langValue}
                     <button
                       type="button"
                       onClick={() => {
-                        const newValues = field.value.filter((val: string) => val !== animalValue);
+                        const newValues = field.value.filter((val: string) => val !== langValue);
                         field.onChange(newValues);
                       }}
-                      className="ml-2 rounded-full hover:bg-[#FF7043]"
+                      className="ml-2 rounded-full hover:bg-[#5FBFB3]"
                     >
                       <X className="h-3 w-3" />
                       <span className="sr-only">Eliminar</span>
@@ -145,4 +142,4 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
   );
 };
 
-export default AnimalsSection;
+export default LanguagesSection;
