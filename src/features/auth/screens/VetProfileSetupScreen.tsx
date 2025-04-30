@@ -48,7 +48,7 @@ const VetProfileSetupScreen = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Configura tu perfil profesional</h1>
           <p className="text-white/80 mt-2">
-            Completa tu información para que los dueños de mascotas puedan encontrarte
+            Completa la información que desees para tu perfil profesional
           </p>
         </div>
 

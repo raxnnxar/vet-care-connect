@@ -16,13 +16,12 @@ import FormSection from './form/FormSection';
 import FormFooter from './form/FormFooter';
 import EmergencyServicesSection from './form-sections/EmergencyServicesSection';
 
+// Updated schema to make all fields optional
 const veterinarianSchema = z.object({
-  // Made optional by adding .optional() or using empty arrays as defaults
+  // All top-level fields made optional with defaults
   specializations: z.array(z.string()).optional().default([]),
-  license_number: z.string().min(1, 'El número de licencia es requerido'),
+  license_number: z.string().optional().default(''),
   years_of_experience: z.number()
-    .min(0, 'Los años de experiencia no pueden ser negativos')
-    .max(70, 'Los años de experiencia deben ser menores a 70')
     .optional()
     .default(0),
   bio: z.string().optional().default(''),
@@ -30,6 +29,8 @@ const veterinarianSchema = z.object({
   license_document_url: z.string().optional(),
   emergency_services: z.boolean().optional().default(false),
   availability: z.any().optional().default({}),
+  
+  // Nested arrays with optional fields
   education: z.array(z.object({
     id: z.string(),
     degree: z.string().optional().default(''),
@@ -37,6 +38,7 @@ const veterinarianSchema = z.object({
     year: z.number().optional().default(new Date().getFullYear()),
     document_url: z.string().optional(),
   })).optional().default([]),
+  
   certifications: z.array(z.object({
     id: z.string(),
     title: z.string().optional().default(''),
@@ -45,12 +47,15 @@ const veterinarianSchema = z.object({
     expiry_date: z.string().optional(),
     document_url: z.string().optional(),
   })).optional().default([]),
+  
   animals_treated: z.array(z.string()).optional().default([]),
+  
   services_offered: z.array(z.object({
     id: z.string(),
     name: z.string().optional().default(''),
     description: z.string().optional().default(''),
   })).optional().default([]),
+  
   languages_spoken: z.array(z.string()).optional().default([]),
 });
 

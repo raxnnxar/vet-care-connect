@@ -21,7 +21,7 @@ const BasicInfoFields: React.FC<BasicInfoFieldsProps> = ({
       {/* License Number */}
       <div className="space-y-2">
         <Label htmlFor="license_number" className="text-base">
-          Número de licencia <span className="text-red-500">*</span>
+          Número de licencia
         </Label>
         <Input
           id="license_number"
@@ -38,7 +38,7 @@ const BasicInfoFields: React.FC<BasicInfoFieldsProps> = ({
       {/* Years of Experience */}
       <div className="space-y-2">
         <Label htmlFor="years_of_experience" className="text-base">
-          Años de experiencia <span className="text-red-500">*</span>
+          Años de experiencia
         </Label>
         <Input
           id="years_of_experience"
