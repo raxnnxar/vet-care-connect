@@ -74,7 +74,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0 bg-white z-50" align="start">
-                  <Command shouldFilter={true}>
+                  <Command>
                     <CommandInput 
                       placeholder="Buscar animal..." 
                       value={animalSearchValue}

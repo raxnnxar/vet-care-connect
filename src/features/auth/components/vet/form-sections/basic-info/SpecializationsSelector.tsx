@@ -97,7 +97,7 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0 max-h-[300px] overflow-auto bg-white z-50" align="start">
-          <Command shouldFilter={true}>
+          <Command>
             <CommandInput 
               placeholder="Buscar especialización..." 
               value={specializationSearchValue}
