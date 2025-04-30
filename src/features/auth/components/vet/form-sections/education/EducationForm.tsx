@@ -46,7 +46,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
       <div className="space-y-4 py-2">
         <div className="space-y-2">
           <Label htmlFor="degree">
-            Título/Grado <span className="text-red-500">*</span>
+            Título/Grado
           </Label>
           <Input
             id="degree"
@@ -62,7 +62,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="institution">
-            Institución <span className="text-red-500">*</span>
+            Institución
           </Label>
           <Input
             id="institution"
@@ -78,7 +78,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="year">
-            Año <span className="text-red-500">*</span>
+            Año
           </Label>
           <Input
             id="year"

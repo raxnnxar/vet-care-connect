@@ -22,7 +22,7 @@ const FormFooter: React.FC<FormFooterProps> = ({ isSubmitting, isValid, hasError
         </div>
         <Button 
           type="submit" 
-          disabled={isSubmitting || !isValid} 
+          disabled={isSubmitting} 
           className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
           size="lg"
         >

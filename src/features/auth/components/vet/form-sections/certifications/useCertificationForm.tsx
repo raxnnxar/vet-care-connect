@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { Control } from 'react-hook-form';
@@ -66,22 +67,8 @@ export const useCertificationForm = ({ control, setValue, userId }: UseCertifica
   };
 
   const validateNewCertification = () => {
-    const errors: Record<string, string> = {};
-
-    if (!newCertification.title.trim()) {
-      errors.title = 'El título es requerido';
-    }
-
-    if (!newCertification.organization.trim()) {
-      errors.organization = 'La organización es requerida';
-    }
-
-    if (!newCertification.issue_date) {
-      errors.issue_date = 'La fecha de emisión es requerida';
-    }
-
-    setNewCertificationErrors(errors);
-    return Object.keys(errors).length === 0;
+    // We're making fields optional now, so returning true
+    return true;
   };
 
   const handleAddCertification = () => {

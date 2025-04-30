@@ -30,11 +30,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     <>
       <div className="space-y-4 py-2">
         <div className="space-y-2">
-          <Label htmlFor="name">
-            Nombre del Servicio <span className="text-red-500">*</span>
+          <Label htmlFor="service_name">
+            Nombre del Servicio
           </Label>
           <Input
-            id="name"
+            id="service_name"
             value={name}
             onChange={(e) => onChange('name', e.target.value)}
             placeholder="Ej. Consulta General, Vacunación, Cirugía, etc."
@@ -44,17 +44,18 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
             <p className="text-sm text-red-500">{errors.name}</p>
           )}
         </div>
-
+        
         <div className="space-y-2">
-          <Label htmlFor="description">
-            Descripción <span className="text-red-500">*</span>
+          <Label htmlFor="service_description">
+            Descripción
           </Label>
           <Textarea
-            id="description"
+            id="service_description"
             value={description}
             onChange={(e) => onChange('description', e.target.value)}
             placeholder="Describe brevemente en qué consiste este servicio..."
-            className={`min-h-[100px] resize-y ${errors.description ? "border-red-500" : ""}`}
+            className={errors.description ? "border-red-500" : ""}
+            rows={4}
           />
           {errors.description && (
             <p className="text-sm text-red-500">{errors.description}</p>

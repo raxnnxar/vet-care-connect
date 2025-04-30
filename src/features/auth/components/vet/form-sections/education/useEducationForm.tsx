@@ -1,72 +1,70 @@
 
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { EducationEntry } from '../../../../types/veterinarianTypes';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { useFieldArray } from 'react-hook-form';
 import { Control } from 'react-hook-form';
-import { VeterinarianProfile } from '../../../../types/veterinarianTypes';
+import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
+import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+interface EducationErrors {
+  degree?: string;
+  institution?: string;
+  year?: string;
+}
 
 export const useEducationForm = (control: Control<VeterinarianProfile>, setValue: any, userId: string) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState<Record<string, boolean>>({});
-  const [newEducationFile, setNewEducationFile] = useState<File | null>(null);
-  const [newEducation, setNewEducation] = useState<Omit<EducationEntry, 'id'>>({
+  const [newEducation, setNewEducation] = useState({
     degree: '',
     institution: '',
-    year: new Date().getFullYear()
+    year: new Date().getFullYear(),
   });
-  const [newEducationErrors, setNewEducationErrors] = useState<Record<string, string>>({});
-
+  const [newEducationFile, setNewEducationFile] = useState<File | null>(null);
+  const [newEducationErrors, setNewEducationErrors] = useState<EducationErrors>({});
+  
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'education'
+    name: 'education',
   });
-
-  // Make sure fields array is properly typed as EducationEntry[]
-  const educationFields = fields as unknown as EducationEntry[];
-
-  const validateNewEducation = () => {
-    const errors: Record<string, string> = {};
-
-    if (!newEducation.degree.trim()) {
-      errors.degree = 'El título es requerido';
-    }
-
-    if (!newEducation.institution.trim()) {
-      errors.institution = 'La institución es requerida';
-    }
-
-    const currentYear = new Date().getFullYear();
-    if (!newEducation.year || newEducation.year < 1950 || newEducation.year > currentYear) {
-      errors.year = `El año debe estar entre 1950 y ${currentYear}`;
-    }
-
-    setNewEducationErrors(errors);
-    return Object.keys(errors).length === 0;
+  
+  const validateEducation = () => {
+    const errors: EducationErrors = {};
+    
+    // We're making fields optional now, so returning true
+    return true;
   };
-
-  const handleAddEducation = () => {
-    if (validateNewEducation()) {
+  
+  const handleAddEducation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (validateEducation()) {
+      const newEducationId = uuidv4();
+      
       append({
-        id: uuidv4(),
-        ...newEducation,
-        document_url: undefined
+        id: newEducationId,
+        degree: newEducation.degree,
+        institution: newEducation.institution,
+        year: newEducation.year,
       });
       
+      if (newEducationFile) {
+        handleUploadNewEducationDocument(newEducationFile, newEducationId);
+      }
+      
+      setIsDialogOpen(false);
       setNewEducation({
         degree: '',
         institution: '',
-        year: new Date().getFullYear()
+        year: new Date().getFullYear(),
       });
       setNewEducationFile(null);
-      setIsDialogOpen(false);
     }
   };
-
+  
   const handleUploadDocument = async (educationId: string, file: File) => {
-    if (!file) return;
+    if (!file || !userId) return;
     
     setIsUploading(prev => ({ ...prev, [educationId]: true }));
     
@@ -88,30 +86,33 @@ export const useEducationForm = (control: Control<VeterinarianProfile>, setValue
         .from('vet-documents')
         .getPublicUrl(filePath);
       
-      const index = educationFields.findIndex(f => f.id === educationId);
+      // Find the index of the education in the fields array
+      const index = fields.findIndex(f => f.id === educationId);
       
       if (index !== -1) {
+        // Update the document_url for the specific education entry
         setValue(`education.${index}.document_url`, urlData.publicUrl);
       }
       
-      toast.success('Documento educativo subido con éxito');
+      toast.success('Documento subido con éxito');
       
     } catch (error: any) {
-      console.error('Error uploading education document:', error);
+      console.error('Error uploading document:', error);
       toast.error(`Error al subir el documento: ${error.message}`);
     } finally {
       setIsUploading(prev => ({ ...prev, [educationId]: false }));
     }
   };
-
-  const handleUploadNewEducationDocument = async (file: File) => {
-    if (!file) return;
+  
+  const handleUploadNewEducationDocument = async (file: File, educationId?: string) => {
     setNewEducationFile(file);
-    toast.success('Documento seleccionado. Se subirá cuando añadas la educación.');
+    if (educationId) {
+      handleUploadDocument(educationId, file);
+    }
   };
-
+  
   return {
-    fields: educationFields,
+    fields,
     isDialogOpen,
     setIsDialogOpen,
     isUploading,

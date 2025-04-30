@@ -61,7 +61,7 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
       <div className="space-y-4 py-2">
         <div className="space-y-2">
           <Label htmlFor="title">
-            Título de la Certificación <span className="text-red-500">*</span>
+            Título de la Certificación
           </Label>
           <Input
             id="title"
@@ -77,7 +77,7 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="organization">
-            Organización <span className="text-red-500">*</span>
+            Organización
           </Label>
           <Input
             id="organization"
@@ -94,7 +94,7 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="issue_date">
-              Fecha de Emisión <span className="text-red-500">*</span>
+              Fecha de Emisión
             </Label>
             <Popover>
               <PopoverTrigger asChild>

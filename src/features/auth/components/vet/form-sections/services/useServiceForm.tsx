@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { Control } from 'react-hook-form';
-import { VeterinarianProfile, ServiceOffered } from '@/features/auth/types/veterinarianTypes';
+import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
 import { v4 as uuidv4 } from 'uuid';
 
 interface UseServiceFormProps {
@@ -11,61 +11,54 @@ interface UseServiceFormProps {
 
 export const useServiceForm = ({ control }: UseServiceFormProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newService, setNewService] = useState<Omit<ServiceOffered, 'id'>>({
+  const [newService, setNewService] = useState({
     name: '',
     description: ''
   });
   const [newServiceErrors, setNewServiceErrors] = useState<Record<string, string>>({});
-
+  
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'services_offered'
+    name: 'services_offered',
   });
-
-  const serviceFields = fields as ServiceOffered[];
-
-  const openDialog = () => {
-    setIsDialogOpen(true);
-  };
-
+  
+  const openDialog = () => setIsDialogOpen(true);
   const closeDialog = () => {
     setIsDialogOpen(false);
     setNewService({ name: '', description: '' });
     setNewServiceErrors({});
   };
-
+  
   const handleFieldChange = (field: string, value: string) => {
     setNewService(prev => ({ ...prev, [field]: value }));
+    // Clear errors when field is edited
+    if (newServiceErrors[field]) {
+      const updatedErrors = { ...newServiceErrors };
+      delete updatedErrors[field];
+      setNewServiceErrors(updatedErrors);
+    }
   };
-
-  const validateNewService = () => {
+  
+  const validateService = () => {
     const errors: Record<string, string> = {};
-
-    if (!newService.name.trim()) {
-      errors.name = 'El nombre del servicio es requerido';
-    }
-
-    if (!newService.description.trim()) {
-      errors.description = 'La descripción del servicio es requerida';
-    }
-
-    setNewServiceErrors(errors);
-    return Object.keys(errors).length === 0;
+    
+    // We're making fields optional now so returning true
+    return true;
   };
-
+  
   const handleAddService = () => {
-    if (validateNewService()) {
+    if (validateService()) {
       append({
         id: uuidv4(),
-        ...newService
+        name: newService.name,
+        description: newService.description
       });
-      
       closeDialog();
     }
   };
 
   return {
-    serviceFields,
+    serviceFields: fields,
     isDialogOpen,
     newService,
     newServiceErrors,
