@@ -17,38 +17,41 @@ import FormFooter from './form/FormFooter';
 import EmergencyServicesSection from './form-sections/EmergencyServicesSection';
 
 const veterinarianSchema = z.object({
-  specializations: z.array(z.string()).min(1, 'Al menos una especialización es requerida'),
+  // Made optional by adding .optional() or using empty arrays as defaults
+  specializations: z.array(z.string()).optional().default([]),
   license_number: z.string().min(1, 'El número de licencia es requerido'),
   years_of_experience: z.number()
     .min(0, 'Los años de experiencia no pueden ser negativos')
-    .max(70, 'Los años de experiencia deben ser menores a 70'),
-  bio: z.string().optional(),
+    .max(70, 'Los años de experiencia deben ser menores a 70')
+    .optional()
+    .default(0),
+  bio: z.string().optional().default(''),
   profile_image_url: z.string().optional(),
   license_document_url: z.string().optional(),
-  emergency_services: z.boolean(),
-  availability: z.any(),
+  emergency_services: z.boolean().optional().default(false),
+  availability: z.any().optional().default({}),
   education: z.array(z.object({
     id: z.string(),
-    degree: z.string().min(1, 'El título es requerido'),
-    institution: z.string().min(1, 'La institución es requerida'),
-    year: z.number().min(1950, 'El año debe ser posterior a 1950').max(new Date().getFullYear(), 'El año no puede ser futuro'),
+    degree: z.string().optional().default(''),
+    institution: z.string().optional().default(''),
+    year: z.number().optional().default(new Date().getFullYear()),
     document_url: z.string().optional(),
-  })),
+  })).optional().default([]),
   certifications: z.array(z.object({
     id: z.string(),
-    title: z.string().min(1, 'El título es requerido'),
-    organization: z.string().min(1, 'La organización es requerida'),
-    issue_date: z.string().min(1, 'La fecha de emisión es requerida'),
+    title: z.string().optional().default(''),
+    organization: z.string().optional().default(''),
+    issue_date: z.string().optional().default(''),
     expiry_date: z.string().optional(),
     document_url: z.string().optional(),
-  })),
-  animals_treated: z.array(z.string()).min(1, 'Debe seleccionar al menos un tipo de animal'),
+  })).optional().default([]),
+  animals_treated: z.array(z.string()).optional().default([]),
   services_offered: z.array(z.object({
     id: z.string(),
-    name: z.string().min(1, 'El nombre del servicio es requerido'),
-    description: z.string().min(1, 'La descripción del servicio es requerida'),
-  })),
-  languages_spoken: z.array(z.string()).min(1, 'Debe seleccionar al menos un idioma'),
+    name: z.string().optional().default(''),
+    description: z.string().optional().default(''),
+  })).optional().default([]),
+  languages_spoken: z.array(z.string()).optional().default([]),
 });
 
 interface VetProfileFormProps {

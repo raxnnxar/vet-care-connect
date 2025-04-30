@@ -65,7 +65,7 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
   return (
     <div className="space-y-2">
       <Label htmlFor="specializations" className="text-base">
-        Especializaciones <span className="text-red-500">*</span>
+        Especializaciones
       </Label>
       <p className="text-sm text-gray-500">
         Selecciona todas las especializaciones que apliquen a tu práctica veterinaria
