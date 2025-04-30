@@ -7,9 +7,22 @@ interface FormFooterProps {
   isSubmitting: boolean;
   isValid: boolean;
   hasErrors: boolean;
+  onForceSubmit?: () => void;
 }
 
-const FormFooter: React.FC<FormFooterProps> = ({ isSubmitting, isValid, hasErrors }) => {
+const FormFooter: React.FC<FormFooterProps> = ({ 
+  isSubmitting, 
+  isValid, 
+  hasErrors,
+  onForceSubmit 
+}) => {
+  const handleButtonClick = (e: React.MouseEvent) => {
+    if (hasErrors && onForceSubmit) {
+      e.preventDefault();
+      onForceSubmit();
+    }
+  };
+
   return (
     <div className="sticky bottom-6 z-10 mt-8">
       <div className="bg-white rounded-xl shadow-lg p-4 flex justify-between items-center">
@@ -25,6 +38,7 @@ const FormFooter: React.FC<FormFooterProps> = ({ isSubmitting, isValid, hasError
           disabled={isSubmitting} 
           className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
           size="lg"
+          onClick={handleButtonClick}
         >
           {isSubmitting ? (
             <>

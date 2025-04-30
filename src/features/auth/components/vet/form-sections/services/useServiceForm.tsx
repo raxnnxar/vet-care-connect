@@ -46,14 +46,12 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   };
   
   const handleAddService = () => {
-    if (validateService()) {
-      append({
-        id: uuidv4(),
-        name: newService.name,
-        description: newService.description
-      });
-      closeDialog();
-    }
+    append({
+      id: uuidv4(),
+      name: newService.name || '',
+      description: newService.description || ''
+    });
+    closeDialog();
   };
 
   return {

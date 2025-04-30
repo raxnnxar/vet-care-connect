@@ -26,15 +26,16 @@ const VetProfileSetupScreen = () => {
     }
 
     setIsLoading(true);
+    console.log("Submitting profile data:", profileData);
 
-    // Always allow submission regardless of validation
     try {
       await updateVeterinarianProfile(userId, profileData);
       toast.success('Perfil actualizado con éxito');
+      // Redirect to vet dashboard immediately after success
       navigate(ROUTES.VET);
     } catch (error: any) {
+      console.error("Error details:", error);
       toast.error(`Error al actualizar el perfil: ${error.message}`);
-    } finally {
       setIsLoading(false);
     }
   };

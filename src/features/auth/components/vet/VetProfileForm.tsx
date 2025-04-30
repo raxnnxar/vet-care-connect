@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -81,6 +80,7 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
     formState: { errors, isValid },
     setValue,
     watch,
+    getValues
   } = useForm<VeterinarianProfile>({
     resolver: zodResolver(veterinarianSchema),
     defaultValues: initialData,
@@ -96,6 +96,12 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
     } catch (error) {
       console.error('Error submitting form:', error);
     }
+  };
+
+  const forceSubmit = () => {
+    // Get current values regardless of validation
+    const currentData = getValues();
+    onSubmit(currentData);
   };
 
   return (
@@ -190,6 +196,7 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
         isSubmitting={isSubmitting} 
         isValid={isValid} 
         hasErrors={Object.keys(errors).length > 0} 
+        onForceSubmit={forceSubmit}
       />
     </form>
   );
