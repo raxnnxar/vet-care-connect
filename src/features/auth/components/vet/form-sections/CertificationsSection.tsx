@@ -30,6 +30,7 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({
   const {
     certificationFields,
     isDialogOpen,
+    setIsDialogOpen, // This was missing in the useCertificationForm hook return values
     isUploading,
     newCertification,
     newCertificationFile,

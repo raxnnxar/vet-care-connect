@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { Control } from 'react-hook-form';
@@ -157,6 +156,7 @@ export const useCertificationForm = ({ control, setValue, userId }: UseCertifica
   return {
     certificationFields,
     isDialogOpen,
+    setIsDialogOpen,
     isUploading,
     newCertification,
     newCertificationFile,
