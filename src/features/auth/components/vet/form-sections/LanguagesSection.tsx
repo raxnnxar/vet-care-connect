@@ -54,8 +54,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                     type="button"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !languagesValue.length && "text-muted-foreground",
-                      errors.languages_spoken && "border-red-500"
+                      !languagesValue.length && "text-muted-foreground"
                     )}
                     onClick={(e) => {
                       e.preventDefault();
@@ -66,7 +65,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                     <span>
                       {languagesValue.length
                         ? `${languagesValue.length} idioma${languagesValue.length > 1 ? 's' : ''} seleccionado${languagesValue.length > 1 ? 's' : ''}`
-                        : "Selecciona idiomas"}
+                        : "Selecciona idiomas (opcional)"}
                     </span>
                   </Button>
                 </PopoverTrigger>
@@ -117,10 +116,6 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({
                   </Command>
                 </PopoverContent>
               </Popover>
-
-              {errors.languages_spoken && (
-                <p className="text-sm text-red-500 mt-2">Debes seleccionar al menos un idioma</p>
-              )}
 
               <div className="flex flex-wrap gap-2 mt-4">
                 {languagesValue.map((langValue: string) => {

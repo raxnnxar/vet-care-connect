@@ -31,35 +31,27 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
       <div className="space-y-4 py-2">
         <div className="space-y-2">
           <Label htmlFor="service_name">
-            Nombre del Servicio
+            Nombre del Servicio (opcional)
           </Label>
           <Input
             id="service_name"
             value={name}
             onChange={(e) => onChange('name', e.target.value)}
             placeholder="Ej. Consulta General, Vacunación, Cirugía, etc."
-            className={errors.name ? "border-red-500" : ""}
           />
-          {errors.name && (
-            <p className="text-sm text-red-500">{errors.name}</p>
-          )}
         </div>
         
         <div className="space-y-2">
           <Label htmlFor="service_description">
-            Descripción
+            Descripción (opcional)
           </Label>
           <Textarea
             id="service_description"
             value={description}
             onChange={(e) => onChange('description', e.target.value)}
             placeholder="Describe brevemente en qué consiste este servicio..."
-            className={errors.description ? "border-red-500" : ""}
             rows={4}
           />
-          {errors.description && (
-            <p className="text-sm text-red-500">{errors.description}</p>
-          )}
         </div>
       </div>
 

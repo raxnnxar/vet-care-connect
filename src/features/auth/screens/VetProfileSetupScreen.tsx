@@ -27,6 +27,7 @@ const VetProfileSetupScreen = () => {
 
     setIsLoading(true);
 
+    // Always allow submission regardless of validation
     try {
       await updateVeterinarianProfile(userId, profileData);
       toast.success('Perfil actualizado con éxito');

@@ -54,8 +54,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                     type="button"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !animalsValue.length && "text-muted-foreground",
-                      errors.animals_treated && "border-red-500"
+                      !animalsValue.length && "text-muted-foreground"
                     )}
                     onClick={(e) => {
                       e.preventDefault();
@@ -69,7 +68,7 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                     <span className="ml-2">
                       {animalsValue.length
                         ? `${animalsValue.length} tipo${animalsValue.length > 1 ? 's' : ''} de animal${animalsValue.length > 1 ? 'es' : ''} seleccionado${animalsValue.length > 1 ? 's' : ''}`
-                        : "Selecciona los tipos de animales"}
+                        : "Selecciona los tipos de animales (opcional)"}
                     </span>
                   </Button>
                 </PopoverTrigger>
@@ -120,10 +119,6 @@ const AnimalsSection: React.FC<AnimalsSectionProps> = ({
                   </Command>
                 </PopoverContent>
               </Popover>
-
-              {errors.animals_treated && (
-                <p className="text-sm text-red-500 mt-2">Debes seleccionar al menos un tipo de animal</p>
-              )}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
                 {animalsValue.map((animalValue: string) => {

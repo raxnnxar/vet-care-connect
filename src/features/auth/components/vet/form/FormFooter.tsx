@@ -16,7 +16,7 @@ const FormFooter: React.FC<FormFooterProps> = ({ isSubmitting, isValid, hasError
         <div>
           {hasErrors && (
             <p className="text-red-500 text-sm">
-              Hay campos con errores. Por favor revisa todas las secciones.
+              Hay campos con errores, pero puedes guardar de todos modos.
             </p>
           )}
         </div>

@@ -15,6 +15,7 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
     name: '',
     description: ''
   });
+  // No longer tracking errors since all fields are optional
   const [newServiceErrors, setNewServiceErrors] = useState<Record<string, string>>({});
   
   const { fields, append, remove } = useFieldArray({
@@ -39,10 +40,8 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
     }
   };
   
+  // Always return true since all fields are optional
   const validateService = () => {
-    const errors: Record<string, string> = {};
-    
-    // We're making fields optional now so returning true
     return true;
   };
   
