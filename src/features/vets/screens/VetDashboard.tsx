@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import VettLogo from '@/ui/atoms/VettLogo';
 import { Bell, Search, Cat, Check, X, MessageSquare, ArrowRight } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
 import { ScrollArea } from '@/ui/molecules/scroll-area';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { formatDate } from '@/frontend/shared/utils/date';
 
 // Sample data for upcoming appointments
 const upcomingAppointments = [
@@ -16,23 +18,44 @@ const upcomingAppointments = [
 
 // Sample data for pending requests
 const pendingRequests = [
-  { id: '1', petName: 'Mía', time: '4:00 PM', date: '25 abr' },
+  { id: '1', petName: 'Mía', time: '4:00 PM', date: '25 abr', fullDate: '25 abr — 4:00 PM' },
 ];
 
-// Weekly calendar days
-const calendarDays = [
-  { day: 'L', date: 22, hasAppointments: true },
-  { day: 'M', date: 23, hasAppointments: false },
-  { day: 'X', date: 4, hasAppointments: false },
-  { day: 'J', date: 16, hasAppointments: false },
-  { day: 'V', date: 13, hasAppointments: false },
-  { day: 'S', date: 25, hasAppointments: false, isSelected: true },
-  { day: 'D', date: 28, hasAppointments: false },
-  { day: 'L', date: 29, hasAppointments: false },
-];
+// Generate calendar days for multiple weeks
+const generateCalendarDays = () => {
+  const days = [];
+  const dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  const today = new Date();
+  
+  // Generate days for the next 3 weeks
+  for (let i = 0; i < 21; i++) {
+    const date = new Date();
+    date.setDate(today.getDate() + i);
+    const dayOfWeek = date.getDay(); // 0 is Sunday, 1 is Monday, etc.
+    const adjustedDayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0 = Monday, 6 = Sunday
+    
+    days.push({
+      day: dayNames[adjustedDayIndex],
+      date: date.getDate(),
+      hasAppointments: Math.random() > 0.7, // Random for demo purposes
+      isSelected: i === 0, // Select today by default
+    });
+  }
+  
+  return days;
+};
+
+const calendarDays = generateCalendarDays();
 
 const VetDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { user } = useAuth();
+  const displayName = user?.displayName || 'Dr. García';
+  
+  // Extract just the first name or title if it exists
+  const vetName = displayName.includes('Dr.') 
+    ? displayName 
+    : `Dr. ${displayName.split(' ')[0]}`;
 
   return (
     <LayoutBase
@@ -65,7 +88,7 @@ const VetDashboard: React.FC = () => {
         {/* Greeting Section */}
         <div className="mt-2">
           <h1 className="text-2xl font-semibold text-[#1F2937]">
-            👋 Hola, Dr. García. Estas son tus citas de hoy:
+            👋 Hola, {vetName}. Estas son tus citas de hoy:
           </h1>
         </div>
 
@@ -97,7 +120,7 @@ const VetDashboard: React.FC = () => {
         {/* Calendar Section */}
         <div>
           <ScrollArea className="w-full whitespace-nowrap">
-            <div className="flex space-x-4 py-2 px-1">
+            <div className="flex space-x-4 py-2 px-1 min-w-full" style={{ paddingRight: '24px' }}>
               {calendarDays.map((day, index) => (
                 <div 
                   key={index} 
@@ -134,7 +157,7 @@ const VetDashboard: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-medium text-lg">{request.petName}</p>
-                    <p className="text-gray-500">{request.time}</p>
+                    <p className="text-gray-500">{request.fullDate}</p>
                   </div>
                 </div>
               </div>
