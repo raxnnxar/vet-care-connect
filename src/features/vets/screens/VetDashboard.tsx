@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import VettLogo from '@/ui/atoms/VettLogo';
@@ -5,20 +6,16 @@ import { Bell, Search, Cat, Check, X, MessageSquare, ArrowRight } from 'lucide-r
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
 import { ScrollArea } from '@/ui/molecules/scroll-area';
-import { format, addDays, startOfWeek, isToday, isSameDay } from 'date-fns';
+import { format, addDays, startOfWeek, isToday, isSameDay, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useUser } from '@/contexts/UserContext';
 import { useSelector } from 'react-redux';
 import '../components/styles/calendar.css';
+import { getVetAppointments, getVetAppointmentsByDate, getVetAppointmentDates, Appointment } from '../api/vetAppointmentsApi';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-// Sample data for upcoming appointments
-const upcomingAppointments = [
-  { id: '1', petName: 'Luna', time: '10:30 AM', date: new Date() },
-  { id: '2', petName: 'Kira', time: '11:30 AM', date: new Date() },
-  { id: '3', petName: 'Max', time: '1:00 PM', date: new Date() },
-];
-
-// Sample data for pending requests
+// Sample data for pending requests (this will stay static for now)
 const pendingRequests = [
   { id: '1', petName: 'Mía', time: '4:00 PM', date: '25 abr' },
 ];
@@ -32,6 +29,11 @@ const VetDashboard: React.FC = () => {
   const { userRole, providerType } = useUser();
   const { user } = useSelector((state: any) => state.auth);
   
+  // State for appointments
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [appointmentDates, setAppointmentDates] = useState<Date[]>([]);
+  
   // Generate weeks of days
   useEffect(() => {
     const generateWeeks = () => {
@@ -40,7 +42,7 @@ const VetDashboard: React.FC = () => {
       
       // Generate 10 weeks (past, current, and future)
       for (let i = -5; i < 5; i++) {
-        const weekStartDate = startOfWeek(addDays(currentDate, i * 7), { weekStartsOn: 1 });
+        const weekStartDate = startOfWeek(addWeeks(currentDate, i), { weekStartsOn: 1 });
         const weekDays: Date[] = [];
         
         // Generate 7 days for each week (Monday to Sunday)
@@ -59,8 +61,40 @@ const VetDashboard: React.FC = () => {
     setWeeks(generateWeeks());
   }, []);
 
+  // Fetch logged-in vet's appointments
   useEffect(() => {
-    // Find and scroll to the current week
+    const fetchAppointments = async () => {
+      if (!user?.id) return;
+      
+      setIsLoading(true);
+      try {
+        // Fetch all appointments for the logged-in vet
+        const allAppointments = await getVetAppointments(user.id);
+        
+        // Get today's appointments
+        const todayAppointments = allAppointments.filter(appointment => 
+          isSameDay(parseDate(appointment.appointment_date), new Date())
+        );
+        
+        // Extract unique dates for the appointment indicators
+        const dates = allAppointments.map(app => parseDate(app.appointment_date));
+        setAppointmentDates(dates);
+        
+        // Set today's appointments by default
+        setAppointments(todayAppointments);
+      } catch (error) {
+        console.error('Error fetching vet appointments:', error);
+        toast.error('Error al cargar las citas');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAppointments();
+  }, [user?.id]);
+
+  // Handle scroll to the current week
+  useEffect(() => {
     if (calendarRef.current) {
       const scrollWidth = calendarRef.current.scrollWidth;
       const numWeeks = weeks.length;
@@ -71,6 +105,31 @@ const VetDashboard: React.FC = () => {
     }
   }, [weeks, currentWeekIndex]);
 
+  // Fetch appointments for the selected date
+  useEffect(() => {
+    const fetchAppointmentsByDate = async () => {
+      if (!user?.id) return;
+      
+      setIsLoading(true);
+      try {
+        const dateAppointments = await getVetAppointmentsByDate(user.id, selectedDate);
+        setAppointments(dateAppointments);
+      } catch (error) {
+        console.error('Error fetching appointments by date:', error);
+        toast.error('Error al cargar las citas para la fecha seleccionada');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAppointmentsByDate();
+  }, [selectedDate, user?.id]);
+
+  // Helper function to parse date strings
+  const parseDate = (dateString: string): Date => {
+    return new Date(dateString);
+  };
+  
   // Handle date selection
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
@@ -88,6 +147,11 @@ const VetDashboard: React.FC = () => {
     }
   };
 
+  // Check if a date has appointments
+  const hasAppointmentsOnDate = (date: Date): boolean => {
+    return appointmentDates.some(appDate => isSameDay(appDate, date));
+  };
+
   // Get the month and year of the currently visible week
   const currentMonthYear = weeks.length > 0 && currentWeekIndex < weeks.length 
     ? format(weeks[currentWeekIndex][0], 'MMMM yyyy', { locale: es }) 
@@ -96,10 +160,8 @@ const VetDashboard: React.FC = () => {
   // Get doctor's name from Redux state
   const doctorName = user?.user_metadata?.name || "García";
 
-  // Filter appointments based on the selected date
-  const filteredAppointments = upcomingAppointments.filter((appointment) => 
-    isSameDay(appointment.date, selectedDate)
-  );
+  // Format the selected date for display
+  const formattedSelectedDate = format(selectedDate, 'd MMMM', { locale: es });
 
   return (
     <LayoutBase
@@ -141,12 +203,19 @@ const VetDashboard: React.FC = () => {
           <h2 className="text-xl font-medium text-[#1F2937] mb-3">
             {isSameDay(selectedDate, new Date()) ? 
               "Tus próximas citas hoy" : 
-              `Citas para ${format(selectedDate, 'd MMMM', { locale: es })}`
+              `Citas para ${formattedSelectedDate}`
             }
           </h2>
           <div className="space-y-3">
-            {filteredAppointments.length > 0 ? (
-              filteredAppointments.map((appointment) => (
+            {isLoading ? (
+              <Card className="p-4 text-center">
+                <div className="animate-pulse flex flex-col space-y-3">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                  <div className="h-24 bg-gray-200 rounded w-full"></div>
+                </div>
+              </Card>
+            ) : appointments.length > 0 ? (
+              appointments.map((appointment) => (
                 <Card key={appointment.id} className="flex items-center justify-between p-3">
                   <div className="flex items-center space-x-3">
                     <div className="bg-gray-100 p-2 rounded-full">
@@ -198,7 +267,7 @@ const VetDashboard: React.FC = () => {
                   {week.map((day, dayIndex) => {
                     const isSelected = isSameDay(day, selectedDate);
                     const dayIsToday = isToday(day);
-                    const hasAppointments = Math.random() > 0.7; // Random for demonstration
+                    const hasAppointments = hasAppointmentsOnDate(day);
                     
                     return (
                       <div 
