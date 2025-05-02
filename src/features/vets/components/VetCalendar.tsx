@@ -135,9 +135,18 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 modifiersStyles={{
                   hasAppointment: {
                     position: "relative",
-                    "::before": {
+                    // Use a properly formatted CSS object without the ::before pseudo-element
+                    backgroundColor: "transparent",
+                    '&::before': {
+                      content: "''",
+                      position: "absolute",
+                      bottom: "0px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: "4px",
+                      height: "4px",
+                      borderRadius: "50%",
                       backgroundColor: "#79D0B8",
-                      opacity: "1",
                     }
                   }
                 }}
