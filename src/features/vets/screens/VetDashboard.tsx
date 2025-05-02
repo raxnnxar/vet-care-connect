@@ -160,7 +160,7 @@ const VetDashboard: React.FC = () => {
           isLoading={isLoading}
         />
 
-        {/* Pending Requests Section - Now dynamic */}
+        {/* Pending Requests Section */}
         <PendingRequestsList requests={[]} />
 
         {/* Appointment History Section */}
