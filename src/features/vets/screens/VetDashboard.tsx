@@ -1,11 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import VettLogo from '@/ui/atoms/VettLogo';
 import { Bell, Search, Cat, Check, X, MessageSquare, ArrowRight } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
 import { ScrollArea } from '@/ui/molecules/scroll-area';
+import { format, addDays, startOfWeek, isToday } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { useUser } from '@/contexts/UserContext';
 
 // Sample data for upcoming appointments
 const upcomingAppointments = [
@@ -19,20 +22,49 @@ const pendingRequests = [
   { id: '1', petName: 'Mía', time: '4:00 PM', date: '25 abr' },
 ];
 
-// Weekly calendar days
-const calendarDays = [
-  { day: 'L', date: 22, hasAppointments: true },
-  { day: 'M', date: 23, hasAppointments: false },
-  { day: 'X', date: 4, hasAppointments: false },
-  { day: 'J', date: 16, hasAppointments: false },
-  { day: 'V', date: 13, hasAppointments: false },
-  { day: 'S', date: 25, hasAppointments: false, isSelected: true },
-  { day: 'D', date: 28, hasAppointments: false },
-  { day: 'L', date: 29, hasAppointments: false },
-];
-
 const VetDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const { user } = useUser();
+  
+  // Generate calendar days based on current week start date
+  const generateCalendarDays = (startDate: Date) => {
+    const days = [];
+    for (let i = 0; i < 14; i++) {
+      const date = addDays(startDate, i);
+      days.push({
+        date,
+        day: format(date, 'EEEEE', { locale: es }).toUpperCase(),
+        dayNumber: format(date, 'd', { locale: es }),
+        hasAppointments: Math.random() > 0.7, // Random for demonstration
+        isSelected: selectedDate.toDateString() === date.toDateString(),
+        isToday: isToday(date)
+      });
+    }
+    return days;
+  };
+  
+  const [calendarDays, setCalendarDays] = useState(generateCalendarDays(currentWeekStart));
+  
+  useEffect(() => {
+    setCalendarDays(generateCalendarDays(currentWeekStart));
+  }, [currentWeekStart, selectedDate]);
+  
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
+  
+  const navigateToPreviousWeek = () => {
+    setCurrentWeekStart(addDays(currentWeekStart, -7));
+  };
+  
+  const navigateToNextWeek = () => {
+    setCurrentWeekStart(addDays(currentWeekStart, 7));
+  };
+  
+  // Get doctor's name - for demo purposes using placeholder if not available
+  const doctorName = user?.user_metadata?.name || "García";
 
   return (
     <LayoutBase
@@ -65,7 +97,7 @@ const VetDashboard: React.FC = () => {
         {/* Greeting Section */}
         <div className="mt-2">
           <h1 className="text-2xl font-semibold text-[#1F2937]">
-            👋 Hola, Dr. García. Estas son tus citas de hoy:
+            👋 Hola, Dr. {doctorName}. Estas son tus citas de hoy:
           </h1>
         </div>
 
@@ -96,14 +128,36 @@ const VetDashboard: React.FC = () => {
 
         {/* Calendar Section */}
         <div>
+          <div className="flex justify-between items-center mb-2">
+            <Button 
+              onClick={navigateToPreviousWeek}
+              variant="ghost" 
+              size="sm"
+              className="text-gray-500"
+            >
+              &#8592;
+            </Button>
+            <h2 className="text-lg font-medium">
+              {format(currentWeekStart, 'MMMM yyyy', { locale: es })}
+            </h2>
+            <Button 
+              onClick={navigateToNextWeek}
+              variant="ghost" 
+              size="sm"
+              className="text-gray-500"
+            >
+              &#8594;
+            </Button>
+          </div>
           <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex space-x-4 py-2 px-1">
               {calendarDays.map((day, index) => (
                 <div 
                   key={index} 
-                  className={`flex flex-col items-center min-w-[40px] ${
-                    day.isSelected ? 'text-white' : 'text-[#1F2937]'
+                  className={`flex flex-col items-center min-w-[40px] cursor-pointer ${
+                    day.isSelected ? 'text-white' : day.isToday ? 'text-[#4DA6A8] font-bold' : 'text-[#1F2937]'
                   }`}
+                  onClick={() => handleDateSelect(day.date)}
                 >
                   <span className="text-sm">{day.day}</span>
                   <div 
@@ -111,7 +165,7 @@ const VetDashboard: React.FC = () => {
                       day.isSelected ? 'bg-[#79D0B8]' : 'bg-transparent'
                     }`}
                   >
-                    <span className="text-lg">{day.date}</span>
+                    <span className="text-lg">{day.dayNumber}</span>
                   </div>
                   {day.hasAppointments && (
                     <div className="w-1.5 h-1.5 rounded-full bg-[#79D0B8] mt-1"></div>
@@ -134,7 +188,7 @@ const VetDashboard: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-medium text-lg">{request.petName}</p>
-                    <p className="text-gray-500">{request.time}</p>
+                    <p className="text-gray-500">{request.date} — {request.time}</p>
                   </div>
                 </div>
               </div>
