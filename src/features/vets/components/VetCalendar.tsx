@@ -94,31 +94,36 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
       <div className="flex justify-center items-center mb-2">
         <Button
           variant="ghost"
-          className="flex items-center gap-1 px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200"
+          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200"
           onClick={() => setCalendarOpen(true)}
         >
-          <h2 className="text-lg font-medium">
+          <h2 className="text-lg font-medium capitalize">
             {currentMonthYear}
           </h2>
           <ChevronDown size={18} className="text-gray-500" />
         </Button>
 
         <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
-          <DialogContent className="sm:max-w-md p-0">
+          <DialogContent className="calendar-modal p-0 sm:max-w-[320px]">
             <div className="p-4">
+              <div className="text-center mb-2">
+                <h2 className="text-xl font-semibold capitalize">
+                  {format(viewDate, 'MMMM yyyy', { locale: es })}
+                </h2>
+              </div>
               <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={handleMonthDateSelect}
                 month={viewDate}
                 onMonthChange={setViewDate}
+                locale={es}
                 className="mx-auto"
                 classNames={{
-                  day_today: "bg-gray-100 text-[#1F2937]",
-                  day_selected: "bg-[#79D0B8] text-white hover:bg-[#79D0B8] hover:text-white",
-                  day: cn(
-                    "hover:bg-gray-100"
-                  )
+                  day_today: "rdp-day_today",
+                  day_selected: "bg-[#79D0B8] text-white hover:bg-[#79D0B8] hover:text-white font-medium",
+                  day: cn("hover:bg-gray-100 font-medium"),
+                  day_outside: "rdp-day_outside"
                 }}
                 components={{
                   IconLeft: () => <ChevronLeft className="h-4 w-4" />,
@@ -126,7 +131,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 }}
                 modifiersClassNames={{
                   selected: "bg-[#79D0B8] text-white",
-                  today: "bg-gray-100",
+                  today: "rdp-day_today",
                   hasAppointment: "day-with-appointment"
                 }}
                 modifiers={{
@@ -171,7 +176,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                     </span>
                     <div 
                       className={`w-10 h-10 flex items-center justify-center rounded-full mt-1 ${
-                        isSelected ? 'bg-[#79D0B8]' : 'bg-transparent'
+                        isSelected ? 'bg-[#79D0B8]' : dayIsToday ? 'border border-[#79D0B8]' : 'bg-transparent'
                       }`}
                     >
                       <span className="text-lg">{format(day, 'd', { locale: es })}</span>

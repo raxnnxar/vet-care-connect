@@ -7,3 +7,44 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Calendar Day styling */
+.rdp-day_today:not(.rdp-day_selected) {
+  border: 1px solid #79D0B8;
+  border-radius: 50%;
+  background-color: transparent !important;
+}
+
+/* Styling for appointment indicators */
+.day-with-appointment {
+  position: relative;
+}
+
+.day-with-appointment::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #79D0B8;
+}
+
+/* Days from adjacent months styling */
+.rdp-day_outside {
+  color: #aaadb0 !important;
+  opacity: 0.6 !important;
+}
+
+/* Modal styling */
+.calendar-modal {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+  background-color: white;
+  max-width: 320px !important;
+  width: 95% !important;
+  margin: 0 auto;
+}
