@@ -9,6 +9,7 @@ import { ScrollArea } from '@/ui/molecules/scroll-area';
 import { format, addDays, startOfWeek, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useUser } from '@/contexts/UserContext';
+import { useSelector } from 'react-redux';
 
 // Sample data for upcoming appointments
 const upcomingAppointments = [
@@ -26,7 +27,8 @@ const VetDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const { user } = useUser();
+  const { userRole, providerType } = useUser();
+  const { user } = useSelector((state: any) => state.auth);
   
   // Generate calendar days based on current week start date
   const generateCalendarDays = (startDate: Date) => {
@@ -63,7 +65,7 @@ const VetDashboard: React.FC = () => {
     setCurrentWeekStart(addDays(currentWeekStart, 7));
   };
   
-  // Get doctor's name - for demo purposes using placeholder if not available
+  // Get doctor's name from Redux state
   const doctorName = user?.user_metadata?.name || "García";
 
   return (
