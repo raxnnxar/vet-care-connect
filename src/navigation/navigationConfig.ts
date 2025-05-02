@@ -5,6 +5,7 @@
 export const VET_ROUTES = {
   DASHBOARD: '/',
   APPOINTMENTS: '/appointments',
+  APPOINTMENT_DETAIL: '/appointments/:id',
   PROFILE: '/profile',
   SETTINGS: '/settings',
   PATIENTS: '/patients',

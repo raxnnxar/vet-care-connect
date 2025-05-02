@@ -6,6 +6,7 @@ import { Cat } from 'lucide-react';
 import { Appointment } from '../api/vetAppointmentsApi';
 import { format, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 
 interface VetAppointmentsListProps {
   appointments: Appointment[];
@@ -18,9 +19,14 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
   selectedDate,
   isLoading
 }) => {
+  const navigate = useNavigate();
   // Format the selected date for display
   const formattedSelectedDate = format(selectedDate, 'd MMMM', { locale: es });
   const isToday = isSameDay(selectedDate, new Date());
+  
+  const handleViewAppointment = (appointmentId: string) => {
+    navigate(`/vet/appointments/${appointmentId}`);
+  };
   
   return (
     <div>
@@ -52,6 +58,7 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
               </div>
               <Button 
                 className="bg-[#79D0B8] hover:bg-[#5FBFB3] text-white"
+                onClick={() => handleViewAppointment(appointment.id)}
               >
                 Ver
               </Button>
