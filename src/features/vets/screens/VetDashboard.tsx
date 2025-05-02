@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowRight } from 'lucide-react';
@@ -161,8 +160,8 @@ const VetDashboard: React.FC = () => {
           isLoading={isLoading}
         />
 
-        {/* Pending Requests Section */}
-        <PendingRequestsList requests={pendingRequests} />
+        {/* Pending Requests Section - Now dynamic */}
+        <PendingRequestsList requests={[]} />
 
         {/* Appointment History Section */}
         <Card 
