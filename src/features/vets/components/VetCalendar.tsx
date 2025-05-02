@@ -89,11 +89,6 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
     setViewDate(prev => addMonths(prev, 1));
   };
 
-  // Custom styles for the calendar 
-  const dayWithAppointmentClass = 
-    "relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 " +
-    "after:rounded-full after:bg-[#79D0B8] after:content-['']";
-
   return (
     <div>
       <div className="flex justify-center items-center mb-2">
@@ -123,8 +118,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                   day_selected: "bg-[#79D0B8] text-white hover:bg-[#79D0B8] hover:text-white",
                   day: cn(
                     "hover:bg-gray-100"
-                  ),
-                  day_has_appointment: dayWithAppointmentClass
+                  )
                 }}
                 components={{
                   IconLeft: () => <ChevronLeft className="h-4 w-4" />,
@@ -133,7 +127,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 modifiersClassNames={{
                   selected: "bg-[#79D0B8] text-white",
                   today: "bg-gray-100",
-                  hasAppointment: dayWithAppointmentClass
+                  hasAppointment: "day-with-appointment"
                 }}
                 modifiers={{
                   hasAppointment: appointmentDates,
