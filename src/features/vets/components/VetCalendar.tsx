@@ -121,9 +121,10 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 className="mx-auto"
                 classNames={{
                   day_today: "rdp-day_today",
-                  day_selected: "bg-[#79D0B8] text-white hover:bg-[#79D0B8] hover:text-white font-medium",
+                  day_selected: "rdp-day_selected",
                   day: cn("hover:bg-gray-100 font-medium"),
-                  day_outside: "rdp-day_outside"
+                  day_outside: "rdp-day_outside",
+                  head_cell: "text-gray-500 font-medium"
                 }}
                 components={{
                   IconLeft: () => <ChevronLeft className="h-4 w-4" />,
@@ -155,7 +156,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
           {weeks.map((week, weekIndex) => (
             <div 
               key={weekIndex} 
-              className="flex space-x-4 py-2 px-4 min-w-full snap-center"
+              className="flex space-x-1 py-2 px-2 min-w-full snap-center"
               style={{ scrollSnapAlign: 'center' }}
             >
               {week.map((day, dayIndex) => {
@@ -166,20 +167,20 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 return (
                   <div 
                     key={dayIndex} 
-                    className={`flex flex-col items-center flex-1 cursor-pointer ${
-                      isSelected ? 'text-white' : dayIsToday ? 'text-[#4DA6A8] font-bold' : 'text-[#1F2937]'
-                    }`}
+                    className={`weekly-calendar-day flex flex-col items-center cursor-pointer`}
                     onClick={() => onDateSelect(day)}
                   >
-                    <span className="text-sm">
+                    <span className="text-xs mb-1 text-gray-500">
                       {format(day, 'EEEEE', { locale: es }).toUpperCase()}
                     </span>
                     <div 
-                      className={`w-10 h-10 flex items-center justify-center rounded-full mt-1 ${
-                        isSelected ? 'bg-[#79D0B8]' : dayIsToday ? 'border border-[#79D0B8]' : 'bg-transparent'
-                      }`}
+                      className={`w-10 h-10 flex items-center justify-center mt-1 
+                        ${isSelected ? 'weekly-day-selected' : ''} 
+                        ${!isSelected && dayIsToday ? 'weekly-day-today' : ''}`}
                     >
-                      <span className="text-lg">{format(day, 'd', { locale: es })}</span>
+                      <span className={`text-lg ${isSelected ? 'text-white' : dayIsToday ? 'text-[#79D0B8]' : 'text-[#1F2937]'}`}>
+                        {format(day, 'd', { locale: es })}
+                      </span>
                     </div>
                     {hasAppointments && (
                       <div className="w-1.5 h-1.5 rounded-full bg-[#79D0B8] mt-1"></div>

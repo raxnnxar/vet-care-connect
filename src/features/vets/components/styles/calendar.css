@@ -10,9 +10,18 @@
 
 /* Calendar Day styling */
 .rdp-day_today:not(.rdp-day_selected) {
-  border: 1px solid #79D0B8;
+  border: 2px solid #79D0B8 !important;
   border-radius: 50%;
   background-color: transparent !important;
+  color: #79D0B8 !important;
+  font-weight: 600;
+}
+
+/* Selected day styling */
+.rdp-day_selected {
+  background-color: #79D0B8 !important;
+  color: white !important;
+  border-radius: 50%;
 }
 
 /* Styling for appointment indicators */
@@ -47,4 +56,49 @@
   max-width: 320px !important;
   width: 95% !important;
   margin: 0 auto;
+}
+
+/* Full month calendar day spacing */
+.rdp-month {
+  margin: 0 auto;
+}
+
+.rdp-table {
+  width: 100%;
+  border-spacing: 4px;
+}
+
+.rdp-cell {
+  padding: 2px;
+  text-align: center;
+}
+
+.rdp-day {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Weekly calendar specific styles */
+.weekly-calendar-day {
+  flex: 1;
+  min-width: 50px;
+  width: 14.28%; /* 100% / 7 days = 14.28% */
+}
+
+.weekly-day-selected {
+  background-color: #79D0B8;
+  color: white;
+  border-radius: 50%;
+}
+
+.weekly-day-today:not(.weekly-day-selected) {
+  border: 2px solid #79D0B8;
+  border-radius: 50%;
+  color: #79D0B8;
+  font-weight: 600;
 }
