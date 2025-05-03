@@ -81,7 +81,10 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                   'lu': 'L', 'ma': 'M', 'mi': 'M', 'ju': 'J',
                   'vi': 'V', 'sá': 'S', 'do': 'D'
                 };
-                return dayMap[day.toLowerCase()] || day;
+                
+                // Format the day properly to get the weekday name
+                const weekdayName = format(day, 'EEEEEE', { locale: es }).toLowerCase();
+                return dayMap[weekdayName] || weekdayName;
               }
             }}
             modifiersClassNames={{
