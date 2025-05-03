@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { format, isSameDay, isToday, addMonths, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -80,15 +79,6 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
     }
   };
 
-  // Navigation between months in the dialog
-  const handlePreviousMonth = () => {
-    setViewDate(prev => subMonths(prev, 1));
-  };
-
-  const handleNextMonth = () => {
-    setViewDate(prev => addMonths(prev, 1));
-  };
-
   return (
     <div>
       <div className="flex justify-center items-center mb-2">
@@ -123,15 +113,14 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                   day_today: "rdp-day_today",
                   day_selected: "rdp-day_selected",
                   day: cn("hover:bg-gray-100 font-medium"),
-                  day_outside: "rdp-day_outside",
-                  head_cell: "text-gray-500 font-medium"
+                  day_outside: "rdp-day_outside"
                 }}
                 components={{
                   IconLeft: () => <ChevronLeft className="h-4 w-4" />,
                   IconRight: () => <ChevronRight className="h-4 w-4" />,
                 }}
                 modifiersClassNames={{
-                  selected: "bg-[#79D0B8] text-white",
+                  selected: "rdp-day_selected",
                   today: "rdp-day_today",
                   hasAppointment: "day-with-appointment"
                 }}
@@ -156,7 +145,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
           {weeks.map((week, weekIndex) => (
             <div 
               key={weekIndex} 
-              className="flex space-x-1 py-2 px-2 min-w-full snap-center"
+              className="flex space-x-4 py-2 px-4 min-w-full snap-center"
               style={{ scrollSnapAlign: 'center' }}
             >
               {week.map((day, dayIndex) => {
@@ -167,18 +156,24 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 return (
                   <div 
                     key={dayIndex} 
-                    className={`weekly-calendar-day flex flex-col items-center cursor-pointer`}
+                    className={`flex flex-col items-center flex-1 cursor-pointer ${
+                      isSelected ? 'text-white' : dayIsToday && !isSelected ? 'text-[#4DA6A8] font-bold' : 'text-[#1F2937]'
+                    }`}
                     onClick={() => onDateSelect(day)}
                   >
-                    <span className="text-xs mb-1 text-gray-500">
+                    <span className="text-sm">
                       {format(day, 'EEEEE', { locale: es }).toUpperCase()}
                     </span>
                     <div 
-                      className={`w-10 h-10 flex items-center justify-center mt-1 
-                        ${isSelected ? 'weekly-day-selected' : ''} 
-                        ${!isSelected && dayIsToday ? 'weekly-day-today' : ''}`}
+                      className={`w-10 h-10 flex items-center justify-center mt-1 ${
+                        isSelected 
+                          ? 'bg-[#79D0B8] rounded-full' 
+                          : dayIsToday 
+                            ? 'bg-[#79D0B8] text-white rounded-md' 
+                            : 'bg-transparent'
+                      }`}
                     >
-                      <span className={`text-lg ${isSelected ? 'text-white' : dayIsToday ? 'text-[#79D0B8]' : 'text-[#1F2937]'}`}>
+                      <span className={`text-lg ${(isSelected || dayIsToday) ? 'text-white font-medium' : ''}`}>
                         {format(day, 'd', { locale: es })}
                       </span>
                     </div>
