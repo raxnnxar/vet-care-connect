@@ -8,6 +8,7 @@ import { Calendar } from '@/ui/molecules/calendar';
 import { Button } from '@/ui/atoms/button';
 import { cn } from '@/lib/utils';
 import './styles/calendar.css';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface VetCalendarProps {
   selectedDate: Date;
@@ -31,6 +32,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
   const calendarRef = useRef<HTMLDivElement>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [viewDate, setViewDate] = useState(selectedDate);
+  const isMobile = useIsMobile();
 
   // Handle calendar scroll
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -155,7 +157,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
           {weeks.map((week, weekIndex) => (
             <div 
               key={weekIndex} 
-              className="flex space-x-4 py-2 px-4 min-w-full snap-center"
+              className="flex py-2 px-4 min-w-full snap-center"
               style={{ scrollSnapAlign: 'center' }}
             >
               {week.map((day, dayIndex) => {
@@ -166,9 +168,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 return (
                   <div 
                     key={dayIndex} 
-                    className={`flex flex-col items-center flex-1 cursor-pointer ${
-                      isSelected ? 'text-white' : dayIsToday ? 'text-[#4DA6A8] font-bold' : 'text-[#1F2937]'
-                    }`}
+                    className="calendar-day-item"
                     onClick={() => onDateSelect(day)}
                   >
                     <span className="text-sm">
@@ -179,7 +179,9 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                         isSelected ? 'bg-[#79D0B8]' : dayIsToday ? 'border border-[#79D0B8]' : 'bg-transparent'
                       }`}
                     >
-                      <span className="text-lg">{format(day, 'd', { locale: es })}</span>
+                      <span className={`text-lg ${isSelected ? 'text-white' : dayIsToday ? 'text-[#4DA6A8] font-bold' : 'text-[#1F2937]'}`}>
+                        {format(day, 'd', { locale: es })}
+                      </span>
                     </div>
                     {hasAppointments && (
                       <div className="w-1.5 h-1.5 rounded-full bg-[#79D0B8] mt-1"></div>

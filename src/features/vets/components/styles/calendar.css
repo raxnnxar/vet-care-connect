@@ -48,3 +48,29 @@
   width: 95% !important;
   margin: 0 auto;
 }
+
+/* Weekly calendar day item styling */
+.calendar-day-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 35px; /* Minimum width to ensure tappable area */
+  cursor: pointer;
+  padding: 0 2px;
+  width: 14.28%; /* Equal width for all 7 days (100% / 7) */
+  box-sizing: border-box;
+  position: relative;
+}
+
+@media (max-width: 480px) {
+  .calendar-day-item {
+    min-width: 30px;
+  }
+}
+
+@media (min-width: 481px) {
+  .calendar-day-item {
+    min-width: 45px;
+  }
+}
