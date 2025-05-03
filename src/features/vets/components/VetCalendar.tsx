@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { format, isSameDay, isToday, addMonths, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -79,6 +80,15 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
     }
   };
 
+  // Navigation between months in the dialog
+  const handlePreviousMonth = () => {
+    setViewDate(prev => subMonths(prev, 1));
+  };
+
+  const handleNextMonth = () => {
+    setViewDate(prev => addMonths(prev, 1));
+  };
+
   return (
     <div>
       <div className="flex justify-center items-center mb-2">
@@ -111,7 +121,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                 className="mx-auto"
                 classNames={{
                   day_today: "rdp-day_today",
-                  day_selected: "rdp-day_selected",
+                  day_selected: "bg-[#79D0B8] text-white hover:bg-[#79D0B8] hover:text-white font-medium",
                   day: cn("hover:bg-gray-100 font-medium"),
                   day_outside: "rdp-day_outside"
                 }}
@@ -120,7 +130,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                   IconRight: () => <ChevronRight className="h-4 w-4" />,
                 }}
                 modifiersClassNames={{
-                  selected: "rdp-day_selected",
+                  selected: "bg-[#79D0B8] text-white",
                   today: "rdp-day_today",
                   hasAppointment: "day-with-appointment"
                 }}
@@ -157,7 +167,7 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                   <div 
                     key={dayIndex} 
                     className={`flex flex-col items-center flex-1 cursor-pointer ${
-                      isSelected ? 'text-white' : dayIsToday && !isSelected ? 'text-[#4DA6A8] font-bold' : 'text-[#1F2937]'
+                      isSelected ? 'text-white' : dayIsToday ? 'text-[#4DA6A8] font-bold' : 'text-[#1F2937]'
                     }`}
                     onClick={() => onDateSelect(day)}
                   >
@@ -165,17 +175,11 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                       {format(day, 'EEEEE', { locale: es }).toUpperCase()}
                     </span>
                     <div 
-                      className={`w-10 h-10 flex items-center justify-center mt-1 ${
-                        isSelected 
-                          ? 'bg-[#79D0B8] rounded-full' 
-                          : dayIsToday 
-                            ? 'bg-[#79D0B8] text-white rounded-md' 
-                            : 'bg-transparent'
+                      className={`w-10 h-10 flex items-center justify-center rounded-full mt-1 ${
+                        isSelected ? 'bg-[#79D0B8]' : dayIsToday ? 'border border-[#79D0B8]' : 'bg-transparent'
                       }`}
                     >
-                      <span className={`text-lg ${(isSelected || dayIsToday) ? 'text-white font-medium' : ''}`}>
-                        {format(day, 'd', { locale: es })}
-                      </span>
+                      <span className="text-lg">{format(day, 'd', { locale: es })}</span>
                     </div>
                     {hasAppointments && (
                       <div className="w-1.5 h-1.5 rounded-full bg-[#79D0B8] mt-1"></div>
