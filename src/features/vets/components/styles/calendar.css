@@ -10,9 +10,23 @@
 
 /* Calendar Day styling */
 .rdp-day_today:not(.rdp-day_selected) {
-  border: 1px solid #79D0B8;
-  border-radius: 50%;
-  background-color: transparent !important;
+  background-color: #79D0B8 !important;
+  color: white !important;
+  border-radius: 0.25rem !important; /* Square with rounded corners */
+  font-weight: 500;
+}
+
+/* Selected day styling */
+.rdp-day_selected {
+  background-color: #79D0B8 !important;
+  color: white !important;
+  border-radius: 50% !important; /* Circle */
+  font-weight: 500;
+}
+
+/* If a day is both today and selected, add subtle outline */
+.rdp-day_today.rdp-day_selected {
+  box-shadow: 0 0 0 1px white, 0 0 0 2px #79D0B8;
 }
 
 /* Styling for appointment indicators */
