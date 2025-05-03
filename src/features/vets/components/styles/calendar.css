@@ -77,20 +77,29 @@
 
 /* Enhanced calendar styles for a professional look */
 .calendar-day-selected {
-  background-color: #79D0B8 !important;
-  color: white !important;
-  box-shadow: 0 2px 8px rgba(121, 208, 184, 0.4);
-  transform: scale(1.05);
-  transition: all 0.2s ease-in-out;
-  font-weight: 600;
-  border-radius: 50%;
+  position: relative;
+  color: #1F2937 !important;
+  font-weight: 700 !important;
+  transition: all 0.2s ease;
+}
+
+.calendar-day-selected::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  background-color: #79D0B8;
+  border-radius: 2px;
 }
 
 .calendar-day-today {
-  border: 2px solid #79D0B8;
   color: #4DA6A8 !important;
   font-weight: 600;
-  background-color: transparent !important;
+  background-color: rgba(121, 208, 184, 0.15) !important;
+  border-radius: 50%;
   position: relative;
 }
 
@@ -112,17 +121,45 @@
   color: #2D8A8C;
 }
 
-/* Caption styling (hide the duplicate month title) */
-.calendar-caption h2 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1F2937;
-  margin-bottom: 1rem;
+/* Calendar day styling */
+.calendar-day {
+  border-radius: 50%;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin: 0 auto;
 }
 
-/* Remove the duplicate caption title */
-.rdp-caption {
-  margin-bottom: 0.5rem;
+.calendar-day:hover {
+  background-color: rgba(121, 208, 184, 0.1);
+  transform: scale(1.05);
+}
+
+/* Month header styling with centered title */
+.calendar-month-header {
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* Calendar title centered and styled */
+.calendar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1F2937;
+  text-align: center;
+  padding: 0.5rem 0;
+  margin-bottom: 0.75rem;
+}
+
+/* Weekday headings styling */
+.calendar-weekday-heading {
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  font-size: 0.8rem;
 }
 
 /* Animation for day selection */
@@ -132,13 +169,14 @@
   transition: transform 0.1s ease-in-out;
 }
 
-.rdp-button:hover:not([disabled]) {
-  background-color: #E6F5F2;
-}
-
 /* Day hover effect */
 .rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_disabled) {
   background-color: #E6F5F2;
   transform: scale(1.05);
   transition: transform 0.2s ease;
+}
+
+/* Remove the month caption from radix UI calendar since we're using our own */
+.rdp-caption {
+  display: none !important;
 }

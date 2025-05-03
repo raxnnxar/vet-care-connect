@@ -14,7 +14,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   selectedDate,
   onOpenMonthlyCalendar,
 }) => {
-  const currentMonthYear = format(selectedDate, 'MMMM yyyy', { locale: es });
+  // Function to capitalize the first letter of each word
+  const capitalizeFirstLetter = (string: string) => {
+    return string.split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  const currentMonthYear = capitalizeFirstLetter(format(selectedDate, 'MMMM yyyy', { locale: es }));
 
   return (
     <div className="flex justify-center items-center mb-2">
