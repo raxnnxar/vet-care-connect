@@ -10,7 +10,7 @@
 
 /* Calendar Day styling */
 .rdp-day_today:not(.rdp-day_selected) {
-  border: 1px solid #79D0B8;
+  border: 2px solid #79D0B8;
   border-radius: 50%;
   background-color: transparent !important;
 }
@@ -73,4 +73,72 @@
   .calendar-day-item {
     min-width: 45px;
   }
+}
+
+/* Enhanced calendar styles for a professional look */
+.calendar-day-selected {
+  background-color: #79D0B8 !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(121, 208, 184, 0.4);
+  transform: scale(1.05);
+  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.calendar-day-today {
+  border: 2px solid #79D0B8;
+  color: #4DA6A8 !important;
+  font-weight: 600;
+  background-color: transparent !important;
+  position: relative;
+}
+
+/* Navigation button styling */
+.calendar-nav-button {
+  color: #4DA6A8;
+  background-color: #F1F5F9;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-nav-button:hover {
+  background-color: #E2E8F0;
+  color: #2D8A8C;
+}
+
+/* Caption styling (hide the duplicate month title) */
+.calendar-caption h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 1rem;
+}
+
+/* Remove the duplicate caption title */
+.rdp-caption {
+  margin-bottom: 0.5rem;
+}
+
+/* Animation for day selection */
+.rdp-button:active:not([disabled]), 
+.rdp-button:focus:not([disabled]) {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+.rdp-button:hover:not([disabled]) {
+  background-color: #E6F5F2;
+}
+
+/* Day hover effect */
+.rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_disabled) {
+  background-color: #E6F5F2;
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
 }

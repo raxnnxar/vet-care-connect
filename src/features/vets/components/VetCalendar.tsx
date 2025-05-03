@@ -82,15 +82,6 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
     }
   };
 
-  // Navigation between months in the dialog
-  const handlePreviousMonth = () => {
-    setViewDate(prev => subMonths(prev, 1));
-  };
-
-  const handleNextMonth = () => {
-    setViewDate(prev => addMonths(prev, 1));
-  };
-
   return (
     <div>
       <div className="flex justify-center items-center mb-2">
@@ -108,11 +99,6 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
         <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
           <DialogContent className="calendar-modal p-0 sm:max-w-[320px]">
             <div className="p-4">
-              <div className="text-center mb-2">
-                <h2 className="text-xl font-semibold capitalize">
-                  {format(viewDate, 'MMMM yyyy', { locale: es })}
-                </h2>
-              </div>
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -125,15 +111,17 @@ const VetCalendar: React.FC<VetCalendarProps> = ({
                   day_today: "rdp-day_today",
                   day_selected: "bg-[#79D0B8] text-white hover:bg-[#79D0B8] hover:text-white font-medium",
                   day: cn("hover:bg-gray-100 font-medium"),
-                  day_outside: "rdp-day_outside"
+                  day_outside: "rdp-day_outside",
+                  nav_button: "calendar-nav-button",
+                  caption: "calendar-caption"
                 }}
                 components={{
                   IconLeft: () => <ChevronLeft className="h-4 w-4" />,
                   IconRight: () => <ChevronRight className="h-4 w-4" />,
                 }}
                 modifiersClassNames={{
-                  selected: "bg-[#79D0B8] text-white",
-                  today: "rdp-day_today",
+                  selected: "calendar-day-selected",
+                  today: "calendar-day-today",
                   hasAppointment: "day-with-appointment"
                 }}
                 modifiers={{
