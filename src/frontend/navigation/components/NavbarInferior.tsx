@@ -15,9 +15,10 @@ interface NavbarInferiorProps {
 const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) => {
   // Get the current path to determine if we're in the vet section
   const isVetPath = window.location.pathname.includes('/vet');
-
+  
+  // Create the proper styling for the nav bar to ensure it doesn't overlap with content
   return (
-    <div className="flex justify-around items-center py-3 px-4 bg-white border-t border-gray-200 shadow-sm fixed bottom-0 left-0 right-0">
+    <div className="flex justify-around items-center py-3 px-4 bg-white border-t border-gray-200 shadow-md fixed bottom-0 left-0 right-0 z-20">
       <NavItem 
         icon={<Calendar size={24} />} 
         label="Citas" 
