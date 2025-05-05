@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { RefObject } from 'react';
 import { format, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import '../styles/calendar.css';
@@ -11,6 +11,7 @@ interface WeeklyCalendarProps {
   selectedDate: Date;
   onDateSelect: (date: Date) => void;
   appointmentDates: Date[];
+  scrollContainerRef: RefObject<HTMLDivElement>;
 }
 
 const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
@@ -20,9 +21,8 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   selectedDate,
   onDateSelect,
   appointmentDates,
+  scrollContainerRef
 }) => {
-  const calendarRef = useRef<HTMLDivElement>(null);
-
   // Check if a date has appointments
   const hasAppointmentsOnDate = (date: Date): boolean => {
     return appointmentDates.some(appDate => isSameDay(appDate, date));
@@ -44,7 +44,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
     <div 
       className="overflow-x-auto snap-x snap-mandatory scrollbar-hide" 
       onScroll={handleScroll}
-      ref={calendarRef}
+      ref={scrollContainerRef}
       style={{ 
         scrollSnapType: 'x mandatory',
         WebkitOverflowScrolling: 'touch'

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Dialog, DialogContent } from '@/ui/molecules/dialog';
+import { Dialog, DialogContent, DialogClose } from '@/ui/molecules/dialog';
 import { Calendar } from '@/ui/molecules/calendar';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { es } from 'date-fns/locale';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -54,9 +54,14 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="calendar-modal p-0 sm:max-w-[320px]">
-        <div className="p-4">
-          <div className="calendar-header flex items-center justify-between mb-4">
+      <DialogContent className="calendar-modal calendar-modal-content p-0 sm:max-w-[320px]">
+        <DialogClose className="close-button absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Cerrar</span>
+        </DialogClose>
+        
+        <div className="p-2">
+          <div className="calendar-header flex items-center justify-between">
             <button 
               onClick={handlePreviousMonth}
               className="calendar-nav-arrow"
@@ -96,7 +101,9 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
               nav_button: "calendar-nav-button hidden", // Hide default navigation buttons
               caption: "calendar-caption",
               month: "calendar-month-header",
-              head_cell: "calendar-weekday-heading"
+              head_cell: "calendar-weekday-heading",
+              months: "rdp-months",
+              cell: "rdp-cell"
             }}
             components={{
               IconLeft: () => null, // Hide default left arrow
