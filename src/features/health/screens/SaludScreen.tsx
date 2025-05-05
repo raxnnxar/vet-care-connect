@@ -78,26 +78,25 @@ const SaludScreen = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E6F7F5]">
-      {/* Header with back button */}
-      <header className="bg-white px-4 py-4 flex items-center shadow-md rounded-b-xl bg-gradient-to-r from-[#79D0B8] to-[#4DA6A8] sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
+      {/* Header with back button - Changed to centered title with solid background */}
+      <header className="bg-[#4DA6A8] px-4 py-4 flex items-center shadow-md rounded-b-xl sticky top-0 z-10">
         <button 
           onClick={handleBackClick}
-          className="mr-3 p-1.5 rounded-full bg-white/20 hover:bg-white/40 text-white"
+          className="absolute left-4 p-1.5 rounded-full bg-white/20 hover:bg-white/40 text-white"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-semibold text-white">Salud</h1>
+        <h1 className="text-xl font-semibold text-white w-full text-center">Salud</h1>
       </header>
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
-        {/* Primary Veterinarian Section */}
+        {/* Primary Veterinarian Section - Removed emoji and changed border style */}
         <div>
-          <h2 className="text-lg font-medium mb-3 text-[#1F2937] flex items-center">
-            <span className="mr-2 bg-accent3/20 p-1 rounded-md text-accent3">💼</span>
+          <h2 className="text-lg font-medium mb-3 text-[#1F2937]">
             Veterinario de cabecera
           </h2>
-          <Card className="p-4 bg-white flex items-center rounded-xl shadow-md border-l-4 border-accent1">
+          <Card className="p-4 bg-white flex items-center rounded-xl shadow-md border border-gray-200">
             <div className="relative">
               <Avatar className="h-20 w-20 mr-4 border-2 border-[#79D0B8] shadow-lg">
                 <AvatarImage src={primaryVet.imageUrl} alt={primaryVet.name} className="object-cover" />
@@ -105,7 +104,7 @@ const SaludScreen = () => {
                   {primaryVet.name.split(' ').map(name => name[0]).join('')}
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute -bottom-1 -right-1 bg-green-500 h-4 w-4 rounded-full border-2 border-white"></div>
+              {/* Removed green dot */}
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-[#1F2937] text-lg">{primaryVet.name}</h3>
@@ -163,17 +162,16 @@ const SaludScreen = () => {
               </Toggle>
             </div>
 
-            {/* Suggested Veterinarians */}
+            {/* Suggested Veterinarians - Removed emoji */}
             <div>
-              <h2 className="font-medium text-lg mb-3 text-[#1F2937] flex items-center">
-                <span className="mr-2 bg-accent1/20 p-1 rounded-md text-accent1">⭐</span>
+              <h2 className="font-medium text-lg mb-3 text-[#1F2937]">
                 Veterinarios sugeridos
               </h2>
               <div className="space-y-4">
                 {suggestedVets.map((vet) => (
                   <Card 
                     key={vet.id}
-                    className="p-4 bg-white flex items-center cursor-pointer hover:shadow-md transition-shadow rounded-xl relative overflow-hidden border-l-2 border-[#79D0B8]"
+                    className="p-4 bg-white flex items-center cursor-pointer hover:shadow-md transition-shadow rounded-xl relative overflow-hidden border border-gray-200"
                     onClick={() => handleVetClick(vet.id)}
                   >
                     <Avatar className="h-16 w-16 mr-3 shadow-sm">
