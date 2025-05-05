@@ -1,3 +1,4 @@
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -46,17 +47,6 @@
   max-width: 320px !important;
   width: 95% !important;
   margin: 0 auto;
-}
-
-/* Improved Close Button Positioning */
-.calendar-modal .close-button {
-  top: 12px !important; 
-  right: 12px !important;
-  opacity: 0.7;
-}
-
-.calendar-modal .dialog-content {
-  padding: 16px 12px 20px;
 }
 
 /* Weekly calendar day item styling */
@@ -131,20 +121,19 @@
   color: #2D8A8C;
 }
 
-/* Month navigation arrows styling - improved spacing and touch targets */
+/* Month navigation arrows styling */
 .calendar-nav-arrow {
   color: #4DA6A8;
   background-color: #F1F5F9;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
   border: none;
   cursor: pointer;
-  margin: 0 2px;
 }
 
 .calendar-nav-arrow:hover {
@@ -154,10 +143,6 @@
 
 .calendar-header {
   padding: 0 4px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 /* Calendar day styling */
@@ -177,23 +162,23 @@
   transform: scale(1.05);
 }
 
-/* Month header styling with centered title and improved spacing */
+/* Month header styling with centered title */
 .calendar-month-header {
   text-align: center;
   padding: 0 8px;
 }
 
-/* Calendar title centered and styled with improved typography */
+/* Calendar title centered and styled */
 .calendar-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1F2937;
   text-align: center;
-  padding: 0 8px;
+  padding: 0.5rem 0;
   margin-bottom: 0;
 }
 
-/* Weekday headings styling with better alignment */
+/* Weekday headings styling */
 .calendar-weekday-heading {
   font-weight: 600;
   color: #6B7280;
@@ -221,30 +206,4 @@
 /* Remove the month caption from radix UI calendar since we're using our own */
 .rdp-caption {
   display: none !important;
-}
-
-/* Improve calendar grid spacing */
-.rdp-months {
-  padding: 0 8px;
-}
-
-.rdp-month {
-  margin-top: 8px;
-}
-
-/* Ensure proper alignment of day cells */
-.rdp-cell {
-  text-align: center;
-  padding: 0;
-  height: 42px;
-}
-
-/* Improve spacing for weekday headings */
-.rdp-head_cell {
-  padding: 8px 0;
-}
-
-/* Modal dialog content specific styling */
-.calendar-modal-content {
-  padding: 12px !important;
 }

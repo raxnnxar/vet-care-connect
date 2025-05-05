@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowRight } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
-import { format, addDays, startOfWeek, endOfWeek, addWeeks, subWeeks, isToday } from 'date-fns';
+import { format, addDays, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { getVetAppointments, getVetAppointmentsByDate, getVetAppointmentDates, Appointment } from '../api/vetAppointmentsApi';
 import { toast } from 'sonner';
@@ -29,7 +28,7 @@ const VetDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [appointmentDates, setAppointmentDates] = useState<Date[]>([]);
   
-  // Generate weeks of days and initialize to the current week
+  // Generate weeks of days
   useEffect(() => {
     const generateWeeks = () => {
       const weeksArray: Date[][] = [];
@@ -48,14 +47,8 @@ const VetDashboard: React.FC = () => {
         weeksArray.push(weekDays);
       }
       
-      // Find the index of the week containing today
-      const todayWeekIndex = weeksArray.findIndex(week => 
-        week.some(day => isToday(day))
-      );
-      
-      // Set the current week index to the one containing today
-      setCurrentWeekIndex(todayWeekIndex >= 0 ? todayWeekIndex : 5);
-      
+      // Set the current week index to the middle of the array (current week)
+      setCurrentWeekIndex(5);
       return weeksArray;
     };
     
@@ -168,7 +161,7 @@ const VetDashboard: React.FC = () => {
         />
 
         {/* Pending Requests Section */}
-        <PendingRequestsList requests={pendingRequests} />
+        <PendingRequestsList requests={[]} />
 
         {/* Appointment History Section */}
         <Card 
