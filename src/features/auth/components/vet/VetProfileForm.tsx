@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -64,15 +63,13 @@ interface VetProfileFormProps {
   onSubmit: (data: VeterinarianProfile) => Promise<void>;
   isSubmitting: boolean;
   userId: string;
-  onChange?: () => void; // New prop to track form changes
 }
 
 const VetProfileForm: React.FC<VetProfileFormProps> = ({
   initialData,
   onSubmit,
   isSubmitting,
-  userId,
-  onChange
+  userId
 }) => {
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [licenseDocumentFile, setLicenseDocumentFile] = useState<File | null>(null);
@@ -80,7 +77,7 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isValid },
     setValue,
     watch,
     getValues
@@ -89,13 +86,6 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
     defaultValues: initialData,
     mode: 'onChange',
   });
-
-  // Notify parent component when form is dirty (has changes)
-  useEffect(() => {
-    if (isDirty && onChange) {
-      onChange();
-    }
-  }, [isDirty, onChange]);
 
   const profileImageUrl = watch('profile_image_url');
   const licenseDocumentUrl = watch('license_document_url');
