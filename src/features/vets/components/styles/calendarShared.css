@@ -1,0 +1,61 @@
+
+/* Common calendar styles shared between components */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Calendar Day styling */
+.rdp-day_today:not(.rdp-day_selected) {
+  border: 2px solid #79D0B8;
+  border-radius: 50%;
+  background-color: transparent !important;
+}
+
+/* Navigation button styling */
+.calendar-nav-button {
+  color: #4DA6A8;
+  background-color: #F1F5F9;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-nav-button:hover {
+  background-color: #E2E8F0;
+  color: #2D8A8C;
+}
+
+/* Animation for day selection */
+.rdp-button:active:not([disabled]), 
+.rdp-button:focus:not([disabled]) {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Calendar header general styling */
+.calendar-header {
+  padding: 0 4px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Calendar title centered and styled with improved typography */
+.calendar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1F2937;
+  text-align: center;
+  padding: 0 8px;
+  margin-bottom: 0;
+}

@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import CalendarHeader from './calendar/CalendarHeader';
 import WeeklyCalendar from './calendar/WeeklyCalendar';
 import MonthlyCalendar from './calendar/MonthlyCalendar';
-import './styles/calendar.css';
+import './styles/calendarShared.css';
 
 interface VetCalendarProps {
   selectedDate: Date;

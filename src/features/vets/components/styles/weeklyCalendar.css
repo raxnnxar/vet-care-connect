@@ -1,0 +1,54 @@
+
+/* Weekly calendar day item styling */
+.calendar-day-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 35px; /* Minimum width to ensure tappable area */
+  cursor: pointer;
+  padding: 0 2px;
+  width: 14.28%; /* Equal width for all 7 days (100% / 7) */
+  box-sizing: border-box;
+  position: relative;
+}
+
+@media (max-width: 480px) {
+  .calendar-day-item {
+    min-width: 30px;
+  }
+}
+
+@media (min-width: 481px) {
+  .calendar-day-item {
+    min-width: 45px;
+  }
+}
+
+/* Enhanced calendar styles for a professional look */
+.calendar-day-selected {
+  position: relative;
+  color: #1F2937 !important;
+  font-weight: 700 !important;
+  transition: all 0.2s ease;
+}
+
+.calendar-day-selected::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  background-color: #79D0B8;
+  border-radius: 2px;
+}
+
+.calendar-day-today {
+  color: #4DA6A8 !important;
+  font-weight: 600;
+  background-color: rgba(121, 208, 184, 0.15) !important;
+  border-radius: 50%;
+  position: relative;
+}

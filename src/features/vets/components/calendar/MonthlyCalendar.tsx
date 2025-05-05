@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogClose } from '@/ui/molecules/dialog';
 import { Calendar } from '@/ui/molecules/calendar';
@@ -6,7 +5,8 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { es } from 'date-fns/locale';
 import { format, addMonths, subMonths } from 'date-fns';
-import '../styles/calendar.css';
+import '../styles/calendarShared.css';
+import '../styles/monthlyCalendar.css';
 
 interface MonthlyCalendarProps {
   open: boolean;
