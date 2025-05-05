@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { VeterinarianProfile } from '../types/veterinarianTypes';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const updateVeterinarianProfile = async (
   userId: string,
