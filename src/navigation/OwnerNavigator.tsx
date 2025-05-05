@@ -17,7 +17,6 @@ import SettingsScreen from '../features/settings/screens/SettingsScreen';
 import { RootState } from '@/state/store';
 import { usePets } from '@/features/pets/hooks';
 import { Pet } from '@/features/pets/types';
-import { ROUTES } from '@/frontend/shared/constants/routes';
 
 const OwnerNavigator = () => {
   const location = useLocation();
