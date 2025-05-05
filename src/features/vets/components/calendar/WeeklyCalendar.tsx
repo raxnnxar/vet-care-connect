@@ -1,8 +1,8 @@
+
 import React, { RefObject } from 'react';
 import { format, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
-import '../styles/calendarShared.css';
-import '../styles/weeklyCalendar.css';
+import '../styles/calendar.css';
 
 interface WeeklyCalendarProps {
   weeks: Date[][];
