@@ -9,6 +9,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
+import { parseVetProfileData } from '@/features/auth/utils/vetProfileUtils';
 
 const VetProfileScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -56,23 +57,8 @@ const VetProfileScreen: React.FC = () => {
         throw error;
       }
 
-      // Initialize empty arrays for undefined json fields
-      const profile: VeterinarianProfile = {
-        specializations: data?.specialization || [],
-        license_number: data?.license_number || '',
-        years_of_experience: data?.years_of_experience || 0,
-        bio: data?.bio || '',
-        profile_image_url: data?.profile_image_url || undefined,
-        license_document_url: data?.license_document_url || undefined,
-        emergency_services: data?.emergency_services || false,
-        availability: data?.availability || {},
-        education: data?.education || [],
-        certifications: data?.certifications || [],
-        animals_treated: data?.animals_treated || [],
-        services_offered: data?.services_offered || [],
-        languages_spoken: data?.languages_spoken || [],
-      };
-
+      // Use the utility function to parse the data
+      const profile = parseVetProfileData(data);
       setVetProfile(profile);
     } catch (error) {
       console.error('Error fetching vet profile:', error);
@@ -158,7 +144,7 @@ const VetProfileScreen: React.FC = () => {
               size="sm"
             >
               {isSubmitting ? (
-                <LoadingSpinner size="sm" />
+                <LoadingSpinner size="small" />
               ) : (
                 <>
                   <Save className="mr-1 h-4 w-4" />
@@ -174,7 +160,7 @@ const VetProfileScreen: React.FC = () => {
       <div className="pb-20">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-[70vh]">
-            <LoadingSpinner size="lg" />
+            <LoadingSpinner size="large" />
             <p className="text-gray-500 mt-4">Cargando perfil...</p>
           </div>
         ) : !vetProfile ? (

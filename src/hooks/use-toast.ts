@@ -6,7 +6,8 @@ import {
 } from "@/ui/molecules/toast"
 
 import {
-  useToast as useToastOriginal,
+  useToast,
+  toast,
 } from "@/ui/molecules/use-toast"
 
-export { type ToastActionElement, type ToastProps, useToastOriginal as useToast }
+export { type ToastActionElement, type ToastProps, useToast, toast }
