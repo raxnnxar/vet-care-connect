@@ -10,6 +10,7 @@ import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
 import { parseVetProfileData } from '@/features/auth/utils/vetProfileUtils';
+import { updateVeterinarianProfile } from '@/features/auth/services/vetProfileService';
 
 const VetProfileScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -81,26 +82,7 @@ const VetProfileScreen: React.FC = () => {
     
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('veterinarians')
-        .update({
-          specialization: data.specializations,
-          license_number: data.license_number,
-          years_of_experience: data.years_of_experience,
-          bio: data.bio,
-          profile_image_url: data.profile_image_url,
-          license_document_url: data.license_document_url,
-          emergency_services: data.emergency_services,
-          availability: data.availability,
-          education: data.education,
-          certifications: data.certifications,
-          animals_treated: data.animals_treated,
-          services_offered: data.services_offered,
-          languages_spoken: data.languages_spoken
-        })
-        .eq('id', userId);
-
-      if (error) throw error;
+      await updateVeterinarianProfile(userId, data);
 
       toast({
         title: "Cambios guardados",
