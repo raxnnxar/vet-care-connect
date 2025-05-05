@@ -11,6 +11,7 @@ import AppointmentDetailScreen from '../features/appointments/screens/Appointmen
 import BookAppointmentScreen from '../features/appointments/screens/BookAppointmentScreen';
 import FindVetsScreen from '../features/vets/screens/FindVetsScreen';
 import VetDetailScreen from '../features/vets/screens/VetDetailScreen';
+import SaludScreen from '../features/health/screens/SaludScreen';
 import NotificationsScreen from '../features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
 import { RootState } from '@/state/store';
@@ -91,6 +92,7 @@ const OwnerNavigator = () => {
         
         <Route path="/find-vets" element={<FindVetsScreen />} />
         <Route path="/vets/:id" element={<VetDetailScreen />} />
+        <Route path="/salud" element={<SaludScreen />} />
         
         <Route path="/notifications" element={<NotificationsScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
