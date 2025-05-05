@@ -121,6 +121,30 @@
   color: #2D8A8C;
 }
 
+/* Month navigation arrows styling */
+.calendar-nav-arrow {
+  color: #4DA6A8;
+  background-color: #F1F5F9;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.calendar-nav-arrow:hover {
+  background-color: #E2E8F0;
+  transform: scale(1.05);
+}
+
+.calendar-header {
+  padding: 0 4px;
+}
+
 /* Calendar day styling */
 .calendar-day {
   border-radius: 50%;
@@ -151,7 +175,7 @@
   color: #1F2937;
   text-align: center;
   padding: 0.5rem 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
 }
 
 /* Weekday headings styling */
@@ -183,4 +207,3 @@
 .rdp-caption {
   display: none !important;
 }
-

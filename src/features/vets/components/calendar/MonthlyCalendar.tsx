@@ -5,7 +5,7 @@ import { Calendar } from '@/ui/molecules/calendar';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { es } from 'date-fns/locale';
-import { format } from 'date-fns';
+import { format, addMonths, subMonths } from 'date-fns';
 import '../styles/calendar.css';
 
 interface MonthlyCalendarProps {
@@ -40,11 +40,46 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
+  
+  // Handle month navigation
+  const handlePreviousMonth = () => {
+    const previousMonth = subMonths(viewDate, 1);
+    onMonthChange(previousMonth);
+  };
+  
+  const handleNextMonth = () => {
+    const nextMonth = addMonths(viewDate, 1);
+    onMonthChange(nextMonth);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="calendar-modal p-0 sm:max-w-[320px]">
         <div className="p-4">
+          <div className="calendar-header flex items-center justify-between mb-4">
+            <button 
+              onClick={handlePreviousMonth}
+              className="calendar-nav-arrow"
+              aria-label="Mes anterior"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            
+            <h2 className="calendar-title">
+              {capitalizeFirstLetter(
+                format(viewDate, 'MMMM yyyy', { locale: es })
+              )}
+            </h2>
+            
+            <button 
+              onClick={handleNextMonth}
+              className="calendar-nav-arrow"
+              aria-label="Mes siguiente"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+          
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -58,21 +93,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
               day_selected: "calendar-day-selected",
               day: cn("hover:bg-gray-100 font-medium calendar-day"),
               day_outside: "rdp-day_outside",
-              nav_button: "calendar-nav-button",
+              nav_button: "calendar-nav-button hidden", // Hide default navigation buttons
               caption: "calendar-caption",
               month: "calendar-month-header",
               head_cell: "calendar-weekday-heading"
             }}
             components={{
-              IconLeft: () => <ChevronLeft className="h-4 w-4" />,
-              IconRight: () => <ChevronRight className="h-4 w-4" />,
-              Caption: ({ displayMonth }) => (
-                <div className="calendar-title">
-                  {capitalizeFirstLetter(
-                    format(displayMonth, 'MMMM yyyy', { locale: es })
-                  )}
-                </div>
-              )
+              IconLeft: () => null, // Hide default left arrow
+              IconRight: () => null, // Hide default right arrow
+              Caption: () => null // Hide default caption as we're providing our own
             }}
             formatters={{
               formatWeekdayName: (day) => {
