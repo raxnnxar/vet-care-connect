@@ -5,6 +5,7 @@ import { VET_ROUTES } from './navigationConfig';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import VetDashboard from '@/features/vets/screens/VetDashboard';
 import VetAppointmentDetailScreen from '@/features/vets/screens/VetAppointmentDetailScreen';
+import VetProfileScreen from '@/features/vets/screens/VetProfileScreen';
 
 const UnderConstructionPage = ({ title }: { title: string }) => (
   <LayoutBase
@@ -32,7 +33,7 @@ const VetNavigator: React.FC = () => {
       <Route path={VET_ROUTES.DASHBOARD} element={<VetDashboard />} />
       <Route path={VET_ROUTES.APPOINTMENTS} element={<UnderConstructionPage title="Citas" />} />
       <Route path={VET_ROUTES.APPOINTMENT_DETAIL} element={<VetAppointmentDetailScreen />} />
-      <Route path={VET_ROUTES.PROFILE} element={<UnderConstructionPage title="Perfil" />} />
+      <Route path={VET_ROUTES.PROFILE} element={<VetProfileScreen />} />
       <Route path={VET_ROUTES.SETTINGS} element={<UnderConstructionPage title="Configuración" />} />
       <Route path={VET_ROUTES.PATIENTS} element={<UnderConstructionPage title="Pacientes" />} />
       <Route path={VET_ROUTES.SCHEDULE} element={<UnderConstructionPage title="Agenda" />} />
