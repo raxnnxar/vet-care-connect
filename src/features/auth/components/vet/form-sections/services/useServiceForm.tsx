@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { useFieldArray } from 'react-hook-form';
-import { Control } from 'react-hook-form';
-import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
+import { useFieldArray, Control, FieldValues } from 'react-hook-form';
+import { VeterinarianProfile, ServiceOffered } from '@/features/auth/types/veterinarianTypes';
 import { v4 as uuidv4 } from 'uuid';
 
 interface UseServiceFormProps {
@@ -17,23 +16,25 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   });
   const [newServiceErrors, setNewServiceErrors] = useState<Record<string, string>>({});
   
-  // Asegurarse de que tenemos un control válido
-  const safeControl = control || {};
-  
-  // Usar useFieldArray con una verificación de seguridad
+  // Use useFieldArray with proper typing
   const { fields, append, remove } = useFieldArray({
-    control: safeControl,
+    control,
     name: 'services_offered',
-    keyName: 'fieldId', // Usar un nombre personalizado para la clave para evitar conflictos con 'id'
+    keyName: 'fieldId', // Custom key name to avoid conflicts with 'id'
   });
   
-  // Asegurar que los campos siempre sean un array
-  const serviceFields = Array.isArray(fields) ? fields : [];
+  // Ensure fields is always treated as an array of ServiceOffered with fieldId
+  const serviceFields = Array.isArray(fields) 
+    ? fields as unknown as (ServiceOffered & { fieldId: string })[]
+    : [];
   
-  // Inicializar services_offered como un array vacío si es necesario
+  // Initialize services_offered as an empty array if needed
   useEffect(() => {
-    if (control && !Array.isArray(control._getWatch('services_offered'))) {
-      control._formValues.services_offered = [];
+    if (!Array.isArray(control._getWatch?.('services_offered'))) {
+      // Only set if the function exists and the current value is not an array
+      if (control._formValues && typeof control._getWatch === 'function') {
+        control._formValues.services_offered = [];
+      }
     }
   }, [control]);
   
@@ -46,7 +47,7 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   
   const handleFieldChange = (field: string, value: string) => {
     setNewService(prev => ({ ...prev, [field]: value }));
-    // Limpiar errores cuando se edita el campo
+    // Clear errors when editing the field
     if (newServiceErrors[field]) {
       const updatedErrors = { ...newServiceErrors };
       delete updatedErrors[field];

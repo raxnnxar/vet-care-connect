@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Control, FieldErrors } from 'react-hook-form';
-import { VeterinarianProfile } from '../../../types/veterinarianTypes';
+import { VeterinarianProfile, ServiceOffered } from '../../../types/veterinarianTypes';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -38,6 +38,13 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     setIsDialogOpen
   } = useServiceForm({ control });
 
+  // Convert serviceFields to ServiceOffered[] to match the expected type for ServicesList
+  const servicesData: ServiceOffered[] = serviceFields.map(field => ({
+    id: field.id || '',
+    name: field.name || '',
+    description: field.description || ''
+  }));
+
   return (
     <div className="space-y-6">
       <p className="text-gray-500 text-sm">
@@ -45,11 +52,11 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       </p>
       
       {/* Check if serviceFields exists and is an array */}
-      {Array.isArray(serviceFields) && serviceFields.length === 0 ? (
+      {Array.isArray(servicesData) && servicesData.length === 0 ? (
         <EmptyServicesState onAddClick={openDialog} />
       ) : (
         <ServicesList 
-          services={serviceFields || []} 
+          services={servicesData} 
           onAddClick={openDialog} 
           onRemoveService={removeService} 
         />
