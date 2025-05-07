@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { VeterinarianProfile } from '../types/veterinarianTypes';
+import { VeterinarianProfile, TimeRange } from '../types/veterinarianTypes';
 import { toast } from 'sonner';
 
 export const updateVeterinarianProfile = async (
@@ -36,7 +36,7 @@ export const updateVeterinarianProfile = async (
         const schedules = Array.isArray(data.schedules) ? data.schedules : [];
         acc[day] = { 
           isAvailable: true, 
-          schedules: schedules.map(schedule => ({
+          schedules: schedules.map((schedule: TimeRange) => ({
             startTime: schedule.startTime || '09:00',
             endTime: schedule.endTime || '18:00'
           }))

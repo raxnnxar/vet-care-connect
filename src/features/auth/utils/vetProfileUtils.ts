@@ -1,3 +1,4 @@
+
 import { Json } from '@/integrations/supabase/types';
 import { 
   VeterinarianProfile, 
@@ -5,7 +6,8 @@ import {
   EducationEntry, 
   CertificationEntry, 
   ServiceOffered,
-  TimeRange
+  TimeRange,
+  DaySchedule
 } from '../types/veterinarianTypes';
 
 // Helper functions to safely convert JSON data to typed objects
@@ -21,15 +23,18 @@ export const parseAvailability = (json: any): AvailabilitySchedule => {
       continue;
     }
     
+    // Ensure we're working with a proper object for type safety
+    const dayValue = value as Record<string, any>;
+    
     // Verificar si es el formato antiguo (con startTime y endTime directamente en el objeto)
-    if ('startTime' in value || 'endTime' in value) {
-      const isAvailable = value.isAvailable === true;
+    if ('startTime' in dayValue || 'endTime' in dayValue) {
+      const isAvailable = dayValue.isAvailable === true;
       const schedules: TimeRange[] = [];
       
-      if (isAvailable && value.startTime && value.endTime) {
+      if (isAvailable && dayValue.startTime && dayValue.endTime) {
         schedules.push({
-          startTime: value.startTime,
-          endTime: value.endTime
+          startTime: String(dayValue.startTime),
+          endTime: String(dayValue.endTime)
         });
       }
       
@@ -40,13 +45,13 @@ export const parseAvailability = (json: any): AvailabilitySchedule => {
     } 
     // Formato nuevo con array de horarios
     else {
-      const isAvailable = value.isAvailable === true;
+      const isAvailable = dayValue.isAvailable === true;
       let schedules: TimeRange[] = [];
       
-      if (Array.isArray(value.schedules)) {
-        schedules = value.schedules.map((schedule: any) => ({
-          startTime: schedule.startTime || '09:00',
-          endTime: schedule.endTime || '18:00'
+      if (Array.isArray(dayValue.schedules)) {
+        schedules = dayValue.schedules.map((schedule: any) => ({
+          startTime: String(schedule?.startTime || '09:00'),
+          endTime: String(schedule?.endTime || '18:00')
         }));
       }
       

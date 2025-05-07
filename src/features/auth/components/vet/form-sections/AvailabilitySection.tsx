@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Control, Controller, useFieldArray } from 'react-hook-form';
-import { VeterinarianProfile, DaySchedule } from '../../../types/veterinarianTypes';
+import { VeterinarianProfile, DaySchedule, TimeRange } from '../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import {
   Select,
@@ -68,12 +68,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Controller
-                    name={`availability.${day.id}.isAvailable`}
+                    name={`availability.${day.id}.isAvailable` as any}
                     control={control}
                     defaultValue={false}
                     render={({ field }) => (
                       <Switch
-                        checked={field.value}
+                        checked={field.value === true}
                         onCheckedChange={field.onChange}
                         id={`${day.id}-available`}
                       />
@@ -82,12 +82,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Controller
-                    name={`availability.${day.id}`}
+                    name={`availability.${day.id}` as any}
                     control={control}
-                    defaultValue={{ isAvailable: false, schedules: [] }}
+                    defaultValue={{ isAvailable: false, schedules: [] as TimeRange[] }}
                     render={({ field }) => {
                       // Asegurarse de que el valor es un objeto válido
-                      const dayData = field.value || { isAvailable: false, schedules: [] };
+                      const dayData = field.value as DaySchedule || { isAvailable: false, schedules: [] as TimeRange[] };
                       
                       // Asegurarse de que schedules siempre sea un array
                       const schedules = Array.isArray(dayData.schedules) ? dayData.schedules : [];
