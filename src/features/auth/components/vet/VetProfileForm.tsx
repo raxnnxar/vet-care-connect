@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -15,7 +16,7 @@ import FormSection from './form/FormSection';
 import FormFooter from './form/FormFooter';
 import EmergencyServicesSection from './form-sections/EmergencyServicesSection';
 
-// Updated schema to make all fields optional
+// Updated schema to make all fields optional with safe default values
 const veterinarianSchema = z.object({
   // All top-level fields made optional with defaults
   specializations: z.array(z.string()).optional().default([]),
@@ -74,6 +75,18 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [licenseDocumentFile, setLicenseDocumentFile] = useState<File | null>(null);
 
+  // Make sure initialData has all array fields defined with fallbacks
+  const safeInitialData: VeterinarianProfile = {
+    ...initialData,
+    specializations: initialData.specializations || [],
+    education: Array.isArray(initialData.education) ? initialData.education : [],
+    certifications: Array.isArray(initialData.certifications) ? initialData.certifications : [],
+    animals_treated: Array.isArray(initialData.animals_treated) ? initialData.animals_treated : [],
+    services_offered: Array.isArray(initialData.services_offered) ? initialData.services_offered : [],
+    languages_spoken: Array.isArray(initialData.languages_spoken) ? initialData.languages_spoken : [],
+    availability: initialData.availability || {}
+  };
+
   const {
     control,
     handleSubmit,
@@ -83,7 +96,7 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
     getValues
   } = useForm<VeterinarianProfile>({
     resolver: zodResolver(veterinarianSchema),
-    defaultValues: initialData,
+    defaultValues: safeInitialData,
     mode: 'onChange',
   });
 
@@ -101,8 +114,23 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
   const forceSubmit = () => {
     // Get current values regardless of validation
     const currentData = getValues();
-    onSubmit(currentData);
+    // Make sure we're not passing undefined arrays
+    const safeData = {
+      ...currentData,
+      specializations: currentData.specializations || [],
+      education: Array.isArray(currentData.education) ? currentData.education : [],
+      certifications: Array.isArray(currentData.certifications) ? currentData.certifications : [],
+      animals_treated: Array.isArray(currentData.animals_treated) ? currentData.animals_treated : [],
+      services_offered: Array.isArray(currentData.services_offered) ? currentData.services_offered : [],
+      languages_spoken: Array.isArray(currentData.languages_spoken) ? currentData.languages_spoken : [],
+      availability: currentData.availability || {}
+    };
+    onSubmit(safeData);
   };
+
+  // Add some debugging
+  console.log('VetProfileForm rendered with initialData:', initialData);
+  console.log('Using safeInitialData:', safeInitialData);
 
   return (
     <form onSubmit={handleSubmit(processSubmit)} className="px-4">

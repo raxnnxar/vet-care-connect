@@ -44,11 +44,12 @@ const EducationSection: React.FC<EducationSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      {fields.length === 0 ? (
+      {/* Check if fields exists and is an array */}
+      {Array.isArray(fields) && fields.length === 0 ? (
         <EmptyEducationState onAddClick={() => setIsDialogOpen(true)} />
       ) : (
         <EducationList
-          fields={fields}
+          fields={fields || []}
           onAddClick={() => setIsDialogOpen(true)}
           onRemove={remove}
           onUpload={handleUploadDocument}

@@ -2,7 +2,6 @@
 import React from 'react';
 import { Control, FieldErrors } from 'react-hook-form';
 import { VeterinarianProfile } from '../../../types/veterinarianTypes';
-import { PlusCircle } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -35,7 +34,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     closeDialog,
     handleFieldChange,
     handleAddService,
-    removeService
+    removeService,
+    setIsDialogOpen
   } = useServiceForm({ control });
 
   return (
@@ -44,18 +44,19 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         Detalla los servicios veterinarios que ofreces para que los dueños de mascotas sepan qué esperar
       </p>
       
-      {serviceFields.length === 0 ? (
+      {/* Check if serviceFields exists and is an array */}
+      {Array.isArray(serviceFields) && serviceFields.length === 0 ? (
         <EmptyServicesState onAddClick={openDialog} />
       ) : (
         <ServicesList 
-          services={serviceFields} 
+          services={serviceFields || []} 
           onAddClick={openDialog} 
           onRemoveService={removeService} 
         />
       )}
 
       {/* Add Service Dialog */}
-      <AlertDialog open={isDialogOpen} onOpenChange={closeDialog}>
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Añadir Servicio</AlertDialogTitle>

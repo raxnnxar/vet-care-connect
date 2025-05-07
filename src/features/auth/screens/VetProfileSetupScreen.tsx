@@ -19,6 +19,11 @@ const VetProfileSetupScreen = () => {
   const userId = user?.id || '';
   const { initialData, isInitialDataLoading, defaultVetProfile } = useVetProfileData(userId);
 
+  // Add debugging to see what data we're getting
+  console.log('VetProfileSetupScreen - initialData:', initialData);
+  console.log('VetProfileSetupScreen - defaultVetProfile:', defaultVetProfile);
+  console.log('VetProfileSetupScreen - isInitialDataLoading:', isInitialDataLoading);
+
   const handleSubmit = async (profileData: VeterinarianProfile) => {
     if (!userId) {
       toast.error('No se pudo identificar al usuario. Vuelve a iniciar sesión.');
@@ -29,7 +34,19 @@ const VetProfileSetupScreen = () => {
     console.log("Submitting profile data:", profileData);
 
     try {
-      await updateVeterinarianProfile(userId, profileData);
+      // Make sure we're not passing undefined arrays
+      const safeProfileData = {
+        ...profileData,
+        specializations: Array.isArray(profileData.specializations) ? profileData.specializations : [],
+        education: Array.isArray(profileData.education) ? profileData.education : [],
+        certifications: Array.isArray(profileData.certifications) ? profileData.certifications : [],
+        animals_treated: Array.isArray(profileData.animals_treated) ? profileData.animals_treated : [],
+        services_offered: Array.isArray(profileData.services_offered) ? profileData.services_offered : [],
+        languages_spoken: Array.isArray(profileData.languages_spoken) ? profileData.languages_spoken : [],
+        availability: profileData.availability || {}
+      };
+      
+      await updateVeterinarianProfile(userId, safeProfileData);
       toast.success('Perfil actualizado con éxito');
       // Redirect to vet dashboard immediately after success
       navigate(ROUTES.VET);
@@ -44,6 +61,9 @@ const VetProfileSetupScreen = () => {
     return <VetProfileLoading />;
   }
 
+  // Make sure we have safe initial data 
+  const safeData = initialData || defaultVetProfile;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#79D0B8] to-[#5FBFB3] py-8 px-4">
       <div className="container mx-auto max-w-3xl px-0">
@@ -55,7 +75,7 @@ const VetProfileSetupScreen = () => {
         </div>
 
         <VetProfileForm 
-          initialData={initialData || defaultVetProfile}
+          initialData={safeData}
           onSubmit={handleSubmit}
           isSubmitting={isLoading}
           userId={userId}

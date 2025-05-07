@@ -26,12 +26,14 @@ export const useCertificationForm = ({ control, setValue, userId }: UseCertifica
   const [newCertificationFile, setNewCertificationFile] = useState<File | null>(null);
   const [newCertificationErrors, setNewCertificationErrors] = useState<Record<string, string>>({});
 
+  // Make sure we're working with a valid field name
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'certifications'
   });
 
-  const certificationFields = fields as CertificationEntry[];
+  // Ensure fields is never undefined
+  const certificationFields = fields || [];
 
   const openDialog = () => {
     setIsDialogOpen(true);

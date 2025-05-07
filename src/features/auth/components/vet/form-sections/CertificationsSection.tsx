@@ -30,7 +30,6 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({
   const {
     certificationFields,
     isDialogOpen,
-    setIsDialogOpen, // This was missing in the useCertificationForm hook return values
     isUploading,
     newCertification,
     newCertificationFile,
@@ -43,16 +42,18 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({
     handleFileSelect,
     handleAddCertification,
     handleUploadDocument,
-    removeCertification
+    removeCertification,
+    setIsDialogOpen
   } = useCertificationForm({ control, setValue, userId });
 
   return (
     <div className="space-y-6">
-      {certificationFields.length === 0 ? (
+      {/* Use Array.isArray to check if certificationFields exists and is an array */}
+      {Array.isArray(certificationFields) && certificationFields.length === 0 ? (
         <EmptyCertificationsState onAddClick={openDialog} />
       ) : (
         <CertificationsList 
-          certifications={certificationFields}
+          certifications={certificationFields || []}
           isUploading={isUploading}
           onAddClick={openDialog}
           onRemoveCertification={removeCertification}

@@ -63,6 +63,24 @@ export const parseSpecializations = (json: any): string[] => {
 
 // Main function to parse all vet profile data from database
 export const parseVetProfileData = (vetData: any): VeterinarianProfile => {
+  // Add defensive checks to make sure we have vetData
+  if (!vetData) {
+    console.error('Cannot parse undefined or null vetData');
+    return {
+      specializations: ['general'],
+      license_number: '',
+      years_of_experience: 0,
+      bio: '',
+      availability: {},
+      education: [],
+      certifications: [],
+      animals_treated: [],
+      services_offered: [],
+      languages_spoken: ['spanish'],
+      emergency_services: false
+    };
+  }
+
   return {
     specializations: parseSpecializations(vetData.specialization),
     license_number: vetData.license_number || '',

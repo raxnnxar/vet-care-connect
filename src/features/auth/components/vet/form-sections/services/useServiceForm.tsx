@@ -23,6 +23,9 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
     name: 'services_offered',
   });
   
+  // Ensure fields is never undefined
+  const serviceFields = fields || [];
+  
   const openDialog = () => setIsDialogOpen(true);
   const closeDialog = () => {
     setIsDialogOpen(false);
@@ -55,8 +58,9 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   };
 
   return {
-    serviceFields: fields,
+    serviceFields,
     isDialogOpen,
+    setIsDialogOpen,
     newService,
     newServiceErrors,
     openDialog,
