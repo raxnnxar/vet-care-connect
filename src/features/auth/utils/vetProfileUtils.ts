@@ -1,17 +1,63 @@
-
 import { Json } from '@/integrations/supabase/types';
 import { 
   VeterinarianProfile, 
   AvailabilitySchedule, 
   EducationEntry, 
   CertificationEntry, 
-  ServiceOffered 
+  ServiceOffered,
+  TimeRange
 } from '../types/veterinarianTypes';
 
 // Helper functions to safely convert JSON data to typed objects
 export const parseAvailability = (json: any): AvailabilitySchedule => {
   if (!json || typeof json !== 'object') return {} as AvailabilitySchedule;
-  return json as AvailabilitySchedule;
+  
+  // Convertir el formato antiguo al nuevo si es necesario
+  const result: AvailabilitySchedule = {};
+  
+  for (const [day, value] of Object.entries(json)) {
+    if (!value || typeof value !== 'object') {
+      result[day as keyof AvailabilitySchedule] = { isAvailable: false, schedules: [] };
+      continue;
+    }
+    
+    // Verificar si es el formato antiguo (con startTime y endTime directamente en el objeto)
+    if ('startTime' in value || 'endTime' in value) {
+      const isAvailable = value.isAvailable === true;
+      const schedules: TimeRange[] = [];
+      
+      if (isAvailable && value.startTime && value.endTime) {
+        schedules.push({
+          startTime: value.startTime,
+          endTime: value.endTime
+        });
+      }
+      
+      result[day as keyof AvailabilitySchedule] = {
+        isAvailable,
+        schedules
+      };
+    } 
+    // Formato nuevo con array de horarios
+    else {
+      const isAvailable = value.isAvailable === true;
+      let schedules: TimeRange[] = [];
+      
+      if (Array.isArray(value.schedules)) {
+        schedules = value.schedules.map((schedule: any) => ({
+          startTime: schedule.startTime || '09:00',
+          endTime: schedule.endTime || '18:00'
+        }));
+      }
+      
+      result[day as keyof AvailabilitySchedule] = {
+        isAvailable,
+        schedules
+      };
+    }
+  }
+  
+  return result;
 };
 
 export const parseEducation = (json: any): EducationEntry[] => {

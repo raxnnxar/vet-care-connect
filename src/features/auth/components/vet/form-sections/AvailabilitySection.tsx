@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Control, Controller, FieldErrors, useFieldArray } from 'react-hook-form';
+import { Control, Controller, useFieldArray } from 'react-hook-form';
 import { VeterinarianProfile, DaySchedule } from '../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import {
@@ -10,11 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui/molecules/select';
-import { Clock } from 'lucide-react';
+import { Clock, Plus, Trash2 } from 'lucide-react';
+import { Button } from '@/ui/atoms/button';
 
 interface AvailabilitySectionProps {
   control: Control<VeterinarianProfile>;
-  errors: FieldErrors<VeterinarianProfile>;
+  errors: any;
 }
 
 const WEEKDAYS = [
@@ -48,14 +49,14 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                 Día
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                 Disponible
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Horario
+                Horarios
               </th>
             </tr>
           </thead>
@@ -67,12 +68,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Controller
-                    name={`availability.${day.id}.isAvailable` as any}
+                    name={`availability.${day.id}.isAvailable`}
                     control={control}
                     defaultValue={false}
                     render={({ field }) => (
                       <Switch
-                        checked={Boolean(field.value)}
+                        checked={field.value}
                         onCheckedChange={field.onChange}
                         id={`${day.id}-available`}
                       />
@@ -81,79 +82,136 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Controller
-                    name={`availability.${day.id}` as any}
+                    name={`availability.${day.id}`}
                     control={control}
-                    defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
+                    defaultValue={{ isAvailable: false, schedules: [] }}
                     render={({ field }) => {
-                      const daySchedule = field.value as DaySchedule;
-                      const isAvailable = daySchedule?.isAvailable;
+                      // Asegurarse de que el valor es un objeto válido
+                      const dayData = field.value || { isAvailable: false, schedules: [] };
                       
-                      return (
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              disabled={!isAvailable}
-                              value={daySchedule?.startTime || '09:00'}
-                              onValueChange={(value) => {
-                                field.onChange({
-                                  ...daySchedule,
-                                  startTime: value,
-                                  // Ensure end time is after start time
-                                  endTime: daySchedule?.endTime && value >= daySchedule.endTime
-                                    ? value
-                                    : daySchedule?.endTime || '18:00'
-                                });
-                              }}
-                            >
-                              <SelectTrigger className="w-full">
-                                <div className="flex items-center">
-                                  <Clock className="mr-2 h-3 w-3 text-gray-400" />
-                                  <SelectValue placeholder="Hora inicio" />
-                                </div>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {HOURS.map((hour) => (
-                                  <SelectItem 
-                                    key={hour} 
-                                    value={hour}
-                                    disabled={daySchedule?.endTime && hour >= daySchedule.endTime}
-                                  >
-                                    {hour}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Select
-                              disabled={!isAvailable}
-                              value={daySchedule?.endTime || '18:00'}
-                              onValueChange={(value) => {
-                                field.onChange({
-                                  ...daySchedule,
-                                  endTime: value
-                                });
-                              }}
-                            >
-                              <SelectTrigger className="w-full">
-                                <div className="flex items-center">
-                                  <Clock className="mr-2 h-3 w-3 text-gray-400" />
-                                  <SelectValue placeholder="Hora fin" />
-                                </div>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {HOURS.map((hour) => (
-                                  <SelectItem 
-                                    key={hour} 
-                                    value={hour}
-                                    disabled={daySchedule?.startTime && hour <= daySchedule.startTime}
-                                  >
-                                    {hour}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                      // Asegurarse de que schedules siempre sea un array
+                      const schedules = Array.isArray(dayData.schedules) ? dayData.schedules : [];
+                      
+                      // Si no hay horarios y el día está disponible, añadir uno por defecto
+                      if (dayData.isAvailable && schedules.length === 0) {
+                        schedules.push({ startTime: '09:00', endTime: '18:00' });
+                      }
+
+                      const handleAddSchedule = () => {
+                        const lastSchedule = schedules[schedules.length - 1];
+                        const newStartTime = lastSchedule ? lastSchedule.endTime : '09:00';
+                        const newEndTime = HOURS.indexOf(newStartTime) + 4 < HOURS.length 
+                          ? HOURS[HOURS.indexOf(newStartTime) + 4]
+                          : HOURS[HOURS.length - 1];
+                        
+                        field.onChange({
+                          ...dayData,
+                          schedules: [...schedules, { startTime: newStartTime, endTime: newEndTime }]
+                        });
+                      };
+
+                      const handleRemoveSchedule = (index: number) => {
+                        const newSchedules = [...schedules];
+                        newSchedules.splice(index, 1);
+                        field.onChange({
+                          ...dayData,
+                          schedules: newSchedules
+                        });
+                      };
+
+                      const updateSchedule = (index: number, key: 'startTime' | 'endTime', value: string) => {
+                        const newSchedules = [...schedules];
+                        newSchedules[index] = { ...newSchedules[index], [key]: value };
+                        
+                        // Si la hora de inicio es después de la hora de fin, actualizar la hora de fin
+                        if (key === 'startTime' && newSchedules[index].startTime > newSchedules[index].endTime) {
+                          newSchedules[index].endTime = newSchedules[index].startTime;
+                        }
+                        
+                        field.onChange({
+                          ...dayData,
+                          schedules: newSchedules
+                        });
+                      };
+
+                      return !dayData.isAvailable ? (
+                        <div className="text-gray-400 italic">No disponible</div>
+                      ) : (
+                        <div className="space-y-4">
+                          {schedules.map((schedule, index) => (
+                            <div key={index} className="flex items-center space-x-2">
+                              <div className="flex-1">
+                                <Select
+                                  value={schedule.startTime}
+                                  onValueChange={(value) => updateSchedule(index, 'startTime', value)}
+                                >
+                                  <SelectTrigger>
+                                    <div className="flex items-center">
+                                      <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                      <SelectValue />
+                                    </div>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {HOURS.map((hour) => (
+                                      <SelectItem 
+                                        key={hour} 
+                                        value={hour}
+                                        disabled={schedule.endTime && hour >= schedule.endTime}
+                                      >
+                                        {hour}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <span className="text-gray-500">a</span>
+                              <div className="flex-1">
+                                <Select
+                                  value={schedule.endTime}
+                                  onValueChange={(value) => updateSchedule(index, 'endTime', value)}
+                                >
+                                  <SelectTrigger>
+                                    <div className="flex items-center">
+                                      <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                      <SelectValue />
+                                    </div>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {HOURS.map((hour) => (
+                                      <SelectItem 
+                                        key={hour} 
+                                        value={hour}
+                                        disabled={schedule.startTime && hour <= schedule.startTime}
+                                      >
+                                        {hour}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              {schedules.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-red-500 hover:text-red-600"
+                                  onClick={() => handleRemoveSchedule(index)}
+                                >
+                                  <Trash2 size={16} />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 text-xs"
+                            onClick={handleAddSchedule}
+                          >
+                            <Plus size={14} className="mr-1" />
+                            Añadir horario
+                          </Button>
                         </div>
                       );
                     }}

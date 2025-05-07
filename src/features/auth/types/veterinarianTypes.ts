@@ -28,8 +28,12 @@ export interface AvailabilitySchedule {
 
 export interface DaySchedule {
   isAvailable: boolean;
-  startTime?: string;
-  endTime?: string;
+  schedules?: TimeRange[];
+}
+
+export interface TimeRange {
+  startTime: string;
+  endTime: string;
 }
 
 export interface EducationEntry {

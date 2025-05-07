@@ -26,6 +26,25 @@ export const updateVeterinarianProfile = async (
       emergency_services: profileData.emergency_services || false
     };
 
+    // Formato de disponibilidad para asegurar compatibilidad JSONB
+    const formattedAvailability = Object.entries(completeProfile.availability || {}).reduce((acc, [day, data]) => {
+      // Si el día no está disponible, solo guardar isAvailable: false y schedules vacío
+      if (!data || !data.isAvailable) {
+        acc[day] = { isAvailable: false, schedules: [] };
+      } else {
+        // Asegurarse de que schedules es un array
+        const schedules = Array.isArray(data.schedules) ? data.schedules : [];
+        acc[day] = { 
+          isAvailable: true, 
+          schedules: schedules.map(schedule => ({
+            startTime: schedule.startTime || '09:00',
+            endTime: schedule.endTime || '18:00'
+          }))
+        };
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
     // Update veterinarian record - convert types to match database requirements
     const { error: updateError } = await supabase
       .from('veterinarians')
@@ -35,7 +54,7 @@ export const updateVeterinarianProfile = async (
         license_document_url: completeProfile.license_document_url,
         years_of_experience: completeProfile.years_of_experience,
         bio: completeProfile.bio,
-        availability: completeProfile.availability as any,
+        availability: formattedAvailability as any,
         education: completeProfile.education as any,
         certifications: completeProfile.certifications as any,
         animals_treated: completeProfile.animals_treated as any,
