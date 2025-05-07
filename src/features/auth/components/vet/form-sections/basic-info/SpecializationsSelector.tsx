@@ -1,23 +1,31 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from '@/ui/atoms/label';
-import { AlertCircle, Check, X } from 'lucide-react';
+import { AlertCircle, Check, X, ChevronsUpDown } from 'lucide-react';
 import { Badge } from '@/ui/atoms/badge';
 import { Button } from '@/ui/atoms/button';
 import { cn } from '@/lib/utils';
 import { SPECIALIZATIONS } from '@/features/auth/types/veterinarianTypes';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/ui/molecules/command';
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/ui/molecules/select';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/ui/molecules/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/ui/molecules/dropdown-menu';
 import { useController } from 'react-hook-form';
 
 interface SpecializationsSelectorProps {
@@ -29,37 +37,54 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
   control,
   errors
 }) => {
-  const [specializationSearchValue, setSpecializationSearchValue] = useState('');
   const [open, setOpen] = useState(false);
   
-  const { field: specializationsField } = useController({
+  // Usar useController para manejar el campo de formulario
+  const { field } = useController({
     name: 'specializations',
     control,
+    // Asegurar que siempre tenemos un array como valor predeterminado
+    defaultValue: [],
   });
 
-  // Ensure specializations is always an array
-  const specializationsValue = Array.isArray(specializationsField.value) 
-    ? specializationsField.value 
+  // Asegurar que specializationsValue siempre sea un array válido
+  const specializationsValue = Array.isArray(field.value) 
+    ? field.value 
     : [];
 
+  // Al montar el componente, asegurar que tenemos un valor de array válido
+  useEffect(() => {
+    if (!Array.isArray(field.value)) {
+      field.onChange([]);
+    }
+  }, [field]);
+
   const handleSelectSpecialization = (value: string) => {
+    // Solo continuar si el valor es una cadena no vacía
+    if (!value?.trim()) return;
+    
+    // Verificar si ya está seleccionado
     const isSelected = specializationsValue.includes(value);
     let newValues: string[];
     
     if (isSelected) {
+      // Eliminar el valor si ya está seleccionado
       newValues = specializationsValue.filter((val: string) => val !== value);
     } else {
+      // Agregar el valor si no está seleccionado
       newValues = [...specializationsValue, value];
     }
     
-    specializationsField.onChange(newValues);
-    setSpecializationSearchValue('');
-    // Don't close the popover to allow multiple selections
+    // Actualizar el valor del campo
+    field.onChange(newValues);
   };
 
   const handleRemoveSpecialization = (value: string) => {
+    // Solo continuar si el valor es una cadena no vacía
+    if (!value?.trim()) return;
+    
     const newValues = specializationsValue.filter((val: string) => val !== value);
-    specializationsField.onChange(newValues);
+    field.onChange(newValues);
   };
 
   return (
@@ -77,46 +102,34 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
             variant="outline" 
             role="combobox"
             aria-expanded={open}
-            type="button" // Explicitly set type to prevent form submission
+            type="button" // Explícitamente definir como botón para evitar envío del formulario
             className={cn(
               "w-full justify-between text-left font-normal bg-white",
               !specializationsValue.length && "text-muted-foreground",
-              errors.specializations ? "border-red-500" : ""
+              errors?.specializations ? "border-red-500" : ""
             )}
-            onClick={(e) => {
-              e.preventDefault(); // Prevent any navigation
-              setOpen(!open);
-            }}
           >
             <span>
               {specializationsValue.length
                 ? `${specializationsValue.length} especialización${specializationsValue.length > 1 ? 'es' : ''} seleccionada${specializationsValue.length > 1 ? 's' : ''}`
                 : "Selecciona especializaciones"}
             </span>
-            <span className="ml-2">▼</span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0 max-h-[300px] overflow-auto bg-white z-50" align="start">
-          <Command>
-            <CommandInput 
-              placeholder="Buscar especialización..." 
-              value={specializationSearchValue}
-              onValueChange={setSpecializationSearchValue}
-              className="border-none focus:ring-0"
-            />
-            <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
-            <CommandGroup className="max-h-[250px] overflow-auto">
+          <div className="p-2">
+            <div className="space-y-2">
               {SPECIALIZATIONS.map((spec) => {
                 const isSelected = specializationsValue.includes(spec.value);
                 return (
-                  <CommandItem
+                  <div 
                     key={spec.value}
-                    value={spec.value}
-                    onSelect={(value) => {
-                      handleSelectSpecialization(value);
-                      return false; // Prevent default behavior
-                    }}
-                    className="flex items-center gap-2 py-3 cursor-pointer"
+                    className={cn(
+                      "flex items-center space-x-2 rounded-md p-2",
+                      isSelected ? "bg-accent" : "hover:bg-muted cursor-pointer"
+                    )}
+                    onClick={() => handleSelectSpecialization(spec.value)}
                   >
                     <div 
                       className={cn(
@@ -127,15 +140,15 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
                       {isSelected && <Check className="h-3 w-3" />}
                     </div>
                     <span>{spec.label}</span>
-                  </CommandItem>
+                  </div>
                 );
               })}
-            </CommandGroup>
-          </Command>
+            </div>
+          </div>
         </PopoverContent>
       </Popover>
       
-      {errors.specializations && (
+      {errors?.specializations && (
         <p className="text-red-500 text-xs flex items-center gap-1">
           <AlertCircle className="h-3 w-3" /> {errors.specializations.message}
         </p>
@@ -144,9 +157,9 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
       <div className="flex flex-wrap gap-2 mt-2">
         {specializationsValue.map((specValue: string) => {
           const spec = SPECIALIZATIONS.find(s => s.value === specValue);
-          return (
+          return spec ? (
             <Badge key={specValue} className="py-1 px-3 bg-[#4DA6A8] hover:bg-[#3D8A8C] text-white">
-              {spec?.label || specValue}
+              {spec.label || specValue}
               <button
                 type="button"
                 onClick={() => handleRemoveSpecialization(specValue)}
@@ -156,7 +169,7 @@ const SpecializationsSelector: React.FC<SpecializationsSelectorProps> = ({
                 <span className="sr-only">Eliminar</span>
               </button>
             </Badge>
-          );
+          ) : null;
         })}
       </div>
     </div>

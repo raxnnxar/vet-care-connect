@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { Control } from 'react-hook-form';
 import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
@@ -15,16 +15,27 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
     name: '',
     description: ''
   });
-  // No longer tracking errors since all fields are optional
   const [newServiceErrors, setNewServiceErrors] = useState<Record<string, string>>({});
   
+  // Asegurarse de que tenemos un control válido
+  const safeControl = control || {};
+  
+  // Usar useFieldArray con una verificación de seguridad
   const { fields, append, remove } = useFieldArray({
-    control,
+    control: safeControl,
     name: 'services_offered',
+    keyName: 'fieldId', // Usar un nombre personalizado para la clave para evitar conflictos con 'id'
   });
   
-  // Ensure fields is never undefined
-  const serviceFields = fields || [];
+  // Asegurar que los campos siempre sean un array
+  const serviceFields = Array.isArray(fields) ? fields : [];
+  
+  // Inicializar services_offered como un array vacío si es necesario
+  useEffect(() => {
+    if (control && !Array.isArray(control._getWatch('services_offered'))) {
+      control._formValues.services_offered = [];
+    }
+  }, [control]);
   
   const openDialog = () => setIsDialogOpen(true);
   const closeDialog = () => {
@@ -35,7 +46,7 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   
   const handleFieldChange = (field: string, value: string) => {
     setNewService(prev => ({ ...prev, [field]: value }));
-    // Clear errors when field is edited
+    // Limpiar errores cuando se edita el campo
     if (newServiceErrors[field]) {
       const updatedErrors = { ...newServiceErrors };
       delete updatedErrors[field];
@@ -43,12 +54,9 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
     }
   };
   
-  // Always return true since all fields are optional
-  const validateService = () => {
-    return true;
-  };
-  
   const handleAddService = () => {
+    if (!append) return;
+    
     append({
       id: uuidv4(),
       name: newService.name || '',
@@ -67,6 +75,8 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
     closeDialog,
     handleFieldChange,
     handleAddService,
-    removeService: remove
+    removeService: (index: number) => {
+      if (remove) remove(index);
+    }
   };
 };
