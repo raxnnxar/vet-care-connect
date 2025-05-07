@@ -1,21 +1,16 @@
 
 import React, { useState } from 'react';
-import { Check, Dog, Cat } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
+import { ANIMAL_TYPES } from '../../../../types/veterinarianTypes';
 import { cn } from '@/lib/utils';
 import { Button } from '@/ui/atoms/button';
-import { ANIMAL_TYPES } from '../../../../types/veterinarianTypes';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/ui/molecules/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/ui/molecules/popover';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue 
+} from '@/ui/molecules/select';
 
 interface AnimalsSelectorProps {
   selectedAnimals: string[];
@@ -24,90 +19,75 @@ interface AnimalsSelectorProps {
 
 const AnimalsSelector: React.FC<AnimalsSelectorProps> = ({
   selectedAnimals = [],
-  onChange,
+  onChange
 }) => {
-  const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-
-  // Asegurarnos que selectedAnimals sea siempre un array
+  // Asegurar que selectedAnimals siempre sea un array
   const safeSelectedAnimals = Array.isArray(selectedAnimals) ? selectedAnimals : [];
+  const [currentValue, setCurrentValue] = useState<string>("");
 
-  const handleToggleAnimal = (animalValue: string) => {
-    if (!animalValue) return;
+  // Manejar la adición de un nuevo animal
+  const handleAddAnimal = () => {
+    if (!currentValue || !currentValue.trim()) return;
     
-    const isSelected = safeSelectedAnimals.includes(animalValue);
-    let newValues: string[];
-    
-    if (isSelected) {
-      newValues = safeSelectedAnimals.filter((val) => val !== animalValue);
-    } else {
-      newValues = [...safeSelectedAnimals, animalValue];
+    // Verificar si el animal ya está seleccionado
+    if (safeSelectedAnimals.includes(currentValue)) {
+      setCurrentValue("");
+      return;
     }
-    
+
+    // Crear un nuevo array con el animal añadido
+    const newValues = [...safeSelectedAnimals, currentValue];
     onChange(newValues);
-    setSearchValue('');
+    setCurrentValue("");
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button 
-          variant="outline"
-          type="button"
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !safeSelectedAnimals.length && "text-muted-foreground"
-          )}
-          onClick={(e) => {
-            e.preventDefault();
-            setOpen(!open);
-          }}
-        >
-          <div className="flex items-center gap-1">
-            <Dog className="h-4 w-4 text-gray-500" />
-            <Cat className="h-4 w-4 text-gray-500" />
-          </div>
-          <span className="ml-2">
-            {safeSelectedAnimals.length
-              ? `${safeSelectedAnimals.length} especie${safeSelectedAnimals.length > 1 ? 's' : ''} seleccionada${safeSelectedAnimals.length > 1 ? 's' : ''}`
-              : "Selecciona especies animales (opcional)"}
-          </span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-white z-50" align="start">
-        <Command>
-          <CommandInput 
-            placeholder="Buscar especie..." 
-            value={searchValue}
-            onValueChange={setSearchValue}
-          />
-          <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
-          <CommandGroup className="max-h-64 overflow-auto">
-            {ANIMAL_TYPES.map((animal) => {
-              const isSelected = safeSelectedAnimals.includes(animal.value);
-              
-              return (
-                <CommandItem
+    <div className="space-y-2">
+      <div className="flex space-x-2">
+        <div className="flex-grow">
+          <Select
+            value={currentValue}
+            onValueChange={(value) => {
+              setCurrentValue(value);
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona una especie" />
+            </SelectTrigger>
+            <SelectContent>
+              {ANIMAL_TYPES.filter(animal => 
+                !safeSelectedAnimals.includes(animal.value)
+              ).map((animal) => (
+                <SelectItem
                   key={animal.value}
                   value={animal.value}
-                  onSelect={() => handleToggleAnimal(animal.value)}
                 >
-                  <div 
-                    className={cn(
-                      "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                      isSelected ? "bg-primary text-primary-foreground" : "opacity-50"
-                    )}
-                  >
-                    {isSelected && <Check className="h-3 w-3" />}
-                  </div>
-                  <span>{animal.label}</span>
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
+                  {animal.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button
+          type="button"
+          onClick={handleAddAnimal}
+          disabled={!currentValue || safeSelectedAnimals.includes(currentValue)}
+          variant="outline"
+          className={cn(
+            "flex items-center gap-2"
+          )}
+        >
+          <PlusCircle className="h-4 w-4" />
+          <span>Agregar</span>
+        </Button>
+      </div>
+
+      {safeSelectedAnimals.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No has seleccionado ninguna especie todavía
+        </p>
+      )}
+    </div>
   );
 };
 

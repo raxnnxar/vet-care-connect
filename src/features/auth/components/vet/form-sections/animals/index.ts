@@ -1,2 +1,3 @@
 
-export { default } from './AnimalsSection';
+import AnimalsSection from './AnimalsSection';
+export default AnimalsSection;
