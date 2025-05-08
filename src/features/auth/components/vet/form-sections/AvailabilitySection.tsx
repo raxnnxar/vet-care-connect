@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Control, Controller, FieldErrors } from 'react-hook-form';
+import { Control, Controller, useWatch } from 'react-hook-form';
 import { VeterinarianProfile, DaySchedule } from '../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import {
@@ -11,10 +11,16 @@ import {
   SelectValue,
 } from '@/ui/molecules/select';
 import { Clock } from 'lucide-react';
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem, 
+  AccordionTrigger 
+} from '@/ui/molecules/accordion';
 
 interface AvailabilitySectionProps {
   control: Control<VeterinarianProfile>;
-  errors: FieldErrors<VeterinarianProfile>;
+  errors: any; // Use 'any' for errors until we can properly type them
 }
 
 const WEEKDAYS = [
@@ -38,6 +44,13 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   control,
   errors,
 }) => {
+  // Use useWatch to get the current value of availability
+  const availability = useWatch({
+    control,
+    name: 'availability',
+    defaultValue: {},
+  });
+
   return (
     <div className="space-y-6">
       <p className="text-gray-500 text-sm">
@@ -47,107 +60,121 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
       <div className="overflow-hidden bg-white rounded-lg border">
         {/* Vista móvil: Diseño en acordeón */}
         <div className="md:hidden">
-          {WEEKDAYS.map((day) => (
-            <div key={day.id} className="border-b last:border-b-0">
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="font-medium">{day.label}</span>
+          <Accordion type="single" collapsible className="w-full">
+            {WEEKDAYS.map((day) => (
+              <AccordionItem key={day.id} value={day.id}>
+                <AccordionTrigger className="flex justify-between items-center px-4 py-3">
+                  <div className="flex items-center space-x-3">
+                    <span className="font-medium">{day.label}</span>
+                    <Controller
+                      name={`availability.${day.id}` as any}
+                      control={control}
+                      defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
+                      render={({ field }) => {
+                        // Since we're using `as any` for the name, we need to ensure type safety here
+                        const daySchedule = field.value as DaySchedule | undefined;
+                        
+                        return (
+                          <Switch
+                            checked={daySchedule?.isAvailable ?? false}
+                            onCheckedChange={(checked) => {
+                              field.onChange({
+                                ...daySchedule,
+                                isAvailable: checked
+                              });
+                            }}
+                            id={`${day.id}-available-mobile`}
+                          />
+                        );
+                      }}
+                    />
+                  </div>
+                </AccordionTrigger>
+
+                <AccordionContent className="px-4 pb-4">
                   <Controller
-                    name={`availability.${day.id}.isAvailable`}
+                    name={`availability.${day.id}` as any}
                     control={control}
-                    defaultValue={false}
-                    render={({ field }) => (
-                      <Switch
-                        checked={Boolean(field.value)}
-                        onCheckedChange={field.onChange}
-                        id={`${day.id}-available-mobile`}
-                      />
-                    )}
+                    defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
+                    render={({ field }) => {
+                      const daySchedule = field.value as DaySchedule | undefined;
+                      const isAvailable = daySchedule?.isAvailable ?? false;
+                      
+                      if (!isAvailable) return null;
+                      
+                      return (
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Hora inicio</label>
+                            <Select
+                              value={daySchedule?.startTime || '09:00'}
+                              onValueChange={(value) => {
+                                field.onChange({
+                                  ...daySchedule,
+                                  startTime: value,
+                                  endTime: daySchedule?.endTime && value >= daySchedule.endTime
+                                    ? value
+                                    : daySchedule?.endTime || '18:00'
+                                });
+                              }}
+                            >
+                              <SelectTrigger className="w-full">
+                                <div className="flex items-center">
+                                  <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                  <SelectValue placeholder="Inicio" />
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {HOURS.map((hour) => (
+                                  <SelectItem 
+                                    key={hour} 
+                                    value={hour}
+                                    disabled={daySchedule?.endTime && hour >= daySchedule.endTime}
+                                  >
+                                    {hour}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Hora fin</label>
+                            <Select
+                              value={daySchedule?.endTime || '18:00'}
+                              onValueChange={(value) => {
+                                field.onChange({
+                                  ...daySchedule,
+                                  endTime: value
+                                });
+                              }}
+                            >
+                              <SelectTrigger className="w-full">
+                                <div className="flex items-center">
+                                  <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                  <SelectValue placeholder="Fin" />
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {HOURS.map((hour) => (
+                                  <SelectItem 
+                                    key={hour} 
+                                    value={hour}
+                                    disabled={daySchedule?.startTime && hour <= daySchedule.startTime}
+                                  >
+                                    {hour}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      );
+                    }}
                   />
-                </div>
-                
-                <Controller
-                  name={`availability.${day.id}`}
-                  control={control}
-                  defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
-                  render={({ field }) => {
-                    const daySchedule = field.value as DaySchedule | undefined;
-                    const isAvailable = daySchedule?.isAvailable;
-                    
-                    if (!isAvailable) return null;
-                    
-                    return (
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs text-gray-500 mb-1 block">Hora inicio</label>
-                          <Select
-                            value={daySchedule?.startTime || '09:00'}
-                            onValueChange={(value) => {
-                              field.onChange({
-                                ...daySchedule,
-                                startTime: value,
-                                endTime: daySchedule?.endTime && value >= daySchedule.endTime
-                                  ? value
-                                  : daySchedule?.endTime || '18:00'
-                              });
-                            }}
-                          >
-                            <SelectTrigger className="w-full">
-                              <div className="flex items-center">
-                                <Clock className="mr-2 h-3 w-3 text-gray-400" />
-                                <SelectValue placeholder="Inicio" />
-                              </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {HOURS.map((hour) => (
-                                <SelectItem 
-                                  key={hour} 
-                                  value={hour}
-                                  disabled={daySchedule?.endTime && hour >= daySchedule.endTime}
-                                >
-                                  {hour}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-xs text-gray-500 mb-1 block">Hora fin</label>
-                          <Select
-                            value={daySchedule?.endTime || '18:00'}
-                            onValueChange={(value) => {
-                              field.onChange({
-                                ...daySchedule,
-                                endTime: value
-                              });
-                            }}
-                          >
-                            <SelectTrigger className="w-full">
-                              <div className="flex items-center">
-                                <Clock className="mr-2 h-3 w-3 text-gray-400" />
-                                <SelectValue placeholder="Fin" />
-                              </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {HOURS.map((hour) => (
-                                <SelectItem 
-                                  key={hour} 
-                                  value={hour}
-                                  disabled={daySchedule?.startTime && hour <= daySchedule.startTime}
-                                >
-                                  {hour}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    );
-                  }}
-                />
-              </div>
-            </div>
-          ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
         
         {/* Vista escritorio: Diseño en tabla */}
@@ -174,26 +201,35 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <Controller
-                      name={`availability.${day.id}.isAvailable`}
-                      control={control}
-                      defaultValue={false}
-                      render={({ field }) => (
-                        <Switch
-                          checked={Boolean(field.value)}
-                          onCheckedChange={field.onChange}
-                          id={`${day.id}-available`}
-                        />
-                      )}
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <Controller
-                      name={`availability.${day.id}`}
+                      name={`availability.${day.id}` as any}
                       control={control}
                       defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
                       render={({ field }) => {
                         const daySchedule = field.value as DaySchedule | undefined;
-                        const isAvailable = daySchedule?.isAvailable;
+                        
+                        return (
+                          <Switch
+                            checked={daySchedule?.isAvailable ?? false}
+                            onCheckedChange={(checked) => {
+                              field.onChange({
+                                ...daySchedule,
+                                isAvailable: checked
+                              });
+                            }}
+                            id={`${day.id}-available`}
+                          />
+                        );
+                      }}
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <Controller
+                      name={`availability.${day.id}` as any}
+                      control={control}
+                      defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
+                      render={({ field }) => {
+                        const daySchedule = field.value as DaySchedule | undefined;
+                        const isAvailable = daySchedule?.isAvailable ?? false;
                         
                         return (
                           <div className="grid grid-cols-2 gap-4">
