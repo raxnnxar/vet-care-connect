@@ -5,64 +5,13 @@ import {
   AvailabilitySchedule, 
   EducationEntry, 
   CertificationEntry, 
-  ServiceOffered,
-  TimeRange,
-  DaySchedule
+  ServiceOffered 
 } from '../types/veterinarianTypes';
 
 // Helper functions to safely convert JSON data to typed objects
 export const parseAvailability = (json: any): AvailabilitySchedule => {
   if (!json || typeof json !== 'object') return {} as AvailabilitySchedule;
-  
-  // Convertir el formato antiguo al nuevo si es necesario
-  const result: AvailabilitySchedule = {};
-  
-  for (const [day, value] of Object.entries(json)) {
-    if (!value || typeof value !== 'object') {
-      result[day as keyof AvailabilitySchedule] = { isAvailable: false, schedules: [] };
-      continue;
-    }
-    
-    // Ensure we're working with a proper object for type safety
-    const dayValue = value as Record<string, any>;
-    
-    // Verificar si es el formato antiguo (con startTime y endTime directamente en el objeto)
-    if ('startTime' in dayValue || 'endTime' in dayValue) {
-      const isAvailable = dayValue.isAvailable === true;
-      const schedules: TimeRange[] = [];
-      
-      if (isAvailable && dayValue.startTime && dayValue.endTime) {
-        schedules.push({
-          startTime: String(dayValue.startTime),
-          endTime: String(dayValue.endTime)
-        });
-      }
-      
-      result[day as keyof AvailabilitySchedule] = {
-        isAvailable,
-        schedules
-      };
-    } 
-    // Formato nuevo con array de horarios
-    else {
-      const isAvailable = dayValue.isAvailable === true;
-      let schedules: TimeRange[] = [];
-      
-      if (Array.isArray(dayValue.schedules)) {
-        schedules = dayValue.schedules.map((schedule: any) => ({
-          startTime: String(schedule?.startTime || '09:00'),
-          endTime: String(schedule?.endTime || '18:00')
-        }));
-      }
-      
-      result[day as keyof AvailabilitySchedule] = {
-        isAvailable,
-        schedules
-      };
-    }
-  }
-  
-  return result;
+  return json as AvailabilitySchedule;
 };
 
 export const parseEducation = (json: any): EducationEntry[] => {
