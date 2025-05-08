@@ -19,12 +19,9 @@ const MobileTimeSlots: React.FC<MobileTimeSlotsProps> = ({ dayId, control }) => 
       defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
       render={({ field }) => {
         const daySchedule = field.value as DaySchedule | undefined;
-        const isAvailable = daySchedule?.isAvailable ?? false;
-        
-        if (!isAvailable) return null;
         
         return (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 mt-2">
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Hora inicio</label>
               <TimeSelect

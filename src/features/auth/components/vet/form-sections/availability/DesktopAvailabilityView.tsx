@@ -13,11 +13,11 @@ const DesktopAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control }
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
               Día
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-              Disponible
-            </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Horario
+            </th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+              Disponible
             </th>
           </tr>
         </thead>

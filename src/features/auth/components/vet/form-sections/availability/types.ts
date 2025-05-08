@@ -21,5 +21,5 @@ export interface DayScheduleRowProps {
 
 export interface AvailabilitySectionProps {
   control: Control<VeterinarianProfile>;
-  errors: any; // Use 'any' for errors until we can properly type them
+  errors?: any; // Use 'any' for errors until we can properly type them
 }
