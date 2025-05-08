@@ -53,6 +53,7 @@ export interface ServiceOffered {
   id: string;
   name: string;
   description: string;
+  price?: number; // Agregado el campo de precio
 }
 
 export interface AnimalType {

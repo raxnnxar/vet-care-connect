@@ -12,7 +12,8 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newService, setNewService] = useState({
     name: '',
-    description: ''
+    description: '',
+    price: ''
   });
   const [newServiceErrors, setNewServiceErrors] = useState<Record<string, string>>({});
   
@@ -41,7 +42,7 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   const openDialog = () => setIsDialogOpen(true);
   const closeDialog = () => {
     setIsDialogOpen(false);
-    setNewService({ name: '', description: '' });
+    setNewService({ name: '', description: '', price: '' });
     setNewServiceErrors({});
   };
   
@@ -57,11 +58,15 @@ export const useServiceForm = ({ control }: UseServiceFormProps) => {
   
   const handleAddService = () => {
     if (!append) return;
+
+    // Validación opcional para el precio (asegurarse de que sea un número válido)
+    const priceValue = newService.price ? parseFloat(newService.price) : undefined;
     
     append({
       id: uuidv4(),
       name: newService.name || '',
-      description: newService.description || ''
+      description: newService.description || '',
+      price: priceValue
     });
     closeDialog();
   };

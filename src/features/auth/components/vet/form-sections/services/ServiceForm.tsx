@@ -8,10 +8,12 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/ui/molecules/alert-dialog';
+import { DollarSign } from 'lucide-react';
 
 interface ServiceFormProps {
   name: string;
   description: string;
+  price?: string | number;
   errors: Record<string, string>;
   onChange: (field: string, value: string) => void;
   onCancel: () => void;
@@ -21,6 +23,7 @@ interface ServiceFormProps {
 const ServiceForm: React.FC<ServiceFormProps> = ({
   name,
   description,
+  price,
   errors,
   onChange,
   onCancel,
@@ -39,6 +42,26 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
             onChange={(e) => onChange('name', e.target.value)}
             placeholder="Ej. Consulta General, Vacunación, Cirugía, etc."
           />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="service_price">
+            Precio (MXN)
+          </Label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Input
+              id="service_price"
+              type="number"
+              value={price ?? ''}
+              onChange={(e) => onChange('price', e.target.value)}
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              className="pl-10"
+            />
+          </div>
+          {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
         </div>
         
         <div className="space-y-2">

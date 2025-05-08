@@ -47,7 +47,8 @@ export const parseServices = (json: any): ServiceOffered[] => {
   return json.map(entry => ({
     id: String(entry?.id || ''),
     name: String(entry?.name || ''),
-    description: String(entry?.description || '')
+    description: String(entry?.description || ''),
+    price: entry?.price !== undefined ? Number(entry.price) : undefined
   }));
 };
 

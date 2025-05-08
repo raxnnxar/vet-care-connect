@@ -42,7 +42,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const servicesData: ServiceOffered[] = serviceFields.map(field => ({
     id: field.id || '',
     name: field.name || '',
-    description: field.description || ''
+    description: field.description || '',
+    price: field.price
   }));
 
   return (
@@ -75,6 +76,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           <ServiceForm
             name={newService.name}
             description={newService.description}
+            price={newService.price}
             errors={newServiceErrors}
             onChange={handleFieldChange}
             onCancel={closeDialog}

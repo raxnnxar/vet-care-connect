@@ -2,7 +2,7 @@
 import React from 'react';
 import { ServiceOffered } from '@/features/auth/types/veterinarianTypes';
 import { Button } from '@/ui/atoms/button';
-import { PlusCircle, Stethoscope, Trash2 } from 'lucide-react';
+import { PlusCircle, Stethoscope, Trash2, DollarSign } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -22,6 +22,16 @@ const ServicesList: React.FC<ServicesListProps> = ({
   onAddClick,
   onRemoveService
 }) => {
+  // Función para formatear el precio
+  const formatPrice = (price?: number) => {
+    if (price === undefined || price === null) return '';
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      minimumFractionDigits: 2
+    }).format(price);
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -33,6 +43,12 @@ const ServicesList: React.FC<ServicesListProps> = ({
                   <Stethoscope className="h-4 w-4 mr-2 text-gray-500" />
                   {service.name}
                 </CardTitle>
+                {service.price !== undefined && (
+                  <div className="flex items-center text-green-600 font-medium">
+                    <DollarSign className="h-4 w-4 mr-1" />
+                    {formatPrice(service.price)}
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardContent className="pt-4">
