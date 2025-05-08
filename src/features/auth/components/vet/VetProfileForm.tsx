@@ -10,7 +10,6 @@ import CertificationsSection from './form-sections/CertificationsSection';
 import AvailabilitySection from './form-sections/AvailabilitySection';
 import ServicesSection from './form-sections/ServicesSection';
 import AnimalsSection from './form-sections/AnimalsSection';
-import LanguagesSection from './form-sections/LanguagesSection';
 import ProfileImageSection from './form/ProfileImageSection';
 import FormSection from './form/FormSection';
 import FormFooter from './form/FormFooter';
@@ -186,13 +185,7 @@ const VetProfileForm: React.FC<VetProfileFormProps> = ({
           />
         </FormSection>
 
-        {/* Languages Section */}
-        <FormSection title="Idiomas">
-          <LanguagesSection 
-            control={control} 
-            errors={errors}
-          />
-        </FormSection>
+        {/* Languages Section - Removed */}
 
         {/* Animals Section */}
         <FormSection title="Animales que Tratas">
