@@ -35,7 +35,7 @@ const EmergencyServicesSection: React.FC<EmergencyServicesSectionProps> = ({
               id="emergency_services"
               checked={field.value}
               onCheckedChange={field.onChange}
-              className="data-[state=checked]:bg-[#FF8A65]"
+              className="data-[state=checked]:bg-[#79D0B8]"
             />
           )}
         />

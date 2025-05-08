@@ -26,7 +26,7 @@ const AnimalsList: React.FC<AnimalsListProps> = ({
           return (
             <Badge 
               key={animalValue} 
-              className="py-1 px-3 bg-[#FF8A65] hover:bg-[#FF7043] flex items-center justify-between"
+              className="py-1 px-3 bg-[#79D0B8] hover:bg-[#5FBFB3] flex items-center justify-between"
             >
               <span className="truncate mr-1">
                 {animal?.label || animalValue}
@@ -34,7 +34,7 @@ const AnimalsList: React.FC<AnimalsListProps> = ({
               <button
                 type="button"
                 onClick={() => onRemove(animalValue)}
-                className="ml-auto rounded-full hover:bg-[#FF7043] p-0.5 flex items-center justify-center"
+                className="ml-auto rounded-full hover:bg-[#5FBFB3] p-0.5 flex items-center justify-center"
                 aria-label={`Eliminar ${animal?.label || animalValue}`}
               >
                 <X className="h-3 w-3" />

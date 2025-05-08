@@ -2,7 +2,7 @@
 import React from 'react';
 import { ServiceOffered } from '@/features/auth/types/veterinarianTypes';
 import { Button } from '@/ui/atoms/button';
-import { PlusCircle, Stethoscope, Trash2, DollarSign } from 'lucide-react';
+import { PlusCircle, Stethoscope, Trash2 } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -45,16 +45,17 @@ const ServicesList: React.FC<ServicesListProps> = ({
                 </CardTitle>
                 {service.price !== undefined && (
                   <div className="flex items-center text-green-600 font-medium">
-                    <DollarSign className="h-4 w-4 mr-1" />
                     {formatPrice(service.price)}
                   </div>
                 )}
               </div>
             </CardHeader>
-            <CardContent className="pt-4">
-              <p className="text-gray-600 text-sm">{service.description}</p>
-            </CardContent>
-            <CardFooter className="flex justify-end border-t bg-gray-50 py-2">
+            {service.description && (
+              <CardContent className="pt-4">
+                <p className="text-gray-600 text-sm">{service.description}</p>
+              </CardContent>
+            )}
+            <CardFooter className="flex justify-center border-t bg-gray-50 py-2">
               <Button 
                 type="button" 
                 variant="ghost" 
