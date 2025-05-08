@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Control, Controller, FieldErrors, useFieldArray } from 'react-hook-form';
+import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { VeterinarianProfile, DaySchedule } from '../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import {
@@ -45,124 +45,231 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
       </p>
       
       <div className="overflow-hidden bg-white rounded-lg border">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                Día
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                Disponible
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Horario
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {WEEKDAYS.map((day) => (
-              <tr key={day.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {day.label}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        {/* Vista móvil: Diseño en acordeón */}
+        <div className="md:hidden">
+          {WEEKDAYS.map((day) => (
+            <div key={day.id} className="border-b last:border-b-0">
+              <div className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="font-medium">{day.label}</span>
                   <Controller
-                    name={`availability.${day.id}.isAvailable` as any}
+                    name={`availability.${day.id}.isAvailable`}
                     control={control}
                     defaultValue={false}
                     render={({ field }) => (
                       <Switch
                         checked={Boolean(field.value)}
                         onCheckedChange={field.onChange}
-                        id={`${day.id}-available`}
+                        id={`${day.id}-available-mobile`}
                       />
                     )}
                   />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <Controller
-                    name={`availability.${day.id}` as any}
-                    control={control}
-                    defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
-                    render={({ field }) => {
-                      const daySchedule = field.value as DaySchedule;
-                      const isAvailable = daySchedule?.isAvailable;
-                      
-                      return (
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              disabled={!isAvailable}
-                              value={daySchedule?.startTime || '09:00'}
-                              onValueChange={(value) => {
-                                field.onChange({
-                                  ...daySchedule,
-                                  startTime: value,
-                                  // Ensure end time is after start time
-                                  endTime: daySchedule?.endTime && value >= daySchedule.endTime
-                                    ? value
-                                    : daySchedule?.endTime || '18:00'
-                                });
-                              }}
-                            >
-                              <SelectTrigger className="w-full">
-                                <div className="flex items-center">
-                                  <Clock className="mr-2 h-3 w-3 text-gray-400" />
-                                  <SelectValue placeholder="Hora inicio" />
-                                </div>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {HOURS.map((hour) => (
-                                  <SelectItem 
-                                    key={hour} 
-                                    value={hour}
-                                    disabled={daySchedule?.endTime && hour >= daySchedule.endTime}
-                                  >
-                                    {hour}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Select
-                              disabled={!isAvailable}
-                              value={daySchedule?.endTime || '18:00'}
-                              onValueChange={(value) => {
-                                field.onChange({
-                                  ...daySchedule,
-                                  endTime: value
-                                });
-                              }}
-                            >
-                              <SelectTrigger className="w-full">
-                                <div className="flex items-center">
-                                  <Clock className="mr-2 h-3 w-3 text-gray-400" />
-                                  <SelectValue placeholder="Hora fin" />
-                                </div>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {HOURS.map((hour) => (
-                                  <SelectItem 
-                                    key={hour} 
-                                    value={hour}
-                                    disabled={daySchedule?.startTime && hour <= daySchedule.startTime}
-                                  >
-                                    {hour}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                </div>
+                
+                <Controller
+                  name={`availability.${day.id}`}
+                  control={control}
+                  defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
+                  render={({ field }) => {
+                    const daySchedule = field.value as DaySchedule | undefined;
+                    const isAvailable = daySchedule?.isAvailable;
+                    
+                    if (!isAvailable) return null;
+                    
+                    return (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Hora inicio</label>
+                          <Select
+                            value={daySchedule?.startTime || '09:00'}
+                            onValueChange={(value) => {
+                              field.onChange({
+                                ...daySchedule,
+                                startTime: value,
+                                endTime: daySchedule?.endTime && value >= daySchedule.endTime
+                                  ? value
+                                  : daySchedule?.endTime || '18:00'
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="w-full">
+                              <div className="flex items-center">
+                                <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                <SelectValue placeholder="Inicio" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {HOURS.map((hour) => (
+                                <SelectItem 
+                                  key={hour} 
+                                  value={hour}
+                                  disabled={daySchedule?.endTime && hour >= daySchedule.endTime}
+                                >
+                                  {hour}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
-                      );
-                    }}
-                  />
-                </td>
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Hora fin</label>
+                          <Select
+                            value={daySchedule?.endTime || '18:00'}
+                            onValueChange={(value) => {
+                              field.onChange({
+                                ...daySchedule,
+                                endTime: value
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="w-full">
+                              <div className="flex items-center">
+                                <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                <SelectValue placeholder="Fin" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {HOURS.map((hour) => (
+                                <SelectItem 
+                                  key={hour} 
+                                  value={hour}
+                                  disabled={daySchedule?.startTime && hour <= daySchedule.startTime}
+                                >
+                                  {hour}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Vista escritorio: Diseño en tabla */}
+        <div className="hidden md:block">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                  Día
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                  Disponible
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Horario
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {WEEKDAYS.map((day) => (
+                <tr key={day.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {day.label}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <Controller
+                      name={`availability.${day.id}.isAvailable`}
+                      control={control}
+                      defaultValue={false}
+                      render={({ field }) => (
+                        <Switch
+                          checked={Boolean(field.value)}
+                          onCheckedChange={field.onChange}
+                          id={`${day.id}-available`}
+                        />
+                      )}
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <Controller
+                      name={`availability.${day.id}`}
+                      control={control}
+                      defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
+                      render={({ field }) => {
+                        const daySchedule = field.value as DaySchedule | undefined;
+                        const isAvailable = daySchedule?.isAvailable;
+                        
+                        return (
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Select
+                                disabled={!isAvailable}
+                                value={daySchedule?.startTime || '09:00'}
+                                onValueChange={(value) => {
+                                  field.onChange({
+                                    ...daySchedule,
+                                    startTime: value,
+                                    endTime: daySchedule?.endTime && value >= daySchedule.endTime
+                                      ? value
+                                      : daySchedule?.endTime || '18:00'
+                                  });
+                                }}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <div className="flex items-center">
+                                    <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                    <SelectValue placeholder="Inicio" />
+                                  </div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {HOURS.map((hour) => (
+                                    <SelectItem 
+                                      key={hour} 
+                                      value={hour}
+                                      disabled={daySchedule?.endTime && hour >= daySchedule.endTime}
+                                    >
+                                      {hour}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Select
+                                disabled={!isAvailable}
+                                value={daySchedule?.endTime || '18:00'}
+                                onValueChange={(value) => {
+                                  field.onChange({
+                                    ...daySchedule,
+                                    endTime: value
+                                  });
+                                }}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <div className="flex items-center">
+                                    <Clock className="mr-2 h-3 w-3 text-gray-400" />
+                                    <SelectValue placeholder="Fin" />
+                                  </div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {HOURS.map((hour) => (
+                                    <SelectItem 
+                                      key={hour} 
+                                      value={hour}
+                                      disabled={daySchedule?.startTime && hour <= daySchedule.startTime}
+                                    >
+                                      {hour}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        );
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
