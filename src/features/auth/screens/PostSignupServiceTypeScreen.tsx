@@ -42,10 +42,12 @@ const PostSignupServiceTypeScreen: React.FC = () => {
         console.log('Service type selection successful:', result.payload);
         toast.success('Tipo de servicio seleccionado con éxito');
         
-        // Direct to the appropriate profile setup screen based on service type
+        // Mejorado: Asegurar que la navegación sea correcta según el tipo de servicio
         if (serviceType === SERVICE_TYPES.VETERINARIAN) {
+          console.log('Redirecting to VET_PROFILE_SETUP');
           navigate(ROUTES.VET_PROFILE_SETUP);
         } else {
+          console.log('Redirecting to PROFILE_SETUP');
           navigate(ROUTES.PROFILE_SETUP);
         }
       } else {

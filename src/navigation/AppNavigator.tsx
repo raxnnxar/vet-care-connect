@@ -48,21 +48,21 @@ const AppNavigator = () => {
         return;
       }
       
-      // If user has no role yet, direct them to role selection
+      // Si el usuario no tiene rol, enviarlo a la selección de rol
       if (!userRole) {
         console.log('User has no role, redirecting to role selection');
         navigate(ROUTES.POST_SIGNUP_ROLE);
         return;
       }
       
-      // If user is a service provider but no provider type yet, redirect to provider type selection
+      // Si el usuario es proveedor de servicios pero sin tipo, redirigir a selección de tipo
       if (userRole === 'service_provider' && !providerType) {
         console.log('Service provider has no type, redirecting to service type selection');
         navigate(ROUTES.POST_SIGNUP_SERVICE_TYPE);
         return;
       }
       
-      // If user is on the root path, redirect based on role
+      // Mejorado: Redirigir a los veterinarios a su página de configuración de perfil si están en la ruta principal
       if (location.pathname === '/') {
         if (userRole === 'pet_owner') {
           console.log('Redirecting pet owner to owner home');
@@ -73,7 +73,6 @@ const AppNavigator = () => {
             navigate(ROUTES.VET);
           } else {
             console.log('Redirecting service provider to appropriate home page');
-            // For now, we only have vet screens implemented
             navigate(ROUTES.VET);
           }
         }

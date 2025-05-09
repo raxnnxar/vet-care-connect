@@ -1,3 +1,4 @@
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '@/integrations/supabase/client';
 import { authActions } from '../authSlice';
@@ -84,6 +85,7 @@ export const updateServiceType = createAsyncThunk(
         }
           
         if (!vetData) {
+          console.log('Creating new veterinarian record for user:', userId);
           const { error: vetError } = await supabase
             .from('veterinarians')
             .insert({ id: userId });
@@ -92,6 +94,8 @@ export const updateServiceType = createAsyncThunk(
             console.error('Error creating veterinarian record:', vetError);
             throw vetError;
           }
+        } else {
+          console.log('Veterinarian record already exists for user:', userId);
         }
       } else if (serviceType === 'grooming') {
         // Check if pet_grooming record already exists
