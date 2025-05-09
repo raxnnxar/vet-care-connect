@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User, Star, Calendar, Clock, DollarSign, PenSquare, Save, Dog, Cat, Stethoscope } from 'lucide-react';
 import { VeterinarianProfile, ServiceOffered, ANIMAL_TYPES } from '@/features/auth/types/veterinarianTypes';
@@ -489,7 +488,7 @@ const EditableSection: React.FC<EditableSectionProps> = ({
           </Button>
         ) : (
           <Button 
-            variant="primary" 
+            variant="default" 
             size="sm" 
             onClick={onSave}
             disabled={isSaving}

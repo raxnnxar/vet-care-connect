@@ -1,4 +1,3 @@
-
 export interface VeterinarianProfile {
   id?: string;
   specializations: string[];
@@ -14,6 +13,8 @@ export interface VeterinarianProfile {
   profile_image_url?: string;
   languages_spoken: string[];
   emergency_services: boolean;
+  average_rating?: number;  // Added missing property
+  total_reviews?: number;   // Added missing property
 }
 
 export interface AvailabilitySchedule {
