@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { 
   User, Star, Calendar, MapPin, Award, Globe, Phone, 
-  FileText, BookOpen, Certificate, PenSquare, Save, 
-  Dog, Cat, Stethoscope, AlertCircle
+  FileText, BookOpen, Stethoscope, PenSquare, Save, 
+  Dog, Cat, AlertCircle
 } from 'lucide-react';
 import { VeterinarianProfile, ServiceOffered, ANIMAL_TYPES, SPECIALIZATIONS } from '@/features/auth/types/veterinarianTypes';
 import { Button } from '@/ui/atoms/button';
