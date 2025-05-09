@@ -298,6 +298,44 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          pet_owner_id: string
+          rating: number
+          updated_at: string | null
+          veterinarian_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          pet_owner_id: string
+          rating: number
+          updated_at?: string | null
+          veterinarian_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          pet_owner_id?: string
+          rating?: number
+          updated_at?: string | null
+          veterinarian_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_veterinarian_id_fkey"
+            columns: ["veterinarian_id"]
+            isOneToOne: false
+            referencedRelation: "veterinarians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_providers: {
         Row: {
           address: string | null
@@ -340,6 +378,7 @@ export type Database = {
         Row: {
           animals_treated: Json | null
           availability: Json | null
+          average_rating: number | null
           bio: string | null
           certifications: Json | null
           education: Json | null
@@ -351,11 +390,13 @@ export type Database = {
           profile_image_url: string | null
           services_offered: Json | null
           specialization: Json | null
+          total_reviews: number | null
           years_of_experience: number | null
         }
         Insert: {
           animals_treated?: Json | null
           availability?: Json | null
+          average_rating?: number | null
           bio?: string | null
           certifications?: Json | null
           education?: Json | null
@@ -367,11 +408,13 @@ export type Database = {
           profile_image_url?: string | null
           services_offered?: Json | null
           specialization?: Json | null
+          total_reviews?: number | null
           years_of_experience?: number | null
         }
         Update: {
           animals_treated?: Json | null
           availability?: Json | null
+          average_rating?: number | null
           bio?: string | null
           certifications?: Json | null
           education?: Json | null
@@ -383,6 +426,7 @@ export type Database = {
           profile_image_url?: string | null
           services_offered?: Json | null
           specialization?: Json | null
+          total_reviews?: number | null
           years_of_experience?: number | null
         }
         Relationships: [
