@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { 
   User, Star, Calendar, MapPin, Award, Globe, Phone, 
   FileText, BookOpen, Stethoscope, PenSquare, Save, 
-  Dog, Cat, AlertCircle
+  Dog, Cat, AlertCircle, Clock
 } from 'lucide-react';
 import { VeterinarianProfile, ServiceOffered, ANIMAL_TYPES, SPECIALIZATIONS } from '@/features/auth/types/veterinarianTypes';
 import { Button } from '@/ui/atoms/button';
@@ -35,12 +36,33 @@ const translateSpecialization = (value: string): string => {
   return specialization ? specialization.label : value.charAt(0).toUpperCase() + value.slice(1).replace('_', ' ');
 };
 
+const getSpecializationIcon = (specialization: string) => {
+  switch (specialization) {
+    case 'surgery':
+      return <Stethoscope className="w-5 h-5 text-[#4DA6A8]" />;
+    case 'dermatology':
+      return <User className="w-5 h-5 text-[#4DA6A8]" />;
+    case 'internal_medicine':
+      return <FileText className="w-5 h-5 text-[#4DA6A8]" />;
+    case 'cardiology':
+      return <AlertCircle className="w-5 h-5 text-[#4DA6A8]" />;
+    case 'oncology':
+      return <Award className="w-5 h-5 text-[#4DA6A8]" />;
+    case 'neurology':
+      return <BookOpen className="w-5 h-5 text-[#4DA6A8]" />;
+    default:
+      return <Award className="w-5 h-5 text-[#4DA6A8]" />;
+  }
+};
+
 const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, userId, isLoading, onSaveSection }) => {
   const [displayName, setDisplayName] = useState<string>('');
   const [editingSections, setEditingSections] = useState<Record<string, boolean>>({
     basicInfo: false,
     services: false,
     animals: false,
+    specializations: false,
+    availability: false,
     education: false,
     certifications: false
   });
@@ -52,6 +74,9 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
   );
   const [editedAnimals, setEditedAnimals] = useState<string[]>(
     profileData.animals_treated || []
+  );
+  const [editedSpecializations, setEditedSpecializations] = useState<string[]>(
+    profileData.specializations || []
   );
   const [newService, setNewService] = useState<ServiceOffered>({
     id: '',
@@ -95,6 +120,8 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
         setEditedServices([...(profileData.services_offered || [])]);
       } else if (section === 'animals') {
         setEditedAnimals([...(profileData.animals_treated || [])]);
+      } else if (section === 'specializations') {
+        setEditedSpecializations([...(profileData.specializations || [])]);
       }
     }
   };
@@ -112,6 +139,11 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
   const handleSaveAnimals = async () => {
     await onSaveSection({ animals_treated: editedAnimals }, 'animales atendidos');
     toggleEditSection('animals');
+  };
+  
+  const handleSaveSpecializations = async () => {
+    await onSaveSection({ specializations: editedSpecializations }, 'especialidades');
+    toggleEditSection('specializations');
   };
   
   const addService = () => {
@@ -140,6 +172,14 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
       setEditedAnimals(editedAnimals.filter(animal => animal !== animalType));
     } else {
       setEditedAnimals([...editedAnimals, animalType]);
+    }
+  };
+
+  const toggleSpecialization = (specialization: string) => {
+    if (editedSpecializations.includes(specialization)) {
+      setEditedSpecializations(editedSpecializations.filter(spec => spec !== specialization));
+    } else {
+      setEditedSpecializations([...editedSpecializations, specialization]);
     }
   };
   
@@ -195,18 +235,117 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
       
       {/* Content section - nueva versión de scroll único */}
       <div className="p-4 space-y-6">
-        {/* Especialidades */}
-        <div className="flex flex-wrap justify-center gap-2 py-2">
-          {profileData.specializations && profileData.specializations.length > 0 ? (
-            profileData.specializations.map((spec) => (
-              <Badge key={spec} className="bg-[#4DA6A8] hover:bg-[#3a8a8c] text-white px-3 py-1 text-sm">
-                {translateSpecialization(spec)}
-              </Badge>
-            ))
+        {/* Animales que atiende - MOVIDO ARRIBA */}
+        <EditableSection 
+          title="Animales que atiende"
+          isEditing={editingSections.animals}
+          onEdit={() => toggleEditSection('animals')}
+          onSave={handleSaveAnimals}
+          isSaving={isLoading}
+        >
+          {!editingSections.animals ? (
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-3 mt-2">
+              {profileData.animals_treated && profileData.animals_treated.length > 0 ? (
+                ANIMAL_TYPES.filter(animal => 
+                  profileData.animals_treated?.includes(animal.value)
+                ).map((animal) => (
+                  <div key={animal.value} className="flex flex-col items-center p-3 bg-[#e8f7f3] rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mb-1">
+                      {animal.value === 'dog' ? (
+                        <Dog className="w-6 h-6 text-[#4DA6A8]" />
+                      ) : animal.value === 'cat' ? (
+                        <Cat className="w-6 h-6 text-[#4DA6A8]" />
+                      ) : (
+                        <span className="w-6 h-6 flex items-center justify-center text-[#4DA6A8] text-xl">•</span>
+                      )}
+                    </div>
+                    <span className="font-medium text-center text-sm">{animal.label}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 italic text-center py-4 col-span-full">
+                  No hay tipos de animales registrados
+                </p>
+              )}
+            </div>
           ) : (
-            <Badge variant="outline">Sin especialidades</Badge>
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-3 mt-2">
+              {ANIMAL_TYPES.map((animal) => (
+                <div 
+                  key={animal.value}
+                  className={`flex flex-col items-center p-3 rounded-lg cursor-pointer transition-colors ${
+                    editedAnimals.includes(animal.value) 
+                      ? 'bg-[#4DA6A8] text-white' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                  onClick={() => toggleAnimal(animal.value)}
+                >
+                  <div className={`w-8 h-8 rounded-full ${editedAnimals.includes(animal.value) ? 'bg-white/20' : 'bg-white'} flex items-center justify-center mb-1`}>
+                    {animal.value === 'dog' ? (
+                      <Dog className="w-5 h-5" />
+                    ) : animal.value === 'cat' ? (
+                      <Cat className="w-5 h-5" />
+                    ) : (
+                      <span className="w-5 h-5 flex items-center justify-center text-lg">•</span>
+                    )}
+                  </div>
+                  <span className="font-medium text-center text-xs">{animal.label}</span>
+                </div>
+              ))}
+            </div>
           )}
-        </div>
+        </EditableSection>
+        
+        <Separator className="my-4 bg-gray-200" />
+        
+        {/* NUEVA SECCIÓN: Especialidades */}
+        <EditableSection 
+          title="Especialidades"
+          isEditing={editingSections.specializations}
+          onEdit={() => toggleEditSection('specializations')}
+          onSave={handleSaveSpecializations}
+          isSaving={isLoading}
+        >
+          {!editingSections.specializations ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+              {profileData.specializations && profileData.specializations.length > 0 ? (
+                profileData.specializations.map((spec) => (
+                  <div key={spec} className="flex items-center p-3 bg-[#e8f7f3] rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
+                      {getSpecializationIcon(spec)}
+                    </div>
+                    <span className="font-medium text-sm">{translateSpecialization(spec)}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 italic text-center py-4 col-span-full">
+                  No hay especialidades registradas
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+              {SPECIALIZATIONS.map((spec) => (
+                <div 
+                  key={spec.value}
+                  className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+                    editedSpecializations.includes(spec.value) 
+                      ? 'bg-[#4DA6A8] text-white' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                  onClick={() => toggleSpecialization(spec.value)}
+                >
+                  <div className={`w-8 h-8 rounded-full ${editedSpecializations.includes(spec.value) ? 'bg-white/20' : 'bg-white'} flex items-center justify-center mr-2`}>
+                    {getSpecializationIcon(spec.value)}
+                  </div>
+                  <span className="font-medium text-sm">{spec.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </EditableSection>
+
+        <Separator className="my-4 bg-gray-200" />
 
         {/* Información personal */}
         <EditableSection 
@@ -240,15 +379,6 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
                   </div>
                 </div>
               )}
-              
-              {profileData.emergency_services && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-md flex items-center">
-                  <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
-                  <span className="text-red-600 font-medium">
-                    Ofrece servicios de emergencia
-                  </span>
-                </div>
-              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -267,70 +397,7 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
           )}
         </EditableSection>
 
-        <Separator className="my-6 bg-gray-200" />
-
-        {/* Animales que atiende */}
-        <EditableSection 
-          title="Animales que atiende"
-          isEditing={editingSections.animals}
-          onEdit={() => toggleEditSection('animals')}
-          onSave={handleSaveAnimals}
-          isSaving={isLoading}
-        >
-          {!editingSections.animals ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-              {profileData.animals_treated && profileData.animals_treated.length > 0 ? (
-                ANIMAL_TYPES.filter(animal => 
-                  profileData.animals_treated?.includes(animal.value)
-                ).map((animal) => (
-                  <div key={animal.value} className="flex flex-col items-center p-4 bg-[#e8f7f3] rounded-lg">
-                    <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-2">
-                      {animal.value === 'dog' ? (
-                        <Dog className="w-8 h-8 text-[#4DA6A8]" />
-                      ) : animal.value === 'cat' ? (
-                        <Cat className="w-8 h-8 text-[#4DA6A8]" />
-                      ) : (
-                        <span className="w-8 h-8 flex items-center justify-center text-[#4DA6A8] text-xl">•</span>
-                      )}
-                    </div>
-                    <span className="font-medium text-center">{animal.label}</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 italic text-center py-6 col-span-full">
-                  No hay tipos de animales registrados
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
-              {ANIMAL_TYPES.map((animal) => (
-                <div 
-                  key={animal.value}
-                  className={`flex flex-col items-center p-4 rounded-lg cursor-pointer transition-colors ${
-                    editedAnimals.includes(animal.value) 
-                      ? 'bg-[#4DA6A8] text-white' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                  onClick={() => toggleAnimal(animal.value)}
-                >
-                  <div className={`w-10 h-10 rounded-full ${editedAnimals.includes(animal.value) ? 'bg-white/20' : 'bg-white'} flex items-center justify-center mb-2`}>
-                    {animal.value === 'dog' ? (
-                      <Dog className="w-6 h-6" />
-                    ) : animal.value === 'cat' ? (
-                      <Cat className="w-6 h-6" />
-                    ) : (
-                      <span className="w-6 h-6 flex items-center justify-center text-xl">•</span>
-                    )}
-                  </div>
-                  <span className="font-medium text-center">{animal.label}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </EditableSection>
-        
-        <Separator className="my-6 bg-gray-200" />
+        <Separator className="my-4 bg-gray-200" />
 
         {/* Servicios */}
         <EditableSection 
@@ -479,6 +546,144 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
             </div>
           )}
         </EditableSection>
+        
+        <Separator className="my-4 bg-gray-200" />
+        
+        {/* NUEVA SECCIÓN: Disponibilidad */}
+        <EditableSection 
+          title="Disponibilidad"
+          isEditing={editingSections.availability}
+          onEdit={() => toggleEditSection('availability')}
+          onSave={() => toggleEditSection('availability')}
+          isSaving={isLoading}
+        >
+          <div className="rounded-lg bg-white">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+                  <h3 className="font-medium">Lunes</h3>
+                </div>
+                {profileData.availability?.monday?.isAvailable ? (
+                  <p className="text-sm text-gray-700">
+                    {profileData.availability.monday.startTime} - {profileData.availability.monday.endTime}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No disponible</p>
+                )}
+              </div>
+              
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+                  <h3 className="font-medium">Martes</h3>
+                </div>
+                {profileData.availability?.tuesday?.isAvailable ? (
+                  <p className="text-sm text-gray-700">
+                    {profileData.availability.tuesday.startTime} - {profileData.availability.tuesday.endTime}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No disponible</p>
+                )}
+              </div>
+              
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+                  <h3 className="font-medium">Miércoles</h3>
+                </div>
+                {profileData.availability?.wednesday?.isAvailable ? (
+                  <p className="text-sm text-gray-700">
+                    {profileData.availability.wednesday.startTime} - {profileData.availability.wednesday.endTime}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No disponible</p>
+                )}
+              </div>
+              
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+                  <h3 className="font-medium">Jueves</h3>
+                </div>
+                {profileData.availability?.thursday?.isAvailable ? (
+                  <p className="text-sm text-gray-700">
+                    {profileData.availability.thursday.startTime} - {profileData.availability.thursday.endTime}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No disponible</p>
+                )}
+              </div>
+              
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+                  <h3 className="font-medium">Viernes</h3>
+                </div>
+                {profileData.availability?.friday?.isAvailable ? (
+                  <p className="text-sm text-gray-700">
+                    {profileData.availability.friday.startTime} - {profileData.availability.friday.endTime}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No disponible</p>
+                )}
+              </div>
+              
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+                  <h3 className="font-medium">Sábado</h3>
+                </div>
+                {profileData.availability?.saturday?.isAvailable ? (
+                  <p className="text-sm text-gray-700">
+                    {profileData.availability.saturday.startTime} - {profileData.availability.saturday.endTime}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No disponible</p>
+                )}
+              </div>
+              
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+                  <h3 className="font-medium">Domingo</h3>
+                </div>
+                {profileData.availability?.sunday?.isAvailable ? (
+                  <p className="text-sm text-gray-700">
+                    {profileData.availability.sunday.startTime} - {profileData.availability.sunday.endTime}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No disponible</p>
+                )}
+              </div>
+            </div>
+            
+            {editingSections.availability && (
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-yellow-800 text-sm">
+                  Para gestionar tu disponibilidad de manera completa, ve a la sección de "Agenda" desde el menú principal.
+                </p>
+              </div>
+            )}
+          </div>
+        </EditableSection>
+        
+        <Separator className="my-4 bg-gray-200" />
+        
+        {/* MOVER: Servicios de emergencia */}
+        {profileData.emergency_services && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-md flex items-center">
+            <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0" />
+            <div>
+              <span className="text-red-600 font-medium block">
+                Ofrece servicios de emergencia
+              </span>
+              <span className="text-red-500 text-sm">
+                Disponible fuera del horario regular para casos urgentes
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
