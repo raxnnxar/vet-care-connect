@@ -26,25 +26,25 @@ const AppNavigator = () => {
       console.log('Current role info:', { userRole, providerType });
       console.log('Current path:', location.pathname);
       
-      // Skip navigation logic if user is already on profile setup or post-signup screens
+      // Skip navigation logic if user is already on specific screens
+      // Added specific check to exclude the profile routes from this check
       if (
         location.pathname === ROUTES.PROFILE_SETUP || 
         location.pathname === ROUTES.VET_PROFILE_SETUP ||
         location.pathname === ROUTES.POST_SIGNUP_ROLE || 
-        location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE
+        location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE ||
+        location.pathname.includes('/vet/profile')
       ) {
-        console.log('User is on a profile setup/post-signup screen, allowing completion of flow');
+        console.log('User is on a setup/profile screen, allowing completion of flow');
         return;
       }
       
-      // If user is already in the owner or vet section, don't redirect
-      if (location.pathname.startsWith('/owner')) {
-        console.log('User is already in the owner section, no redirect needed');
-        return;
-      }
-      
-      if (location.pathname.startsWith('/vet')) {
-        console.log('User is already in the vet section, no redirect needed');
+      // If user is already in the owner or vet section (except profile), don't redirect
+      if (
+        (location.pathname.startsWith('/owner') && !location.pathname.includes('/profile')) || 
+        (location.pathname.startsWith('/vet') && !location.pathname.includes('/profile'))
+      ) {
+        console.log('User is in a section (not profile), no redirect needed');
         return;
       }
       
@@ -62,7 +62,7 @@ const AppNavigator = () => {
         return;
       }
       
-      // Mejorado: Redirigir a los veterinarios a su página de configuración de perfil si están en la ruta principal
+      // Mejorado: Redirigir según el rol y tipo de usuario
       if (location.pathname === '/') {
         if (userRole === 'pet_owner') {
           console.log('Redirecting pet owner to owner home');

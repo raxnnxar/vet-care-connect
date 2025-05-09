@@ -1,8 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import { RootState } from '@/state/store';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useVetProfileData } from '@/features/auth/hooks/useVetProfileData';
@@ -11,21 +9,19 @@ import { updateVeterinarianProfile } from '@/features/auth/services/vetProfileSe
 import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
 import VetProfileHeader from '../components/profile/VetProfileHeader';
 import VetProfileLoading from '@/features/auth/components/vet/VetProfileLoading';
+import { toast } from 'sonner';
 
 const VetProfileScreen: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const userId = user?.id || '';
   
   const { initialData, isInitialDataLoading, defaultVetProfile } = useVetProfileData(userId);
 
-  useEffect(() => {
-    if (!user) {
-      toast.error('Necesitas iniciar sesión para ver tu perfil');
-      navigate('/login');
-    }
-  }, [user, navigate]);
+  React.useEffect(() => {
+    // Log to debug navigation issues
+    console.log('VetProfileScreen mounted. User ID:', userId);
+  }, [userId]);
 
   const handleSubmit = async (profileData: VeterinarianProfile) => {
     if (!userId) {
@@ -59,11 +55,7 @@ const VetProfileScreen: React.FC = () => {
   if (isInitialDataLoading) {
     return (
       <LayoutBase
-        header={
-          <div className="flex justify-between items-center px-4 py-3 bg-[#79D0B8]">
-            <h1 className="text-white font-medium text-lg">Mi Perfil</h1>
-          </div>
-        }
+        header={<VetProfileHeader />}
         footer={<NavbarInferior activeTab="profile" />}
       >
         <VetProfileLoading />

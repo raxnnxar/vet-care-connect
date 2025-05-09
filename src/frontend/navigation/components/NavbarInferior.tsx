@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, Calendar, MessageSquare, Settings, User } from 'lucide-react';
 import { ROUTES } from '../../shared/constants/routes';
 import { cn } from '@/lib/utils';
@@ -13,8 +13,10 @@ interface NavbarInferiorProps {
 }
 
 const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) => {
+  const location = useLocation();
+  
   // Get the current path to determine if we're in the vet section
-  const isVetPath = window.location.pathname.includes('/vet');
+  const isVetPath = location.pathname.includes('/vet');
   
   // Create the proper styling for the nav bar to ensure it doesn't overlap with content
   return (
@@ -46,7 +48,7 @@ const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) =
       <NavItem 
         icon={<User size={24} />} 
         label="Perfil" 
-        to={isVetPath ? VET_ROUTES.PROFILE : ROUTES.OWNER_PROFILE} 
+        to={isVetPath ? '/vet/profile' : ROUTES.OWNER_PROFILE} 
         isActive={activeTab === 'profile'} 
       />
     </div>
