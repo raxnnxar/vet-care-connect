@@ -4,7 +4,7 @@ import { VeterinarianProfile, DaySchedule, AvailabilitySchedule } from "../../..
 
 // Define the WeekDay type for our day identifiers
 export interface WeekDay {
-  id: keyof AvailabilitySchedule;
+  id: string;
   label: string;
 }
 

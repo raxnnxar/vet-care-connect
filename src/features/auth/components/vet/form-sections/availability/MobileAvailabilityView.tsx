@@ -16,11 +16,11 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
       <div className="divide-y border rounded-lg">
         {WEEKDAYS.map((day) => {
           const dayId = day.id;
-          const fieldPath = `availability.${dayId}` as const;
-          const isAvailablePath = `availability.${dayId}.isAvailable` as const;
+          const fieldPath = `availability.${dayId}`;
+          const isAvailablePath = `availability.${dayId}.isAvailable`;
           
           return (
-            <div key={String(dayId)} className="p-4">
+            <div key={dayId} className="p-4">
               <div className="flex justify-between items-center mb-3">
                 <span className="font-medium text-base">{day.label}</span>
                 <Controller
@@ -49,7 +49,7 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                           });
                         }
                       }}
-                      id={`${String(dayId)}-available-mobile`}
+                      id={`${dayId}-available-mobile`}
                     />
                   )}
                 />

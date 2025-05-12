@@ -17,7 +17,7 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
   const isAvailablePath = `availability.${dayId}.isAvailable` as const;
 
   return (
-    <tr key={String(dayId)}>
+    <tr key={dayId}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {day.label}
       </td>
@@ -94,7 +94,7 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
                   });
                 }
               }}
-              id={`${String(dayId)}-available`}
+              id={`${dayId}-available`}
             />
           )}
         />

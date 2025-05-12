@@ -5,10 +5,10 @@ import { DaySchedule } from '../../../../types/veterinarianTypes';
 import TimeSelect from './TimeSelect';
 import { Control } from 'react-hook-form';
 import { VeterinarianProfile } from '../../../../types/veterinarianTypes';
-import { WeekDay } from './types';
+import { AvailabilitySchedule } from '../../../../types/veterinarianTypes';
 
 interface MobileTimeSlotsProps {
-  dayId: keyof WeekDay['id'];
+  dayId: string;
   control: Control<VeterinarianProfile>;
 }
 
