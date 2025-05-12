@@ -1,16 +1,11 @@
 
-import { Control, UseFormSetValue } from "react-hook-form";
-import { VeterinarianProfile, DaySchedule } from "../../../../types/veterinarianTypes";
+import { Control } from "react-hook-form";
+import { VeterinarianProfile, DaySchedule, AvailabilitySchedule } from "../../../../types/veterinarianTypes";
 
-// Define the AvailabilityMap type to match what's used in VeterinarianProfile
-export interface AvailabilityMap {
-  monday?: DaySchedule;
-  tuesday?: DaySchedule;
-  wednesday?: DaySchedule;
-  thursday?: DaySchedule;
-  friday?: DaySchedule;
-  saturday?: DaySchedule;
-  sunday?: DaySchedule;
+// Define the WeekDay type for our day identifiers
+export interface WeekDay {
+  id: keyof AvailabilitySchedule;
+  label: string;
 }
 
 export interface TimeSlotProps {
@@ -20,11 +15,6 @@ export interface TimeSlotProps {
   isStartTime?: boolean;
   endTime?: string;
   startTime?: string;
-}
-
-export interface WeekDay {
-  id: keyof AvailabilityMap;
-  label: string;
 }
 
 export interface DayScheduleRowProps {

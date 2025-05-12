@@ -1,23 +1,29 @@
 
 import React from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import { DaySchedule } from '../../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import TimeSelect from './TimeSelect';
 import { DayScheduleRowProps } from './types';
 
 const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
-  // Now this will work because we're wrapped in FormProvider
-  const { setValue } = useFormContext();
+  // Get methods from the parent form context
+  const { setValue, getValues } = useFormContext();
+
+  const dayId = day.id;
+  
+  // Create a field path that will work with object notation
+  const fieldPath = `availability.${dayId}` as const;
+  const isAvailablePath = `availability.${dayId}.isAvailable` as const;
 
   return (
-    <tr key={String(day.id)}>
+    <tr key={String(dayId)}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {day.label}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         <Controller
-          name={`availability.${String(day.id)}`}
+          name={fieldPath as any}
           control={control}
           defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
           render={({ field }) => {
@@ -63,30 +69,32 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
         <Controller
-          name={`availability.${String(day.id)}.isAvailable`}
+          name={isAvailablePath as any}
           control={control}
           defaultValue={false}
           render={({ field }) => (
             <Switch
-              checked={field.value}
+              checked={Boolean(field.value)}
               onCheckedChange={(checked) => {
                 field.onChange(checked);
                 
                 // When the switch is activated, ensure default values are saved
                 if (checked) {
+                  const currentValue = getValues(fieldPath as any) as DaySchedule | undefined;
+                  
                   const defaultDaySchedule = {
                     isAvailable: true,
-                    startTime: '09:00',
-                    endTime: '18:00'
+                    startTime: currentValue?.startTime || '09:00',
+                    endTime: currentValue?.endTime || '18:00'
                   };
                   
-                  setValue(`availability.${String(day.id)}`, defaultDaySchedule, {
+                  setValue(fieldPath as any, defaultDaySchedule, {
                     shouldDirty: true,
                     shouldValidate: true
                   });
                 }
               }}
-              id={`${String(day.id)}-available`}
+              id={`${String(dayId)}-available`}
             />
           )}
         />

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useFormContext, FormProvider } from 'react-hook-form';
+import { FormProvider, useFormContext } from 'react-hook-form';
 import { AvailabilitySectionProps } from './availability/types';
 import MobileAvailabilityView from './availability/MobileAvailabilityView';
 import DesktopAvailabilityView from './availability/DesktopAvailabilityView';
