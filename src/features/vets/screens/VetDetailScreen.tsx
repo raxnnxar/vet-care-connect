@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft, MapPin, Phone, Mail, Calendar, Star, MessageCircle } from 'lucide-react';
@@ -62,10 +63,12 @@ const VetDetailScreen = () => {
             total_reviews,
             bio,
             animals_treated,
-            profiles (
-              first_name,
-              last_name,
-              email
+            service_providers:id (
+              profiles (
+                first_name,
+                last_name,
+                email
+              )
             )
           `)
           .eq('id', id)
@@ -158,9 +161,9 @@ const VetDetailScreen = () => {
   }
 
   if (data) {
-    // Format veterinarian name using profile data
-    const firstName = data.profiles?.first_name || '';
-    const lastName = data.profiles?.last_name || '';
+    // Format veterinarian name using profile data from service_providers > profiles path
+    const firstName = data.service_providers?.profiles?.first_name || '';
+    const lastName = data.service_providers?.profiles?.last_name || '';
     
     const vetName = firstName || lastName 
       ? `Dr${firstName.toLowerCase().endsWith('a') ? 'a' : ''}. ${firstName} ${lastName}`.trim()
@@ -275,7 +278,7 @@ const VetDetailScreen = () => {
                 
                 <div className="flex items-center">
                   <Mail className="text-[#79D0B8] mr-3" size={20} />
-                  <span>{data.profiles?.email || "Email no disponible"}</span>
+                  <span>{data.service_providers?.profiles?.email || "Email no disponible"}</span>
                 </div>
               </div>
             </div>
@@ -305,26 +308,26 @@ const VetDetailScreen = () => {
   }
 
   return (
-    <LayoutBase
-      header={
-        <div className="flex items-center p-4 bg-[#79D0B8]">
-          <Button 
-            variant="ghost" 
-            className="text-white p-1 mr-2" 
-            onClick={handleGoBack}
-          >
-            <ArrowLeft size={24} />
-          </Button>
-          <h1 className="text-xl font-medium text-white">Cargando...</h1>
+      <LayoutBase
+        header={
+          <div className="flex items-center p-4 bg-[#79D0B8]">
+            <Button 
+              variant="ghost" 
+              className="text-white p-1 mr-2" 
+              onClick={handleGoBack}
+            >
+              <ArrowLeft size={24} />
+            </Button>
+            <h1 className="text-xl font-medium text-white">Cargando...</h1>
+          </div>
+        }
+        footer={<NavbarInferior activeTab="home" />}
+      >
+        <div className="p-4 flex justify-center items-center h-full">
+          <p>Cargando información del veterinario...</p>
         </div>
-      }
-      footer={<NavbarInferior activeTab="home" />}
-    >
-      <div className="p-4 flex justify-center items-center h-full">
-        <p>Cargando información del veterinario...</p>
-      </div>
-    </LayoutBase>
-  );
+      </LayoutBase>
+    );
 };
 
 export default VetDetailScreen;

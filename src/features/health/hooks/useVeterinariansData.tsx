@@ -26,7 +26,7 @@ export const useVeterinariansData = () => {
         setLoading(true);
         setError(null);
 
-        // Consulta modificada para obtener también el perfil y animals_treated
+        // Consulta modificada para seguir la ruta de relación correcta
         const { data: veterinarians, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
@@ -36,9 +36,11 @@ export const useVeterinariansData = () => {
             average_rating,
             total_reviews,
             animals_treated,
-            profiles (
-              first_name,
-              last_name
+            service_providers:id (
+              profiles (
+                first_name,
+                last_name
+              )
             )
           `)
           .order('average_rating', { ascending: false });
@@ -59,9 +61,9 @@ export const useVeterinariansData = () => {
 
         // Map the database data to our frontend model
         const formattedVets: Veterinarian[] = veterinarians.map(vet => {
-          // Get first and last name from profiles
-          const firstName = vet.profiles?.first_name || '';
-          const lastName = vet.profiles?.last_name || '';
+          // Get first and last name from the profiles through service_providers relation
+          const firstName = vet.service_providers?.profiles?.first_name || '';
+          const lastName = vet.service_providers?.profiles?.last_name || '';
           
           // Format display name with Dr. prefix
           const fullName = firstName || lastName 
