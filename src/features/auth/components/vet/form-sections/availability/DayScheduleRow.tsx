@@ -65,8 +65,20 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
           defaultValue={false}
           render={({ field }) => (
             <Switch
-              checked={field.value}
-              onCheckedChange={field.onChange}
+              checked={Boolean(field.value)}
+              onCheckedChange={(checked) => {
+                field.onChange(checked);
+                // Asegurar que se establezcan los valores predeterminados cuando se activa
+                if (checked) {
+                  const currentValue = control.getValues(`availability.${day.id}` as any) as DaySchedule || {};
+                  control.setValue(`availability.${day.id}` as any, {
+                    ...currentValue,
+                    isAvailable: true,
+                    startTime: currentValue.startTime || '09:00',
+                    endTime: currentValue.endTime || '18:00'
+                  });
+                }
+              }}
               id={`${day.id}-available`}
             />
           )}
