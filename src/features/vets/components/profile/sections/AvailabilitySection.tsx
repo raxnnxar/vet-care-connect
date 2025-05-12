@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { EditableSection } from '../EditableSection';
 import { AvailabilitySchedule } from '@/features/auth/types/veterinarianTypes';
 
@@ -31,7 +31,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div className="p-3 border rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4DA6A8] mr-2" />
               <h3 className="font-medium">Lunes</h3>
             </div>
             {availability?.monday?.isAvailable ? (
@@ -45,7 +45,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
           
           <div className="p-3 border rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4DA6A8] mr-2" />
               <h3 className="font-medium">Martes</h3>
             </div>
             {availability?.tuesday?.isAvailable ? (
@@ -59,7 +59,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
           
           <div className="p-3 border rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4DA6A8] mr-2" />
               <h3 className="font-medium">Miércoles</h3>
             </div>
             {availability?.wednesday?.isAvailable ? (
@@ -73,7 +73,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
           
           <div className="p-3 border rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4DA6A8] mr-2" />
               <h3 className="font-medium">Jueves</h3>
             </div>
             {availability?.thursday?.isAvailable ? (
@@ -87,7 +87,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
           
           <div className="p-3 border rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4DA6A8] mr-2" />
               <h3 className="font-medium">Viernes</h3>
             </div>
             {availability?.friday?.isAvailable ? (
@@ -101,7 +101,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
           
           <div className="p-3 border rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4DA6A8] mr-2" />
               <h3 className="font-medium">Sábado</h3>
             </div>
             {availability?.saturday?.isAvailable ? (
@@ -115,7 +115,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
           
           <div className="p-3 border rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="w-5 h-5 text-[#4DA6A8] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4DA6A8] mr-2" />
               <h3 className="font-medium">Domingo</h3>
             </div>
             {availability?.sunday?.isAvailable ? (

@@ -12,6 +12,8 @@ import PersonalInfoSection from './sections/PersonalInfoSection';
 import ServicesSection from './sections/ServicesSection';
 import AvailabilitySection from './sections/AvailabilitySection';
 import EmergencyServiceSection from './sections/EmergencyServiceSection';
+import EducationSection from './sections/EducationSection';
+import CertificationsSection from './sections/CertificationsSection';
 
 interface VetProfilePreviewProps {
   profileData: VeterinarianProfile;
@@ -84,6 +86,16 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
   
   const handleSaveSpecializations = async () => {
     return await onSaveSection({ specializations: editedSpecializations }, 'especialidades');
+  };
+  
+  const handleSaveEducation = async () => {
+    toggleEditSection('education');
+    return Promise.resolve();
+  };
+  
+  const handleSaveCertifications = async () => {
+    toggleEditSection('certifications');
+    return Promise.resolve();
   };
   
   const addService = () => {
@@ -167,6 +179,28 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
           toggleSpecialization={toggleSpecialization}
         />
 
+        <Separator className="my-4 bg-gray-200" />
+
+        {/* NUEVA SECCIÓN: Educación */}
+        <EducationSection 
+          educationEntries={profileData.education}
+          isEditing={editingSections.education}
+          toggleEditing={() => toggleEditSection('education')}
+          handleSave={handleSaveEducation}
+          isLoading={isLoading}
+        />
+        
+        <Separator className="my-4 bg-gray-200" />
+        
+        {/* NUEVA SECCIÓN: Certificaciones */}
+        <CertificationsSection 
+          certifications={profileData.certifications}
+          isEditing={editingSections.certifications}
+          toggleEditing={() => toggleEditSection('certifications')}
+          handleSave={handleSaveCertifications}
+          isLoading={isLoading}
+        />
+        
         <Separator className="my-4 bg-gray-200" />
 
         {/* Información personal */}
