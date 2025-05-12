@@ -9,7 +9,25 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/ui/atoms/skeleton';
 import { toast } from 'sonner';
-import { translateSpecialization } from '@/features/auth/utils/vetProfileUtils';
+
+// Create translateSpecialization function here instead of importing it
+const translateSpecialization = (code: string): string => {
+  const specializations = {
+    'surgery': 'Cirugía',
+    'dermatology': 'Dermatología',
+    'internal_medicine': 'Medicina interna',
+    'cardiology': 'Cardiología',
+    'oncology': 'Oncología',
+    'neurology': 'Neurología',
+    'ophthalmology': 'Oftalmología',
+    'dentistry': 'Odontología',
+    'nutrition': 'Nutrición',
+    'behavior': 'Comportamiento',
+    'emergency': 'Emergencias'
+  };
+  
+  return specializations[code] || code.charAt(0).toUpperCase() + code.slice(1).replace('_', ' ');
+};
 
 const VetDetailScreen = () => {
   const { id } = useParams();
@@ -38,10 +56,11 @@ const VetDetailScreen = () => {
       if (data) {
         setVetData({
           ...data,
-          fullName: data.profile ? `${data.profile.first_name} ${data.profile.last_name}` : 'Veterinario',
+          fullName: data.profile && typeof data.profile === 'object' ? 
+            `${data.profile.first_name || ''} ${data.profile.last_name || ''}`.trim() : 'Veterinario',
           imageUrl: data.profile_image_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
-          specializations: Array.isArray(data.specializations) ? 
-            data.specializations.map(translateSpecialization) : []
+          specializations: Array.isArray(data.specialization) ? 
+            data.specialization.map(translateSpecialization) : []
         });
       }
     } catch (error) {

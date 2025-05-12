@@ -7,7 +7,7 @@ export interface Veterinarian {
   id: string;
   profile_image_url?: string;
   bio?: string;
-  specializations?: string[];
+  specialization?: string[];
   average_rating?: number;
   total_reviews?: number;
   animals_treated?: string[];
@@ -40,7 +40,7 @@ export const useVeterinariansData = (searchTerm = '') => {
     if (searchTerm) {
       // Using ilike for case-insensitive search in PostgreSQL
       // Note: This is a simplification and might need adjustment based on your schema
-      query = query.or(`specializations.ilike.%${searchTerm}%,profile.first_name.ilike.%${searchTerm}%,profile.last_name.ilike.%${searchTerm}%`);
+      query = query.or(`specialization.ilike.%${searchTerm}%,profile.first_name.ilike.%${searchTerm}%,profile.last_name.ilike.%${searchTerm}%`);
     }
     
     const { data, error } = await query;
@@ -53,13 +53,14 @@ export const useVeterinariansData = (searchTerm = '') => {
     // Process and format data for the UI
     return data?.map(vet => ({
       ...vet,
-      // Format name from profile relation
-      name: vet.profile ? `${vet.profile.first_name} ${vet.profile.last_name}` : 'Veterinario',
+      // Format name from profile relation - use safe access
+      name: vet.profile && typeof vet.profile === 'object' ? 
+        `${vet.profile.first_name || ''} ${vet.profile.last_name || ''}`.trim() : 'Veterinario',
       // Use a default image if none provided
       imageUrl: vet.profile_image_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
       // Extract first specialization for the card display
-      specialization: Array.isArray(vet.specializations) ? 
-        vet.specializations.map(spec => translateSpecialization(spec)).join(', ') : '',
+      specialization: Array.isArray(vet.specialization) ? 
+        vet.specialization.map(spec => translateSpecialization(spec)).join(', ') : '',
       // Ensure rating is a number
       rating: vet.average_rating || 4.5,
       reviewCount: vet.total_reviews || 0,
