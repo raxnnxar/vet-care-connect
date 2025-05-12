@@ -40,8 +40,7 @@ export const useVeterinariansData = () => {
               business_name,
               provider_type,
               profiles (
-                display_name,
-                profile_picture_url
+                display_name
               )
             )
           `)
@@ -125,10 +124,8 @@ export const useVeterinariansData = () => {
             }
           }
 
-          // Get image URL with fallback to profile picture
-          const imageUrl = vet.profile_image_url || 
-                          vet.service_providers?.profiles?.profile_picture_url || 
-                          '';
+          // Get image URL - we only have profile_image_url from veterinarians now
+          const imageUrl = vet.profile_image_url || '';
 
           // Return the formatted vet object
           return {
