@@ -28,12 +28,15 @@ const VetServicesSection: React.FC<VetServicesSectionProps> = ({ services }) => 
     }).format(price);
   };
 
-  if (services.length === 0) {
+  // Ensure services is an array before proceeding
+  const servicesList = Array.isArray(services) ? services : [];
+
+  if (servicesList.length === 0) {
     return null;
   }
 
   // Show only top 3 services unless "Ver todos" is clicked
-  const displayServices = showAll ? services : services.slice(0, 3);
+  const displayServices = showAll ? servicesList : servicesList.slice(0, 3);
 
   return (
     <Card>
@@ -62,7 +65,7 @@ const VetServicesSection: React.FC<VetServicesSectionProps> = ({ services }) => 
           </div>
         ))}
       </CardContent>
-      {services.length > 3 && (
+      {servicesList.length > 3 && (
         <CardFooter className="flex justify-center pt-0 pb-4">
           <Button 
             variant="ghost" 
@@ -77,7 +80,7 @@ const VetServicesSection: React.FC<VetServicesSectionProps> = ({ services }) => 
             ) : (
               <>
                 <ChevronDown className="w-4 h-4 mr-1" />
-                Ver todos los servicios ({services.length})
+                Ver todos los servicios ({servicesList.length})
               </>
             )}
           </Button>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft } from 'lucide-react';
@@ -57,6 +56,13 @@ const VetDetailScreen = () => {
           .maybeSingle();
 
         if (error) throw error;
+        
+        // Ensure services_offered is an array
+        if (data) {
+          data.services_offered = Array.isArray(data.services_offered) 
+            ? data.services_offered 
+            : [];
+        }
         
         setData(data);
       } catch (error) {
@@ -175,7 +181,7 @@ const VetDetailScreen = () => {
           
           {/* Services Section */}
           <div className="mb-4">
-            <VetServicesSection services={data.services_offered || []} />
+            <VetServicesSection services={Array.isArray(data.services_offered) ? data.services_offered : []} />
           </div>
           
           {/* Contact Section */}
