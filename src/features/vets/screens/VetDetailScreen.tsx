@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft, MapPin, Phone, Mail, Calendar, Star } from 'lucide-react';
@@ -56,7 +55,7 @@ const VetDetailScreen = () => {
       if (data) {
         setVetData({
           ...data,
-          fullName: data.profile && typeof data.profile === 'object' ? 
+          fullName: data.profile && typeof data.profile === 'object' && data.profile !== null ? 
             `${data.profile.first_name || ''} ${data.profile.last_name || ''}`.trim() : 'Veterinario',
           imageUrl: data.profile_image_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
           specializations: Array.isArray(data.specialization) ? 

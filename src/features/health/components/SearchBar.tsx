@@ -3,7 +3,6 @@ import React from 'react';
 import { Search, Filter } from 'lucide-react';
 import { Input } from '@/ui/atoms/input';
 import { Toggle } from '@/ui/atoms/toggle';
-import { useDebounce } from '@/core/hooks/useDebounce';
 
 interface SearchBarProps {
   searchQuery: string;

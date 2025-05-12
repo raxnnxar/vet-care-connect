@@ -53,8 +53,8 @@ export const useVeterinariansData = (searchTerm = '') => {
     // Process and format data for the UI
     return data?.map(vet => ({
       ...vet,
-      // Format name from profile relation - use safe access
-      name: vet.profile && typeof vet.profile === 'object' ? 
+      // Format name from profile relation - use safe access with null checks
+      name: vet.profile && typeof vet.profile === 'object' && vet.profile !== null ? 
         `${vet.profile.first_name || ''} ${vet.profile.last_name || ''}`.trim() : 'Veterinario',
       // Use a default image if none provided
       imageUrl: vet.profile_image_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
