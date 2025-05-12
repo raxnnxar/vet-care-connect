@@ -1,6 +1,8 @@
 
+import { WeekDay } from "./types";
+
 // Common constants used in availability components
-export const WEEKDAYS = [
+export const WEEKDAYS: WeekDay[] = [
   { id: 'monday', label: 'Lunes' },
   { id: 'tuesday', label: 'Martes' },
   { id: 'wednesday', label: 'Miércoles' },

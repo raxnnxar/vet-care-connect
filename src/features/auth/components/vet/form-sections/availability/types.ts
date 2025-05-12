@@ -1,6 +1,6 @@
 
 import { Control } from "react-hook-form";
-import { VeterinarianProfile, DaySchedule } from "../../../../types/veterinarianTypes";
+import { VeterinarianProfile, DaySchedule, AvailabilityMap } from "../../../../types/veterinarianTypes";
 
 export interface TimeSlotProps {
   value: string;
@@ -11,15 +11,17 @@ export interface TimeSlotProps {
   startTime?: string;
 }
 
+export interface WeekDay {
+  id: keyof AvailabilityMap;
+  label: string;
+}
+
 export interface DayScheduleRowProps {
-  day: {
-    id: string;
-    label: string;
-  };
+  day: WeekDay;
   control: Control<VeterinarianProfile>;
 }
 
 export interface AvailabilitySectionProps {
   control: Control<VeterinarianProfile>;
-  errors?: any; // Use 'any' for errors until we can properly type them
+  errors?: any;
 }
