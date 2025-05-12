@@ -1,6 +1,17 @@
 
 import { Control } from "react-hook-form";
-import { VeterinarianProfile, DaySchedule, AvailabilityMap } from "../../../../types/veterinarianTypes";
+import { VeterinarianProfile, DaySchedule } from "../../../../types/veterinarianTypes";
+
+// Add the missing AvailabilityMap type
+export interface AvailabilityMap {
+  monday?: DaySchedule;
+  tuesday?: DaySchedule;
+  wednesday?: DaySchedule;
+  thursday?: DaySchedule;
+  friday?: DaySchedule;
+  saturday?: DaySchedule;
+  sunday?: DaySchedule;
+}
 
 export interface TimeSlotProps {
   value: string;

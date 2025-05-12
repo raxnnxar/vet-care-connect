@@ -12,11 +12,11 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
     <div className="md:hidden">
       <div className="divide-y border rounded-lg">
         {WEEKDAYS.map((day) => (
-          <div key={day.id} className="p-4">
+          <div key={day.id as React.Key} className="p-4">
             <div className="flex justify-between items-center mb-3">
               <span className="font-medium text-base">{day.label}</span>
               <Controller
-                name={`availability.${day.id}.isAvailable` as any}
+                name={`availability.${String(day.id)}.isAvailable` as any}
                 control={control}
                 defaultValue={false}
                 render={({ field }) => (
@@ -33,39 +33,26 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                           endTime: '18:00'
                         };
                         
-                        // Access the complete day field name to set default values
-                        const dayFieldName = `availability.${day.id}` as const;
-                        const currentValue = control._getWatch?.(dayFieldName) || {};
-                        
-                        // Set the complete values with the control's setValue function
-                        control._formState.dirtyFields[dayFieldName] = true;
-                        if (control._fields[dayFieldName]?._f?.mount) {
-                          control._fields[dayFieldName]._f.onChange({
-                            target: {
-                              value: {
-                                ...currentValue,
-                                isAvailable: true,
-                                startTime: currentValue.startTime || '09:00',
-                                endTime: currentValue.endTime || '18:00'
-                              }
-                            }
-                          });
-                        }
+                        // Use setValue from control to update the value directly
+                        control.setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
+                          shouldDirty: true,
+                          shouldValidate: true
+                        });
                       }
                     }}
-                    id={`${day.id}-available-mobile`}
+                    id={`${String(day.id)}-available-mobile`}
                   />
                 )}
               />
             </div>
             
             <Controller
-              name={`availability.${day.id}.isAvailable` as any}
+              name={`availability.${String(day.id)}.isAvailable` as any}
               control={control}
               defaultValue={false}
               render={({ field }) => (
                 field.value ? (
-                  <MobileTimeSlots dayId={day.id} control={control} />
+                  <MobileTimeSlots dayId={day.id as string} control={control} />
                 ) : null
               )}
             />

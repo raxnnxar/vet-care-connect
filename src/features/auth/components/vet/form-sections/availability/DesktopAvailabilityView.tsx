@@ -23,7 +23,7 @@ const DesktopAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control }
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {WEEKDAYS.map((day) => (
-            <DayScheduleRow key={day.id} day={day} control={control} />
+            <DayScheduleRow key={day.id as React.Key} day={day} control={control} />
           ))}
         </tbody>
       </table>

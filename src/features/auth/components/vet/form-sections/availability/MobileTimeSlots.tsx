@@ -5,16 +5,17 @@ import { DaySchedule } from '../../../../types/veterinarianTypes';
 import TimeSelect from './TimeSelect';
 import { Control } from 'react-hook-form';
 import { VeterinarianProfile } from '../../../../types/veterinarianTypes';
+import { AvailabilityMap } from './types';
 
 interface MobileTimeSlotsProps {
-  dayId: string;
+  dayId: keyof AvailabilityMap;
   control: Control<VeterinarianProfile>;
 }
 
 const MobileTimeSlots: React.FC<MobileTimeSlotsProps> = ({ dayId, control }) => {
   return (
     <Controller
-      name={`availability.${dayId}` as any}
+      name={`availability.${String(dayId)}` as any}
       control={control}
       defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
       render={({ field }) => {

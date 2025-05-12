@@ -8,13 +8,13 @@ import { DayScheduleRowProps } from './types';
 
 const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
   return (
-    <tr key={day.id}>
+    <tr key={day.id as React.Key}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {day.label}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         <Controller
-          name={`availability.${day.id}` as any}
+          name={`availability.${String(day.id)}` as any}
           control={control}
           defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
           render={({ field }) => {
@@ -60,7 +60,7 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
         <Controller
-          name={`availability.${day.id}.isAvailable` as any}
+          name={`availability.${String(day.id)}.isAvailable` as any}
           control={control}
           defaultValue={false}
           render={({ field }) => (
@@ -77,27 +77,14 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
                     endTime: '18:00'
                   };
                   
-                  // Access the complete day field name to set default values
-                  const dayFieldName = `availability.${day.id}` as const;
-                  const currentValue = control._getWatch?.(dayFieldName) || {};
-                  
-                  // Set the complete values with the control's setValue function
-                  control._formState.dirtyFields[dayFieldName] = true;
-                  if (control._fields[dayFieldName]?._f?.mount) {
-                    control._fields[dayFieldName]._f.onChange({
-                      target: {
-                        value: {
-                          ...currentValue,
-                          isAvailable: true,
-                          startTime: currentValue.startTime || '09:00',
-                          endTime: currentValue.endTime || '18:00'
-                        }
-                      }
-                    });
-                  }
+                  // Use setValue from control to update the value directly
+                  control.setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
+                    shouldDirty: true,
+                    shouldValidate: true
+                  });
                 }
               }}
-              id={`${day.id}-available`}
+              id={`${String(day.id)}-available`}
             />
           )}
         />
