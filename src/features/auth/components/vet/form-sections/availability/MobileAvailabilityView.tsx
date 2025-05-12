@@ -8,18 +8,18 @@ import { WEEKDAYS } from './constants';
 import { AvailabilitySectionProps, WeekDay } from './types';
 
 const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control }) => {
-  // Get setValue from useFormContext
+  // Now this will work because we're wrapped in FormProvider
   const { setValue } = useFormContext();
   
   return (
     <div className="md:hidden">
       <div className="divide-y border rounded-lg">
         {WEEKDAYS.map((day) => (
-          <div key={String(day.id) as React.Key} className="p-4">
+          <div key={String(day.id)} className="p-4">
             <div className="flex justify-between items-center mb-3">
               <span className="font-medium text-base">{day.label}</span>
               <Controller
-                name={`availability.${String(day.id)}.isAvailable` as any}
+                name={`availability.${String(day.id)}.isAvailable`}
                 control={control}
                 defaultValue={false}
                 render={({ field }) => (
@@ -36,8 +36,7 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                           endTime: '18:00'
                         };
                         
-                        // Use setValue from useFormContext instead of control
-                        setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
+                        setValue(`availability.${String(day.id)}`, defaultDaySchedule, {
                           shouldDirty: true,
                           shouldValidate: true
                         });
@@ -50,7 +49,7 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
             </div>
             
             <Controller
-              name={`availability.${String(day.id)}.isAvailable` as any}
+              name={`availability.${String(day.id)}.isAvailable`}
               control={control}
               defaultValue={false}
               render={({ field }) => (

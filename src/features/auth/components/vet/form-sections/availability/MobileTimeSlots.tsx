@@ -15,7 +15,7 @@ interface MobileTimeSlotsProps {
 const MobileTimeSlots: React.FC<MobileTimeSlotsProps> = ({ dayId, control }) => {
   return (
     <Controller
-      name={`availability.${String(dayId)}` as any}
+      name={`availability.${String(dayId)}`}
       control={control}
       defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
       render={({ field }) => {

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, FormProvider } from 'react-hook-form';
 import { AvailabilitySectionProps } from './availability/types';
 import MobileAvailabilityView from './availability/MobileAvailabilityView';
 import DesktopAvailabilityView from './availability/DesktopAvailabilityView';
@@ -9,7 +9,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   control,
   errors,
 }) => {
-  // We're already within the form context from VetProfileForm
+  // Get the form methods from the parent form context
   const formMethods = useFormContext();
 
   return (
@@ -19,11 +19,13 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
       </p>
       
       <div className="overflow-hidden bg-white rounded-lg border">
-        {/* Vista móvil: Diseño en acordeón */}
-        <MobileAvailabilityView control={control} errors={errors} />
-        
-        {/* Vista escritorio: Diseño en tabla */}
-        <DesktopAvailabilityView control={control} errors={errors} />
+        <FormProvider {...formMethods}>
+          {/* Vista móvil: Diseño en acordeón */}
+          <MobileAvailabilityView control={control} errors={errors} />
+          
+          {/* Vista escritorio: Diseño en tabla */}
+          <DesktopAvailabilityView control={control} errors={errors} />
+        </FormProvider>
       </div>
       
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">

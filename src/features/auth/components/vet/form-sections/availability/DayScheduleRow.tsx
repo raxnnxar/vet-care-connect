@@ -7,17 +7,17 @@ import TimeSelect from './TimeSelect';
 import { DayScheduleRowProps } from './types';
 
 const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
-  // Get setValue from useFormContext
+  // Now this will work because we're wrapped in FormProvider
   const { setValue } = useFormContext();
 
   return (
-    <tr key={String(day.id) as React.Key}>
+    <tr key={String(day.id)}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {day.label}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         <Controller
-          name={`availability.${String(day.id)}` as any}
+          name={`availability.${String(day.id)}`}
           control={control}
           defaultValue={{ isAvailable: false, startTime: '09:00', endTime: '18:00' } as DaySchedule}
           render={({ field }) => {
@@ -63,7 +63,7 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
         <Controller
-          name={`availability.${String(day.id)}.isAvailable` as any}
+          name={`availability.${String(day.id)}.isAvailable`}
           control={control}
           defaultValue={false}
           render={({ field }) => (
@@ -80,8 +80,7 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
                     endTime: '18:00'
                   };
                   
-                  // Use setValue from useFormContext instead of control
-                  setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
+                  setValue(`availability.${String(day.id)}`, defaultDaySchedule, {
                     shouldDirty: true,
                     shouldValidate: true
                   });
