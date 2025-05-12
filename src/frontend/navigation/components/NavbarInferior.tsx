@@ -6,7 +6,7 @@ import { ROUTES } from '../../shared/constants/routes';
 import { cn } from '@/lib/utils';
 import { VET_ROUTES } from '@/navigation/navigationConfig';
 
-export type NavTabType = 'home' | 'appointments' | 'chats' | 'settings' | 'profile' | 'pets' | 'search';
+export type NavTabType = 'home' | 'appointments' | 'chats' | 'settings' | 'profile' | 'pets' | 'search' | 'schedule';
 
 interface NavbarInferiorProps {
   activeTab?: NavTabType;
