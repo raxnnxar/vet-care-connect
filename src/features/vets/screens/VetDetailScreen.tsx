@@ -46,11 +46,12 @@ const VetDetailScreen = () => {
         const { data, error } = await supabase
           .from('veterinarians')
           .select(`
-            *,
-            profiles:service_providers!veterinarians_id_fkey(
-              display_name,
-              email
-            )
+            id,
+            specialization,
+            profile_image_url,
+            average_rating,
+            total_reviews,
+            bio
           `)
           .eq('id', id)
           .maybeSingle();
@@ -135,13 +136,8 @@ const VetDetailScreen = () => {
   }
 
   if (data) {
-    // Format veterinarian name
-    const vetName = data.profiles && 
-                    typeof data.profiles === 'object' && 
-                    'display_name' in data.profiles && 
-                    data.profiles.display_name 
-      ? data.profiles.display_name 
-      : "Doctor(a)";
+    // Format veterinarian name - using ID as a fallback since we don't have profile data
+    const vetName = `Dr. ${data.id.substring(0, 5)}`;
 
     // Format specialization
     const specializations = parseSpecializations(data.specialization);

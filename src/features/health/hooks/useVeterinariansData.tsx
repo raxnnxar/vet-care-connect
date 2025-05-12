@@ -23,15 +23,21 @@ export const useVeterinariansData = () => {
         setLoading(true);
         setError(null);
 
-        // Join with profile table by specifying the exact relationship to avoid ambiguity
+        // Consulta directa a la tabla veterinarians
         const { data: veterinarians, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
-            *,
-            profiles:service_providers!veterinarians_id_fkey(
-              display_name
-            )
-          `);
+            id,
+            specialization,
+            profile_image_url,
+            average_rating,
+            total_reviews,
+            bio
+          `)
+          .order('average_rating', { ascending: false });
+
+        console.log('Datos obtenidos:', veterinarians); // Para depuración
+        console.log('Error si existe:', vetError); // Para depuración
 
         if (vetError) {
           throw vetError;
@@ -39,17 +45,8 @@ export const useVeterinariansData = () => {
 
         // Map the database data to our frontend model
         const formattedVets: Veterinarian[] = veterinarians.map(vet => {
-          // Safely handle potentially null profile
-          let displayName = "Dr. Veterinario";
-          
-          // Check if profiles exists and has display_name
-          if (vet.profiles && typeof vet.profiles === 'object') {
-            // Use optional chaining to safely access display_name
-            const profiles = vet.profiles as Record<string, any>;
-            if ('display_name' in profiles) {
-              displayName = String(profiles.display_name || '');
-            }
-          }
+          // Format display name with Dr. prefix
+          const displayName = `Dr. ${vet.id.substring(0, 5)}`;
           
           // Parse specializations - ensure it's an array
           let specializations: string[] = [];
@@ -79,7 +76,7 @@ export const useVeterinariansData = () => {
             imageUrl: vet.profile_image_url || 'https://randomuser.me/api/portraits/men/32.jpg',
             rating: vet.average_rating || 0,
             reviewCount: vet.total_reviews || 0,
-            distance: "1.2 km" // This is mocked for now, would need geolocation data
+            distance: "1.2 km" // Mocked distance data
           };
         });
 
