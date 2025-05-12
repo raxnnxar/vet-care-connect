@@ -5,58 +5,22 @@ import NavbarInferior from '@/frontend/navigation/components/NavbarInferior';
 import SaludHeader from '../components/SaludHeader';
 import PrimaryVet from '../components/PrimaryVet';
 import VetTabs from '../components/VetTabs';
+import { useVeterinariansData } from '../hooks/useVeterinariansData';
+import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
 
-// Temporary mock data for primary vet
+// Temporary mock data for primary vet until we implement the functionality
+// to select a primary vet
 const primaryVet = {
   id: 'primary-vet',
-  name: 'Dra. Elena Martínez',
-  specialization: 'Medicina General, Cirugía',
+  name: 'Veterinario de Cabecera',
+  specialization: 'Selecciona tu veterinario de confianza',
   imageUrl: 'https://randomuser.me/api/portraits/women/10.jpg',
 };
-
-// Temporary mock data for suggested vets
-const suggestedVets = [
-  {
-    id: 'vet1',
-    name: 'Dr. Carlos Rodríguez',
-    specialization: 'Cardiología',
-    imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-    rating: 4.8,
-    reviewCount: 124,
-    distance: '1.2 km'
-  },
-  {
-    id: 'vet2',
-    name: 'Dra. Laura Gómez',
-    specialization: 'Dermatología',
-    imageUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-    rating: 4.7,
-    reviewCount: 98,
-    distance: '2.5 km'
-  },
-  {
-    id: 'vet3',
-    name: 'Dr. Miguel Hernández',
-    specialization: 'Oftalmología',
-    imageUrl: 'https://randomuser.me/api/portraits/men/22.jpg',
-    rating: 4.9,
-    reviewCount: 156,
-    distance: '0.8 km'
-  },
-  {
-    id: 'vet4',
-    name: 'Dra. Ana Sánchez',
-    specialization: 'Nutrición',
-    imageUrl: 'https://randomuser.me/api/portraits/women/28.jpg',
-    rating: 4.6,
-    reviewCount: 87,
-    distance: '3.1 km'
-  }
-];
 
 const SaludScreen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('veterinarios');
+  const { vets, loading, error } = useVeterinariansData();
   
   const handleBackClick = () => {
     navigate('/owner');
@@ -64,7 +28,7 @@ const SaludScreen = () => {
 
   const handleScheduleClick = (vetId: string) => {
     console.log(`Schedule appointment with vet ${vetId}`);
-    // Will navigate to appointment booking page in the future
+    navigate(`/owner/appointments/book/${vetId}`);
   };
 
   const handleVetClick = (vetId: string) => {
@@ -78,12 +42,29 @@ const SaludScreen = () => {
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
         <PrimaryVet vet={primaryVet} onScheduleClick={handleScheduleClick} />
-        <VetTabs 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab} 
-          vets={suggestedVets}
-          onVetClick={handleVetClick}
-        />
+        
+        {loading ? (
+          <div className="flex justify-center items-center py-10">
+            <LoadingSpinner />
+          </div>
+        ) : error ? (
+          <div className="p-4 bg-red-50 rounded-md border border-red-200 text-red-700">
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-2 text-sm underline"
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : (
+          <VetTabs 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab} 
+            vets={vets}
+            onVetClick={handleVetClick}
+          />
+        )}
       </main>
       
       <NavbarInferior activeTab="home" />

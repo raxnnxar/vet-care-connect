@@ -1,19 +1,10 @@
 
 import React from 'react';
 import VetCard from './VetCard';
-
-interface Vet {
-  id: string;
-  name: string;
-  specialization?: string;
-  imageUrl: string;
-  rating: number;
-  reviewCount: number;
-  distance: string;
-}
+import { Veterinarian } from '../hooks/useVeterinariansData';
 
 interface VetListProps {
-  vets: Vet[];
+  vets: Veterinarian[];
   onVetClick: (vetId: string) => void;
 }
 

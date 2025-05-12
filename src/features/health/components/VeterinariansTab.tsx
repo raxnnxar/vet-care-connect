@@ -1,32 +1,37 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import SearchBar from './SearchBar';
 import VetList from './VetList';
-
-interface Vet {
-  id: string;
-  name: string;
-  specialization?: string;
-  imageUrl: string;
-  rating: number;
-  reviewCount: number;
-  distance: string;
-}
+import { Veterinarian } from '../hooks/useVeterinariansData';
+import { useDebounce } from '@/hooks/use-debounce';
 
 interface VeterinariansTabProps {
-  vets: Vet[];
+  vets: Veterinarian[];
   onVetClick: (vetId: string) => void;
 }
 
 const VeterinariansTab: React.FC<VeterinariansTabProps> = ({ vets, onVetClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  // Here we could filter vets based on searchQuery if needed
-  const filteredVets = vets;
+  const filteredVets = useMemo(() => {
+    if (!debouncedSearchQuery.trim()) {
+      return vets;
+    }
+
+    const query = debouncedSearchQuery.toLowerCase();
+    return vets.filter(vet => {
+      const nameMatch = vet.name.toLowerCase().includes(query);
+      const specializationMatch = vet.specialization.some(
+        spec => spec.toLowerCase().includes(query)
+      );
+      return nameMatch || specializationMatch;
+    });
+  }, [vets, debouncedSearchQuery]);
 
   return (
     <>
@@ -34,7 +39,13 @@ const VeterinariansTab: React.FC<VeterinariansTabProps> = ({ vets, onVetClick })
         searchQuery={searchQuery} 
         onSearchChange={handleSearchChange} 
       />
-      <VetList vets={filteredVets} onVetClick={onVetClick} />
+      {filteredVets.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          <p>No se encontraron veterinarios que coincidan con tu búsqueda.</p>
+        </div>
+      ) : (
+        <VetList vets={filteredVets} onVetClick={onVetClick} />
+      )}
     </>
   );
 };

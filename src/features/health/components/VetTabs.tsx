@@ -3,21 +3,12 @@ import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/ui/molecules/tabs';
 import VeterinariansTab from './VeterinariansTab';
 import HospitalesTab from './HospitalesTab';
-
-interface Vet {
-  id: string;
-  name: string;
-  specialization?: string;
-  imageUrl: string;
-  rating: number;
-  reviewCount: number;
-  distance: string;
-}
+import { Veterinarian } from '../hooks/useVeterinariansData';
 
 interface VetTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
-  vets: Vet[];
+  vets: Veterinarian[];
   onVetClick: (vetId: string) => void;
 }
 

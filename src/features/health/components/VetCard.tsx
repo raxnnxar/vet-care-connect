@@ -8,7 +8,7 @@ interface VetCardProps {
   vet: {
     id: string;
     name: string;
-    specialization?: string;
+    specialization: string[];
     imageUrl: string;
     rating: number;
     reviewCount: number;
@@ -18,6 +18,11 @@ interface VetCardProps {
 }
 
 const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
+  // Get the first specialization to display
+  const primarySpecialization = vet.specialization && vet.specialization.length > 0 
+    ? vet.specialization[0] 
+    : "Medicina General";
+  
   return (
     <Card 
       key={vet.id}
@@ -32,12 +37,10 @@ const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
       </Avatar>
       <div className="flex-1">
         <h3 className="font-medium text-[#1F2937] text-base">{vet.name}</h3>
-        {vet.specialization && (
-          <p className="text-sm text-gray-500">{vet.specialization}</p>
-        )}
+        <p className="text-sm text-gray-500">{primarySpecialization}</p>
         <div className="flex items-center mt-1">
           <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-          <span className="ml-1 text-sm font-medium">{vet.rating}</span>
+          <span className="ml-1 text-sm font-medium">{vet.rating.toFixed(1)}</span>
           <span className="ml-1 text-xs text-gray-500">({vet.reviewCount} reseñas)</span>
           <div className="ml-auto flex items-center text-xs text-gray-500">
             <MapPin className="w-3 h-3 mr-1" />

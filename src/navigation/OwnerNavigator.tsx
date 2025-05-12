@@ -11,6 +11,7 @@ import AppointmentDetailScreen from '../features/appointments/screens/Appointmen
 import BookAppointmentScreen from '../features/appointments/screens/BookAppointmentScreen';
 import FindVetsScreen from '../features/vets/screens/FindVetsScreen';
 import VetDetailScreen from '../features/vets/screens/VetDetailScreen';
+import VetReviewScreen from '../features/vets/screens/VetReviewScreen';
 import SaludScreen from '../features/health/screens/SaludScreen';
 import NotificationsScreen from '../features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
@@ -92,6 +93,7 @@ const OwnerNavigator = () => {
         
         <Route path="/find-vets" element={<FindVetsScreen />} />
         <Route path="/vets/:id" element={<VetDetailScreen />} />
+        <Route path="/vets/:id/review" element={<VetReviewScreen />} />
         <Route path="/salud" element={<SaludScreen />} />
         
         <Route path="/notifications" element={<NotificationsScreen />} />
