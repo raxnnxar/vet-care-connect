@@ -36,7 +36,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </div>
             {availability?.monday?.isAvailable ? (
               <p className="text-sm text-gray-700">
-                {availability.monday.startTime || '09:00'} - {availability.monday.endTime || '18:00'}
+                {availability.monday.startTime} - {availability.monday.endTime}
               </p>
             ) : (
               <p className="text-sm text-gray-500 italic">No disponible</p>
@@ -50,7 +50,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </div>
             {availability?.tuesday?.isAvailable ? (
               <p className="text-sm text-gray-700">
-                {availability.tuesday.startTime || '09:00'} - {availability.tuesday.endTime || '18:00'}
+                {availability.tuesday.startTime} - {availability.tuesday.endTime}
               </p>
             ) : (
               <p className="text-sm text-gray-500 italic">No disponible</p>
@@ -64,7 +64,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </div>
             {availability?.wednesday?.isAvailable ? (
               <p className="text-sm text-gray-700">
-                {availability.wednesday.startTime || '09:00'} - {availability.wednesday.endTime || '18:00'}
+                {availability.wednesday.startTime} - {availability.wednesday.endTime}
               </p>
             ) : (
               <p className="text-sm text-gray-500 italic">No disponible</p>
@@ -78,7 +78,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </div>
             {availability?.thursday?.isAvailable ? (
               <p className="text-sm text-gray-700">
-                {availability.thursday.startTime || '09:00'} - {availability.thursday.endTime || '18:00'}
+                {availability.thursday.startTime} - {availability.thursday.endTime}
               </p>
             ) : (
               <p className="text-sm text-gray-500 italic">No disponible</p>
@@ -92,7 +92,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </div>
             {availability?.friday?.isAvailable ? (
               <p className="text-sm text-gray-700">
-                {availability.friday.startTime || '09:00'} - {availability.friday.endTime || '18:00'}
+                {availability.friday.startTime} - {availability.friday.endTime}
               </p>
             ) : (
               <p className="text-sm text-gray-500 italic">No disponible</p>
@@ -106,7 +106,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </div>
             {availability?.saturday?.isAvailable ? (
               <p className="text-sm text-gray-700">
-                {availability.saturday.startTime || '09:00'} - {availability.saturday.endTime || '18:00'}
+                {availability.saturday.startTime} - {availability.saturday.endTime}
               </p>
             ) : (
               <p className="text-sm text-gray-500 italic">No disponible</p>
@@ -120,7 +120,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </div>
             {availability?.sunday?.isAvailable ? (
               <p className="text-sm text-gray-700">
-                {availability.sunday.startTime || '09:00'} - {availability.sunday.endTime || '18:00'}
+                {availability.sunday.startTime} - {availability.sunday.endTime}
               </p>
             ) : (
               <p className="text-sm text-gray-500 italic">No disponible</p>
@@ -131,7 +131,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
         {isEditing && (
           <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-yellow-800 text-sm">
-              Para gestionar tu disponibilidad de manera completa, ve a la sección de "Calendario" desde el menú principal.
+              Para gestionar tu disponibilidad de manera completa, ve a la sección de "Agenda" desde el menú principal.
             </p>
           </div>
         )}

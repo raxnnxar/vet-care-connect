@@ -3,42 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { VeterinarianProfile } from '../types/veterinarianTypes';
 import { toast } from 'sonner';
 
-/**
- * Garantiza que cada día disponible tenga la estructura correcta de horarios
- */
-const ensureCorrectAvailabilityStructure = (availability: any) => {
-  if (!availability) return {};
-  
-  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-  const processedAvailability = { ...availability };
-
-  days.forEach(day => {
-    if (processedAvailability[day] && processedAvailability[day].isAvailable === true) {
-      // Asegurar que los días marcados como disponibles tengan horarios
-      processedAvailability[day] = {
-        isAvailable: true,
-        startTime: processedAvailability[day].startTime || '09:00',
-        endTime: processedAvailability[day].endTime || '18:00'
-      };
-    } else if (processedAvailability[day]) {
-      // Mantener solo isAvailable para los días no disponibles
-      processedAvailability[day] = {
-        isAvailable: false
-      };
-    }
-  });
-
-  return processedAvailability;
-};
-
 export const updateVeterinarianProfile = async (
   userId: string,
   profileData: VeterinarianProfile
 ): Promise<boolean> => {
   try {
-    // Procesar la disponibilidad para asegurar estructura correcta
-    const processedAvailability = ensureCorrectAvailabilityStructure(profileData.availability);
-    
     // Ensure all required fields have values
     const completeProfile: VeterinarianProfile = {
       ...profileData,
@@ -48,7 +17,7 @@ export const updateVeterinarianProfile = async (
       years_of_experience: profileData.years_of_experience || 0,
       bio: profileData.bio || '',
       // Ensure arrays and objects are properly initialized
-      availability: processedAvailability,
+      availability: profileData.availability || {},
       education: profileData.education || [],
       certifications: profileData.certifications || [],
       animals_treated: profileData.animals_treated || [],
