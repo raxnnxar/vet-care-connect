@@ -4,17 +4,20 @@ import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
-import { Card } from '@/ui/molecules/card';
 import { supabase } from '@/integrations/supabase/client';
-import { getInitials } from '../utils/vetDetailUtils';
+import { getInitials, translateSpecialization, formatAnimalsTreated } from '../utils/vetDetailUtils';
 
-// Import our new components
+// Import our components
 import VetProfileHeader from '../components/detail/VetProfileHeader';
 import VetAboutSection from '../components/detail/VetAboutSection';
 import VetContactSection from '../components/detail/VetContactSection';
 import VetActionButtons from '../components/detail/VetActionButtons';
 import LoadingState from '../components/detail/LoadingState';
 import ErrorState from '../components/detail/ErrorState';
+import VetEducationSection from '../components/detail/VetEducationSection';
+import VetCertificationsSection from '../components/detail/VetCertificationsSection';
+import VetServicesSection from '../components/detail/VetServicesSection';
+import VetAnimalsTreatedSection from '../components/detail/VetAnimalsTreatedSection';
 
 const VetDetailScreen = () => {
   const { id } = useParams();
@@ -38,6 +41,9 @@ const VetDetailScreen = () => {
             total_reviews,
             bio,
             animals_treated,
+            education,
+            certifications,
+            services_offered,
             service_providers (
               business_name,
               provider_type,
@@ -125,29 +131,59 @@ const VetDetailScreen = () => {
     const vetName = displayName 
       ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`.trim()
       : `Dr. ${data.id.substring(0, 5)}`;
-
+    
+    // Extract specializations and format them
+    const specializations = Array.isArray(data.specialization) && data.specialization.length > 0
+      ? data.specialization.map((spec: string) => translateSpecialization(spec)).join(', ')
+      : 'Medicina General';
+    
     return (
       <LayoutBase
         header={<Header />}
         footer={<NavbarInferior activeTab="home" />}
       >
-        <div className="p-4 pb-20">
-          <Card className="mb-6">
+        <div className="p-4 pb-20 bg-gray-50">
+          {/* Profile Header Card */}
+          <div className="mb-4">
             <VetProfileHeader 
               data={data} 
-              displayName={vetName} 
+              displayName={vetName}
+              specializations={specializations}
               getInitials={getInitials} 
             />
-          </Card>
+          </div>
           
-          <Card className="mb-6">
+          {/* Animals Treated Section */}
+          <div className="mb-4">
+            <VetAnimalsTreatedSection animals={data.animals_treated || []} />
+          </div>
+          
+          {/* About Section */}
+          <div className="mb-4">
             <VetAboutSection bio={data.bio} />
-          </Card>
+          </div>
           
-          <Card className="mb-6">
+          {/* Education Section */}
+          <div className="mb-4">
+            <VetEducationSection education={data.education || []} />
+          </div>
+          
+          {/* Certifications Section */}
+          <div className="mb-4">
+            <VetCertificationsSection certifications={data.certifications || []} />
+          </div>
+          
+          {/* Services Section */}
+          <div className="mb-4">
+            <VetServicesSection services={data.services_offered || []} />
+          </div>
+          
+          {/* Contact Section */}
+          <div className="mb-6">
             <VetContactSection email={data.service_providers?.profiles?.email} />
-          </Card>
+          </div>
           
+          {/* Action Buttons */}
           <VetActionButtons 
             onBookAppointment={handleBookAppointment}
             onReviewClick={handleReviewClick}

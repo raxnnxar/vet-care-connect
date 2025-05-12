@@ -1,33 +1,51 @@
 
 import React from 'react';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
 
 interface VetContactSectionProps {
-  email: string | null;
+  email?: string;
+  phone?: string;
+  address?: string;
 }
 
-const VetContactSection: React.FC<VetContactSectionProps> = ({ email }) => {
+const VetContactSection: React.FC<VetContactSectionProps> = ({
+  email,
+  phone,
+  address
+}) => {
   return (
-    <div className="p-4">
-      <h3 className="font-medium text-lg mb-3">Contacto</h3>
-      
-      <div className="space-y-3">
-        <div className="flex items-center">
-          <MapPin className="text-[#79D0B8] mr-3" size={20} />
-          <span>Dirección no disponible</span>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-semibold">Contacto</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="space-y-3">
+          <div className="flex items-center">
+            <MapPin className="h-5 w-5 text-[#4DA6A8] mr-3" />
+            <span className="text-gray-600">
+              {address || "Dirección no disponible"}
+            </span>
+          </div>
+          
+          <div className="flex items-center">
+            <Phone className="h-5 w-5 text-[#4DA6A8] mr-3" />
+            <span className="text-gray-600">
+              {phone || "Teléfono no disponible"}
+            </span>
+          </div>
+          
+          {email && (
+            <div className="flex items-center">
+              <Mail className="h-5 w-5 text-[#4DA6A8] mr-3" />
+              <a href={`mailto:${email}`} className="text-blue-600 hover:underline">
+                {email}
+              </a>
+            </div>
+          )}
         </div>
-        
-        <div className="flex items-center">
-          <Phone className="text-[#79D0B8] mr-3" size={20} />
-          <span>Teléfono no disponible</span>
-        </div>
-        
-        <div className="flex items-center">
-          <Mail className="text-[#79D0B8] mr-3" size={20} />
-          <span>{email || "Email no disponible"}</span>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

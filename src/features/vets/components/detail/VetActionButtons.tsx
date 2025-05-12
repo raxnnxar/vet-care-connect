@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, MessageCircle } from 'lucide-react';
+import { Calendar, MessageSquare } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 
 interface VetActionButtonsProps {
@@ -13,21 +13,21 @@ const VetActionButtons: React.FC<VetActionButtonsProps> = ({
   onReviewClick
 }) => {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <Button 
+    <div className="fixed bottom-16 left-0 right-0 p-4 flex gap-3 bg-white border-t shadow-lg">
+      <Button
+        className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3] text-white"
         onClick={onBookAppointment}
-        className="bg-[#79D0B8] hover:bg-[#68BBA3] py-3"
       >
-        <Calendar className="mr-2" size={20} />
+        <Calendar className="mr-2 h-4 w-4" />
         Agendar Cita
       </Button>
       
-      <Button 
+      <Button
+        variant="outline"
+        className="flex-1 border-[#79D0B8] text-[#4DA6A8] hover:bg-[#e8f7f3]"
         onClick={onReviewClick}
-        variant="outline" 
-        className="border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10 py-3"
       >
-        <MessageCircle className="mr-2" size={20} />
+        <MessageSquare className="mr-2 h-4 w-4" />
         Calificar
       </Button>
     </div>

@@ -28,7 +28,26 @@ export const formatAnimalsTreated = (animals: string[]) => {
     return "Animales domésticos";
   }
   
-  return animals.join(', ');
+  const translateAnimal = (animal: string): string => {
+    const translations: Record<string, string> = {
+      'dog': 'Perros',
+      'cat': 'Gatos',
+      'bird': 'Aves',
+      'rabbit': 'Conejos',
+      'rodent': 'Roedores',
+      'reptile': 'Reptiles',
+      'fish': 'Peces',
+      'horse': 'Caballos',
+      'exotic': 'Exóticos',
+      'farm_animals': 'Animales de Granja',
+      'small_mammals': 'Pequeños Mamíferos'
+    };
+    
+    return translations[animal.toLowerCase()] || animal;
+  };
+  
+  const translatedAnimals = animals.map(translateAnimal);
+  return translatedAnimals.join(', ');
 };
 
 // Generate initials for the avatar
