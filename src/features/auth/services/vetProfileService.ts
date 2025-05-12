@@ -1,25 +1,34 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { VeterinarianProfile, AvailabilitySchedule, DaySchedule } from '../types/veterinarianTypes';
+import { VeterinarianProfile } from '../types/veterinarianTypes';
 import { toast } from 'sonner';
 
-// Función para asegurar que todos los días tengan la estructura correcta
-const ensureCorrectAvailabilityStructure = (availability: AvailabilitySchedule): AvailabilitySchedule => {
-  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-  const result = { ...availability };
+/**
+ * Garantiza que cada día disponible tenga la estructura correcta de horarios
+ */
+const ensureCorrectAvailabilityStructure = (availability: any) => {
+  if (!availability) return {};
   
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const processedAvailability = { ...availability };
+
   days.forEach(day => {
-    if (result[day] && result[day].isAvailable === true) {
-      // Asegura que haya valores predeterminados si el día está disponible pero falta información
-      result[day] = {
+    if (processedAvailability[day] && processedAvailability[day].isAvailable === true) {
+      // Asegurar que los días marcados como disponibles tengan horarios
+      processedAvailability[day] = {
         isAvailable: true,
-        startTime: result[day].startTime || '09:00',
-        endTime: result[day].endTime || '18:00'
+        startTime: processedAvailability[day].startTime || '09:00',
+        endTime: processedAvailability[day].endTime || '18:00'
+      };
+    } else if (processedAvailability[day]) {
+      // Mantener solo isAvailable para los días no disponibles
+      processedAvailability[day] = {
+        isAvailable: false
       };
     }
   });
-  
-  return result;
+
+  return processedAvailability;
 };
 
 export const updateVeterinarianProfile = async (
@@ -27,8 +36,8 @@ export const updateVeterinarianProfile = async (
   profileData: VeterinarianProfile
 ): Promise<boolean> => {
   try {
-    // Asegurar que la estructura de disponibilidad es correcta
-    const processedAvailability = ensureCorrectAvailabilityStructure(profileData.availability || {});
+    // Procesar la disponibilidad para asegurar estructura correcta
+    const processedAvailability = ensureCorrectAvailabilityStructure(profileData.availability);
     
     // Ensure all required fields have values
     const completeProfile: VeterinarianProfile = {

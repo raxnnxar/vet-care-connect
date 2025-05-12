@@ -1,21 +1,6 @@
 
-import { Control, FieldErrors, UseFormSetValue } from 'react-hook-form';
-import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
-
-export interface WeekDay {
-  id: keyof AvailabilityMap;
-  label: string;
-}
-
-export interface AvailabilityMap {
-  monday: boolean;
-  tuesday: boolean;
-  wednesday: boolean;
-  thursday: boolean;
-  friday: boolean;
-  saturday: boolean;
-  sunday: boolean;
-}
+import { Control } from "react-hook-form";
+import { VeterinarianProfile, DaySchedule } from "../../../../types/veterinarianTypes";
 
 export interface TimeSlotProps {
   value: string;
@@ -27,12 +12,14 @@ export interface TimeSlotProps {
 }
 
 export interface DayScheduleRowProps {
-  day: WeekDay;
+  day: {
+    id: string;
+    label: string;
+  };
   control: Control<VeterinarianProfile>;
-  setValue: UseFormSetValue<VeterinarianProfile>;
 }
 
 export interface AvailabilitySectionProps {
   control: Control<VeterinarianProfile>;
-  errors: FieldErrors<VeterinarianProfile>;
+  errors?: any; // Use 'any' for errors until we can properly type them
 }

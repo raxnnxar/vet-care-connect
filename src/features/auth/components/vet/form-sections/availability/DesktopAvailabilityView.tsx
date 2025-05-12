@@ -1,15 +1,10 @@
 
 import React from 'react';
-import { useFormContext } from 'react-hook-form';
 import { WEEKDAYS } from './constants';
 import DayScheduleRow from './DayScheduleRow';
-import { AvailabilitySectionProps, WeekDay } from './types';
-import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
+import { AvailabilitySectionProps } from './types';
 
 const DesktopAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control }) => {
-  // Get setValue from form context to pass to DayScheduleRow
-  const { setValue } = useFormContext<VeterinarianProfile>();
-
   return (
     <div className="hidden md:block">
       <table className="min-w-full divide-y divide-gray-200">
@@ -28,12 +23,7 @@ const DesktopAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control }
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {WEEKDAYS.map((day) => (
-            <DayScheduleRow 
-              key={day.id} 
-              day={day as WeekDay} 
-              control={control} 
-              setValue={setValue}
-            />
+            <DayScheduleRow key={day.id} day={day} control={control} />
           ))}
         </tbody>
       </table>
