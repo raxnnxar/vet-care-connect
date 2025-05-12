@@ -1,45 +1,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
-import { ArrowLeft, MapPin, Phone, Mail, Calendar, Star, MessageCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { parseSpecializations } from '@/features/auth/utils/vetProfileUtils';
+import { getInitials } from '../utils/vetDetailUtils';
 
-// Helper function to translate specialization to human-readable format
-const translateSpecialization = (spec: string): string => {
-  const translations: Record<string, string> = {
-    'cardiology': 'Cardiología',
-    'dermatology': 'Dermatología',
-    'orthopedics': 'Ortopedia',
-    'neurology': 'Neurología',
-    'ophthalmology': 'Oftalmología',
-    'oncology': 'Oncología',
-    'general': 'Medicina General',
-    'surgery': 'Cirugía',
-    'dentistry': 'Odontología',
-    'nutrition': 'Nutrición',
-    'internal_medicine': 'Medicina Interna',
-    'emergency': 'Emergencias',
-    'rehabilitation': 'Rehabilitación',
-    'exotics': 'Animales Exóticos',
-    // Add more translations as needed
-  };
-  
-  return translations[spec.toLowerCase()] || spec;
-};
-
-// Helper function to format animals treated 
-const formatAnimalsTreated = (animals: string[]) => {
-  if (!animals || animals.length === 0) {
-    return "Animales domésticos";
-  }
-  
-  return animals.join(', ');
-};
+// Import our new components
+import VetProfileHeader from '../components/detail/VetProfileHeader';
+import VetAboutSection from '../components/detail/VetAboutSection';
+import VetContactSection from '../components/detail/VetContactSection';
+import VetActionButtons from '../components/detail/VetActionButtons';
+import LoadingState from '../components/detail/LoadingState';
+import ErrorState from '../components/detail/ErrorState';
 
 const VetDetailScreen = () => {
   const { id } = useParams();
@@ -103,39 +78,29 @@ const VetDetailScreen = () => {
     navigate(`/owner/vets/${id}/review`);
   };
 
-  // Generate initials for the avatar
-  const getInitials = (displayName?: string) => {
-    if (!displayName) return '';
-    
-    const nameParts = displayName.split(' ');
-    if (nameParts.length >= 2) {
-      return `${nameParts[0].charAt(0).toUpperCase()}${nameParts[1].charAt(0).toUpperCase()}`;
-    } else if (nameParts.length === 1) {
-      return nameParts[0].substring(0, 2).toUpperCase();
-    }
-    return '';
-  };
+  // Create header component for all states
+  const Header = () => (
+    <div className="flex items-center p-4 bg-[#79D0B8]">
+      <Button 
+        variant="ghost" 
+        className="text-white p-1 mr-2" 
+        onClick={handleGoBack}
+      >
+        <ArrowLeft size={24} />
+      </Button>
+      <h1 className="text-xl font-medium text-white">
+        {loading ? "Cargando..." : error ? "Error" : "Perfil del Veterinario"}
+      </h1>
+    </div>
+  );
 
   if (loading) {
     return (
       <LayoutBase
-        header={
-          <div className="flex items-center p-4 bg-[#79D0B8]">
-            <Button 
-              variant="ghost" 
-              className="text-white p-1 mr-2" 
-              onClick={handleGoBack}
-            >
-              <ArrowLeft size={24} />
-            </Button>
-            <h1 className="text-xl font-medium text-white">Cargando...</h1>
-          </div>
-        }
+        header={<Header />}
         footer={<NavbarInferior activeTab="home" />}
       >
-        <div className="p-4 flex justify-center items-center h-full">
-          <p>Cargando información del veterinario...</p>
-        </div>
+        <LoadingState />
       </LayoutBase>
     );
   }
@@ -143,26 +108,10 @@ const VetDetailScreen = () => {
   if (error || !data) {
     return (
       <LayoutBase
-        header={
-          <div className="flex items-center p-4 bg-[#79D0B8]">
-            <Button 
-              variant="ghost" 
-              className="text-white p-1 mr-2" 
-              onClick={handleGoBack}
-            >
-              <ArrowLeft size={24} />
-            </Button>
-            <h1 className="text-xl font-medium text-white">Error</h1>
-          </div>
-        }
+        header={<Header />}
         footer={<NavbarInferior activeTab="home" />}
       >
-        <div className="p-4">
-          <p>{error || 'No se encontró información del veterinario'}</p>
-          <Button onClick={handleGoBack} className="mt-4">
-            Volver
-          </Button>
-        </div>
+        <ErrorState message={error} onGoBack={handleGoBack} />
       </LayoutBase>
     );
   }
@@ -172,171 +121,50 @@ const VetDetailScreen = () => {
     const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
     
     // For gendered prefix (Dr/Dra), we'll check if the name seems feminine (ends with 'a')
-    // This is a simplification and might not work for all Spanish names
     const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
     const vetName = displayName 
       ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`.trim()
       : `Dr. ${data.id.substring(0, 5)}`;
 
-    // Format specialization
-    const specializations = parseSpecializations(data.specialization);
-    const formattedSpecializations = specializations.map(spec => 
-      translateSpecialization(String(spec))
-    ).join(', ');
-
-    // Format animals treated
-    let animalsTreated: string[] = [];
-    if (data.animals_treated) {
-      try {
-        if (Array.isArray(data.animals_treated)) {
-          animalsTreated = data.animals_treated.map((a: any) => String(a));
-        } else {
-          const parsed = typeof data.animals_treated === 'string'
-            ? JSON.parse(data.animals_treated)
-            : data.animals_treated;
-          animalsTreated = Array.isArray(parsed) ? parsed.map((a: any) => String(a)) : [];
-        }
-      } catch (e) {
-        console.error("Error parsing animals treated:", e);
-        animalsTreated = [];
-      }
-    }
-    
-    const formattedAnimalsTreated = formatAnimalsTreated(animalsTreated);
-
     return (
       <LayoutBase
-        header={
-          <div className="flex items-center p-4 bg-[#79D0B8]">
-            <Button 
-              variant="ghost" 
-              className="text-white p-1 mr-2" 
-              onClick={handleGoBack}
-            >
-              <ArrowLeft size={24} />
-            </Button>
-            <h1 className="text-xl font-medium text-white">Perfil del Veterinario</h1>
-          </div>
-        }
+        header={<Header />}
         footer={<NavbarInferior activeTab="home" />}
       >
         <div className="p-4 pb-20">
           <Card className="mb-6">
-            <div className="p-4 flex items-center">
-              <Avatar className="h-24 w-24 border-2 border-[#79D0B8]">
-                {data.profile_image_url ? (
-                  <AvatarImage src={data.profile_image_url} alt={vetName} className="object-cover" />
-                ) : (
-                  <AvatarFallback className="bg-[#79D0B8] text-white">
-                    {getInitials(displayName)}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              
-              <div className="ml-4">
-                <h2 className="text-xl font-semibold">{vetName}</h2>
-                <p className="text-gray-600">{formattedSpecializations}</p>
-                
-                <div className="flex items-center mt-1">
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        size={16}
-                        className={star <= (data.average_rating || 0) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
-                      />
-                    ))}
-                  </div>
-                  <span className="ml-1 text-sm text-gray-600">
-                    {data.average_rating?.toFixed(1) || "0.0"} ({data.total_reviews || 0} reseñas)
-                  </span>
-                </div>
-                
-                {animalsTreated.length > 0 && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Trata: {formattedAnimalsTreated}
-                  </p>
-                )}
-              </div>
-            </div>
+            <VetProfileHeader 
+              data={data} 
+              displayName={vetName} 
+              getInitials={getInitials} 
+            />
           </Card>
           
           <Card className="mb-6">
-            <div className="p-4">
-              <h3 className="font-medium text-lg mb-3">Acerca de</h3>
-              <p className="text-gray-600">
-                {data.bio || "Este veterinario no ha proporcionado información adicional."}
-              </p>
-            </div>
+            <VetAboutSection bio={data.bio} />
           </Card>
           
           <Card className="mb-6">
-            <div className="p-4">
-              <h3 className="font-medium text-lg mb-3">Contacto</h3>
-              
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <MapPin className="text-[#79D0B8] mr-3" size={20} />
-                  <span>Dirección no disponible</span>
-                </div>
-                
-                <div className="flex items-center">
-                  <Phone className="text-[#79D0B8] mr-3" size={20} />
-                  <span>Teléfono no disponible</span>
-                </div>
-                
-                <div className="flex items-center">
-                  <Mail className="text-[#79D0B8] mr-3" size={20} />
-                  <span>{data.service_providers?.profiles?.email || "Email no disponible"}</span>
-                </div>
-              </div>
-            </div>
+            <VetContactSection email={data.service_providers?.profiles?.email} />
           </Card>
           
-          <div className="grid grid-cols-2 gap-4">
-            <Button 
-              onClick={handleBookAppointment}
-              className="bg-[#79D0B8] hover:bg-[#68BBA3] py-3"
-            >
-              <Calendar className="mr-2" size={20} />
-              Agendar Cita
-            </Button>
-            
-            <Button 
-              onClick={handleReviewClick}
-              variant="outline" 
-              className="border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10 py-3"
-            >
-              <MessageCircle className="mr-2" size={20} />
-              Calificar
-            </Button>
-          </div>
+          <VetActionButtons 
+            onBookAppointment={handleBookAppointment}
+            onReviewClick={handleReviewClick}
+          />
         </div>
       </LayoutBase>
     );
   }
 
   return (
-      <LayoutBase
-        header={
-          <div className="flex items-center p-4 bg-[#79D0B8]">
-            <Button 
-              variant="ghost" 
-              className="text-white p-1 mr-2" 
-              onClick={handleGoBack}
-            >
-              <ArrowLeft size={24} />
-            </Button>
-            <h1 className="text-xl font-medium text-white">Cargando...</h1>
-          </div>
-        }
-        footer={<NavbarInferior activeTab="home" />}
-      >
-        <div className="p-4 flex justify-center items-center h-full">
-          <p>Cargando información del veterinario...</p>
-        </div>
-      </LayoutBase>
-    );
+    <LayoutBase
+      header={<Header />}
+      footer={<NavbarInferior activeTab="home" />}
+    >
+      <LoadingState />
+    </LayoutBase>
+  );
 };
 
 export default VetDetailScreen;
