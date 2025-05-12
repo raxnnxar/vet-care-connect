@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { useWatch } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { AvailabilitySectionProps } from './availability/types';
 import MobileAvailabilityView from './availability/MobileAvailabilityView';
 import DesktopAvailabilityView from './availability/DesktopAvailabilityView';
-import { Form } from '@/ui/molecules/form';
+import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
 
 const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   control,

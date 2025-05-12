@@ -1,13 +1,15 @@
 
 import React from 'react';
-import { Controller } from 'react-hook-form';
-import { DaySchedule } from '../../../../types/veterinarianTypes';
+import { Controller, useFormContext } from 'react-hook-form';
+import { VeterinarianProfile } from '../../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import MobileTimeSlots from './MobileTimeSlots';
 import { WEEKDAYS } from './constants';
-import { AvailabilitySectionProps } from './types';
+import { AvailabilitySectionProps, WeekDay } from './types';
 
 const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control }) => {
+  const { setValue } = useFormContext<VeterinarianProfile>();
+
   return (
     <div className="md:hidden">
       <div className="divide-y border rounded-lg">
@@ -22,7 +24,18 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                 render={({ field }) => (
                   <Switch
                     checked={field.value}
-                    onCheckedChange={field.onChange}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      
+                      // Si se activa la disponibilidad, aseguramos que se establezcan los valores predeterminados
+                      if (checked) {
+                        setValue(`availability.${day.id}`, {
+                          isAvailable: true,
+                          startTime: '09:00',
+                          endTime: '18:00'
+                        }, { shouldValidate: true });
+                      }
+                    }}
                     id={`${day.id}-available-mobile`}
                   />
                 )}

@@ -6,7 +6,7 @@ import { Switch } from '@/ui/atoms/switch';
 import TimeSelect from './TimeSelect';
 import { DayScheduleRowProps } from './types';
 
-const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
+const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control, setValue }) => {
   return (
     <tr key={day.id}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -71,9 +71,8 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
                 
                 // Si se activa la disponibilidad, aseguramos que se establezcan los valores predeterminados
                 if (checked) {
-                  // Utilizamos directamente el Controller para asegurar que los valores predeterminados se establecen
-                  // sin necesidad de acceder al contexto del formulario
-                  control.setValue(`availability.${day.id}`, {
+                  // Establecer valores predeterminados cuando se activa la disponibilidad
+                  setValue(`availability.${day.id}`, {
                     isAvailable: true,
                     startTime: '09:00',
                     endTime: '18:00'
