@@ -1,13 +1,35 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { VeterinarianProfile } from '../types/veterinarianTypes';
+import { VeterinarianProfile, AvailabilitySchedule, DaySchedule } from '../types/veterinarianTypes';
 import { toast } from 'sonner';
+
+// Función para asegurar que todos los días tengan la estructura correcta
+const ensureCorrectAvailabilityStructure = (availability: AvailabilitySchedule): AvailabilitySchedule => {
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const result = { ...availability };
+  
+  days.forEach(day => {
+    if (result[day] && result[day].isAvailable === true) {
+      // Asegura que haya valores predeterminados si el día está disponible pero falta información
+      result[day] = {
+        isAvailable: true,
+        startTime: result[day].startTime || '09:00',
+        endTime: result[day].endTime || '18:00'
+      };
+    }
+  });
+  
+  return result;
+};
 
 export const updateVeterinarianProfile = async (
   userId: string,
   profileData: VeterinarianProfile
 ): Promise<boolean> => {
   try {
+    // Asegurar que la estructura de disponibilidad es correcta
+    const processedAvailability = ensureCorrectAvailabilityStructure(profileData.availability || {});
+    
     // Ensure all required fields have values
     const completeProfile: VeterinarianProfile = {
       ...profileData,
@@ -17,7 +39,7 @@ export const updateVeterinarianProfile = async (
       years_of_experience: profileData.years_of_experience || 0,
       bio: profileData.bio || '',
       // Ensure arrays and objects are properly initialized
-      availability: profileData.availability || {},
+      availability: processedAvailability,
       education: profileData.education || [],
       certifications: profileData.certifications || [],
       animals_treated: profileData.animals_treated || [],
