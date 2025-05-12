@@ -60,7 +60,7 @@ export const useVeterinariansData = (searchTerm = '') => {
       imageUrl: vet.profile_image_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
       // Extract first specialization for the card display
       specialization: Array.isArray(vet.specialization) ? 
-        vet.specialization.map(spec => translateSpecialization(spec)).join(', ') : '',
+        vet.specialization.map(spec => translateSpecialization(String(spec))).join(', ') : '',
       // Ensure rating is a number
       rating: vet.average_rating || 4.5,
       reviewCount: vet.total_reviews || 0,

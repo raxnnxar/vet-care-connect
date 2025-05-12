@@ -60,7 +60,7 @@ const VetDetailScreen = () => {
             `${data.profile.first_name || ''} ${data.profile.last_name || ''}`.trim() : 'Veterinario',
           imageUrl: data.profile_image_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
           specializations: Array.isArray(data.specialization) ? 
-            data.specialization.map(translateSpecialization) : []
+            data.specialization.map((spec: any) => translateSpecialization(String(spec))) : []
         });
       }
     } catch (error) {
