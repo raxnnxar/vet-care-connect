@@ -63,10 +63,11 @@ const VetDetailScreen = () => {
             total_reviews,
             bio,
             animals_treated,
-            service_providers:id (
+            service_providers (
+              business_name,
+              provider_type,
               profiles (
-                first_name,
-                last_name,
+                display_name,
                 email
               )
             )
@@ -103,10 +104,16 @@ const VetDetailScreen = () => {
   };
 
   // Generate initials for the avatar
-  const getInitials = (firstName?: string, lastName?: string) => {
-    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
-    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
-    return `${firstInitial}${lastInitial}`;
+  const getInitials = (displayName?: string) => {
+    if (!displayName) return '';
+    
+    const nameParts = displayName.split(' ');
+    if (nameParts.length >= 2) {
+      return `${nameParts[0].charAt(0).toUpperCase()}${nameParts[1].charAt(0).toUpperCase()}`;
+    } else if (nameParts.length === 1) {
+      return nameParts[0].substring(0, 2).toUpperCase();
+    }
+    return '';
   };
 
   if (loading) {
@@ -161,12 +168,14 @@ const VetDetailScreen = () => {
   }
 
   if (data) {
-    // Format veterinarian name using profile data from service_providers > profiles path
-    const firstName = data.service_providers?.profiles?.first_name || '';
-    const lastName = data.service_providers?.profiles?.last_name || '';
+    // Format veterinarian name using display_name from profiles
+    const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
     
-    const vetName = firstName || lastName 
-      ? `Dr${firstName.toLowerCase().endsWith('a') ? 'a' : ''}. ${firstName} ${lastName}`.trim()
+    // For gendered prefix (Dr/Dra), we'll check if the name seems feminine (ends with 'a')
+    // This is a simplification and might not work for all Spanish names
+    const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
+    const vetName = displayName 
+      ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`.trim()
       : `Dr. ${data.id.substring(0, 5)}`;
 
     // Format specialization
@@ -219,7 +228,7 @@ const VetDetailScreen = () => {
                   <AvatarImage src={data.profile_image_url} alt={vetName} className="object-cover" />
                 ) : (
                   <AvatarFallback className="bg-[#79D0B8] text-white">
-                    {getInitials(firstName, lastName)}
+                    {getInitials(displayName)}
                   </AvatarFallback>
                 )}
               </Avatar>

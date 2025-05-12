@@ -36,10 +36,12 @@ export const useVeterinariansData = () => {
             average_rating,
             total_reviews,
             animals_treated,
-            service_providers:id (
+            service_providers (
+              business_name,
+              provider_type,
               profiles (
-                first_name,
-                last_name
+                display_name,
+                profile_picture_url
               )
             )
           `)
@@ -53,21 +55,36 @@ export const useVeterinariansData = () => {
         }
 
         // Helper function to get initials from name
-        const getInitials = (firstName?: string, lastName?: string) => {
-          const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
-          const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
-          return `${firstInitial}${lastInitial}`;
+        const getInitials = (displayName?: string) => {
+          if (!displayName) return '';
+          
+          const nameParts = displayName.split(' ');
+          if (nameParts.length >= 2) {
+            return `${nameParts[0].charAt(0).toUpperCase()}${nameParts[1].charAt(0).toUpperCase()}`;
+          } else if (nameParts.length === 1) {
+            return nameParts[0].substring(0, 2).toUpperCase();
+          }
+          return '';
         };
 
         // Map the database data to our frontend model
         const formattedVets: Veterinarian[] = veterinarians.map(vet => {
-          // Get first and last name from the profiles through service_providers relation
-          const firstName = vet.service_providers?.profiles?.first_name || '';
-          const lastName = vet.service_providers?.profiles?.last_name || '';
+          // Get display name from profiles through service_providers relation
+          const displayName = vet.service_providers?.profiles?.display_name || vet.service_providers?.business_name || 'Sin nombre';
+          
+          // For firstName and lastName, we'll use parts of displayName
+          let firstName = '', lastName = '';
+          const nameParts = displayName.split(' ');
+          if (nameParts.length >= 2) {
+            firstName = nameParts[0];
+            lastName = nameParts.slice(1).join(' ');
+          } else if (nameParts.length === 1) {
+            firstName = nameParts[0];
+          }
           
           // Format display name with Dr. prefix
-          const fullName = firstName || lastName 
-            ? `Dr${firstName.toLowerCase().endsWith('a') ? 'a' : ''}. ${firstName} ${lastName}`.trim()
+          const fullName = firstName 
+            ? `Dr${firstName.toLowerCase().endsWith('a') ? 'a' : ''}. ${displayName}`
             : `Dr. ${vet.id.substring(0, 5)}`;
           
           // Parse specializations - ensure it's an array
@@ -108,6 +125,11 @@ export const useVeterinariansData = () => {
             }
           }
 
+          // Get image URL with fallback to profile picture
+          const imageUrl = vet.profile_image_url || 
+                          vet.service_providers?.profiles?.profile_picture_url || 
+                          '';
+
           // Return the formatted vet object
           return {
             id: vet.id,
@@ -115,7 +137,7 @@ export const useVeterinariansData = () => {
             firstName: firstName,
             lastName: lastName,
             specialization: specializations,
-            imageUrl: vet.profile_image_url || '',
+            imageUrl: imageUrl,
             rating: vet.average_rating || 0,
             reviewCount: vet.total_reviews || 0,
             distance: "1.2 km", // Mocked distance data
