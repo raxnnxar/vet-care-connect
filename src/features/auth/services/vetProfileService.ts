@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VeterinarianProfile, AvailabilitySchedule } from '../types/veterinarianTypes';
 import { toast } from 'sonner';
 
-// Función auxiliar para asegurar que la disponibilidad tenga la estructura correcta
+// Helper function to ensure the availability has the correct structure
 const ensureCorrectAvailabilityStructure = (availability: any): AvailabilitySchedule => {
   if (!availability) return {};
   
@@ -11,7 +11,7 @@ const ensureCorrectAvailabilityStructure = (availability: any): AvailabilitySche
   const result: AvailabilitySchedule = {};
   
   days.forEach(day => {
-    // Si el día tiene la propiedad isAvailable como true, asegúrate de que tenga startTime y endTime
+    // If the day has isAvailable property as true, ensure it has startTime and endTime
     if (availability[day]?.isAvailable === true) {
       result[day] = {
         isAvailable: true,
@@ -19,7 +19,7 @@ const ensureCorrectAvailabilityStructure = (availability: any): AvailabilitySche
         endTime: availability[day].endTime || '18:00'
       };
     } else if (availability[day]) {
-      // Si el día existe pero isAvailable no es true, lo configuramos como no disponible
+      // If the day exists but isAvailable is not true, configure it as unavailable
       result[day] = { isAvailable: false };
     }
   });
@@ -40,7 +40,7 @@ export const updateVeterinarianProfile = async (
       license_number: profileData.license_number || '',
       years_of_experience: profileData.years_of_experience || 0,
       bio: profileData.bio || '',
-      // Asegurar que la disponibilidad tenga la estructura correcta
+      // Ensure availability has the correct structure
       availability: ensureCorrectAvailabilityStructure(profileData.availability),
       education: profileData.education || [],
       certifications: profileData.certifications || [],

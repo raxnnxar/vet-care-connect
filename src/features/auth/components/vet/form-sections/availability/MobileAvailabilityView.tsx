@@ -25,7 +25,7 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                     onCheckedChange={(checked) => {
                       field.onChange(checked);
                       
-                      // Cuando se activa el switch, asegurarse de que se guarden los valores predeterminados
+                      // When the switch is activated, ensure default values are saved
                       if (checked) {
                         const defaultDaySchedule = {
                           isAvailable: true,
@@ -33,14 +33,14 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                           endTime: '18:00'
                         };
                         
-                        // Acceder al nombre del día completo para establecer los valores predeterminados
-                        const dayFieldName = `availability.${day.id}` as any;
-                        const currentValue = control._getWatch(dayFieldName) || {};
+                        // Access the complete day field name to set default values
+                        const dayFieldName = `availability.${day.id}` as const;
+                        const currentValue = control._getWatch?.(dayFieldName) || {};
                         
-                        // Establecer los valores completos con la función setValue del control
+                        // Set the complete values with the control's setValue function
                         control._formState.dirtyFields[dayFieldName] = true;
-                        control._fields[dayFieldName]?.._f.mount && 
-                          control._fields[dayFieldName]?._f.onChange({
+                        if (control._fields[dayFieldName]?._f?.mount) {
+                          control._fields[dayFieldName]._f.onChange({
                             target: {
                               value: {
                                 ...currentValue,
@@ -50,6 +50,7 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                               }
                             }
                           });
+                        }
                       }
                     }}
                     id={`${day.id}-available-mobile`}
