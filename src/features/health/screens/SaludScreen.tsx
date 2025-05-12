@@ -7,6 +7,9 @@ import PrimaryVet from '../components/PrimaryVet';
 import VetTabs from '../components/VetTabs';
 import { useVeterinariansData } from '../hooks/useVeterinariansData';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
+import { Alert, AlertTitle, AlertDescription } from '@/ui/molecules/alert';
+import { RefreshCw } from 'lucide-react';
+import { Button } from '@/ui/atoms/button';
 
 // Temporary mock data for primary vet until we implement the functionality
 // to select a primary vet
@@ -36,6 +39,10 @@ const SaludScreen = () => {
     navigate(`/owner/vets/${vetId}`);
   };
 
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
       <SaludHeader onBackClick={handleBackClick} />
@@ -48,15 +55,21 @@ const SaludScreen = () => {
             <LoadingSpinner />
           </div>
         ) : error ? (
-          <div className="p-4 bg-red-50 rounded-md border border-red-200 text-red-700">
-            <p>{error}</p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="mt-2 text-sm underline"
-            >
-              Reintentar
-            </button>
-          </div>
+          <Alert variant="destructive" className="bg-red-50 rounded-md border border-red-200">
+            <AlertTitle className="text-red-700 font-medium">{error}</AlertTitle>
+            <AlertDescription className="mt-2 flex justify-between items-center">
+              <span className="text-red-600">Ocurrió un error al cargar los veterinarios.</span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRetry}
+                className="flex items-center gap-1 border-red-300 text-red-700 hover:bg-red-50"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Reintentar
+              </Button>
+            </AlertDescription>
+          </Alert>
         ) : (
           <VetTabs 
             activeTab={activeTab} 

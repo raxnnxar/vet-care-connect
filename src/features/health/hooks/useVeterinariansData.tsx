@@ -23,12 +23,12 @@ export const useVeterinariansData = () => {
         setLoading(true);
         setError(null);
 
-        // Update the query to join with profiles table properly
+        // Join with profile table by specifying the exact relationship to avoid ambiguity
         const { data: veterinarians, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
             *,
-            profiles:id(
+            profiles:service_providers!veterinarians_id_fkey(
               display_name
             )
           `);
