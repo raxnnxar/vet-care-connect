@@ -1,12 +1,15 @@
 
 import React from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { DaySchedule } from '../../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import TimeSelect from './TimeSelect';
 import { DayScheduleRowProps } from './types';
 
 const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
+  // Usamos useFormContext para acceder a los métodos del formulario
+  const { setValue, getValues } = useFormContext();
+  
   return (
     <tr key={day.id}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -66,7 +69,19 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
           render={({ field }) => (
             <Switch
               checked={field.value}
-              onCheckedChange={field.onChange}
+              onCheckedChange={(checked) => {
+                field.onChange(checked);
+                
+                // Si se activa la disponibilidad, aseguramos que se establezcan los valores predeterminados
+                if (checked) {
+                  const currentValues = getValues(`availability.${day.id}`) || {};
+                  setValue(`availability.${day.id}`, {
+                    isAvailable: true,
+                    startTime: currentValues.startTime || '09:00',
+                    endTime: currentValues.endTime || '18:00'
+                  });
+                }
+              }}
               id={`${day.id}-available`}
             />
           )}
