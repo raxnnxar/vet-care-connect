@@ -69,24 +69,21 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
     }
   };
   
+  // Fix: Return a promise here to match the expected type
   const handleSaveBasicInfo = async () => {
-    await onSaveSection({ bio: editedBio }, 'información básica');
-    toggleEditSection('basicInfo');
+    return await onSaveSection({ bio: editedBio }, 'información básica');
   };
   
   const handleSaveServices = async () => {
-    await onSaveSection({ services_offered: editedServices }, 'servicios');
-    toggleEditSection('services');
+    return await onSaveSection({ services_offered: editedServices }, 'servicios');
   };
   
   const handleSaveAnimals = async () => {
-    await onSaveSection({ animals_treated: editedAnimals }, 'animales atendidos');
-    toggleEditSection('animals');
+    return await onSaveSection({ animals_treated: editedAnimals }, 'animales atendidos');
   };
   
   const handleSaveSpecializations = async () => {
-    await onSaveSection({ specializations: editedSpecializations }, 'especialidades');
-    toggleEditSection('specializations');
+    return await onSaveSection({ specializations: editedSpecializations }, 'especialidades');
   };
   
   const addService = () => {
@@ -124,6 +121,14 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
     } else {
       setEditedSpecializations([...editedSpecializations, specialization]);
     }
+  };
+  
+  // Function that returns a Promise<void> for availability section
+  const handleSaveAvailability = async () => {
+    // Just toggle the section for now as the actual availability saving
+    // functionality is handled elsewhere
+    toggleEditSection('availability');
+    return Promise.resolve();
   };
   
   return (
@@ -201,7 +206,7 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
           availability={profileData.availability || {}}
           isEditing={editingSections.availability}
           toggleEditing={() => toggleEditSection('availability')}
-          handleSave={() => toggleEditSection('availability')}
+          handleSave={handleSaveAvailability}
           isLoading={isLoading}
         />
         

@@ -3,6 +3,7 @@ import React from 'react';
 import { Stethoscope, User, FileText, AlertCircle, Award, BookOpen } from 'lucide-react';
 import { Specialization } from '@/features/auth/types/veterinarianTypes';
 import { EditableSection } from '../EditableSection';
+import { SPECIALIZATIONS } from '@/features/auth/types/veterinarianTypes';
 
 interface SpecializationsSectionProps {
   specializations: string[];
@@ -97,8 +98,5 @@ const SpecializationsSection: React.FC<SpecializationsSectionProps> = ({
     </EditableSection>
   );
 };
-
-// Import directly to avoid circular dependencies
-const { SPECIALIZATIONS } = require('@/features/auth/types/veterinarianTypes');
 
 export default SpecializationsSection;
