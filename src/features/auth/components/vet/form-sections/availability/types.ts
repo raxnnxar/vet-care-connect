@@ -1,8 +1,8 @@
 
-import { Control } from "react-hook-form";
+import { Control, UseFormSetValue } from "react-hook-form";
 import { VeterinarianProfile, DaySchedule } from "../../../../types/veterinarianTypes";
 
-// Add the missing AvailabilityMap type
+// Define the AvailabilityMap type to match what's used in VeterinarianProfile
 export interface AvailabilityMap {
   monday?: DaySchedule;
   tuesday?: DaySchedule;

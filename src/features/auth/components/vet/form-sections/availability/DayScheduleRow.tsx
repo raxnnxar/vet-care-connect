@@ -1,14 +1,17 @@
 
 import React from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { DaySchedule } from '../../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import TimeSelect from './TimeSelect';
 import { DayScheduleRowProps } from './types';
 
 const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
+  // Get setValue from useFormContext
+  const { setValue } = useFormContext();
+
   return (
-    <tr key={day.id as React.Key}>
+    <tr key={String(day.id) as React.Key}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {day.label}
       </td>
@@ -77,8 +80,8 @@ const DayScheduleRow: React.FC<DayScheduleRowProps> = ({ day, control }) => {
                     endTime: '18:00'
                   };
                   
-                  // Use setValue from control to update the value directly
-                  control.setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
+                  // Use setValue from useFormContext instead of control
+                  setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
                     shouldDirty: true,
                     shouldValidate: true
                   });

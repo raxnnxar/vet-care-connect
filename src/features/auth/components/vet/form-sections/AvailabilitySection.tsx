@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useWatch } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { AvailabilitySectionProps } from './availability/types';
 import MobileAvailabilityView from './availability/MobileAvailabilityView';
 import DesktopAvailabilityView from './availability/DesktopAvailabilityView';
@@ -9,12 +9,8 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   control,
   errors,
 }) => {
-  // Use useWatch to get the current value of availability
-  const availability = useWatch({
-    control,
-    name: 'availability',
-    defaultValue: {},
-  });
+  // We're already within the form context from VetProfileForm
+  const formMethods = useFormContext();
 
   return (
     <div className="space-y-6">

@@ -1,18 +1,21 @@
 
 import React from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { DaySchedule } from '../../../../types/veterinarianTypes';
 import { Switch } from '@/ui/atoms/switch';
 import MobileTimeSlots from './MobileTimeSlots';
 import { WEEKDAYS } from './constants';
-import { AvailabilitySectionProps } from './types';
+import { AvailabilitySectionProps, WeekDay } from './types';
 
 const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control }) => {
+  // Get setValue from useFormContext
+  const { setValue } = useFormContext();
+  
   return (
     <div className="md:hidden">
       <div className="divide-y border rounded-lg">
         {WEEKDAYS.map((day) => (
-          <div key={day.id as React.Key} className="p-4">
+          <div key={String(day.id) as React.Key} className="p-4">
             <div className="flex justify-between items-center mb-3">
               <span className="font-medium text-base">{day.label}</span>
               <Controller
@@ -33,8 +36,8 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
                           endTime: '18:00'
                         };
                         
-                        // Use setValue from control to update the value directly
-                        control.setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
+                        // Use setValue from useFormContext instead of control
+                        setValue(`availability.${String(day.id)}` as any, defaultDaySchedule, {
                           shouldDirty: true,
                           shouldValidate: true
                         });
@@ -52,7 +55,7 @@ const MobileAvailabilityView: React.FC<AvailabilitySectionProps> = ({ control })
               defaultValue={false}
               render={({ field }) => (
                 field.value ? (
-                  <MobileTimeSlots dayId={day.id as string} control={control} />
+                  <MobileTimeSlots dayId={day.id} control={control} />
                 ) : null
               )}
             />
