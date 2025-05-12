@@ -28,7 +28,7 @@ const VetList: React.FC<VetListProps> = ({ vets, onVetClick }) => {
           <VetCard 
             key={vet.id}
             vet={vet}
-            onClick={onVetClick}
+            onClick={() => onVetClick(vet.id)}
           />
         ))}
       </div>

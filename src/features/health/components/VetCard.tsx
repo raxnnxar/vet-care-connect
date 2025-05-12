@@ -37,8 +37,8 @@ const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
         )}
         <div className="flex items-center mt-1">
           <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-          <span className="ml-1 text-sm font-medium">{vet.rating}</span>
-          <span className="ml-1 text-xs text-gray-500">({vet.reviewCount} reseñas)</span>
+          <span className="ml-1 text-sm font-medium">{vet.rating?.toFixed(1) || "N/A"}</span>
+          <span className="ml-1 text-xs text-gray-500">({vet.reviewCount || 0} reseñas)</span>
           <div className="ml-auto flex items-center text-xs text-gray-500">
             <MapPin className="w-3 h-3 mr-1" />
             {vet.distance}
