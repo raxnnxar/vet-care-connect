@@ -36,7 +36,7 @@ export const useVeterinariansData = () => {
             average_rating,
             total_reviews,
             animals_treated,
-            profiles:id (
+            profiles (
               first_name,
               last_name
             )

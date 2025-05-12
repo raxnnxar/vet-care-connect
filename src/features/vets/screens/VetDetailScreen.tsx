@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft, MapPin, Phone, Mail, Calendar, Star, MessageCircle } from 'lucide-react';
@@ -63,7 +62,7 @@ const VetDetailScreen = () => {
             total_reviews,
             bio,
             animals_treated,
-            profiles:id (
+            profiles (
               first_name,
               last_name,
               email
