@@ -5,11 +5,14 @@ import { supabase } from '@/integrations/supabase/client';
 export interface Veterinarian {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
   specialization: string[];
   imageUrl: string;
   rating: number;
   reviewCount: number;
   distance: string;
+  animalsTreated: string[];
 }
 
 export const useVeterinariansData = () => {
@@ -23,7 +26,7 @@ export const useVeterinariansData = () => {
         setLoading(true);
         setError(null);
 
-        // Consulta directa a la tabla veterinarians
+        // Consulta modificada para obtener también el perfil y animals_treated
         const { data: veterinarians, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
@@ -32,7 +35,11 @@ export const useVeterinariansData = () => {
             profile_image_url,
             average_rating,
             total_reviews,
-            bio
+            animals_treated,
+            profiles:id (
+              first_name,
+              last_name
+            )
           `)
           .order('average_rating', { ascending: false });
 
@@ -43,10 +50,23 @@ export const useVeterinariansData = () => {
           throw vetError;
         }
 
+        // Helper function to get initials from name
+        const getInitials = (firstName?: string, lastName?: string) => {
+          const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
+          const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+          return `${firstInitial}${lastInitial}`;
+        };
+
         // Map the database data to our frontend model
         const formattedVets: Veterinarian[] = veterinarians.map(vet => {
+          // Get first and last name from profiles
+          const firstName = vet.profiles?.first_name || '';
+          const lastName = vet.profiles?.last_name || '';
+          
           // Format display name with Dr. prefix
-          const displayName = `Dr. ${vet.id.substring(0, 5)}`;
+          const fullName = firstName || lastName 
+            ? `Dr${firstName.toLowerCase().endsWith('a') ? 'a' : ''}. ${firstName} ${lastName}`.trim()
+            : `Dr. ${vet.id.substring(0, 5)}`;
           
           // Parse specializations - ensure it's an array
           let specializations: string[] = [];
@@ -68,15 +88,36 @@ export const useVeterinariansData = () => {
             }
           }
 
+          // Parse animals treated
+          let animalsTreated: string[] = [];
+          if (vet.animals_treated) {
+            try {
+              if (Array.isArray(vet.animals_treated)) {
+                animalsTreated = vet.animals_treated.map(a => String(a));
+              } else {
+                const parsed = typeof vet.animals_treated === 'string'
+                  ? JSON.parse(vet.animals_treated)
+                  : vet.animals_treated;
+                animalsTreated = Array.isArray(parsed) ? parsed.map(a => String(a)) : [];
+              }
+            } catch (e) {
+              console.error("Error parsing animals treated:", e);
+              animalsTreated = [];
+            }
+          }
+
           // Return the formatted vet object
           return {
             id: vet.id,
-            name: displayName,
+            name: fullName,
+            firstName: firstName,
+            lastName: lastName,
             specialization: specializations,
-            imageUrl: vet.profile_image_url || 'https://randomuser.me/api/portraits/men/32.jpg',
+            imageUrl: vet.profile_image_url || '',
             rating: vet.average_rating || 0,
             reviewCount: vet.total_reviews || 0,
-            distance: "1.2 km" // Mocked distance data
+            distance: "1.2 km", // Mocked distance data
+            animalsTreated: animalsTreated
           };
         });
 

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft, MapPin, Phone, Mail, Calendar, Star, MessageCircle } from 'lucide-react';
@@ -31,6 +32,15 @@ const translateSpecialization = (spec: string): string => {
   return translations[spec.toLowerCase()] || spec;
 };
 
+// Helper function to format animals treated 
+const formatAnimalsTreated = (animals: string[]) => {
+  if (!animals || animals.length === 0) {
+    return "Animales domésticos";
+  }
+  
+  return animals.join(', ');
+};
+
 const VetDetailScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,7 +61,13 @@ const VetDetailScreen = () => {
             profile_image_url,
             average_rating,
             total_reviews,
-            bio
+            bio,
+            animals_treated,
+            profiles:id (
+              first_name,
+              last_name,
+              email
+            )
           `)
           .eq('id', id)
           .maybeSingle();
@@ -82,6 +98,13 @@ const VetDetailScreen = () => {
 
   const handleReviewClick = () => {
     navigate(`/owner/vets/${id}/review`);
+  };
+
+  // Generate initials for the avatar
+  const getInitials = (firstName?: string, lastName?: string) => {
+    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
+    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+    return `${firstInitial}${lastInitial}`;
   };
 
   if (loading) {
@@ -136,14 +159,39 @@ const VetDetailScreen = () => {
   }
 
   if (data) {
-    // Format veterinarian name - using ID as a fallback since we don't have profile data
-    const vetName = `Dr. ${data.id.substring(0, 5)}`;
+    // Format veterinarian name using profile data
+    const firstName = data.profiles?.first_name || '';
+    const lastName = data.profiles?.last_name || '';
+    
+    const vetName = firstName || lastName 
+      ? `Dr${firstName.toLowerCase().endsWith('a') ? 'a' : ''}. ${firstName} ${lastName}`.trim()
+      : `Dr. ${data.id.substring(0, 5)}`;
 
     // Format specialization
     const specializations = parseSpecializations(data.specialization);
     const formattedSpecializations = specializations.map(spec => 
       translateSpecialization(String(spec))
     ).join(', ');
+
+    // Format animals treated
+    let animalsTreated: string[] = [];
+    if (data.animals_treated) {
+      try {
+        if (Array.isArray(data.animals_treated)) {
+          animalsTreated = data.animals_treated.map((a: any) => String(a));
+        } else {
+          const parsed = typeof data.animals_treated === 'string'
+            ? JSON.parse(data.animals_treated)
+            : data.animals_treated;
+          animalsTreated = Array.isArray(parsed) ? parsed.map((a: any) => String(a)) : [];
+        }
+      } catch (e) {
+        console.error("Error parsing animals treated:", e);
+        animalsTreated = [];
+      }
+    }
+    
+    const formattedAnimalsTreated = formatAnimalsTreated(animalsTreated);
 
     return (
       <LayoutBase
@@ -169,7 +217,7 @@ const VetDetailScreen = () => {
                   <AvatarImage src={data.profile_image_url} alt={vetName} className="object-cover" />
                 ) : (
                   <AvatarFallback className="bg-[#79D0B8] text-white">
-                    {vetName.substring(0, 2).toUpperCase()}
+                    {getInitials(firstName, lastName)}
                   </AvatarFallback>
                 )}
               </Avatar>
@@ -192,6 +240,12 @@ const VetDetailScreen = () => {
                     {data.average_rating?.toFixed(1) || "0.0"} ({data.total_reviews || 0} reseñas)
                   </span>
                 </div>
+                
+                {animalsTreated.length > 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Trata: {formattedAnimalsTreated}
+                  </p>
+                )}
               </div>
             </div>
           </Card>
@@ -222,7 +276,7 @@ const VetDetailScreen = () => {
                 
                 <div className="flex items-center">
                   <Mail className="text-[#79D0B8] mr-3" size={20} />
-                  <span>{data.profile?.email || "Email no disponible"}</span>
+                  <span>{data.profiles?.email || "Email no disponible"}</span>
                 </div>
               </div>
             </div>
