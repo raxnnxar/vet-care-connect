@@ -23,17 +23,15 @@ export const useVeterinariansData = () => {
         setLoading(true);
         setError(null);
 
+        // Update the query to join with profiles table properly
         const { data: veterinarians, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
             *,
-            profile:id(
-              id,
-              display_name,
-              email
+            profiles:id(
+              display_name
             )
-          `)
-          .order('average_rating', { ascending: false });
+          `);
 
         if (vetError) {
           throw vetError;
@@ -42,7 +40,12 @@ export const useVeterinariansData = () => {
         // Map the database data to our frontend model
         const formattedVets: Veterinarian[] = veterinarians.map(vet => {
           // Safely handle potentially null profile
-          const displayName = vet.profile ? String(vet.profile.display_name || '') : '';
+          let displayName = "Dr. Veterinario";
+          
+          // Check if profiles exists and has display_name
+          if (vet.profiles && typeof vet.profiles === 'object' && 'display_name' in vet.profiles) {
+            displayName = String(vet.profiles.display_name || '');
+          }
           
           // Parse specializations - ensure it's an array
           let specializations: string[] = [];

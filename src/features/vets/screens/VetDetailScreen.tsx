@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft, MapPin, Phone, Mail, Calendar, Star, MessageCircle } from 'lucide-react';
@@ -48,7 +47,7 @@ const VetDetailScreen = () => {
           .from('veterinarians')
           .select(`
             *,
-            profile:id(
+            profiles:id(
               display_name,
               email
             )
@@ -136,8 +135,8 @@ const VetDetailScreen = () => {
   }
 
   // Format veterinarian name
-  const vetName = data.profile && data.profile.display_name 
-    ? data.profile.display_name 
+  const vetName = data.profiles && data.profiles.display_name 
+    ? data.profiles.display_name 
     : "Doctor(a)";
 
   // Format specialization
