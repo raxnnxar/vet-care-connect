@@ -43,8 +43,12 @@ export const useVeterinariansData = () => {
           let displayName = "Dr. Veterinario";
           
           // Check if profiles exists and has display_name
-          if (vet.profiles && typeof vet.profiles === 'object' && 'display_name' in vet.profiles) {
-            displayName = String(vet.profiles.display_name || '');
+          if (vet.profiles && typeof vet.profiles === 'object') {
+            // Use optional chaining to safely access display_name
+            const profiles = vet.profiles as Record<string, any>;
+            if ('display_name' in profiles) {
+              displayName = String(profiles.display_name || '');
+            }
           }
           
           // Parse specializations - ensure it's an array
