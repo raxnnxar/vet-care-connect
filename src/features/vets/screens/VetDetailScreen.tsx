@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft } from 'lucide-react';
@@ -7,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getInitials, translateSpecialization, formatAnimalsTreated } from '../utils/vetDetailUtils';
 
 // Import our components
-import VetProfileHeader from '../components/detail/VetProfileHeader';
+import VetProfileHero from '../components/detail/VetProfileHero';
 import VetAboutSection from '../components/detail/VetAboutSection';
 import VetContactSection from '../components/detail/VetContactSection';
 import VetActionButtons from '../components/detail/VetActionButtons';
@@ -43,6 +44,7 @@ const VetDetailScreen = () => {
             education,
             certifications,
             services_offered,
+            license_number,
             service_providers (
               business_name,
               provider_type,
@@ -145,20 +147,32 @@ const VetDetailScreen = () => {
     
     return (
       <LayoutBase
-        header={<Header />}
+        header={null}
         footer={<NavbarInferior activeTab="home" />}
       >
+        {/* Back button that floats on top of the header */}
+        <div className="absolute top-4 left-4 z-10">
+          <Button 
+            variant="ghost" 
+            className="bg-white/20 text-white rounded-full p-2" 
+            onClick={handleGoBack}
+          >
+            <ArrowLeft size={24} />
+          </Button>
+        </div>
+        
+        {/* New Hero Section */}
+        <VetProfileHero 
+          displayName={vetName}
+          specializations={specializations}
+          profileImageUrl={data.profile_image_url}
+          averageRating={data.average_rating}
+          totalReviews={data.total_reviews}
+          licenseNumber={data.license_number}
+          getInitials={getInitials}
+        />
+        
         <div className="p-4 pb-20 bg-gray-50">
-          {/* Profile Header Card */}
-          <div className="mb-4">
-            <VetProfileHeader 
-              data={data} 
-              displayName={vetName}
-              specializations={specializations}
-              getInitials={getInitials} 
-            />
-          </div>
-          
           {/* Animals Treated Section */}
           <div className="mb-4">
             <VetAnimalsTreatedSection animals={data.animals_treated || []} />

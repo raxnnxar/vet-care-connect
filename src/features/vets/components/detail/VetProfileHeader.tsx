@@ -11,6 +11,8 @@ interface VetProfileHeaderProps {
   getInitials: (name: string) => string;
 }
 
+// Este componente ya no se usa en VetDetailScreen, pero lo actualizamos
+// para mantener consistencia en caso de que se use en otras partes
 const VetProfileHeader: React.FC<VetProfileHeaderProps> = ({
   data,
   displayName,
