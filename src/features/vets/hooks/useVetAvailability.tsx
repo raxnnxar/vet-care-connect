@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AvailabilitySchedule, DaySchedule } from '@/features/auth/types/veterinarianTypes';
 import { toast } from 'sonner';
+import { Json } from '@/integrations/supabase/types';
 
 export const useVetAvailability = (userId: string, initialAvailability: AvailabilitySchedule) => {
   const [availability, setAvailability] = useState<AvailabilitySchedule>(initialAvailability || {});
@@ -73,9 +74,12 @@ export const useVetAvailability = (userId: string, initialAvailability: Availabi
 
     setIsLoading(true);
     try {
+      // Convert the availability object to a plain object that meets the Json requirements
+      const availabilityJson = availability as unknown as Json;
+      
       const { error } = await supabase
         .from('veterinarians')
-        .update({ availability })
+        .update({ availability: availabilityJson })
         .eq('id', userId);
 
       if (error) {
