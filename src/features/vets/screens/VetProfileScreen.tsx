@@ -10,13 +10,14 @@ import VetProfileHeader from '../components/profile/VetProfileHeader';
 import VetProfilePreview from '../components/profile/VetProfilePreview';
 import VetProfileLoading from '@/features/auth/components/vet/VetProfileLoading';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const VetProfileScreen: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(false);
   const userId = user?.id || '';
   
-  const { initialData, isInitialDataLoading, defaultVetProfile } = useVetProfileData(userId);
+  const { initialData, isInitialDataLoading, defaultVetProfile, refreshProfileData } = useVetProfileData(userId);
   const [profileData, setProfileData] = useState<VeterinarianProfile | null>(null);
 
   // Set profile data once initial data is loaded
@@ -51,12 +52,38 @@ const VetProfileScreen: React.FC = () => {
       // Save to the database
       await updateVeterinarianProfile(userId, updatedProfileData);
       toast.success(`Sección ${sectionName} actualizada con éxito`);
+      
+      // Refresh data from the database to ensure UI is up to date
+      await refreshProfileData();
     } catch (error: any) {
       toast.error(`Error al actualizar la sección ${sectionName}: ${error.message}`);
       // Revert to the previous state if there's an error
       setProfileData(initialData);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Function to refresh availability data specifically
+  const refreshAvailabilityData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('veterinarians')
+        .select('availability')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      if (data && profileData) {
+        const updatedProfileData = {
+          ...profileData,
+          availability: data.availability
+        };
+        setProfileData(updatedProfileData);
+      }
+    } catch (error: any) {
+      console.error('Error refreshing availability data:', error.message);
     }
   };
 
@@ -82,6 +109,7 @@ const VetProfileScreen: React.FC = () => {
           userId={userId}
           isLoading={isLoading}
           onSaveSection={handleSaveSection}
+          onAvailabilityUpdated={refreshAvailabilityData}
         />
       </div>
     </LayoutBase>

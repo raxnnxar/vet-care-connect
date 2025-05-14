@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Separator } from '@/ui/atoms/separator';
 import { VeterinarianProfile, ServiceOffered, ANIMAL_TYPES, SPECIALIZATIONS } from '@/features/auth/types/veterinarianTypes';
@@ -13,15 +14,23 @@ import AvailabilitySection from './sections/AvailabilitySection';
 import EmergencyServiceSection from './sections/EmergencyServiceSection';
 import EducationSection from './sections/EducationSection';
 import CertificationsSection from './sections/CertificationsSection';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VetProfilePreviewProps {
   profileData: VeterinarianProfile;
   userId: string;
   isLoading: boolean;
   onSaveSection: (sectionData: Partial<VeterinarianProfile>, sectionName: string) => Promise<void>;
+  onAvailabilityUpdated?: () => Promise<void>;
 }
 
-const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, userId, isLoading, onSaveSection }) => {
+const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ 
+  profileData, 
+  userId, 
+  isLoading, 
+  onSaveSection,
+  onAvailabilityUpdated
+}) => {
   const [editingSections, setEditingSections] = useState<Record<string, boolean>>({
     basicInfo: false,
     services: false,
@@ -50,6 +59,14 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
     price: undefined
   });
   
+  // Update local state when profileData changes
+  useEffect(() => {
+    setEditedBio(profileData.bio || '');
+    setEditedServices(profileData.services_offered || []);
+    setEditedAnimals(profileData.animals_treated || []);
+    setEditedSpecializations(profileData.specializations || []);
+  }, [profileData]);
+  
   const toggleEditSection = (section: string) => {
     setEditingSections(prev => ({
       ...prev,
@@ -70,7 +87,6 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
     }
   };
   
-  // Fix: Return a promise here to match the expected type
   const handleSaveBasicInfo = async () => {
     return await onSaveSection({ bio: editedBio }, 'información básica');
   };
@@ -97,10 +113,12 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
     return Promise.resolve();
   };
   
-  // Nueva función para guardar la disponibilidad
+  // Función para guardar la disponibilidad y actualizar la UI
   const handleSaveAvailability = async () => {
-    // No es necesario llamar a onSaveSection aquí porque
-    // el propio AvailabilityEditor se encarga de guardar en Supabase
+    // Primero llamamos a la función de actualización de disponibilidad del padre
+    if (onAvailabilityUpdated) {
+      await onAvailabilityUpdated();
+    }
     return Promise.resolve();
   };
   
@@ -233,7 +251,7 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
         
         <Separator className="my-4 bg-gray-200" />
         
-        {/* SECCIÓN: Disponibilidad - Actualizada para pasar userId */}
+        {/* SECCIÓN: Disponibilidad - Actualizada para refrescar datos */}
         <AvailabilitySection 
           availability={profileData.availability || {}}
           userId={userId}
@@ -241,6 +259,7 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
           toggleEditing={() => toggleEditSection('availability')}
           handleSave={handleSaveAvailability}
           isLoading={isLoading}
+          onAvailabilityUpdated={onAvailabilityUpdated}
         />
         
         <Separator className="my-4 bg-gray-200" />

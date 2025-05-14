@@ -7,11 +7,12 @@ import AvailabilityEditor from './availability/AvailabilityEditor';
 
 interface AvailabilitySectionProps {
   availability: AvailabilitySchedule;
-  userId: string; // Añadido userId para poder guardar cambios
+  userId: string; 
   isEditing: boolean;
   toggleEditing: () => void;
   handleSave: () => Promise<void>;
   isLoading: boolean;
+  onAvailabilityUpdated?: (updatedAvailability: AvailabilitySchedule) => void;
 }
 
 const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
@@ -20,8 +21,19 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   isEditing,
   toggleEditing,
   handleSave,
-  isLoading
+  isLoading,
+  onAvailabilityUpdated
 }) => {
+  // Function to handle closing the editor and refreshing availability data
+  const handleEditorSave = () => {
+    toggleEditing();
+    
+    // Trigger data refresh through the parent component
+    if (handleSave) {
+      handleSave();
+    }
+  };
+
   return (
     <EditableSection
       title="Disponibilidad"
@@ -136,7 +148,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
         <AvailabilityEditor 
           userId={userId}
           initialAvailability={availability || {}}
-          onSave={toggleEditing}
+          onSave={handleEditorSave}
         />
       )}
     </EditableSection>
