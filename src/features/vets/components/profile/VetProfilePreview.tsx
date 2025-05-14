@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Separator } from '@/ui/atoms/separator';
@@ -98,6 +97,13 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
     return Promise.resolve();
   };
   
+  // Nueva función para guardar la disponibilidad
+  const handleSaveAvailability = async () => {
+    // No es necesario llamar a onSaveSection aquí porque
+    // el propio AvailabilityEditor se encarga de guardar en Supabase
+    return Promise.resolve();
+  };
+  
   const addService = () => {
     if (!newService.name) return;
     
@@ -133,14 +139,6 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
     } else {
       setEditedSpecializations([...editedSpecializations, specialization]);
     }
-  };
-  
-  // Function that returns a Promise<void> for availability section
-  const handleSaveAvailability = async () => {
-    // Just toggle the section for now as the actual availability saving
-    // functionality is handled elsewhere
-    toggleEditSection('availability');
-    return Promise.resolve();
   };
   
   return (
@@ -235,9 +233,10 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({ profileData, user
         
         <Separator className="my-4 bg-gray-200" />
         
-        {/* SECCIÓN: Disponibilidad */}
+        {/* SECCIÓN: Disponibilidad - Actualizada para pasar userId */}
         <AvailabilitySection 
           availability={profileData.availability || {}}
+          userId={userId}
           isEditing={editingSections.availability}
           toggleEditing={() => toggleEditSection('availability')}
           handleSave={handleSaveAvailability}
