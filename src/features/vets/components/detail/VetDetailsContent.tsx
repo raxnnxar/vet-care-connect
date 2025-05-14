@@ -49,7 +49,7 @@ const VetDetailsContent: React.FC<VetDetailsContentProps> = ({
       
       {/* Animals Treated Section */}
       <div className="mb-4">
-        <VetAnimalsTreatedSection animals={data.animals_treated || []} />
+        <VetAnimalsTreatedSection animals={Array.isArray(data.animals_treated) ? data.animals_treated : []} />
       </div>
       
       {/* About Section */}
@@ -59,12 +59,12 @@ const VetDetailsContent: React.FC<VetDetailsContentProps> = ({
       
       {/* Education Section */}
       <div className="mb-4">
-        <VetEducationSection education={data.education || []} />
+        <VetEducationSection education={Array.isArray(data.education) ? data.education : []} />
       </div>
       
       {/* Certifications Section */}
       <div className="mb-4">
-        <VetCertificationsSection certifications={data.certifications || []} />
+        <VetCertificationsSection certifications={Array.isArray(data.certifications) ? data.certifications : []} />
       </div>
       
       {/* Services Section */}

@@ -1,64 +1,49 @@
 
-// Helper function to translate specialization to human-readable format
-export const translateSpecialization = (spec: string): string => {
-  const translations: Record<string, string> = {
-    'cardiology': 'Cardiología',
-    'dermatology': 'Dermatología',
-    'orthopedics': 'Ortopedia',
-    'neurology': 'Neurología',
-    'ophthalmology': 'Oftalmología',
-    'oncology': 'Oncología',
+/**
+ * Utility functions for vet detail display
+ */
+
+/**
+ * Get initials from a name
+ * @param name Full name
+ * @returns First and last initial
+ */
+export const getInitials = (name: string): string => {
+  if (!name) return '??';
+  
+  const parts = name.split(' ');
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+};
+
+/**
+ * Map specialization codes to Spanish display names
+ * @param specialization Specialization code
+ * @returns Spanish display name
+ */
+export const translateSpecialization = (specialization: string): string => {
+  const specializationMap: Record<string, string> = {
     'general': 'Medicina General',
     'surgery': 'Cirugía',
-    'dentistry': 'Odontología',
-    'nutrition': 'Nutrición',
     'internal_medicine': 'Medicina Interna',
-    'emergency': 'Emergencias',
-    'rehabilitation': 'Rehabilitación',
-    'exotics': 'Animales Exóticos',
-    // Add more translations as needed
+    'dermatology': 'Dermatología',
+    'ophthalmology': 'Oftalmología',
+    'dentistry': 'Odontología',
+    'anesthesiology': 'Anestesiología',
+    'oncology': 'Oncología',
+    'cardiology': 'Cardiología',
+    'neurology': 'Neurología',
+    'exotic_animals': 'Medicina de Animales Exóticos',
+    'large_animals': 'Medicina de Animales Grandes',
+    'emergency_care': 'Emergencias y Cuidados Críticos',
+    'rehabilitation': 'Rehabilitación y Fisioterapia',
+    'ethology': 'Etología',
+    'pathology': 'Patología',
+    'sports_medicine': 'Medicina deportiva para animales',
+    'nutrition': 'Nutriología',
+    'preventive_medicine': 'Medicina preventiva y bienestar animal'
   };
   
-  return translations[spec.toLowerCase()] || spec;
-};
-
-// Helper function to format animals treated 
-export const formatAnimalsTreated = (animals: string[]) => {
-  if (!animals || animals.length === 0) {
-    return "Animales domésticos";
-  }
-  
-  const translateAnimal = (animal: string): string => {
-    const translations: Record<string, string> = {
-      'dog': 'Perros',
-      'cat': 'Gatos',
-      'bird': 'Aves',
-      'rabbit': 'Conejos',
-      'rodent': 'Roedores',
-      'reptile': 'Reptiles',
-      'fish': 'Peces',
-      'horse': 'Caballos',
-      'exotic': 'Exóticos',
-      'farm_animals': 'Animales de Granja',
-      'small_mammals': 'Pequeños Mamíferos'
-    };
-    
-    return translations[animal.toLowerCase()] || animal;
-  };
-  
-  const translatedAnimals = animals.map(translateAnimal);
-  return translatedAnimals.join(', ');
-};
-
-// Generate initials for the avatar
-export const getInitials = (displayName: string): string => {
-  if (!displayName) return '';
-  
-  const nameParts = displayName.split(' ');
-  if (nameParts.length >= 2) {
-    return `${nameParts[0].charAt(0).toUpperCase()}${nameParts[1].charAt(0).toUpperCase()}`;
-  } else if (nameParts.length === 1) {
-    return nameParts[0].substring(0, 2).toUpperCase();
-  }
-  return '';
+  return specializationMap[specialization] || specialization;
 };

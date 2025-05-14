@@ -1,10 +1,9 @@
 
 import React, { useState } from 'react';
-import { Stethoscope, ChevronDown, ChevronUp } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/ui/molecules/card';
-import { Button } from '@/ui/atoms/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
-interface ServiceOffered {
+interface Service {
   id: string;
   name: string;
   description?: string;
@@ -12,80 +11,76 @@ interface ServiceOffered {
 }
 
 interface VetServicesSectionProps {
-  services: ServiceOffered[];
+  services: Service[];
 }
 
 const VetServicesSection: React.FC<VetServicesSectionProps> = ({ services }) => {
-  const [showAll, setShowAll] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   
-  // Format price
-  const formatPrice = (price?: number) => {
-    if (price === undefined) return '';
-    
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN'
-    }).format(price);
-  };
-
-  // Ensure services is an array before proceeding
+  // Ensure services is an array
   const servicesList = Array.isArray(services) ? services : [];
-
-  if (servicesList.length === 0) {
-    return null;
+  
+  // Display up to 3 services when collapsed, or all when expanded
+  const displayedServices = isExpanded 
+    ? servicesList 
+    : servicesList.slice(0, 3);
+  
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+  
+  if (!servicesList.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Servicios</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-500 text-sm">No hay servicios disponibles</p>
+        </CardContent>
+      </Card>
+    );
   }
-
-  // Show only top 3 services unless "Ver todos" is clicked
-  const displayServices = showAll ? servicesList : servicesList.slice(0, 3);
-
+  
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold flex items-center">
-          <Stethoscope className="mr-2 h-5 w-5 text-[#4DA6A8]" />
-          Servicios Principales
-        </CardTitle>
+      <CardHeader>
+        <CardTitle>Servicios</CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
-        {displayServices.map((service) => (
-          <div key={service.id} className="py-3 border-b last:border-0">
-            <div className="flex justify-between">
-              <div className="flex-1">
-                <span className="font-medium">{service.name}</span>
-                {service.description && (
-                  <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+      <CardContent>
+        <ul className="space-y-3">
+          {displayedServices.map((service) => (
+            <li key={service.id} className="border-b last:border-0 pb-2">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-medium">{service.name}</h3>
+                  {service.description && (
+                    <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                  )}
+                </div>
+                {service.price !== undefined && (
+                  <div className="text-right font-medium">
+                    ${service.price.toFixed(2)}
+                  </div>
                 )}
               </div>
-              {service.price !== undefined && (
-                <div className="text-green-600 font-medium">
-                  {formatPrice(service.price)}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </CardContent>
-      {servicesList.length > 3 && (
-        <CardFooter className="flex justify-center pt-0 pb-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => setShowAll(!showAll)}
-            className="text-[#4DA6A8] hover:text-[#3C9B9D] hover:bg-[#e8f7f3]"
+            </li>
+          ))}
+        </ul>
+        
+        {servicesList.length > 3 && (
+          <button 
+            onClick={toggleExpand}
+            className="flex items-center text-[#79D0B8] mt-3 text-sm"
           >
-            {showAll ? (
-              <>
-                <ChevronUp className="w-4 h-4 mr-1" />
-                Ver menos
-              </>
+            {isExpanded ? (
+              <>Ver menos <ChevronUp className="ml-1 w-4 h-4" /></>
             ) : (
-              <>
-                <ChevronDown className="w-4 h-4 mr-1" />
-                Ver todos los servicios ({servicesList.length})
-              </>
+              <>Ver todos ({servicesList.length}) <ChevronDown className="ml-1 w-4 h-4" /></>
             )}
-          </Button>
-        </CardFooter>
-      )}
+          </button>
+        )}
+      </CardContent>
     </Card>
   );
 };
