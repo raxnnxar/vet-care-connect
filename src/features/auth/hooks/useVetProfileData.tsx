@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { VeterinarianProfile } from '../types/veterinarianTypes';
-import { defaultVetProfile } from '../utils/vetProfileUtils';
+import { defaultVetProfile, parseSpecializations } from '../utils/vetProfileUtils';
 
 export const useVetProfileData = (userId: string) => {
   const [initialData, setInitialData] = useState<VeterinarianProfile | null>(null);
@@ -29,7 +29,8 @@ export const useVetProfileData = (userId: string) => {
       const profileData: VeterinarianProfile = {
         ...defaultVetProfile,
         ...data,
-        specializations: data.specializations || [],
+        // Fix: Map from specialization in database to specializations in the app model
+        specializations: parseSpecializations(data.specialization),
         education: data.education || [],
         certifications: data.certifications || [],
         animals_treated: data.animals_treated || [],

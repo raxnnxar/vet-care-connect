@@ -1,59 +1,54 @@
 
 import React from 'react';
-import { PenSquare, Save } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
+import { Edit, Check } from 'lucide-react';
 
 interface EditableSectionProps {
   title: string;
+  children: React.ReactNode;
   isEditing: boolean;
   onEdit: () => void;
-  onSave: () => void;
-  isSaving: boolean;
-  children: React.ReactNode;
+  onSave?: (() => Promise<void>) | null; // Make onSave optional or null
+  isSaving?: boolean;
 }
 
-export const EditableSection: React.FC<EditableSectionProps> = ({ 
-  title, 
-  isEditing, 
-  onEdit, 
-  onSave, 
-  isSaving,
-  children 
+export const EditableSection: React.FC<EditableSectionProps> = ({
+  title,
+  children,
+  isEditing,
+  onEdit,
+  onSave,
+  isSaving = false
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow mb-4 overflow-hidden">
-      <div className="flex items-center justify-between bg-gray-50 px-4 py-3 border-b">
-        <h2 className="text-lg font-medium text-gray-800">{title}</h2>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-gray-900">{title}</h2>
         {!isEditing ? (
-          <Button variant="ghost" size="sm" onClick={onEdit}>
-            <PenSquare className="h-4 w-4 mr-1" />
-            Editar
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onEdit}
+            className="flex items-center gap-1.5 border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8] hover:text-white"
+          >
+            <Edit className="h-4 w-4" />
+            <span>Editar</span>
           </Button>
-        ) : (
-          <Button 
-            variant="default" 
-            size="sm" 
+        ) : onSave && (
+          // Only show save button if onSave is provided and not null
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onSave}
             disabled={isSaving}
-            className="bg-[#79D0B8] hover:bg-[#4DA6A8] text-white"
+            className="flex items-center gap-1.5 border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8] hover:text-white"
           >
-            {isSaving ? (
-              <span className="flex items-center">
-                <div className="animate-spin mr-1 h-4 w-4 border-2 border-white border-opacity-20 border-t-white rounded-full"></div>
-                Guardando...
-              </span>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-1" />
-                Guardar
-              </>
-            )}
+            <Check className="h-4 w-4" />
+            <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
           </Button>
         )}
       </div>
-      <div className="p-4">
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 };

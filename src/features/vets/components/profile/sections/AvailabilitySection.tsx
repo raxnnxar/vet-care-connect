@@ -12,7 +12,7 @@ interface AvailabilitySectionProps {
   toggleEditing: () => void;
   handleSave: () => Promise<void>;
   isLoading: boolean;
-  onAvailabilityUpdated?: (updatedAvailability: AvailabilitySchedule) => void;
+  onAvailabilityUpdated?: () => Promise<void>;
 }
 
 const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
@@ -29,8 +29,8 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
     toggleEditing();
     
     // Trigger data refresh through the parent component
-    if (handleSave) {
-      handleSave();
+    if (onAvailabilityUpdated) {
+      onAvailabilityUpdated();
     }
   };
 
@@ -39,7 +39,8 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
       title="Disponibilidad"
       isEditing={isEditing}
       onEdit={toggleEditing}
-      onSave={handleSave}
+      // Remove the handleSave function from here, as it's now handled in the editor
+      onSave={null} 
       isSaving={isLoading}
     >
       {!isEditing ? (

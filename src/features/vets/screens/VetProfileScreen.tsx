@@ -5,12 +5,13 @@ import { RootState } from '@/state/store';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useVetProfileData } from '@/features/auth/hooks/useVetProfileData';
 import { updateVeterinarianProfile } from '@/features/auth/services/vetProfileService';
-import { VeterinarianProfile } from '@/features/auth/types/veterinarianTypes';
+import { VeterinarianProfile, AvailabilitySchedule } from '@/features/auth/types/veterinarianTypes';
 import VetProfileHeader from '../components/profile/VetProfileHeader';
 import VetProfilePreview from '../components/profile/VetProfilePreview';
 import VetProfileLoading from '@/features/auth/components/vet/VetProfileLoading';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { parseAvailability } from '@/features/auth/utils/vetProfileUtils';
 
 const VetProfileScreen: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -76,9 +77,12 @@ const VetProfileScreen: React.FC = () => {
       if (error) throw error;
 
       if (data && profileData) {
+        // Convert the JSON data from supabase to the correct availability schedule type
+        const availabilityData = parseAvailability(data.availability);
+        
         const updatedProfileData = {
           ...profileData,
-          availability: data.availability
+          availability: availabilityData
         };
         setProfileData(updatedProfileData);
       }

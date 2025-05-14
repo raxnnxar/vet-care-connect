@@ -62,28 +62,31 @@ export const parseSpecializations = (json: any): string[] => {
   return json.map(item => String(item || ''));
 };
 
+// Adding the missing defaultVetProfile export
+export const defaultVetProfile: VeterinarianProfile = {
+  specializations: ['general'],
+  license_number: '',
+  years_of_experience: 0,
+  bio: '',
+  availability: {},
+  education: [],
+  certifications: [],
+  animals_treated: [],
+  services_offered: [],
+  languages_spoken: ['spanish'],
+  emergency_services: false
+};
+
 // Main function to parse all vet profile data from database
 export const parseVetProfileData = (vetData: any): VeterinarianProfile => {
   // Add defensive checks to make sure we have vetData
   if (!vetData) {
     console.error('Cannot parse undefined or null vetData');
-    return {
-      specializations: ['general'],
-      license_number: '',
-      years_of_experience: 0,
-      bio: '',
-      availability: {},
-      education: [],
-      certifications: [],
-      animals_treated: [],
-      services_offered: [],
-      languages_spoken: ['spanish'],
-      emergency_services: false
-    };
+    return defaultVetProfile;
   }
 
   return {
-    specializations: parseSpecializations(vetData.specialization),
+    specializations: parseSpecializations(vetData.specialization), // Fix: use specialization from database
     license_number: vetData.license_number || '',
     license_document_url: vetData.license_document_url,
     years_of_experience: vetData.years_of_experience || 0,
