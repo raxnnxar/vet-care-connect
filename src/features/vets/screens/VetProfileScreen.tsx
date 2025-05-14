@@ -80,11 +80,14 @@ const VetProfileScreen: React.FC = () => {
         // Convert the JSON data from supabase to the correct availability schedule type
         const availabilityData = parseAvailability(data.availability);
         
-        const updatedProfileData = {
-          ...profileData,
-          availability: availabilityData
-        };
-        setProfileData(updatedProfileData);
+        // Use the functional update form to ensure we're working with the latest state
+        setProfileData(prevState => {
+          if (!prevState) return null;
+          return {
+            ...prevState,
+            availability: availabilityData
+          };
+        });
       }
     } catch (error: any) {
       console.error('Error refreshing availability data:', error.message);

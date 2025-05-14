@@ -74,12 +74,11 @@ export const useVetAvailability = (userId: string, initialAvailability: Availabi
 
     setIsLoading(true);
     try {
-      // Convert the availability object to a plain object that meets the Json requirements
-      const availabilityJson = availability as unknown as Json;
-      
+      // Properly type the availability object for Supabase
+      // The availability object needs to be an object that can be stored as JSON
       const { error } = await supabase
         .from('veterinarians')
-        .update({ availability: availabilityJson })
+        .update({ availability: availability as unknown as Json })
         .eq('id', userId);
 
       if (error) {

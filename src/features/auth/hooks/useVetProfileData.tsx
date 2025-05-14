@@ -2,7 +2,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { VeterinarianProfile } from '../types/veterinarianTypes';
-import { defaultVetProfile, parseSpecializations } from '../utils/vetProfileUtils';
+import { Json } from '@/integrations/supabase/types';
+import { 
+  defaultVetProfile, 
+  parseSpecializations, 
+  parseEducation, 
+  parseCertifications, 
+  parseAnimals, 
+  parseServices, 
+  parseLanguages, 
+  parseAvailability 
+} from '../utils/vetProfileUtils';
 
 export const useVetProfileData = (userId: string) => {
   const [initialData, setInitialData] = useState<VeterinarianProfile | null>(null);
@@ -25,18 +35,18 @@ export const useVetProfileData = (userId: string) => {
 
       if (error) throw error;
 
-      // Ensure that arrays are properly defined
+      // Ensure that all data is properly parsed to the correct type
       const profileData: VeterinarianProfile = {
         ...defaultVetProfile,
         ...data,
-        // Fix: Map from specialization in database to specializations in the app model
+        // Parse all JSON fields from database into appropriate types
         specializations: parseSpecializations(data.specialization),
-        education: data.education || [],
-        certifications: data.certifications || [],
-        animals_treated: data.animals_treated || [],
-        services_offered: data.services_offered || [],
-        languages_spoken: data.languages_spoken || [],
-        availability: data.availability || {}
+        education: parseEducation(data.education),
+        certifications: parseCertifications(data.certifications),
+        animals_treated: parseAnimals(data.animals_treated),
+        services_offered: parseServices(data.services_offered),
+        languages_spoken: parseLanguages(data.languages_spoken),
+        availability: parseAvailability(data.availability)
       };
 
       console.log('Loaded profile data:', profileData);

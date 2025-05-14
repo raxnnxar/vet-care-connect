@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import { EditableSection } from '../EditableSection';
@@ -25,13 +24,17 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   onAvailabilityUpdated
 }) => {
   // Function to handle closing the editor and refreshing availability data
-  const handleEditorSave = () => {
+  const handleEditorSave = async () => {
+    // Close the editing mode
     toggleEditing();
     
-    // Trigger data refresh through the parent component
+    // If there's a callback for updating availability, call it
     if (onAvailabilityUpdated) {
-      onAvailabilityUpdated();
+      await onAvailabilityUpdated();
     }
+    
+    // Call the parent save function if needed
+    await handleSave();
   };
 
   return (
@@ -39,8 +42,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
       title="Disponibilidad"
       isEditing={isEditing}
       onEdit={toggleEditing}
-      // Remove the handleSave function from here, as it's now handled in the editor
-      onSave={null} 
+      onSave={null} // Remove the top save button by passing null
       isSaving={isLoading}
     >
       {!isEditing ? (
