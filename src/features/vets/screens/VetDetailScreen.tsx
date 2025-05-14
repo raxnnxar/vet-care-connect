@@ -172,7 +172,7 @@ const VetDetailScreen = () => {
           getInitials={getInitials}
         />
         
-        <div className="p-4 pb-20 bg-gray-50">
+        <div className="p-4 pb-28 bg-gray-50">
           {/* Animals Treated Section */}
           <div className="mb-4">
             <VetAnimalsTreatedSection animals={data.animals_treated || []} />
@@ -183,19 +183,19 @@ const VetDetailScreen = () => {
             <VetAboutSection bio={data.bio} />
           </div>
           
-          {/* Education Section */}
+          {/* Services Section */}
+          <div className="mb-4">
+            <VetServicesSection services={Array.isArray(data.services_offered) ? data.services_offered : []} />
+          </div>
+          
+          {/* Education Section - Añadida después de servicios */}
           <div className="mb-4">
             <VetEducationSection education={data.education || []} />
           </div>
           
-          {/* Certifications Section */}
+          {/* Certifications Section - Añadida después de educación */}
           <div className="mb-4">
             <VetCertificationsSection certifications={data.certifications || []} />
-          </div>
-          
-          {/* Services Section */}
-          <div className="mb-4">
-            <VetServicesSection services={Array.isArray(data.services_offered) ? data.services_offered : []} />
           </div>
           
           {/* Contact Section */}
