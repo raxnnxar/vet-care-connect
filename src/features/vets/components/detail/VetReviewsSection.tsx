@@ -32,29 +32,36 @@ const VetReviewsSection: React.FC<VetReviewsSectionProps> = ({ veterinarianId })
       try {
         setLoading(true);
 
-        // Corrección: Modificar la consulta para extraer los datos correctamente
-        const { data, error } = await supabase
+        // Using a simpler approach to get reviews and join with profile information
+        const { data: reviewsData, error: reviewsError } = await supabase
           .from('reviews')
-          .select(`
-            id,
-            rating,
-            comment,
-            created_at,
-            pet_owner_id,
-            profiles:pet_owner_id (display_name)
-          `)
+          .select('*')
           .eq('veterinarian_id', veterinarianId)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (reviewsError) throw reviewsError;
 
-        // Formatear los datos para incluir el nombre del dueño
-        const formattedReviews = data?.map(review => ({
-          ...review,
-          display_name: review.profiles?.display_name || 'Usuario'
-        })) || [];
+        // If we have reviews, fetch the display names for each reviewer
+        if (reviewsData && reviewsData.length > 0) {
+          const reviewsWithProfiles = await Promise.all(
+            reviewsData.map(async (review) => {
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('display_name')
+                .eq('id', review.pet_owner_id)
+                .single();
+              
+              return {
+                ...review,
+                display_name: profileData?.display_name || 'Usuario'
+              };
+            })
+          );
 
-        setReviews(formattedReviews);
+          setReviews(reviewsWithProfiles);
+        } else {
+          setReviews([]);
+        }
       } catch (err: any) {
         console.error('Error al cargar reseñas:', err);
         setError('No se pudieron cargar las reseñas');
