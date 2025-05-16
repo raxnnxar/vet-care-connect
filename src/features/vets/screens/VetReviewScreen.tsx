@@ -48,10 +48,15 @@ const VetReviewScreen = () => {
         const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
         setVetName(`Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`);
         
-        // Establecer especialidad
-        const spec = Array.isArray(data.specialization) && data.specialization.length > 0
-          ? data.specialization[0]
-          : 'general';
+        // Establecer especialidad - Corrige el error de tipo aquí
+        let spec = 'general';
+        if (Array.isArray(data.specialization) && data.specialization.length > 0) {
+          // Asegurarnos de que cada elemento sea string
+          const firstSpec = data.specialization[0];
+          if (typeof firstSpec === 'string') {
+            spec = firstSpec;
+          }
+        }
         
         setVetSpecialty(translateSpecialization(spec));
         setProfileImage(data.profile_image_url);

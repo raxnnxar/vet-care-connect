@@ -32,7 +32,7 @@ const VetReviewsSection: React.FC<VetReviewsSectionProps> = ({ veterinarianId })
       try {
         setLoading(true);
 
-        // Obtener reseñas con información del dueño
+        // Corrección: Modificar la consulta para extraer los datos correctamente
         const { data, error } = await supabase
           .from('reviews')
           .select(`
@@ -41,7 +41,7 @@ const VetReviewsSection: React.FC<VetReviewsSectionProps> = ({ veterinarianId })
             comment,
             created_at,
             pet_owner_id,
-            profiles!reviews_pet_owner_id_fkey (display_name)
+            profiles:pet_owner_id (display_name)
           `)
           .eq('veterinarian_id', veterinarianId)
           .order('created_at', { ascending: false });
