@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import VetProfileHero from './VetProfileHero';
@@ -10,8 +10,8 @@ import VetEducationSection from './VetEducationSection';
 import VetCertificationsSection from './VetCertificationsSection';
 import VetServicesSection from './VetServicesSection';
 import VetAnimalsTreatedSection from './VetAnimalsTreatedSection';
-import VetReviewsSection from './VetReviewsSection';
 import { getInitials } from '../../utils/vetDetailUtils';
+import { ReviewsDialog } from '../../utils/vetReviewUtils';
 
 interface VetDetailContentProps {
   data: any;
@@ -24,6 +24,8 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
   onBookAppointment,
   onReviewClick,
 }) => {
+  const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
+
   // Format veterinarian name using display_name from profiles
   const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
   
@@ -73,7 +75,7 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         </Button>
       </div>
       
-      {/* Hero Section */}
+      {/* Hero Section with clickable rating */}
       <VetProfileHero 
         displayName={vetName}
         specializations={specializations}
@@ -82,17 +84,13 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         totalReviews={data.total_reviews}
         licenseNumber={data.license_number}
         getInitials={getInitials}
+        onRatingClick={() => setReviewsDialogOpen(true)}
       />
       
       <div className="p-4 pb-28 bg-gray-50">
         {/* Animals Treated Section */}
         <div className="mb-4">
           <VetAnimalsTreatedSection animals={data.animals_treated || []} />
-        </div>
-        
-        {/* Reviews Section - Nueva sección añadida */}
-        <div className="mb-4">
-          <VetReviewsSection veterinarianId={data.id} />
         </div>
         
         {/* About Section */}
@@ -120,9 +118,16 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
           <VetContactSection email={data.service_providers?.profiles?.email} />
         </div>
         
-        {/* Action Buttons */}
+        {/* Action Buttons - now only has Book Appointment */}
         <VetActionButtons 
           onBookAppointment={onBookAppointment}
+        />
+
+        {/* Reviews Dialog */}
+        <ReviewsDialog
+          isOpen={reviewsDialogOpen}
+          setIsOpen={setReviewsDialogOpen}
+          veterinarianId={data.id}
           onReviewClick={onReviewClick}
         />
       </div>

@@ -10,6 +10,7 @@ interface VetProfileHeroProps {
   totalReviews?: number;
   licenseNumber?: string;
   getInitials: (name: string) => string;
+  onRatingClick?: () => void;
 }
 
 const VetProfileHero: React.FC<VetProfileHeroProps> = ({
@@ -19,7 +20,8 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
   averageRating = 0,
   totalReviews = 0,
   licenseNumber,
-  getInitials
+  getInitials,
+  onRatingClick
 }) => {
   // Format rating to display with one decimal place
   const formattedRating = Number(averageRating).toFixed(1);
@@ -43,8 +45,11 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
       <h1 className="text-2xl font-bold text-center">{displayName}</h1>
       <p className="text-lg mb-2">{specializations}</p>
       
-      {/* Rating and reviews section */}
-      <div className="flex items-center bg-[#4DA6A8] rounded-full px-6 py-2 mt-2">
+      {/* Rating and reviews section - now clickable */}
+      <button 
+        onClick={onRatingClick}
+        className="flex items-center bg-[#4DA6A8] rounded-full px-6 py-2 mt-2 cursor-pointer transition-all hover:bg-[#3D8A8C] focus:outline-none"
+      >
         <span className="text-xl font-bold mr-2">{formattedRating}</span>
         <div className="flex">
           {[1, 2, 3, 4, 5].map((star) => (
@@ -57,7 +62,7 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
         <span className="ml-3">
           ({totalReviews || 0} reseñas)
         </span>
-      </div>
+      </button>
 
       {/* License information */}
       {licenseNumber && (
