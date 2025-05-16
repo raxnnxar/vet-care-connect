@@ -1,16 +1,27 @@
 
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface SaludHeaderProps {
-  onBackClick: () => void;
+  onBackClick?: () => void;
 }
 
 const SaludHeader: React.FC<SaludHeaderProps> = ({ onBackClick }) => {
+  const navigate = useNavigate();
+  
+  const handleGoBack = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <header className="bg-[#4DA6A8] px-4 py-4 flex items-center shadow-md rounded-b-xl sticky top-0 z-10">
       <button 
-        onClick={onBackClick}
+        onClick={handleGoBack}
         className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white"
       >
         <ArrowLeft className="w-5 h-5" />

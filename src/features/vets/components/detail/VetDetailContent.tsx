@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
 import VetProfileHero from './VetProfileHero';
 import VetAboutSection from './VetAboutSection';
@@ -25,11 +26,12 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
   onReviewClick,
 }) => {
   const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Format veterinarian name using display_name from profiles
   const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
   
-  // For gendered prefix (Dr/Dra), we'll check if the name seems feminine (ends with 'a')
+  // Para el prefijo de género (Dr/Dra), we'll check if the name seems feminine (ends with 'a')
   const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
   const vetName = displayName 
     ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`.trim()
@@ -62,6 +64,10 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
     return translations[spec.toLowerCase()] || spec;
   }
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
     <>
       {/* Back button that floats on top of the header */}
@@ -69,7 +75,7 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         <Button 
           variant="ghost" 
           className="bg-white/20 text-white rounded-full p-2" 
-          onClick={() => window.history.back()}
+          onClick={handleGoBack}
         >
           <ArrowLeft size={24} />
         </Button>
