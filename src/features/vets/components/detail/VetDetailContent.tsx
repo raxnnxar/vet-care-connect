@@ -10,6 +10,7 @@ import VetEducationSection from './VetEducationSection';
 import VetCertificationsSection from './VetCertificationsSection';
 import VetServicesSection from './VetServicesSection';
 import VetAnimalsTreatedSection from './VetAnimalsTreatedSection';
+import VetReviewsSection from './VetReviewsSection';
 import { getInitials } from '../../utils/vetDetailUtils';
 
 interface VetDetailContentProps {
@@ -87,6 +88,11 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         {/* Animals Treated Section */}
         <div className="mb-4">
           <VetAnimalsTreatedSection animals={data.animals_treated || []} />
+        </div>
+        
+        {/* Reviews Section - Nueva sección añadida */}
+        <div className="mb-4">
+          <VetReviewsSection veterinarianId={data.id} />
         </div>
         
         {/* About Section */}
