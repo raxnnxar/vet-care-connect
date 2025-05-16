@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/ui/atoms/button';
 import VetProfileHero from './VetProfileHero';
 import VetAboutSection from './VetAboutSection';
 import VetContactSection from './VetContactSection';
