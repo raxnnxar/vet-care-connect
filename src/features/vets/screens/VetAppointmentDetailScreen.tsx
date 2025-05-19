@@ -14,15 +14,15 @@ import { toast } from 'sonner';
 
 const getStatusBadge = (status: string | null) => {
   const statusConfig: Record<string, { color: string, text: string }> = {
-    'confirmed': { color: 'bg-green-100 text-green-800', text: 'Confirmada' },
-    'pending': { color: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' },
-    'completed': { color: 'bg-blue-100 text-blue-800', text: 'Completada' },
-    'cancelled': { color: 'bg-red-100 text-red-800', text: 'Cancelada' }
+    'programada': { color: 'bg-green-100 text-green-800', text: 'Confirmada' },
+    'pendiente': { color: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' },
+    'completada': { color: 'bg-blue-100 text-blue-800', text: 'Completada' },
+    'cancelada': { color: 'bg-red-100 text-red-800', text: 'Cancelada' }
   };
   
   const config = status && statusConfig[status] 
     ? statusConfig[status] 
-    : statusConfig.pending;
+    : statusConfig.pendiente;
   
   return (
     <Badge className={`${config.color} border-0`}>

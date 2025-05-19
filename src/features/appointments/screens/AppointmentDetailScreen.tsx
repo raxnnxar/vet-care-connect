@@ -28,9 +28,7 @@ const AppointmentDetailScreen: React.FC = () => {
         .from('appointments')
         .select(`
           *,
-          pets (
-            *
-          )
+          pets:pet_id(*)
         `)
         .eq('id', id)
         .single();
@@ -102,6 +100,8 @@ const AppointmentDetailScreen: React.FC = () => {
     ? format(new Date(appointmentDetails.appointment_date), 'HH:mm')
     : '';
 
+  const pet = appointmentDetails.pets as Pet | null;
+
   return (
     <LayoutBase
       header={
@@ -121,16 +121,16 @@ const AppointmentDetailScreen: React.FC = () => {
           status={appointmentDetails.status}
         />
         
-        {appointmentDetails.pets && (
-          <PetInfo pet={appointmentDetails.pets as Pet} />
+        {pet && (
+          <PetInfo pet={pet} />
         )}
 
         <ServiceDetails
           serviceType={appointmentDetails.service_type}
           duration={appointmentDetails.duration}
           price={appointmentDetails.price}
-          clinicName={appointmentDetails.clinic_name}
-          clinicAddress={appointmentDetails.clinic_address}
+          clinicName={appointmentDetails.location || ""}
+          clinicAddress={appointmentDetails.location || ""}
           notes={appointmentDetails.notes}
           paymentStatus={appointmentDetails.payment_status}
         />

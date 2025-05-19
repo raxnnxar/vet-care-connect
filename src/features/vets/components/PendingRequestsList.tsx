@@ -35,10 +35,10 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
         .select(`
           id,
           appointment_date,
-          pets:pet_id (name)
+          pets:pet_id(name)
         `)
         .eq('provider_id', user.user.id)
-        .eq('status', 'pending');
+        .eq('status', 'pendiente');
       
       if (error) {
         console.error('Error fetching pending requests:', error);
@@ -67,7 +67,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: 'confirmed' })
+        .update({ status: 'programada' })
         .eq('id', requestId)
         .select();
       
@@ -92,7 +92,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: 'cancelled' })
+        .update({ status: 'cancelada' })
         .eq('id', requestId)
         .select();
       
