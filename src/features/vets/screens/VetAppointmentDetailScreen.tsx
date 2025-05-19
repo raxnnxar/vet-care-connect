@@ -13,6 +13,16 @@ import { Badge } from '@/ui/atoms/badge';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
 
+interface AppointmentPetResponse {
+  id: string;
+  name: string;
+  species: string;
+  breed?: string;
+  sex?: string;
+  date_of_birth?: string;
+  profile_picture_url?: string;
+}
+
 const getStatusBadge = (status: string | null) => {
   const statusConfig: Record<string, { color: string, text: string }> = {
     'programada': { color: 'bg-green-100 text-green-800', text: 'Confirmada' },
@@ -139,13 +149,30 @@ const VetAppointmentDetailScreen: React.FC = () => {
     }
   };
   
-  // Use a more robust type guard to check if pets is valid
-  const hasPet = appointment.pets && 
-                typeof appointment.pets === 'object' && 
-                appointment.pets !== null && 
-                !('error' in appointment.pets);
-                
-  const pet = hasPet ? (appointment.pets as Pet) : null;
+  // Transform pet data safely to a Pet object only when valid
+  let pet: Pet | null = null;
+  
+  if (appointment.pets && 
+      typeof appointment.pets === 'object' && 
+      appointment.pets !== null &&
+      !('error' in appointment.pets) &&
+      'id' in appointment.pets) {
+        
+    // Now we know it's a valid pet object 
+    const petData = appointment.pets as AppointmentPetResponse;
+    
+    pet = {
+      id: petData.id,
+      name: petData.name,
+      species: petData.species,
+      breed: petData.breed,
+      sex: petData.sex,
+      date_of_birth: petData.date_of_birth,
+      profile_picture_url: petData.profile_picture_url,
+      owner_id: appointment.owner_id || '',
+      created_at: ''
+    };
+  }
   
   return (
     <LayoutBase

@@ -42,16 +42,17 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
 
     // Format the appointments with pet names and formatted times
     return data.map(appointment => {
-      // Safe access to pet name with proper null checks
-      let petName = 'Mascota'; // Default value
+      // Default pet name if no pet data is available
+      let petName = 'Mascota';
       
+      // Safely access pet name with thorough null checking
       if (appointment.pets && 
           typeof appointment.pets === 'object' && 
-          appointment.pets !== null) {
-        
-        if ('name' in appointment.pets && appointment.pets.name) {
-          petName = appointment.pets.name;
-        }
+          appointment.pets !== null &&
+          !('error' in appointment.pets) && 
+          'name' in appointment.pets && 
+          appointment.pets.name) {
+        petName = appointment.pets.name;
       }
       
       return {
@@ -94,16 +95,17 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
 
     // Format the appointments with pet names and formatted times
     return data.map(appointment => {
-      // Safe access to pet name with proper null checks
-      let petName = 'Mascota'; // Default value
+      // Default pet name if no pet data is available
+      let petName = 'Mascota';
       
+      // Safely access pet name with thorough null checking
       if (appointment.pets && 
           typeof appointment.pets === 'object' && 
-          appointment.pets !== null) {
-        
-        if ('name' in appointment.pets && appointment.pets.name) {
-          petName = appointment.pets.name;
-        }
+          appointment.pets !== null &&
+          !('error' in appointment.pets) && 
+          'name' in appointment.pets && 
+          appointment.pets.name) {
+        petName = appointment.pets.name;
       }
       
       return {

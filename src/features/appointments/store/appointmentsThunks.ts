@@ -1,4 +1,3 @@
-
 import { AppDispatch } from '../../../state/store';
 import { appointmentsActions } from './appointmentsSlice';
 import { 
@@ -17,6 +16,7 @@ import {
   AppointmentFilters
 } from '../types';
 import { QueryOptions } from '../../../core/api/apiClient';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 
 /**
  * Fetch all appointments with optional filtering
@@ -113,7 +113,7 @@ export const cancelExistingAppointment = (id: string) => async (dispatch: AppDis
     if (error) throw new Error(error.message || 'Failed to cancel appointment');
     if (!data) throw new Error('Appointment cancellation returned no data');
     
-    dispatch(appointmentsActions.updateAppointmentSuccess({ ...data, status: 'cancelled' }));
+    dispatch(appointmentsActions.updateAppointmentSuccess({ ...data, status: APPOINTMENT_STATUS.CANCELLED }));
     return data;
   } catch (err) {
     dispatch(appointmentsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));

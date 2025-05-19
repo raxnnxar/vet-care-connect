@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
@@ -13,6 +13,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
+
+interface AppointmentPetResponse {
+  id: string;
+  name: string;
+  species: string;
+  breed?: string;
+  sex?: string;
+  date_of_birth?: string;
+  profile_picture_url?: string;
+}
 
 const AppointmentDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +38,7 @@ const AppointmentDetailScreen: React.FC = () => {
         .from('appointments')
         .select(`
           *,
-          pets:pet_id(*)
+          pets:pet_id(id, name, species, breed, sex, date_of_birth, profile_picture_url)
         `)
         .eq('id', id)
         .single();
@@ -100,13 +110,30 @@ const AppointmentDetailScreen: React.FC = () => {
     ? format(new Date(appointmentDetails.appointment_date), 'HH:mm')
     : '';
 
-  // Use type assertion with null check and optional chaining
-  const hasPet = appointmentDetails.pets && 
-                typeof appointmentDetails.pets === 'object' && 
-                appointmentDetails.pets !== null && 
-                !('error' in appointmentDetails.pets);
-                
-  const pet = hasPet ? (appointmentDetails.pets as Pet) : null;
+  // Transform pet data safely to a Pet object only when valid
+  let pet: Pet | null = null;
+  
+  if (appointmentDetails.pets && 
+      typeof appointmentDetails.pets === 'object' && 
+      appointmentDetails.pets !== null &&
+      !('error' in appointmentDetails.pets) &&
+      'id' in appointmentDetails.pets) {
+        
+    // Now we know it's a valid pet object 
+    const petData = appointmentDetails.pets as AppointmentPetResponse;
+    
+    pet = {
+      id: petData.id,
+      name: petData.name,
+      species: petData.species,
+      breed: petData.breed,
+      sex: petData.sex,
+      date_of_birth: petData.date_of_birth,
+      profile_picture_url: petData.profile_picture_url,
+      owner_id: appointmentDetails.owner_id || '',
+      created_at: ''
+    };
+  }
 
   return (
     <LayoutBase

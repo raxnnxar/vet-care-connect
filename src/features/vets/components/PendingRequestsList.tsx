@@ -47,16 +47,17 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       }
       
       return data.map(appointment => {
-        // Safe access to pet name with proper null checks
-        let petName = 'Mascota'; // Default value
+        // Default pet name
+        let petName = 'Mascota';
         
+        // Safely access pet name with thorough null checking
         if (appointment.pets && 
             typeof appointment.pets === 'object' && 
-            appointment.pets !== null) {
-          
-          if ('name' in appointment.pets && appointment.pets.name) {
-            petName = appointment.pets.name;
-          }
+            appointment.pets !== null &&
+            !('error' in appointment.pets) && 
+            'name' in appointment.pets && 
+            appointment.pets.name) {
+          petName = appointment.pets.name;
         }
         
         return {
