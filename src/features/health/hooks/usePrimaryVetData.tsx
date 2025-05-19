@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
 import { getPrimaryVet } from '../services/primaryVetService';
+import { Json } from '@/integrations/supabase/types';
 
 interface PrimaryVetData {
   id: string;
@@ -41,10 +42,11 @@ export const usePrimaryVetData = () => {
             ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`.trim()
             : `Dr. ${vetData.id.substring(0, 5)}`;
           
-          // Parse specialization
+          // Parse specialization - ensure it's converted to string
           let specialization = 'Medicina General';
           if (vetData.specialization && Array.isArray(vetData.specialization) && vetData.specialization.length > 0) {
-            specialization = vetData.specialization[0];
+            // Convert the first element to string regardless of its type
+            specialization = String(vetData.specialization[0]);
           }
           
           setPrimaryVet({
