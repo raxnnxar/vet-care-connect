@@ -33,10 +33,12 @@ export type PetGenderType = (typeof PET_GENDER)[keyof typeof PET_GENDER];
 
 // Appointment Constants
 export const APPOINTMENT_STATUS = {
-  PENDING: 'pending',
-  CONFIRMED: 'confirmed',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled'
+  PENDING: 'pendiente',
+  CONFIRMED: 'programada',
+  COMPLETED: 'completada',
+  CANCELLED: 'cancelada',
+  RESCHEDULED: 'reprogramada',
+  NO_SHOW: 'no_asistió'
 } as const;
 
 export type AppointmentStatusType = (typeof APPOINTMENT_STATUS)[keyof typeof APPOINTMENT_STATUS];
@@ -76,4 +78,3 @@ export const ERROR_MESSAGES = {
     INVALID_EMAIL: 'Por favor, introduce un correo electrónico válido.'
   }
 };
-

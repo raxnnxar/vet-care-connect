@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 
 interface PendingRequest {
   id: string;
@@ -38,29 +39,37 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           pets:pet_id(id, name)
         `)
         .eq('provider_id', user.user.id)
-        .eq('status', 'pendiente');
+        .eq('status', APPOINTMENT_STATUS.PENDING);
       
       if (error) {
         console.error('Error fetching pending requests:', error);
         throw error;
       }
       
-      return data.map(appointment => ({
-        id: appointment.id,
-        petName: appointment.pets && 
-                 appointment.pets !== null && 
-                 typeof appointment.pets === 'object' && 
-                 'name' in appointment.pets &&
-                 appointment.pets.name ? 
-          appointment.pets.name : 
-          'Mascota',
-        time: appointment.appointment_date ? 
-          new Date(appointment.appointment_date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : 
-          'Hora no especificada',
-        date: appointment.appointment_date ? 
-          new Date(appointment.appointment_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : 
-          'Fecha no especificada'
-      }));
+      return data.map(appointment => {
+        // Safe access to pet name with proper null checks
+        let petName = 'Mascota'; // Default value
+        
+        if (appointment.pets && 
+            typeof appointment.pets === 'object' && 
+            appointment.pets !== null) {
+          
+          if ('name' in appointment.pets && appointment.pets.name) {
+            petName = appointment.pets.name;
+          }
+        }
+        
+        return {
+          id: appointment.id,
+          petName,
+          time: appointment.appointment_date ? 
+            new Date(appointment.appointment_date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : 
+            'Hora no especificada',
+          date: appointment.appointment_date ? 
+            new Date(appointment.appointment_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : 
+            'Fecha no especificada'
+        };
+      });
     },
     initialData: initialRequests
   });
@@ -73,7 +82,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: 'programada' })
+        .update({ status: APPOINTMENT_STATUS.CONFIRMED })
         .eq('id', requestId)
         .select();
       
@@ -98,7 +107,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: 'cancelada' })
+        .update({ status: APPOINTMENT_STATUS.CANCELLED })
         .eq('id', requestId)
         .select();
       

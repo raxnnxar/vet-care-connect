@@ -100,13 +100,13 @@ const AppointmentDetailScreen: React.FC = () => {
     ? format(new Date(appointmentDetails.appointment_date), 'HH:mm')
     : '';
 
-  // Use type assertion with null check
-  const pet = appointmentDetails.pets && 
-              appointmentDetails.pets !== null && 
-              typeof appointmentDetails.pets === 'object' && 
-              !('error' in appointmentDetails.pets) 
-    ? appointmentDetails.pets as Pet 
-    : null;
+  // Use type assertion with null check and optional chaining
+  const hasPet = appointmentDetails.pets && 
+                typeof appointmentDetails.pets === 'object' && 
+                appointmentDetails.pets !== null && 
+                !('error' in appointmentDetails.pets);
+                
+  const pet = hasPet ? (appointmentDetails.pets as Pet) : null;
 
   return (
     <LayoutBase

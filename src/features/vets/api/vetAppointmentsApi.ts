@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO } from 'date-fns';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 
 export interface Appointment {
   id: string;
@@ -40,19 +41,27 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
     }
 
     // Format the appointments with pet names and formatted times
-    return data.map(appointment => ({
-      ...appointment,
-      petName: appointment.pets && 
-               typeof appointment.pets === 'object' && 
-               appointment.pets !== null &&
-               'name' in appointment.pets &&
-               appointment.pets.name ? 
-        appointment.pets.name : 
-        'Mascota',
-      time: appointment.appointment_date ? 
-        format(parseISO(appointment.appointment_date), 'h:mm a') : 
-        'Hora no especificada'
-    }));
+    return data.map(appointment => {
+      // Safe access to pet name with proper null checks
+      let petName = 'Mascota'; // Default value
+      
+      if (appointment.pets && 
+          typeof appointment.pets === 'object' && 
+          appointment.pets !== null) {
+        
+        if ('name' in appointment.pets && appointment.pets.name) {
+          petName = appointment.pets.name;
+        }
+      }
+      
+      return {
+        ...appointment,
+        petName,
+        time: appointment.appointment_date ? 
+          format(parseISO(appointment.appointment_date), 'h:mm a') : 
+          'Hora no especificada'
+      };
+    });
   } catch (err) {
     console.error('Unexpected error in getVetAppointments:', err);
     return [];
@@ -84,19 +93,27 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
     }
 
     // Format the appointments with pet names and formatted times
-    return data.map(appointment => ({
-      ...appointment,
-      petName: appointment.pets && 
-               typeof appointment.pets === 'object' && 
-               appointment.pets !== null &&
-               'name' in appointment.pets &&
-               appointment.pets.name ? 
-        appointment.pets.name : 
-        'Mascota',
-      time: appointment.appointment_date ? 
-        format(parseISO(appointment.appointment_date), 'h:mm a') : 
-        'Hora no especificada'
-    }));
+    return data.map(appointment => {
+      // Safe access to pet name with proper null checks
+      let petName = 'Mascota'; // Default value
+      
+      if (appointment.pets && 
+          typeof appointment.pets === 'object' && 
+          appointment.pets !== null) {
+        
+        if ('name' in appointment.pets && appointment.pets.name) {
+          petName = appointment.pets.name;
+        }
+      }
+      
+      return {
+        ...appointment,
+        petName,
+        time: appointment.appointment_date ? 
+          format(parseISO(appointment.appointment_date), 'h:mm a') : 
+          'Hora no especificada'
+      };
+    });
   } catch (err) {
     console.error('Unexpected error in getVetAppointmentsByDate:', err);
     return [];

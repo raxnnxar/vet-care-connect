@@ -140,12 +140,12 @@ const VetAppointmentDetailScreen: React.FC = () => {
   };
   
   // Use a more robust type guard to check if pets is valid
-  const pet = appointment.pets && 
-              appointment.pets !== null && 
-              typeof appointment.pets === 'object' && 
-              !('error' in appointment.pets) 
-    ? appointment.pets as Pet 
-    : null;
+  const hasPet = appointment.pets && 
+                typeof appointment.pets === 'object' && 
+                appointment.pets !== null && 
+                !('error' in appointment.pets);
+                
+  const pet = hasPet ? (appointment.pets as Pet) : null;
   
   return (
     <LayoutBase
