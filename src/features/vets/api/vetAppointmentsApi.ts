@@ -22,6 +22,12 @@ export interface Appointment {
   time?: string;
 }
 
+interface PetData {
+  id: string;
+  name: string;
+  // Add other pet fields if needed
+}
+
 /**
  * Fetches all appointments for a specific veterinarian
  */
@@ -47,14 +53,11 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
       
       // First check if pets exists and is an object
       if (appointment.pets && typeof appointment.pets === 'object') {
-        const petsData = appointment.pets;
+        // Use type assertion after validating object exists
+        const petsData = appointment.pets as PetData;
         
-        // Then check if it's not null, not an error object, and has a name property
-        if (petsData && 
-            !('error' in petsData) && 
-            'name' in petsData && 
-            petsData.name && 
-            typeof petsData.name === 'string') {
+        // Then check if it has a name property that's a string
+        if ('name' in petsData && typeof petsData.name === 'string') {
           petName = petsData.name;
         }
       }
@@ -104,14 +107,11 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
       
       // First check if pets exists and is an object
       if (appointment.pets && typeof appointment.pets === 'object') {
-        const petsData = appointment.pets;
+        // Use type assertion after validating object exists
+        const petsData = appointment.pets as PetData;
         
-        // Then check if it's not null, not an error object, and has a name property
-        if (petsData && 
-            !('error' in petsData) && 
-            'name' in petsData && 
-            petsData.name && 
-            typeof petsData.name === 'string') {
+        // Then check if it has a name property that's a string
+        if ('name' in petsData && typeof petsData.name === 'string') {
           petName = petsData.name;
         }
       }

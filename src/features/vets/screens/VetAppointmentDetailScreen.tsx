@@ -156,26 +156,19 @@ const VetAppointmentDetailScreen: React.FC = () => {
   if (appointment.pets && 
       typeof appointment.pets === 'object') {
     
-    // Additional null check before accessing nested properties
-    const petsData = appointment.pets;
+    // Type assertion after validation
+    const petsData = appointment.pets as AppointmentPetResponse;
     
-    // Check if it's a valid pet object and not an error
-    if (petsData && 
-        !('error' in petsData) && 
-        'id' in petsData && 
-        petsData.id) {
-        
-      // Type assertion after validation
-      const petData = petsData as AppointmentPetResponse;
-      
+    // Check if it's a valid pet object with required properties
+    if ('id' in petsData && petsData.id) {
       pet = {
-        id: petData.id,
-        name: petData.name,
-        species: petData.species,
-        breed: petData.breed,
-        sex: petData.sex,
-        date_of_birth: petData.date_of_birth,
-        profile_picture_url: petData.profile_picture_url,
+        id: petsData.id,
+        name: petsData.name,
+        species: petsData.species,
+        breed: petsData.breed,
+        sex: petsData.sex,
+        date_of_birth: petsData.date_of_birth,
+        profile_picture_url: petsData.profile_picture_url,
         owner_id: appointment.owner_id || '',
         created_at: ''
       };

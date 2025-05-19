@@ -41,7 +41,8 @@ export const APPOINTMENT_STATUS = {
   NO_SHOW: 'no_asistió'
 } as const;
 
-export type AppointmentStatusType = (typeof APPOINTMENT_STATUS)[keyof typeof APPOINTMENT_STATUS];
+// Ensure we include string literal type for the appointment status constants
+export type AppointmentStatusType = typeof APPOINTMENT_STATUS[keyof typeof APPOINTMENT_STATUS];
 
 export const APPOINTMENT_TYPES = {
   CHECK_UP: 'check_up',

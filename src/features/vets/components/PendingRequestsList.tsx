@@ -20,6 +20,12 @@ interface PendingRequestsListProps {
   requests: PendingRequest[];
 }
 
+interface PetData {
+  id: string;
+  name: string;
+  // Add other pet fields if needed
+}
+
 const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: initialRequests }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -39,7 +45,8 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           pets:pet_id(id, name)
         `)
         .eq('provider_id', user.user.id)
-        .eq('status', APPOINTMENT_STATUS.PENDING as string);
+        // Use type assertion to match the expected status type
+        .eq('status', APPOINTMENT_STATUS.PENDING);
       
       if (error) {
         console.error('Error fetching pending requests:', error);
@@ -52,14 +59,11 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
         
         // First check if pets exists and is an object
         if (appointment.pets && typeof appointment.pets === 'object') {
-          const petsData = appointment.pets;
+          // Use type assertion after validating object exists
+          const petsData = appointment.pets as PetData;
           
-          // Then check if it's not null, not an error object, and has a name property
-          if (petsData && 
-              !('error' in petsData) && 
-              'name' in petsData && 
-              petsData.name && 
-              typeof petsData.name === 'string') {
+          // Then check if it has a name property that's a string
+          if ('name' in petsData && typeof petsData.name === 'string') {
             petName = petsData.name;
           }
         }
