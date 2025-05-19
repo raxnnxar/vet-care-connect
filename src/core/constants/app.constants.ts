@@ -41,7 +41,7 @@ export const APPOINTMENT_STATUS = {
   NO_SHOW: 'no_asistió'
 } as const;
 
-// Ensure we include string literal type for the appointment status constants
+// This will create a type that includes all values from the APPOINTMENT_STATUS object
 export type AppointmentStatusType = typeof APPOINTMENT_STATUS[keyof typeof APPOINTMENT_STATUS];
 
 export const APPOINTMENT_TYPES = {
