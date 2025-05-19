@@ -10,6 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/molecules/tabs';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Separator } from '@/ui/atoms/separator';
+import PetSelectionStep from '@/features/pets/components/PetSelectionStep';
+import { Pet } from '@/features/pets/types';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 
 const BookAppointmentScreen: React.FC = () => {
   const { vetId } = useParams<{ vetId: string }>();
@@ -17,9 +21,11 @@ const BookAppointmentScreen: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [veterinarian, setVeterinarian] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const fetchVetDetails = async () => {
@@ -61,7 +67,7 @@ const BookAppointmentScreen: React.FC = () => {
   };
 
   const handleContinue = () => {
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     } else {
       // Here would be API call to book appointment
@@ -106,8 +112,8 @@ const BookAppointmentScreen: React.FC = () => {
         {/* Steps indicator */}
         <div className="mb-6">
           <div className="flex justify-between mb-2">
-            {[1, 2, 3].map((step) => (
-              <div key={step} className="flex flex-col items-center w-1/3">
+            {[1, 2, 3, 4].map((step) => (
+              <div key={step} className="flex flex-col items-center w-1/4">
                 <div 
                   className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 
                     ${currentStep === step 
@@ -119,7 +125,7 @@ const BookAppointmentScreen: React.FC = () => {
                   {currentStep > step ? <Check size={16} /> : step}
                 </div>
                 <span className="text-xs text-center">
-                  {step === 1 ? 'Servicio' : step === 2 ? 'Fecha y Hora' : 'Confirmar'}
+                  {step === 1 ? 'Mascota' : step === 2 ? 'Servicio' : step === 3 ? 'Fecha y Hora' : 'Confirmar'}
                 </span>
               </div>
             ))}
@@ -127,7 +133,7 @@ const BookAppointmentScreen: React.FC = () => {
           <div className="h-1 bg-gray-200 relative">
             <div 
               className="absolute h-full bg-[#79D0B8] transition-all duration-300"
-              style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
+              style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
             ></div>
           </div>
         </div>
@@ -147,6 +153,13 @@ const BookAppointmentScreen: React.FC = () => {
             ) : (
               <>
                 {currentStep === 1 && (
+                  <PetSelectionStep 
+                    selectedPet={selectedPet} 
+                    onPetSelect={setSelectedPet}
+                  />
+                )}
+                
+                {currentStep === 2 && (
                   <>
                     <h3 className="font-medium text-gray-700 mb-4">Selecciona un servicio</h3>
                     <div className="space-y-3">
@@ -187,7 +200,7 @@ const BookAppointmentScreen: React.FC = () => {
                   </>
                 )}
                 
-                {currentStep === 2 && (
+                {currentStep === 3 && (
                   <>
                     <h3 className="font-medium text-gray-700 mb-4">Selecciona fecha y hora</h3>
                     <Tabs defaultValue="calendar" className="w-full">
@@ -243,11 +256,20 @@ const BookAppointmentScreen: React.FC = () => {
                   </>
                 )}
                 
-                {currentStep === 3 && (
+                {currentStep === 4 && (
                   <>
                     <h3 className="font-medium text-gray-700 mb-4">Confirma tu cita</h3>
                     
                     <div className="space-y-4">
+                      <div>
+                        <span className="text-sm text-gray-500">Mascota</span>
+                        {selectedPet && (
+                          <div className="font-medium">{selectedPet.name}</div>
+                        )}
+                      </div>
+                      
+                      <Separator />
+                      
                       <div>
                         <span className="text-sm text-gray-500">Servicio</span>
                         <div className="font-medium">{selectedService?.name}</div>
@@ -296,11 +318,12 @@ const BookAppointmentScreen: React.FC = () => {
             className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
             onClick={handleContinue}
             disabled={
-              (currentStep === 1 && !selectedService) || 
-              (currentStep === 2 && (!selectedDate || !selectedTime))
+              (currentStep === 1 && !selectedPet) || 
+              (currentStep === 2 && !selectedService) || 
+              (currentStep === 3 && (!selectedDate || !selectedTime))
             }
           >
-            {currentStep === 3 ? 'Confirmar Cita' : 'Continuar'}
+            {currentStep === 4 ? 'Confirmar Cita' : 'Continuar'}
           </Button>
         </div>
       </div>
