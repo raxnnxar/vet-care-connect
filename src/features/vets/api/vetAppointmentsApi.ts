@@ -48,11 +48,14 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
       // Safely access pet name with thorough null checking
       if (appointment.pets && 
           typeof appointment.pets === 'object' && 
-          appointment.pets !== null &&
-          !('error' in appointment.pets) && 
-          'name' in appointment.pets && 
-          appointment.pets?.name) {
-        petName = appointment.pets.name as string;
+          appointment.pets !== null) {
+        
+        // Check if it's not an error object and has a name property
+        if (!('error' in appointment.pets) && 
+            'name' in appointment.pets && 
+            typeof appointment.pets.name === 'string') {
+          petName = appointment.pets.name;
+        }
       }
       
       return {
@@ -101,11 +104,14 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
       // Safely access pet name with thorough null checking
       if (appointment.pets && 
           typeof appointment.pets === 'object' && 
-          appointment.pets !== null &&
-          !('error' in appointment.pets) && 
-          'name' in appointment.pets && 
-          appointment.pets?.name) {
-        petName = appointment.pets.name as string;
+          appointment.pets !== null) {
+        
+        // Check if it's not an error object and has a name property
+        if (!('error' in appointment.pets) && 
+            'name' in appointment.pets && 
+            typeof appointment.pets.name === 'string') {
+          petName = appointment.pets.name;
+        }
       }
       
       return {

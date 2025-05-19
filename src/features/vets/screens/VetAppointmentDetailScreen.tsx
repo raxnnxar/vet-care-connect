@@ -158,7 +158,7 @@ const VetAppointmentDetailScreen: React.FC = () => {
       !('error' in appointment.pets) &&
       'id' in appointment.pets) {
         
-    // Now we know it's a valid pet object 
+    // Type assertion after validation
     const petData = appointment.pets as AppointmentPetResponse;
     
     pet = {
