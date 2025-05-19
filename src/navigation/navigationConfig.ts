@@ -9,7 +9,8 @@ export const VET_ROUTES = {
   PROFILE: '/profile',
   SETTINGS: '/settings',
   PATIENTS: '/patients',
-  SCHEDULE: '/schedule'
+  SCHEDULE: '/schedule',
+  REVIEW: '/review/:id'
 };
 
 export type VetRouteType = keyof typeof VET_ROUTES;
