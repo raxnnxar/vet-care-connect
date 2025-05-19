@@ -12,14 +12,6 @@ import { Alert, AlertTitle, AlertDescription } from '@/ui/molecules/alert';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 
-// Fallback primary vet data when no primary vet is selected
-const fallbackPrimaryVet = {
-  id: 'select-primary-vet',
-  name: 'Veterinario de Cabecera',
-  specialization: 'Selecciona tu veterinario de confianza',
-  imageUrl: '',
-};
-
 const SaludScreen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('veterinarios');
@@ -40,12 +32,14 @@ const SaludScreen = () => {
     navigate(`/owner/vets/${vetId}`);
   };
 
+  const handleFindVetsClick = () => {
+    console.log('Navigate to find vets screen');
+    navigate('/owner/find-vets');
+  };
+
   const handleRetry = () => {
     window.location.reload();
   };
-
-  // Determine which primary vet to show
-  const primaryVetToShow = primaryVet || fallbackPrimaryVet;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
@@ -62,8 +56,9 @@ const SaludScreen = () => {
           </Alert>
         ) : (
           <PrimaryVet 
-            vet={primaryVetToShow} 
-            onScheduleClick={handleScheduleClick} 
+            vet={primaryVet} 
+            onScheduleClick={handleScheduleClick}
+            onFindVetsClick={handleFindVetsClick}
             loading={loadingPrimaryVet}
           />
         )}
