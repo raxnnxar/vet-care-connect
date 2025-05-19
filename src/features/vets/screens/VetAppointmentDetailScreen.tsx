@@ -162,7 +162,8 @@ const VetAppointmentDetailScreen: React.FC = () => {
     // Check if it's a valid pet object and not an error
     if (petsData !== null && 
         !('error' in petsData) && 
-        'id' in petsData) {
+        'id' in petsData && 
+        petsData.id) {
         
       // Type assertion after validation
       const petData = petsData as AppointmentPetResponse;

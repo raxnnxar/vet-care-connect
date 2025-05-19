@@ -58,6 +58,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           if (petsData !== null && 
               !('error' in petsData) && 
               'name' in petsData && 
+              petsData.name && 
               typeof petsData.name === 'string') {
             petName = petsData.name;
           }

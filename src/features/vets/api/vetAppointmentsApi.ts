@@ -53,6 +53,7 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
         if (petsData !== null && 
             !('error' in petsData) && 
             'name' in petsData && 
+            petsData.name && 
             typeof petsData.name === 'string') {
           petName = petsData.name;
         }
@@ -109,6 +110,7 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
         if (petsData !== null && 
             !('error' in petsData) && 
             'name' in petsData && 
+            petsData.name && 
             typeof petsData.name === 'string') {
           petName = petsData.name;
         }
