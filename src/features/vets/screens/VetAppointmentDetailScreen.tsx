@@ -11,6 +11,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Badge } from '@/ui/atoms/badge';
 import { toast } from 'sonner';
+import { Pet } from '@/features/pets/types';
 
 const getStatusBadge = (status: string | null) => {
   const statusConfig: Record<string, { color: string, text: string }> = {
@@ -138,9 +139,12 @@ const VetAppointmentDetailScreen: React.FC = () => {
     }
   };
   
-  // Use a type guard to check if pets is valid before accessing its properties
-  const pet = appointment.pets && typeof appointment.pets === 'object' && !('error' in appointment.pets) 
-    ? appointment.pets 
+  // Use a more robust type guard to check if pets is valid
+  const pet = appointment.pets && 
+              appointment.pets !== null && 
+              typeof appointment.pets === 'object' && 
+              !('error' in appointment.pets) 
+    ? appointment.pets as Pet 
     : null;
   
   return (
