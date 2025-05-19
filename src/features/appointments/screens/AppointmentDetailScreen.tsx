@@ -121,7 +121,7 @@ const AppointmentDetailScreen: React.FC = () => {
     const petsData = appointmentDetails.pets;
     
     // Check if it's a valid pet object and not an error
-    if (petsData !== null && 
+    if (petsData && 
         !('error' in petsData) && 
         'id' in petsData && 
         petsData.id) {

@@ -50,7 +50,7 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
         const petsData = appointment.pets;
         
         // Then check if it's not null, not an error object, and has a name property
-        if (petsData !== null && 
+        if (petsData && 
             !('error' in petsData) && 
             'name' in petsData && 
             petsData.name && 
@@ -107,7 +107,7 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
         const petsData = appointment.pets;
         
         // Then check if it's not null, not an error object, and has a name property
-        if (petsData !== null && 
+        if (petsData && 
             !('error' in petsData) && 
             'name' in petsData && 
             petsData.name && 

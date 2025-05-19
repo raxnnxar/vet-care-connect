@@ -160,7 +160,7 @@ const VetAppointmentDetailScreen: React.FC = () => {
     const petsData = appointment.pets;
     
     // Check if it's a valid pet object and not an error
-    if (petsData !== null && 
+    if (petsData && 
         !('error' in petsData) && 
         'id' in petsData && 
         petsData.id) {
@@ -236,7 +236,7 @@ const VetAppointmentDetailScreen: React.FC = () => {
                   <Cat size={32} className="text-[#4DA6A8]" />
                 </div>
                 <div className="ml-3">
-                  <p className="font-medium text-lg">{pet.name}</p>
+                  <p className="font-semibold text-lg">{pet.name}</p>
                   <p className="text-gray-500">
                     {pet.species}
                     {pet.breed ? ` - ${pet.breed}` : ''}
