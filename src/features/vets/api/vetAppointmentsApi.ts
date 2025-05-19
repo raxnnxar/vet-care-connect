@@ -45,16 +45,16 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
       // Default pet name if no pet data is available
       let petName = 'Mascota';
       
-      // Safely access pet name with thorough null checking
-      if (appointment.pets && 
-          typeof appointment.pets === 'object' && 
-          appointment.pets !== null) {
+      // First check if pets exists and is an object
+      if (appointment.pets && typeof appointment.pets === 'object') {
+        const petsData = appointment.pets;
         
-        // Check if it's not an error object and has a name property
-        if (!('error' in appointment.pets) && 
-            'name' in appointment.pets && 
-            typeof appointment.pets.name === 'string') {
-          petName = appointment.pets.name;
+        // Then check if it's not null, not an error object, and has a name property
+        if (petsData !== null && 
+            !('error' in petsData) && 
+            'name' in petsData && 
+            typeof petsData.name === 'string') {
+          petName = petsData.name;
         }
       }
       
@@ -101,16 +101,16 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
       // Default pet name if no pet data is available
       let petName = 'Mascota';
       
-      // Safely access pet name with thorough null checking
-      if (appointment.pets && 
-          typeof appointment.pets === 'object' && 
-          appointment.pets !== null) {
+      // First check if pets exists and is an object
+      if (appointment.pets && typeof appointment.pets === 'object') {
+        const petsData = appointment.pets;
         
-        // Check if it's not an error object and has a name property
-        if (!('error' in appointment.pets) && 
-            'name' in appointment.pets && 
-            typeof appointment.pets.name === 'string') {
-          petName = appointment.pets.name;
+        // Then check if it's not null, not an error object, and has a name property
+        if (petsData !== null && 
+            !('error' in petsData) && 
+            'name' in petsData && 
+            typeof petsData.name === 'string') {
+          petName = petsData.name;
         }
       }
       

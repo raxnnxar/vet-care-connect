@@ -113,26 +113,33 @@ const AppointmentDetailScreen: React.FC = () => {
   // Transform pet data safely to a Pet object only when valid
   let pet: Pet | null = null;
   
+  // Use null check before accessing properties
   if (appointmentDetails.pets && 
-      typeof appointmentDetails.pets === 'object' && 
-      appointmentDetails.pets !== null &&
-      !('error' in appointmentDetails.pets) &&
-      'id' in appointmentDetails.pets) {
-        
-    // Type assertion after validation
-    const petData = appointmentDetails.pets as AppointmentPetResponse;
+      typeof appointmentDetails.pets === 'object') {
     
-    pet = {
-      id: petData.id,
-      name: petData.name,
-      species: petData.species,
-      breed: petData.breed,
-      sex: petData.sex,
-      date_of_birth: petData.date_of_birth,
-      profile_picture_url: petData.profile_picture_url,
-      owner_id: appointmentDetails.owner_id || '',
-      created_at: ''
-    };
+    // Additional null check before accessing nested properties
+    const petsData = appointmentDetails.pets;
+    
+    // Check if it's a valid pet object and not an error
+    if (petsData !== null && 
+        !('error' in petsData) && 
+        'id' in petsData) {
+        
+      // Type assertion after validation
+      const petData = petsData as AppointmentPetResponse;
+      
+      pet = {
+        id: petData.id,
+        name: petData.name,
+        species: petData.species,
+        breed: petData.breed,
+        sex: petData.sex,
+        date_of_birth: petData.date_of_birth,
+        profile_picture_url: petData.profile_picture_url,
+        owner_id: appointmentDetails.owner_id || '',
+        created_at: ''
+      };
+    }
   }
 
   return (
