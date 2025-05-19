@@ -191,18 +191,21 @@ export type Database = {
           address: string | null
           id: string
           phone_number: string | null
+          primary_vet_id: string | null
           profile_picture_url: string | null
         }
         Insert: {
           address?: string | null
           id: string
           phone_number?: string | null
+          primary_vet_id?: string | null
           profile_picture_url?: string | null
         }
         Update: {
           address?: string | null
           id?: string
           phone_number?: string | null
+          primary_vet_id?: string | null
           profile_picture_url?: string | null
         }
         Relationships: [
@@ -211,6 +214,13 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_owners_primary_vet_id_fkey"
+            columns: ["primary_vet_id"]
+            isOneToOne: false
+            referencedRelation: "veterinarians"
             referencedColumns: ["id"]
           },
         ]

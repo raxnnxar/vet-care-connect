@@ -14,9 +14,10 @@ interface VetData {
 interface PrimaryVetProps {
   vet: VetData;
   onScheduleClick: (vetId: string) => void;
+  loading?: boolean;
 }
 
-const PrimaryVet: React.FC<PrimaryVetProps> = ({ vet, onScheduleClick }) => {
+const PrimaryVet: React.FC<PrimaryVetProps> = ({ vet, onScheduleClick, loading = false }) => {
   return (
     <div>
       <h2 className="text-lg font-medium mb-3 text-[#1F2937]">
@@ -40,6 +41,7 @@ const PrimaryVet: React.FC<PrimaryVetProps> = ({ vet, onScheduleClick }) => {
             onClick={() => onScheduleClick(vet.id)}
             className="mt-3 bg-[#79D0B8] hover:bg-[#4DA6A8] text-white shadow-md transition-all duration-200 rounded-lg font-medium"
             size="sm"
+            disabled={loading}
           >
             Agendar
           </Button>

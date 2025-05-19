@@ -8,7 +8,11 @@ import VetAppointmentDetailScreen from '@/features/vets/screens/VetAppointmentDe
 import VetProfileScreen from '@/features/vets/screens/VetProfileScreen';
 import VetScheduleScreen from '@/features/vets/screens/VetScheduleScreen';
 
-const UnderConstructionPage = ({ title }: { title: string }) => (
+interface UnderConstructionPageProps {
+  title: string;
+}
+
+const UnderConstructionPage: React.FC<UnderConstructionPageProps> = ({ title }) => (
   <LayoutBase
     header={
       <div className="flex justify-between items-center px-4 py-3 bg-[#79D0B8]">

@@ -6,24 +6,25 @@ import SaludHeader from '../components/SaludHeader';
 import PrimaryVet from '../components/PrimaryVet';
 import VetTabs from '../components/VetTabs';
 import { useVeterinariansData } from '../hooks/useVeterinariansData';
+import { usePrimaryVetData } from '../hooks/usePrimaryVetData';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
 import { Alert, AlertTitle, AlertDescription } from '@/ui/molecules/alert';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 
-// Temporary mock data for primary vet until we implement the functionality
-// to select a primary vet
-const primaryVet = {
-  id: 'primary-vet',
+// Fallback primary vet data when no primary vet is selected
+const fallbackPrimaryVet = {
+  id: 'select-primary-vet',
   name: 'Veterinario de Cabecera',
   specialization: 'Selecciona tu veterinario de confianza',
-  imageUrl: 'https://randomuser.me/api/portraits/women/10.jpg',
+  imageUrl: '',
 };
 
 const SaludScreen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('veterinarios');
-  const { vets, loading, error } = useVeterinariansData();
+  const { vets, loading: loadingVets, error: vetsError } = useVeterinariansData();
+  const { primaryVet, loading: loadingPrimaryVet, error: primaryVetError } = usePrimaryVetData();
   
   const handleBackClick = () => {
     navigate('/owner');
@@ -43,20 +44,38 @@ const SaludScreen = () => {
     window.location.reload();
   };
 
+  // Determine which primary vet to show
+  const primaryVetToShow = primaryVet || fallbackPrimaryVet;
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
       <SaludHeader onBackClick={handleBackClick} />
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
-        <PrimaryVet vet={primaryVet} onScheduleClick={handleScheduleClick} />
+        {/* Primary Vet Section */}
+        {primaryVetError ? (
+          <Alert variant="destructive" className="bg-red-50 rounded-md border border-red-200">
+            <AlertTitle className="text-red-700 font-medium">Error</AlertTitle>
+            <AlertDescription className="text-red-600">
+              No se pudo cargar el veterinario de cabecera
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <PrimaryVet 
+            vet={primaryVetToShow} 
+            onScheduleClick={handleScheduleClick} 
+            loading={loadingPrimaryVet}
+          />
+        )}
         
-        {loading ? (
+        {/* Vets List Section */}
+        {loadingVets ? (
           <div className="flex justify-center items-center py-10">
             <LoadingSpinner />
           </div>
-        ) : error ? (
+        ) : vetsError ? (
           <Alert variant="destructive" className="bg-red-50 rounded-md border border-red-200">
-            <AlertTitle className="text-red-700 font-medium">{error}</AlertTitle>
+            <AlertTitle className="text-red-700 font-medium">{vetsError}</AlertTitle>
             <AlertDescription className="mt-2 flex justify-between items-center">
               <span className="text-red-600">Ocurrió un error al cargar los veterinarios.</span>
               <Button 

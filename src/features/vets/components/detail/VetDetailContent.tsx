@@ -124,9 +124,10 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
           <VetContactSection email={data.service_providers?.profiles?.email} />
         </div>
         
-        {/* Action Buttons - now only has Book Appointment */}
+        {/* Action Buttons */}
         <VetActionButtons 
           onBookAppointment={onBookAppointment}
+          vetId={data.id}
         />
 
         {/* Reviews Dialog */}
