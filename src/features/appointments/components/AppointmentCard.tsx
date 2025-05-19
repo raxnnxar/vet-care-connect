@@ -3,7 +3,8 @@ import { Calendar, Clock, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Card } from '@/ui/molecules/card';
-import { Badge } from '@/ui/atoms/badge';
+import { AppointmentStatusBadge } from './AppointmentStatusBadge';
+import { AppointmentStatusType } from '@/core/constants/app.constants';
 
 interface AppointmentCardProps {
   appointment: {
@@ -12,7 +13,7 @@ interface AppointmentCardProps {
     appointment_date: string;
     clinic_name?: string;
     location?: string;
-    status: string;
+    status: AppointmentStatusType;
     pets?: {
       name: string;
       id: string;
@@ -21,17 +22,6 @@ interface AppointmentCardProps {
   };
   onClick: (id: string) => void;
 }
-
-const getStatusConfig = (status: string) => {
-  const statusConfig = {
-    confirmed: { className: 'bg-green-100 text-green-800', text: 'Confirmada' },
-    pending: { className: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' },
-    completed: { className: 'bg-blue-100 text-blue-800', text: 'Completada' },
-    cancelled: { className: 'bg-red-100 text-red-800', text: 'Cancelada' }
-  };
-  
-  return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-};
 
 const formatDate = (dateString: string) => {
   try {
@@ -43,8 +33,6 @@ const formatDate = (dateString: string) => {
 };
 
 export const AppointmentCard = ({ appointment, onClick }: AppointmentCardProps) => {
-  const statusConfig = getStatusConfig(appointment.status);
-  
   return (
     <Card 
       key={appointment.id} 
@@ -54,9 +42,7 @@ export const AppointmentCard = ({ appointment, onClick }: AppointmentCardProps) 
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium">{appointment.provider_name || 'Veterinario'}</h3>
-          <Badge className={statusConfig.className}>
-            {statusConfig.text}
-          </Badge>
+          <AppointmentStatusBadge status={appointment.status} />
         </div>
         
         <p className="text-sm text-gray-500 mb-1">

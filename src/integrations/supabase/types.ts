@@ -615,6 +615,7 @@ export type Database = {
         | "cancelada"
         | "reprogramada"
         | "no_asistió"
+        | "pendiente"
       payment_status: "pendiente" | "pagado" | "reembolsado" | "parcial"
     }
     CompositeTypes: {
@@ -737,6 +738,7 @@ export const Constants = {
         "cancelada",
         "reprogramada",
         "no_asistió",
+        "pendiente",
       ],
       payment_status: ["pendiente", "pagado", "reembolsado", "parcial"],
     },

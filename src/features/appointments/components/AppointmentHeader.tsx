@@ -2,29 +2,13 @@
 import React from 'react';
 import { formatDate } from '@/frontend/shared/utils/date';
 import { Calendar, Clock } from 'lucide-react';
-import { Badge } from '@/ui/atoms/badge';
-
-const getStatusBadge = (status: string | undefined) => {
-  const statusConfig = {
-    confirmed: { color: 'bg-green-100 text-green-800', text: 'Confirmada' },
-    pending: { color: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' },
-    completed: { color: 'bg-blue-100 text-blue-800', text: 'Completada' },
-    cancelled: { color: 'bg-red-100 text-red-800', text: 'Cancelada' }
-  };
-  
-  const config = status ? statusConfig[status as keyof typeof statusConfig] : statusConfig.pending;
-  
-  return (
-    <Badge variant="outline" className={`${config.color} border-0`}>
-      {config.text}
-    </Badge>
-  );
-};
+import { AppointmentStatusBadge } from './AppointmentStatusBadge';
+import { AppointmentStatusType } from '@/core/constants/app.constants';
 
 interface AppointmentHeaderProps {
   date: string;
   time: string;
-  status: string | undefined;
+  status: AppointmentStatusType | undefined;
 }
 
 export const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
@@ -36,7 +20,7 @@ export const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Detalles de la Cita</h2>
-        {getStatusBadge(status)}
+        {status && <AppointmentStatusBadge status={status} />}
       </div>
       
       <div className="flex gap-4">

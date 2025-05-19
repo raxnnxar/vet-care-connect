@@ -9,9 +9,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Badge } from '@/ui/atoms/badge';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
+import { AppointmentStatusBadge } from '@/features/appointments/components/AppointmentStatusBadge';
+import { AppointmentStatusType } from '@/core/constants/app.constants';
 
 interface AppointmentPetResponse {
   id: string;
@@ -22,25 +23,6 @@ interface AppointmentPetResponse {
   date_of_birth?: string;
   profile_picture_url?: string;
 }
-
-const getStatusBadge = (status: string | null) => {
-  const statusConfig: Record<string, { color: string, text: string }> = {
-    'programada': { color: 'bg-green-100 text-green-800', text: 'Confirmada' },
-    'pendiente': { color: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' },
-    'completada': { color: 'bg-blue-100 text-blue-800', text: 'Completada' },
-    'cancelada': { color: 'bg-red-100 text-red-800', text: 'Cancelada' }
-  };
-  
-  const config = status && statusConfig[status] 
-    ? statusConfig[status] 
-    : statusConfig.pendiente;
-  
-  return (
-    <Badge className={`${config.color} border-0`}>
-      {config.text}
-    </Badge>
-  );
-};
 
 const VetAppointmentDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -192,7 +174,9 @@ const VetAppointmentDetailScreen: React.FC = () => {
         <div>
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-xl font-medium">Información de la Cita</h2>
-            {getStatusBadge(appointment.status)}
+            {appointment.status && (
+              <AppointmentStatusBadge status={appointment.status as AppointmentStatusType} />
+            )}
           </div>
           
           <Card className="p-4 space-y-3">
