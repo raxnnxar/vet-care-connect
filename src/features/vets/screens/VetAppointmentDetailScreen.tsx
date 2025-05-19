@@ -138,7 +138,10 @@ const VetAppointmentDetailScreen: React.FC = () => {
     }
   };
   
-  const pet = appointment.pets;
+  // Use a type guard to check if pets is valid before accessing its properties
+  const pet = appointment.pets && typeof appointment.pets === 'object' && !('error' in appointment.pets) 
+    ? appointment.pets 
+    : null;
   
   return (
     <LayoutBase

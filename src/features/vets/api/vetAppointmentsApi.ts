@@ -30,7 +30,7 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
       .from('appointments')
       .select(`
         *,
-        pets:pet_id(name)
+        pets:pet_id(id, name)
       `)
       .eq('provider_id', providerId);
     
@@ -42,7 +42,9 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
     // Format the appointments with pet names and formatted times
     return data.map(appointment => ({
       ...appointment,
-      petName: appointment.pets?.name || 'Mascota',
+      petName: appointment.pets && typeof appointment.pets === 'object' && 'name' in appointment.pets 
+        ? appointment.pets.name 
+        : 'Mascota',
       time: appointment.appointment_date ? 
         format(parseISO(appointment.appointment_date), 'h:mm a') : 
         'Hora no especificada'
@@ -66,7 +68,7 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
       .from('appointments')
       .select(`
         *,
-        pets:pet_id(name)
+        pets:pet_id(id, name)
       `)
       .eq('provider_id', providerId)
       .gte('appointment_date', startOfDay)
@@ -80,7 +82,9 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
     // Format the appointments with pet names and formatted times
     return data.map(appointment => ({
       ...appointment,
-      petName: appointment.pets?.name || 'Mascota',
+      petName: appointment.pets && typeof appointment.pets === 'object' && 'name' in appointment.pets 
+        ? appointment.pets.name 
+        : 'Mascota',
       time: appointment.appointment_date ? 
         format(parseISO(appointment.appointment_date), 'h:mm a') : 
         'Hora no especificada'

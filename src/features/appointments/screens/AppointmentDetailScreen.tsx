@@ -100,7 +100,10 @@ const AppointmentDetailScreen: React.FC = () => {
     ? format(new Date(appointmentDetails.appointment_date), 'HH:mm')
     : '';
 
-  const pet = appointmentDetails.pets as Pet | null;
+  // Use type assertion only if we're sure the pets property exists and is valid
+  const pet = appointmentDetails.pets && typeof appointmentDetails.pets === 'object' && !('error' in appointmentDetails.pets) 
+    ? appointmentDetails.pets as Pet 
+    : null;
 
   return (
     <LayoutBase

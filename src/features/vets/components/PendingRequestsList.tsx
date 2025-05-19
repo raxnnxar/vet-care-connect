@@ -35,7 +35,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
         .select(`
           id,
           appointment_date,
-          pets:pet_id(name)
+          pets:pet_id(id, name)
         `)
         .eq('provider_id', user.user.id)
         .eq('status', 'pendiente');
@@ -47,7 +47,9 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       
       return data.map(appointment => ({
         id: appointment.id,
-        petName: appointment.pets?.name || 'Mascota',
+        petName: appointment.pets && typeof appointment.pets === 'object' && 'name' in appointment.pets 
+          ? appointment.pets.name 
+          : 'Mascota',
         time: appointment.appointment_date ? 
           new Date(appointment.appointment_date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : 
           'Hora no especificada',
