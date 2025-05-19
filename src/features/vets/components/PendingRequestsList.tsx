@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
@@ -45,7 +44,6 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           pets:pet_id(id, name)
         `)
         .eq('provider_id', user.user.id)
-        // Use type assertion to match the expected status type
         .eq('status', APPOINTMENT_STATUS.PENDING);
       
       if (error) {
