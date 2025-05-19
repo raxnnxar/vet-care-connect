@@ -39,7 +39,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           pets:pet_id(id, name)
         `)
         .eq('provider_id', user.user.id)
-        .eq('status', APPOINTMENT_STATUS.PENDING);
+        .eq('status', APPOINTMENT_STATUS.PENDING as string);
       
       if (error) {
         console.error('Error fetching pending requests:', error);
@@ -56,8 +56,8 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
             appointment.pets !== null &&
             !('error' in appointment.pets) && 
             'name' in appointment.pets && 
-            appointment.pets.name) {
-          petName = appointment.pets.name;
+            appointment.pets?.name) {
+          petName = appointment.pets.name as string;
         }
         
         return {

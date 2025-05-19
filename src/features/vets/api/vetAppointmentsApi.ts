@@ -51,8 +51,8 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
           appointment.pets !== null &&
           !('error' in appointment.pets) && 
           'name' in appointment.pets && 
-          appointment.pets.name) {
-        petName = appointment.pets.name;
+          appointment.pets?.name) {
+        petName = appointment.pets.name as string;
       }
       
       return {
@@ -104,8 +104,8 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
           appointment.pets !== null &&
           !('error' in appointment.pets) && 
           'name' in appointment.pets && 
-          appointment.pets.name) {
-        petName = appointment.pets.name;
+          appointment.pets?.name) {
+        petName = appointment.pets.name as string;
       }
       
       return {
