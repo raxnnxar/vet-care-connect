@@ -91,6 +91,7 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         licenseNumber={data.license_number}
         getInitials={getInitials}
         onRatingClick={() => setReviewsDialogOpen(true)}
+        vetId={data.id}
       />
       
       <div className="p-4 pb-28 bg-gray-50">
@@ -127,7 +128,6 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         {/* Action Buttons */}
         <VetActionButtons 
           onBookAppointment={onBookAppointment}
-          vetId={data.id}
         />
 
         {/* Reviews Dialog */}

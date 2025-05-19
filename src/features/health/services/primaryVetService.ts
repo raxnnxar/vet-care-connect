@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 /**
  * Sets a veterinarian as the primary vet for a pet owner
  */
-export const setPrimaryVet = async (ownerId: string, vetId: string) => {
+export const setPrimaryVet = async (ownerId: string, vetId: string | null) => {
   try {
     const { data, error } = await supabase
       .from('pet_owners')

@@ -22,23 +22,26 @@ export const usePrimaryVet = () => {
 
     setLoading(true);
     try {
-      const result = await setPrimaryVet(user.id, vetId);
+      // Primero obtenemos el veterinario principal actual
+      const currentVet = await getPrimaryVet(user.id);
+      
+      // Si el vet actual es el mismo que intentamos establecer, lo quitamos (valor null)
+      const targetVetId = currentVet.success && currentVet.data && currentVet.data.id === vetId 
+        ? null 
+        : vetId;
+      
+      const result = await setPrimaryVet(user.id, targetVetId);
       
       if (result.success) {
-        toast({
-          title: "¡Éxito!",
-          description: "Veterinario establecido como principal correctamente",
-          variant: "default"
-        });
         return true;
       } else {
-        throw new Error("No se pudo establecer el veterinario principal");
+        throw new Error("No se pudo actualizar el veterinario principal");
       }
     } catch (error) {
       console.error("Error setting primary vet:", error);
       toast({
         title: "Error",
-        description: "No se pudo establecer el veterinario principal",
+        description: "No se pudo actualizar el veterinario principal",
         variant: "destructive"
       });
       return false;
