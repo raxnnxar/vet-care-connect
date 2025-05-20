@@ -1,16 +1,19 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Pet } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
 import { toast } from 'sonner';
+import { usePetFileUploads } from './usePetFileUploads';
 
 export const usePets = () => {
   const [pets, setPets] = useState<Pet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useSelector((state: RootState) => state.auth);
+  // Use the file upload hook
+  const { uploadProfilePicture, uploadVaccineDoc } = usePetFileUploads();
 
   useEffect(() => {
     if (user) {
@@ -44,6 +47,32 @@ export const usePets = () => {
     }
   };
 
+  // Add getCurrentUserPets method
+  const getCurrentUserPets = useCallback(async () => {
+    try {
+      if (!user?.id) {
+        return { payload: [] };
+      }
+      
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*')
+        .eq('owner_id', user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      return { payload: data || [] };
+    } catch (err: any) {
+      console.error('Error fetching current user pets:', err);
+      return { error: err.message, payload: [] };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
+
   const createPet = async (petData: Omit<Pet, 'id' | 'created_at' | 'owner_id'>) => {
     try {
       if (!user) {
@@ -72,9 +101,13 @@ export const usePets = () => {
 
   const updatePet = async (petId: string, petData: Partial<Pet>) => {
     try {
+      // Check if medicalHistory is present in the petData and handle it separately
+      const { medicalHistory, ...restPetData } = petData as any;
+      
+      // First update the pet's basic information
       const { data, error } = await supabase
         .from('pets')
-        .update(petData)
+        .update(restPetData)
         .eq('id', petId)
         .eq('owner_id', user?.id)  // Ensure the user can only update their own pets
         .select()
@@ -84,8 +117,25 @@ export const usePets = () => {
         throw error;
       }
 
+      // If there's medical history data, handle it separately
+      if (medicalHistory) {
+        const { error: medicalError } = await supabase
+          .from('pet_medical_history')
+          .upsert({
+            pet_id: petId,
+            ...medicalHistory
+          })
+          .select()
+          .single();
+
+        if (medicalError) {
+          console.error('Error updating medical history:', medicalError);
+          // Don't throw here, we already have updated the pet information
+        }
+      }
+
       setPets(prevPets =>
-        prevPets.map(pet => (pet.id === petId ? { ...pet, ...data } as Pet : pet))
+        prevPets.map(pet => (pet.id === petId ? { ...pet, ...restPetData } as Pet : pet))
       );
       toast.success('Mascota actualizada exitosamente');
       return data;
@@ -144,6 +194,9 @@ export const usePets = () => {
     createPet,
     updatePet,
     deletePet,
-    getPetById
+    getPetById,
+    getCurrentUserPets,
+    uploadProfilePicture,
+    uploadVaccineDoc
   };
 };
