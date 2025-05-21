@@ -315,6 +315,7 @@ export type Database = {
           id: string
           name: string
           owner_id: string | null
+          primary_vet_id: string | null
           profile_picture_url: string | null
           sex: string | null
           species: string
@@ -329,6 +330,7 @@ export type Database = {
           id?: string
           name: string
           owner_id?: string | null
+          primary_vet_id?: string | null
           profile_picture_url?: string | null
           sex?: string | null
           species: string
@@ -343,6 +345,7 @@ export type Database = {
           id?: string
           name?: string
           owner_id?: string | null
+          primary_vet_id?: string | null
           profile_picture_url?: string | null
           sex?: string | null
           species?: string
@@ -362,6 +365,20 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "pet_owners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pets_primary_vet_id_fkey"
+            columns: ["primary_vet_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_details"
+            referencedColumns: ["vet_id"]
+          },
+          {
+            foreignKeyName: "pets_primary_vet_id_fkey"
+            columns: ["primary_vet_id"]
+            isOneToOne: false
+            referencedRelation: "veterinarians"
             referencedColumns: ["id"]
           },
         ]

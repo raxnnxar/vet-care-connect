@@ -1,33 +1,26 @@
 
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 
 interface SaludHeaderProps {
-  onBackClick?: () => void;
+  onBackClick: () => void;
+  children?: React.ReactNode;
 }
 
-const SaludHeader: React.FC<SaludHeaderProps> = ({ onBackClick }) => {
-  const navigate = useNavigate();
-  
-  const handleGoBack = () => {
-    if (onBackClick) {
-      onBackClick();
-    } else {
-      navigate(-1);
-    }
-  };
-
+const SaludHeader: React.FC<SaludHeaderProps> = ({ onBackClick, children }) => {
   return (
-    <header className="bg-[#4DA6A8] px-4 py-4 flex items-center shadow-md rounded-b-xl sticky top-0 z-10">
-      <button 
-        onClick={handleGoBack}
-        className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </button>
-      <h1 className="text-xl font-semibold text-white w-full text-center">Salud</h1>
-    </header>
+    <div className="flex items-center justify-between p-4 bg-[#79D0B8] text-white shadow-sm">
+      <div className="flex items-center">
+        <button 
+          onClick={onBackClick}
+          className="p-1 mr-3 rounded-full hover:bg-[#5FBFB3] transition-colors"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <h1 className="text-xl font-semibold">Salud</h1>
+      </div>
+      {children}
+    </div>
   );
 };
 

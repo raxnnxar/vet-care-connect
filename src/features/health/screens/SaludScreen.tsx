@@ -5,6 +5,7 @@ import NavbarInferior from '@/frontend/navigation/components/NavbarInferior';
 import SaludHeader from '../components/SaludHeader';
 import PrimaryVet from '../components/PrimaryVet';
 import VetTabs from '../components/VetTabs';
+import PetSelector from '../components/PetSelector';
 import { useVeterinariansData } from '../hooks/useVeterinariansData';
 import { usePrimaryVetData } from '../hooks/usePrimaryVetData';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
@@ -15,8 +16,9 @@ import { Button } from '@/ui/atoms/button';
 const SaludScreen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('veterinarios');
+  const [selectedPetId, setSelectedPetId] = useState<string | undefined>(undefined);
   const { vets, loading: loadingVets, error: vetsError } = useVeterinariansData();
-  const { primaryVet, loading: loadingPrimaryVet, error: primaryVetError } = usePrimaryVetData();
+  const { primaryVet, loading: loadingPrimaryVet, error: primaryVetError } = usePrimaryVetData(selectedPetId);
   
   const handleBackClick = () => {
     navigate('/owner');
@@ -41,9 +43,20 @@ const SaludScreen = () => {
     window.location.reload();
   };
 
+  const handlePetChange = (petId: string) => {
+    setSelectedPetId(petId);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
-      <SaludHeader onBackClick={handleBackClick} />
+      <SaludHeader onBackClick={handleBackClick}>
+        <div className="ml-auto">
+          <PetSelector 
+            selectedPetId={selectedPetId} 
+            onPetChange={handlePetChange}
+          />
+        </div>
+      </SaludHeader>
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
         {/* Primary Vet Section */}
