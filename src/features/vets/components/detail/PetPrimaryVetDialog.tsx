@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
@@ -19,7 +20,7 @@ import {
 } from '@/ui/molecules/collapsible';
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/atoms/avatar';
 import { Button } from '@/ui/atoms/button';
-import { ChevronDown, PawPrint } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface PetPrimaryVetDialogProps {
   open: boolean;
@@ -143,11 +144,6 @@ const PetPrimaryVetDialog: React.FC<PetPrimaryVetDialogProps> = ({
       .toUpperCase()
       .substring(0, 2);
   };
-
-  const getAnimalIcon = (species: string) => {
-    // We're using the PawPrint icon for all animals to keep it simple
-    return <PawPrint className="h-5 w-5 text-[#79D0B8]" />;
-  };
   
   // Count how many pets have this vet as primary
   const primaryVetCount = selectedPets.length;
@@ -173,8 +169,7 @@ const PetPrimaryVetDialog: React.FC<PetPrimaryVetDialogProps> = ({
           </div>
         ) : pets.length === 0 ? (
           <div className="py-10 text-center">
-            <PawPrint className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-4 text-gray-500">
+            <p className="text-gray-500">
               No tienes mascotas registradas
             </p>
           </div>
@@ -246,10 +241,7 @@ const PetPrimaryVetDialog: React.FC<PetPrimaryVetDialogProps> = ({
                         <div className="font-medium text-gray-800">
                           {pet.name}
                         </div>
-                        <div className="flex items-center text-xs text-gray-500">
-                          {getAnimalIcon(pet.species)}
-                          <span className="ml-1">{pet.species} {pet.breed ? `· ${pet.breed}` : ''}</span>
-                        </div>
+                        {/* Se eliminó la sección que mostraba el icono de animal y la especie */}
                       </div>
                     </div>
                     
