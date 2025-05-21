@@ -1,4 +1,3 @@
-
 /**
  * Core pet entity type
  */
@@ -15,7 +14,8 @@ export interface Pet {
   owner_id: string;
   profile_picture_url?: string;
   created_at: string;
-  medicalHistory?: PetMedicalHistory; // Add this property
+  medicalHistory?: PetMedicalHistory;
+  primary_vet_id?: string; // Added this property to match the database schema
 }
 
 /**
