@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Star, MapPin, Stethoscope } from 'lucide-react';
+import { Star, MapPin } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
 

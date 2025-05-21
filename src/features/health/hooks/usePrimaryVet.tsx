@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
 import { useToast } from '@/hooks/use-toast';
-import { setPrimaryVet, getPrimaryVet } from '../services/primaryVetService';
+import { supabase } from '@/integrations/supabase/client';
 
 export const usePrimaryVet = () => {
   const [loading, setLoading] = useState(false);
@@ -22,21 +21,28 @@ export const usePrimaryVet = () => {
 
     setLoading(true);
     try {
-      // Primero obtenemos el veterinario principal actual
-      const currentVet = await getPrimaryVet(user.id);
+      // Get the current primary vet for the user
+      const { data: ownerData, error: ownerError } = await supabase
+        .from('pet_owners')
+        .select('primary_vet_id')
+        .eq('id', user.id)
+        .single();
+        
+      if (ownerError) throw ownerError;
       
-      // Si el vet actual es el mismo que intentamos establecer, lo quitamos (valor null)
-      const targetVetId = currentVet.success && currentVet.data && currentVet.data.id === vetId 
-        ? null 
-        : vetId;
+      // If the vet is already the primary vet, remove it (set to null)
+      // Otherwise, set the new vet as primary
+      const newPrimaryVetId = ownerData.primary_vet_id === vetId ? null : vetId;
       
-      const result = await setPrimaryVet(user.id, targetVetId);
+      // Update the owner's primary_vet_id
+      const { error: updateError } = await supabase
+        .from('pet_owners')
+        .update({ primary_vet_id: newPrimaryVetId })
+        .eq('id', user.id);
+        
+      if (updateError) throw updateError;
       
-      if (result.success) {
-        return true;
-      } else {
-        throw new Error("No se pudo actualizar el veterinario principal");
-      }
+      return true;
     } catch (error) {
       console.error("Error setting primary vet:", error);
       toast({

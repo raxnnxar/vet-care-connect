@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Star, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePrimaryVet } from '@/features/health/hooks/usePrimaryVet';
@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger 
 } from '@/ui/molecules/tooltip';
+import PetPrimaryVetDialog from './PetPrimaryVetDialog';
 
 interface VetProfileHeroProps {
   displayName: string;
@@ -34,31 +35,21 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
   onRatingClick,
   vetId,
 }) => {
-  const { setAsPRIMARY, loading } = usePrimaryVet();
+  const { loading } = usePrimaryVet();
   const { primaryVet } = usePrimaryVetData();
   const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
   
   const isPrimaryVet = primaryVet?.id === vetId;
   
-  const handleSetAsPrimary = async (e: React.MouseEvent) => {
+  const handleSetAsPrimary = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     if (loading) return;
     
-    const success = await setAsPRIMARY(vetId);
-    
-    if (success) {
-      toast({
-        title: isPrimaryVet 
-          ? "Veterinario eliminado como principal" 
-          : "Veterinario establecido como principal",
-        description: isPrimaryVet 
-          ? "Se ha eliminado este veterinario como tu veterinario de cabecera" 
-          : "Se ha establecido este veterinario como tu veterinario de cabecera",
-        variant: "default"
-      });
-    }
+    // Open the pet selection dialog
+    setDialogOpen(true);
   };
   
   // Format rating to display with one decimal place
@@ -100,7 +91,7 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
             </TooltipTrigger>
             <TooltipContent side="bottom" className="bg-white text-gray-800 text-xs">
               {isPrimaryVet 
-                ? "Quitar como veterinario de cabecera" 
+                ? "Gestionar veterinario de cabecera" 
                 : "Establecer como veterinario de cabecera"}
             </TooltipContent>
           </Tooltip>
@@ -145,6 +136,14 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
           Licencia: <span className="font-medium">{licenseNumber}</span>
         </div>
       )}
+
+      {/* Pet Primary Vet Dialog */}
+      <PetPrimaryVetDialog 
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        vetId={vetId}
+        vetName={displayName}
+      />
     </div>
   );
 };
