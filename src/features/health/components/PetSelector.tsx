@@ -12,7 +12,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
 import { Pet } from '@/features/pets/types';
 import { usePets } from '@/features/pets/hooks';
 import { Skeleton } from '@/ui/atoms/skeleton';
-import { Dog } from 'lucide-react';
+import { Dog, Cat } from 'lucide-react';
 
 interface PetSelectorProps {
   selectedPetId: string | undefined;
@@ -20,58 +20,51 @@ interface PetSelectorProps {
 }
 
 const PetSelector: React.FC<PetSelectorProps> = ({ selectedPetId, onPetChange }) => {
-  const { getCurrentUserPets } = usePets();
-  const [userPets, setUserPets] = useState<Pet[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { pets, isLoading } = usePets();
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
   useEffect(() => {
-    const fetchPets = async () => {
-      try {
-        setIsLoading(true);
-        const result = await getCurrentUserPets();
-        
-        if (result.payload && Array.isArray(result.payload) && result.payload.length > 0) {
-          setUserPets(result.payload);
-          
-          // If no pet is selected yet or the selected pet is not in the list
-          if (!selectedPetId || !result.payload.some(pet => pet.id === selectedPetId)) {
-            // Set the first pet as selected
-            onPetChange(result.payload[0].id);
-            setSelectedPet(result.payload[0]);
-          } else {
-            // Find and set the selected pet
-            const pet = result.payload.find(p => p.id === selectedPetId);
-            if (pet) {
-              setSelectedPet(pet);
-            }
-          }
+    if (!isLoading && pets.length > 0) {
+      // Si no hay mascota seleccionada o la seleccionada no está en la lista
+      if (!selectedPetId || !pets.some(pet => pet.id === selectedPetId)) {
+        // Establecer la primera mascota como seleccionada
+        onPetChange(pets[0].id);
+        setSelectedPet(pets[0]);
+      } else {
+        // Encontrar y establecer la mascota seleccionada
+        const pet = pets.find(p => p.id === selectedPetId);
+        if (pet) {
+          setSelectedPet(pet);
         }
-      } catch (error) {
-        console.error('Error fetching user pets:', error);
-      } finally {
-        setIsLoading(false);
       }
-    };
-
-    fetchPets();
-  }, [getCurrentUserPets, selectedPetId, onPetChange]);
+    }
+  }, [isLoading, pets, selectedPetId, onPetChange]);
 
   const handlePetSelect = (pet: Pet) => {
     setSelectedPet(pet);
     onPetChange(pet.id);
   };
 
+  const getPetIcon = (petType: string | undefined) => {
+    switch (petType?.toLowerCase()) {
+      case 'cat':
+        return <Cat className="h-4 w-4 text-[#79D0B8]" />;
+      case 'dog':
+      default:
+        return <Dog className="h-4 w-4 text-[#79D0B8]" />;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center space-x-2">
-        <Skeleton className="h-10 w-10 rounded-full" />
-        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-9 w-9 rounded-full" />
+        <Skeleton className="h-5 w-20" />
       </div>
     );
   }
 
-  if (!selectedPet || userPets.length === 0) {
+  if (!selectedPet || pets.length === 0) {
     return null;
   }
 
@@ -80,39 +73,41 @@ const PetSelector: React.FC<PetSelectorProps> = ({ selectedPetId, onPetChange })
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="flex items-center gap-2 px-3 py-2 bg-white border-gray-300 hover:bg-gray-50"
+          className="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 hover:border-white/40 transition-all duration-200 shadow-sm"
         >
-          <Avatar className="h-8 w-8 bg-white border border-[#79D0B8]">
+          <Avatar className="h-7 w-7 bg-white/80 border-2 border-[#79D0B8]">
             {selectedPet.profile_picture_url ? (
               <AvatarImage src={selectedPet.profile_picture_url} alt={selectedPet.name} className="object-cover" />
             ) : (
-              <AvatarFallback>
-                <Dog size={16} />
+              <AvatarFallback className="bg-white/90">
+                {getPetIcon(selectedPet.species)}
               </AvatarFallback>
             )}
           </Avatar>
-          <span className="text-sm font-medium">{selectedPet.name}</span>
-          <ChevronDown size={16} />
+          <span className="text-sm font-medium text-white">{selectedPet.name}</span>
+          <ChevronDown size={16} className="text-white opacity-80" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="end" 
-        className="w-56 bg-white border border-gray-200 rounded-md shadow-lg p-1 z-50"
+        className="w-56 bg-white/90 backdrop-blur-sm border border-white/30 rounded-md shadow-lg p-1 z-50"
       >
-        {userPets.map((pet) => (
+        {pets.map((pet) => (
           <DropdownMenuItem 
             key={pet.id} 
-            className={`flex items-center gap-2 px-3 py-2 cursor-pointer rounded-md ${
-              pet.id === selectedPet.id ? 'bg-[#e8f7f3] text-[#4DA6A8]' : 'hover:bg-gray-100'
+            className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-md transition-colors duration-200 ${
+              pet.id === selectedPet.id 
+                ? 'bg-[#79D0B8]/20 text-[#4DA6A8] font-medium' 
+                : 'hover:bg-[#79D0B8]/10 text-gray-700'
             }`}
             onClick={() => handlePetSelect(pet)}
           >
-            <Avatar className="h-8 w-8 border border-[#79D0B8]">
+            <Avatar className="h-8 w-8 border-2 border-[#79D0B8]/80">
               {pet.profile_picture_url ? (
                 <AvatarImage src={pet.profile_picture_url} alt={pet.name} className="object-cover" />
               ) : (
-                <AvatarFallback>
-                  <Dog size={16} />
+                <AvatarFallback className="bg-white">
+                  {getPetIcon(pet.species)}
                 </AvatarFallback>
               )}
             </Avatar>

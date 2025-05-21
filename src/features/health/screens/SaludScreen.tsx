@@ -50,12 +50,10 @@ const SaludScreen = () => {
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
       <SaludHeader onBackClick={handleBackClick}>
-        <div className="ml-auto">
-          <PetSelector 
-            selectedPetId={selectedPetId} 
-            onPetChange={handlePetChange}
-          />
-        </div>
+        <PetSelector 
+          selectedPetId={selectedPetId} 
+          onPetChange={handlePetChange}
+        />
       </SaludHeader>
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
