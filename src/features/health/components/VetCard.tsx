@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Star, MapPin, Heart } from 'lucide-react';
+import { Star, MapPin, Stethoscope } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
-import { usePetPrimaryVet } from '../hooks/usePetPrimaryVet';
 
 interface VetCardProps {
   vet: {
@@ -22,8 +21,6 @@ interface VetCardProps {
 }
 
 const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
-  const { hasAsPrimaryVet } = usePetPrimaryVet(vet.id);
-  
   // Format specialization to display in uppercase with +X for additional ones
   const formatSpecialization = () => {
     if (!vet.specialization || vet.specialization.length === 0) {
@@ -75,14 +72,7 @@ const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
         )}
       </Avatar>
       <div className="flex-1">
-        <div className="flex items-center justify-between">
-          <h3 className="font-medium text-[#1F2937] text-base">{vet.name}</h3>
-          <div className="p-1.5 rounded-full">
-            <Heart 
-              className={`w-5 h-5 ${hasAsPrimaryVet ? 'fill-[#FF8A65] text-[#FF8A65]' : 'text-gray-400'}`} 
-            />
-          </div>
-        </div>
+        <h3 className="font-medium text-[#1F2937] text-base">{vet.name}</h3>
         <p className="text-sm text-gray-500 font-medium">{formatSpecialization()}</p>
         <p className="text-xs text-gray-500 mt-0.5">{formatAnimalsTreated()}</p>
         <div className="flex items-center mt-1">

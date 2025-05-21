@@ -1,10 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Star, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePrimaryVet } from '@/features/health/hooks/usePrimaryVet';
 import { usePrimaryVetData } from '@/features/health/hooks/usePrimaryVetData';
-import PetPrimaryVetDialog from '@/features/health/components/PetPrimaryVetDialog';
 import { 
   Tooltip,
   TooltipContent,
@@ -35,15 +34,32 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
   onRatingClick,
   vetId,
 }) => {
-  const { toast } = useToast();
+  const { setAsPRIMARY, loading } = usePrimaryVet();
   const { primaryVet } = usePrimaryVetData();
-  const { petsWithVet, loadPetsWithVet, hasAsPrimaryVet } = usePrimaryVet(vetId);
-  const [showPetDialog, setShowPetDialog] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   
-  useEffect(() => {
-    loadPetsWithVet();
-  }, []);
+  const isPrimaryVet = primaryVet?.id === vetId;
+  
+  const handleSetAsPrimary = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (loading) return;
+    
+    const success = await setAsPRIMARY(vetId);
+    
+    if (success) {
+      toast({
+        title: isPrimaryVet 
+          ? "Veterinario eliminado como principal" 
+          : "Veterinario establecido como principal",
+        description: isPrimaryVet 
+          ? "Se ha eliminado este veterinario como tu veterinario de cabecera" 
+          : "Se ha establecido este veterinario como tu veterinario de cabecera",
+        variant: "default"
+      });
+    }
+  };
   
   // Format rating to display with one decimal place
   const formattedRating = averageRating ? Number(averageRating).toFixed(1) : '0.0';
@@ -64,12 +80,6 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
     return stars;
   };
 
-  const handlePrimaryVetClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setShowPetDialog(true);
-  };
-
   return (
     <div className="bg-[#79D0B8] pt-20 pb-6 flex flex-col items-center text-white relative">
       {/* Primary Vet Button */}
@@ -78,18 +88,18 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <button 
-                onClick={handlePrimaryVetClick}
+                onClick={handleSetAsPrimary}
                 disabled={loading}
                 className={`bg-white/20 p-2 rounded-full transition-colors ${loading ? 'opacity-50' : 'hover:bg-white/30'}`}
               >
                 <Heart 
                   size={24} 
-                  className={hasAsPrimaryVet ? "fill-white text-white" : "text-white"} 
+                  className={isPrimaryVet ? "fill-white text-white" : "text-white"} 
                 />
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="bg-white text-gray-800 text-xs">
-              {hasAsPrimaryVet 
+              {isPrimaryVet 
                 ? "Quitar como veterinario de cabecera" 
                 : "Establecer como veterinario de cabecera"}
             </TooltipContent>
@@ -135,14 +145,6 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
           Licencia: <span className="font-medium">{licenseNumber}</span>
         </div>
       )}
-
-      {/* Pet Primary Vet Dialog */}
-      <PetPrimaryVetDialog 
-        vetId={vetId} 
-        vetName={displayName}
-        isOpen={showPetDialog}
-        onClose={() => setShowPetDialog(false)}
-      />
     </div>
   );
 };
