@@ -37,7 +37,7 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
 }) => {
   const { toast } = useToast();
   const { primaryVet } = usePrimaryVetData();
-  const { petsWithVet, loadPetsWithVet, hasAsPrimaryVet } = usePetPrimaryVet(vetId);
+  const { petsWithVet, loadPetsWithVet, hasAsPrimaryVet } = usePrimaryVet(vetId);
   const [showPetDialog, setShowPetDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   
