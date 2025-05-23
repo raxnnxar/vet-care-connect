@@ -83,8 +83,8 @@ const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
       </div>
 
       {selectedDate && timeSlots.length > 0 && (
-        <div className="border rounded-xl border-[#5ECBAD] bg-[#5ECBAD]/5">
-          <div className="p-4 border-b border-[#5ECBAD]/20">
+        <div className="bg-white border rounded-xl border-gray-200">
+          <div className="p-4 border-b border-gray-200">
             <h4 className="font-medium text-[#4BA68D]">
               Horarios disponibles
             </h4>
