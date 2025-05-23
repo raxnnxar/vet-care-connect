@@ -74,8 +74,17 @@ export const scheduleAppointment = (appointmentData: CreateAppointmentData) => a
     
     // Prepare appointment data with 'pendiente' status
     const appointmentWithStatus = {
-      ...appointmentData,
-      status: APPOINTMENT_STATUS.PENDING
+      pet_id: appointmentData.petId,
+      provider_id: appointmentData.vetId,
+      owner_id: appointmentData.owner_id,
+      appointment_date: new Date(`${appointmentData.date}T${appointmentData.time}:00.000Z`),
+      duration: appointmentData.duration || 30,
+      service_type: appointmentData.service_type || 'consulta_general',
+      reason: appointmentData.reason || 'Consulta general',
+      notes: appointmentData.notes,
+      price: appointmentData.price || 50,
+      status: APPOINTMENT_STATUS.PENDING,
+      location: appointmentData.location || 'Clínica veterinaria'
     };
     
     console.log('Appointment data with status:', appointmentWithStatus);
@@ -88,7 +97,7 @@ export const scheduleAppointment = (appointmentData: CreateAppointmentData) => a
         provider_id: appointmentWithStatus.provider_id,
         owner_id: appointmentWithStatus.owner_id,
         appointment_date: appointmentWithStatus.appointment_date,
-        duration: appointmentWithStatus.duration || 30,
+        duration: appointmentWithStatus.duration,
         service_type: appointmentWithStatus.service_type,
         reason: appointmentWithStatus.reason,
         notes: appointmentWithStatus.notes,
@@ -111,8 +120,20 @@ export const scheduleAppointment = (appointmentData: CreateAppointmentData) => a
     
     console.log('Appointment saved successfully:', savedAppointment);
     
+    // Transform database response to match our Appointment interface
+    const appointmentForStore = {
+      id: savedAppointment.id,
+      petId: savedAppointment.pet_id,
+      vetId: savedAppointment.provider_id,
+      date: new Date(savedAppointment.appointment_date).toISOString().split('T')[0],
+      time: new Date(savedAppointment.appointment_date).toTimeString().split(' ')[0].substring(0, 5),
+      status: savedAppointment.status,
+      type: 'check_up' as AppointmentTypeType,
+      notes: savedAppointment.notes || ''
+    };
+    
     // Update Redux store
-    dispatch(appointmentsActions.createAppointmentSuccess(savedAppointment));
+    dispatch(appointmentsActions.createAppointmentSuccess(appointmentForStore));
     
     // Show success message
     toast({
@@ -121,7 +142,7 @@ export const scheduleAppointment = (appointmentData: CreateAppointmentData) => a
       variant: "default"
     });
     
-    return savedAppointment;
+    return appointmentForStore;
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Error desconocido al agendar la cita';
     console.error('Error scheduling appointment:', err);
@@ -186,7 +207,19 @@ export const cancelExistingAppointment = (id: string) => async (dispatch: AppDis
       throw new Error('No se pudo cancelar la cita');
     }
     
-    dispatch(appointmentsActions.updateAppointmentSuccess(updatedAppointment));
+    // Transform database response to match our Appointment interface
+    const appointmentForStore = {
+      id: updatedAppointment.id,
+      petId: updatedAppointment.pet_id,
+      vetId: updatedAppointment.provider_id,
+      date: new Date(updatedAppointment.appointment_date).toISOString().split('T')[0],
+      time: new Date(updatedAppointment.appointment_date).toTimeString().split(' ')[0].substring(0, 5),
+      status: updatedAppointment.status,
+      type: 'check_up' as AppointmentTypeType,
+      notes: updatedAppointment.notes || ''
+    };
+    
+    dispatch(appointmentsActions.updateAppointmentSuccess(appointmentForStore));
     
     // Show success message
     toast({
@@ -195,7 +228,7 @@ export const cancelExistingAppointment = (id: string) => async (dispatch: AppDis
       variant: "default"
     });
     
-    return updatedAppointment;
+    return appointmentForStore;
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Error desconocido al cancelar la cita';
     console.error('Error canceling appointment:', err);

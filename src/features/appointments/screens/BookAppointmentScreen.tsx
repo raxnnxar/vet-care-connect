@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -5,13 +6,21 @@ import { AppDispatch, RootState } from '@/state/store';
 import { scheduleAppointment } from '../store/appointmentsThunks';
 import { fetchVetById } from '@/features/vets/store/vetsThunks';
 import { fetchPetsByOwner } from '@/features/pets/store/petsThunks';
-import PetSelectionStep from '../components/PetSelectionStep';
+import PetSelectionStep from '@/features/pets/components/PetSelectionStep';
 import DateTimeSelector from '../components/booking/DateTimeSelector';
+import LayoutBase from '@/frontend/navigation/components/LayoutBase';
+import NavbarInferior from '@/frontend/navigation/components/NavbarInferior';
 import { Button } from '@/ui/atoms/button';
-import { ArrowLeft, Calendar, Clock, MapPin, User, DollarSign } from 'lucide-react';
+import { Card, CardContent } from '@/ui/molecules/card';
+import { Separator } from '@/ui/atoms/separator';
+import { ArrowLeft, Calendar, Clock, MapPin, User, DollarSign, Check } from 'lucide-react';
 import { CreateAppointmentData } from '../types';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Pet } from '@/features/pets/types';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const BookAppointmentScreen: React.FC = () => {
   const { vetId } = useParams<{ vetId: string }>();
@@ -75,7 +84,6 @@ const BookAppointmentScreen: React.FC = () => {
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Here would be API call to book appointment
       navigate(`/owner/appointments`);
     }
   };
@@ -118,16 +126,12 @@ const BookAppointmentScreen: React.FC = () => {
     }
 
     const appointmentData: CreateAppointmentData = {
-      pet_id: selectedPet.id,
-      provider_id: vetId,
-      owner_id: user.id,
-      appointment_date: new Date(`${selectedDate.toISOString().split('T')[0]}T${selectedTime}:00.000Z`),
-      duration: 30,
-      service_type: 'consulta_general',
-      reason: appointmentDetails.reason || 'Consulta general',
-      notes: appointmentDetails.notes,
-      price: 50,
-      location: selectedVet?.business_name || 'Clínica veterinaria'
+      petId: selectedPet.id,
+      vetId: vetId,
+      date: selectedDate.toISOString().split('T')[0],
+      time: selectedTime,
+      type: 'check_up' as any,
+      notes: appointmentDetails.notes
     };
 
     console.log('Submitting appointment data:', appointmentData);
