@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -101,6 +102,13 @@ const BookAppointmentScreen: React.FC = () => {
     return displayName ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}` : '';
   };
 
+  // Ensure services_offered is always an array
+  const getServicesOffered = () => {
+    if (!veterinarian?.services_offered) return [];
+    if (Array.isArray(veterinarian.services_offered)) return veterinarian.services_offered;
+    return [];
+  };
+
   return (
     <LayoutBase
       header={
@@ -168,7 +176,7 @@ const BookAppointmentScreen: React.FC = () => {
                   <>
                     <h3 className="font-medium text-gray-700 mb-4">Selecciona un servicio</h3>
                     <div className="space-y-3">
-                      {veterinarian?.services_offered?.map((service: any) => (
+                      {getServicesOffered().map((service: any) => (
                         <div 
                           key={service.id}
                           onClick={() => setSelectedService(service)}
@@ -196,7 +204,7 @@ const BookAppointmentScreen: React.FC = () => {
                         </div>
                       ))}
                       
-                      {(!veterinarian?.services_offered || veterinarian.services_offered.length === 0) && (
+                      {getServicesOffered().length === 0 && (
                         <div className="p-4 text-center text-gray-500">
                           No hay servicios disponibles
                         </div>
