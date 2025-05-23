@@ -26,23 +26,7 @@ export interface AppointmentSlot {
 }
 
 // Data types for creating and updating appointments
-export interface CreateAppointmentData {
-  petId: string;
-  vetId: string;
-  date: string;
-  time: string;
-  type: AppointmentTypeType;
-  notes?: string;
-  owner_id?: string;
-  pet_id?: string;
-  provider_id?: string;
-  appointment_date?: Date;
-  duration?: number;
-  service_type?: string;
-  reason?: string;
-  price?: number;
-  location?: string;
-}
+export type CreateAppointmentData = Omit<Appointment, 'id'>;
 
 export type UpdateAppointmentData = Partial<Omit<Appointment, 'id'>>;
 

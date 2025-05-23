@@ -1,3 +1,4 @@
+
 import { AppDispatch } from '../../../state/store';
 import { appointmentsActions } from './appointmentsSlice';
 import { 
@@ -16,9 +17,7 @@ import {
   AppointmentFilters
 } from '../types';
 import { QueryOptions } from '../../../core/api/apiClient';
-import { APPOINTMENT_STATUS, AppointmentTypeType } from '@/core/constants/app.constants';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 
 /**
  * Fetch all appointments with optional filtering
@@ -64,98 +63,27 @@ export const fetchAppointmentById = (id: string) => async (dispatch: AppDispatch
 };
 
 /**
- * Schedule a new appointment and save to database
+ * Schedule a new appointment
  */
 export const scheduleAppointment = (appointmentData: CreateAppointmentData) => async (dispatch: AppDispatch) => {
   dispatch(appointmentsActions.requestStarted());
   
   try {
-    console.log('Starting appointment creation with data:', appointmentData);
-    
-    // Prepare appointment data with 'pendiente' status
+    // Ensure the appointment starts with 'pendiente' status
     const appointmentWithStatus = {
-      pet_id: appointmentData.petId,
-      provider_id: appointmentData.vetId,
-      owner_id: appointmentData.owner_id,
-      appointment_date: new Date(`${appointmentData.date}T${appointmentData.time}:00.000Z`).toISOString(),
-      duration: appointmentData.duration || 30,
-      service_type: appointmentData.service_type || 'consulta_general',
-      reason: appointmentData.reason || 'Consulta general',
-      notes: appointmentData.notes,
-      price: appointmentData.price || 50,
-      status: APPOINTMENT_STATUS.PENDING,
-      location: appointmentData.location || 'Clínica veterinaria'
+      ...appointmentData,
+      status: APPOINTMENT_STATUS.PENDING
     };
     
-    console.log('Appointment data with status:', appointmentWithStatus);
+    const { data, error } = await createAppointment(appointmentWithStatus);
     
-    // Save the appointment to Supabase database
-    const { data: savedAppointment, error: saveError } = await supabase
-      .from('appointments')
-      .insert({
-        pet_id: appointmentWithStatus.pet_id,
-        provider_id: appointmentWithStatus.provider_id,
-        owner_id: appointmentWithStatus.owner_id,
-        appointment_date: appointmentWithStatus.appointment_date,
-        duration: appointmentWithStatus.duration,
-        service_type: appointmentWithStatus.service_type,
-        reason: appointmentWithStatus.reason,
-        notes: appointmentWithStatus.notes,
-        price: appointmentWithStatus.price,
-        status: appointmentWithStatus.status,
-        location: appointmentWithStatus.location,
-        payment_status: 'pendiente'
-      })
-      .select()
-      .single();
+    if (error) throw new Error(error.message || 'Failed to schedule appointment');
+    if (!data) throw new Error('Appointment creation returned no data');
     
-    if (saveError) {
-      console.error('Error saving appointment to database:', saveError);
-      throw new Error(saveError.message || 'Error al guardar la cita en la base de datos');
-    }
-    
-    if (!savedAppointment) {
-      throw new Error('No se pudo crear la cita');
-    }
-    
-    console.log('Appointment saved successfully:', savedAppointment);
-    
-    // Transform database response to match our Appointment interface
-    const appointmentForStore = {
-      id: savedAppointment.id,
-      petId: savedAppointment.pet_id,
-      vetId: savedAppointment.provider_id,
-      date: new Date(savedAppointment.appointment_date).toISOString().split('T')[0],
-      time: new Date(savedAppointment.appointment_date).toTimeString().split(' ')[0].substring(0, 5),
-      status: savedAppointment.status,
-      type: 'check_up' as AppointmentTypeType,
-      notes: savedAppointment.notes || ''
-    };
-    
-    // Update Redux store
-    dispatch(appointmentsActions.createAppointmentSuccess(appointmentForStore));
-    
-    // Show success message
-    toast({
-      title: "¡Cita agendada exitosamente!",
-      description: "Tu cita ha sido programada y está pendiente de confirmación por parte del veterinario. Recibirás una notificación cuando sea confirmada.",
-      variant: "default"
-    });
-    
-    return appointmentForStore;
+    dispatch(appointmentsActions.createAppointmentSuccess(data));
+    return data;
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Error desconocido al agendar la cita';
-    console.error('Error scheduling appointment:', err);
-    
-    dispatch(appointmentsActions.requestFailed(errorMessage));
-    
-    // Show error message
-    toast({
-      title: "Error al agendar la cita",
-      description: errorMessage,
-      variant: "destructive"
-    });
-    
+    dispatch(appointmentsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
     return null;
   }
 };
@@ -187,61 +115,15 @@ export const cancelExistingAppointment = (id: string) => async (dispatch: AppDis
   dispatch(appointmentsActions.requestStarted());
   
   try {
-    // Update appointment status in database
-    const { data: updatedAppointment, error: updateError } = await supabase
-      .from('appointments')
-      .update({ 
-        status: APPOINTMENT_STATUS.CANCELLED,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await cancelAppointment(id);
     
-    if (updateError) {
-      console.error('Error canceling appointment:', updateError);
-      throw new Error(updateError.message || 'Error al cancelar la cita');
-    }
+    if (error) throw new Error(error.message || 'Failed to cancel appointment');
+    if (!data) throw new Error('Appointment cancellation returned no data');
     
-    if (!updatedAppointment) {
-      throw new Error('No se pudo cancelar la cita');
-    }
-    
-    // Transform database response to match our Appointment interface
-    const appointmentForStore = {
-      id: updatedAppointment.id,
-      petId: updatedAppointment.pet_id,
-      vetId: updatedAppointment.provider_id,
-      date: new Date(updatedAppointment.appointment_date).toISOString().split('T')[0],
-      time: new Date(updatedAppointment.appointment_date).toTimeString().split(' ')[0].substring(0, 5),
-      status: updatedAppointment.status,
-      type: 'check_up' as AppointmentTypeType,
-      notes: updatedAppointment.notes || ''
-    };
-    
-    dispatch(appointmentsActions.updateAppointmentSuccess(appointmentForStore));
-    
-    // Show success message
-    toast({
-      title: "Cita cancelada",
-      description: "La cita ha sido cancelada exitosamente.",
-      variant: "default"
-    });
-    
-    return appointmentForStore;
+    dispatch(appointmentsActions.updateAppointmentSuccess({ ...data, status: APPOINTMENT_STATUS.CANCELLED }));
+    return data;
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Error desconocido al cancelar la cita';
-    console.error('Error canceling appointment:', err);
-    
-    dispatch(appointmentsActions.requestFailed(errorMessage));
-    
-    // Show error message
-    toast({
-      title: "Error al cancelar la cita",
-      description: errorMessage,
-      variant: "destructive"
-    });
-    
+    dispatch(appointmentsActions.requestFailed(err instanceof Error ? err.message : 'An unknown error occurred'));
     return null;
   }
 };

@@ -1,34 +1,22 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/state/store';
-import { scheduleAppointment } from '../store/appointmentsThunks';
-import { fetchVetById } from '@/features/vets/store/vetsThunks';
-import { fetchPetsByOwner } from '@/features/pets/store/petsThunks';
-import PetSelectionStep from '@/features/pets/components/PetSelectionStep';
-import DateTimeSelector from '../components/booking/DateTimeSelector';
-import LayoutBase from '@/frontend/navigation/components/LayoutBase';
-import NavbarInferior from '@/frontend/navigation/components/NavbarInferior';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
+import { ArrowLeft, Check } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/ui/molecules/card';
 import { Separator } from '@/ui/atoms/separator';
-import { ArrowLeft, Calendar, Clock, MapPin, User, DollarSign, Check } from 'lucide-react';
-import { CreateAppointmentData } from '../types';
-import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import PetSelectionStep from '@/features/pets/components/PetSelectionStep';
+import DateTimeSelector from '@/features/appointments/components/booking/DateTimeSelector';
 import { Pet } from '@/features/pets/types';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const BookAppointmentScreen: React.FC = () => {
   const { vetId } = useParams<{ vetId: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const { user } = useAuth();
-  const { toast } = useToast();
-  
   const [currentStep, setCurrentStep] = useState(1);
   const [veterinarian, setVeterinarian] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,10 +24,7 @@ const BookAppointmentScreen: React.FC = () => {
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [appointmentDetails, setAppointmentDetails] = useState({
-    reason: '',
-    notes: ''
-  });
+  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const fetchVetDetails = async () => {
@@ -84,6 +69,7 @@ const BookAppointmentScreen: React.FC = () => {
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     } else {
+      // Here would be API call to book appointment
       navigate(`/owner/appointments`);
     }
   };
@@ -113,37 +99,6 @@ const BookAppointmentScreen: React.FC = () => {
       
     const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
     return displayName ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}` : '';
-  };
-
-  const handleConfirmBooking = async () => {
-    if (!selectedPet || !selectedDate || !selectedTime || !vetId || !user) {
-      toast({
-        title: "Información incompleta",
-        description: "Por favor completa todos los campos requeridos.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const appointmentData: CreateAppointmentData = {
-      petId: selectedPet.id,
-      vetId: vetId,
-      date: selectedDate.toISOString().split('T')[0],
-      time: selectedTime,
-      type: 'check_up' as any,
-      notes: appointmentDetails.notes
-    };
-
-    console.log('Submitting appointment data:', appointmentData);
-    
-    const result = await dispatch(scheduleAppointment(appointmentData));
-    
-    if (result) {
-      // Navigate back to appointments list after successful booking
-      setTimeout(() => {
-        navigate('/owner/appointments');
-      }, 2000);
-    }
   };
 
   return (
@@ -323,7 +278,7 @@ const BookAppointmentScreen: React.FC = () => {
             
             <Button 
               className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
-              onClick={handleConfirmBooking}
+              onClick={handleContinue}
               disabled={
                 (currentStep === 1 && !selectedPet) || 
                 (currentStep === 2 && !selectedService) || 
