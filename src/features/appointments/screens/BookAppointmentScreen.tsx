@@ -3,17 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
-import { ArrowLeft, Calendar, Check } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/ui/molecules/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/molecules/tabs';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { Separator } from '@/ui/atoms/separator';
 import PetSelectionStep from '@/features/pets/components/PetSelectionStep';
+import DateTimeSelector from '@/features/appointments/components/booking/DateTimeSelector';
 import { Pet } from '@/features/pets/types';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const BookAppointmentScreen: React.FC = () => {
   const { vetId } = useParams<{ vetId: string }>();
@@ -140,7 +140,7 @@ const BookAppointmentScreen: React.FC = () => {
         
         <Card className="mb-6">
           <CardContent className="p-4">
-            {!isLoading && (
+            {!isLoading && currentStep !== 3 && (
               <h2 className="text-lg font-medium mb-1">{getVetName()}</h2>
             )}
             {isLoading ? (
@@ -201,59 +201,12 @@ const BookAppointmentScreen: React.FC = () => {
                 )}
                 
                 {currentStep === 3 && (
-                  <>
-                    <h3 className="font-medium text-gray-700 mb-4">Selecciona fecha y hora</h3>
-                    <Tabs defaultValue="calendar" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2 mb-4">
-                        <TabsTrigger value="calendar">Calendario</TabsTrigger>
-                        <TabsTrigger value="next-available">Próximas Disponibles</TabsTrigger>
-                      </TabsList>
-                      
-                      <TabsContent value="calendar" className="space-y-4">
-                        <div className="text-center p-6 bg-gray-100 rounded-lg">
-                          Este veterinario aún no ha habilitado la programación de citas.
-                        </div>
-                      </TabsContent>
-                      
-                      <TabsContent value="next-available" className="space-y-4">
-                        <div className="divide-y border rounded-lg">
-                          {/* Mock available slots - in a real app, these would come from the backend */}
-                          {[1, 2, 3].map((day) => {
-                            const date = new Date();
-                            date.setDate(date.getDate() + day);
-                            
-                            return (
-                              <div key={day} className="p-4">
-                                <h4 className="font-medium mb-2">
-                                  {format(date, 'EEEE, d MMMM', { locale: es })}
-                                </h4>
-                                <div className="grid grid-cols-3 gap-2">
-                                  {['10:00', '11:30', '16:00'].map((time) => (
-                                    <div
-                                      key={`${day}-${time}`}
-                                      onClick={() => {
-                                        setSelectedDate(date);
-                                        setSelectedTime(time);
-                                      }}
-                                      className={`p-2 text-center border rounded-md cursor-pointer ${
-                                        selectedDate && 
-                                        selectedDate.getDate() === date.getDate() && 
-                                        selectedTime === time
-                                          ? 'bg-[#79D0B8] text-white border-[#79D0B8]'
-                                          : 'hover:border-[#79D0B8]'
-                                      }`}
-                                    >
-                                      {time}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </>
+                  <DateTimeSelector
+                    selectedDate={selectedDate}
+                    selectedTime={selectedTime}
+                    onDateSelect={setSelectedDate}
+                    onTimeSelect={setSelectedTime}
+                  />
                 )}
                 
                 {currentStep === 4 && (
