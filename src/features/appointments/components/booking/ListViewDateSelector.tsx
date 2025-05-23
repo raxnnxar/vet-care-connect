@@ -4,7 +4,7 @@ import { format, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import TimeSlotsList from './TimeSlotsList';
 
-interface AvailableDaysListProps {
+interface ListViewDateSelectorProps {
   availableDays: Date[];
   selectedDate: Date | null;
   selectedTime: string | null;
@@ -12,7 +12,7 @@ interface AvailableDaysListProps {
   onTimeSelect: (time: string) => void;
 }
 
-const AvailableDaysList: React.FC<AvailableDaysListProps> = ({
+const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
   availableDays,
   selectedDate,
   selectedTime,
@@ -46,7 +46,7 @@ const AvailableDaysList: React.FC<AvailableDaysListProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-h-96 overflow-y-auto">
+    <div className="space-y-4 max-h-96 overflow-y-auto">
       {availableDays.map((day) => {
         const timeSlots = generateTimeSlots(day);
         const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -97,4 +97,4 @@ const AvailableDaysList: React.FC<AvailableDaysListProps> = ({
   );
 };
 
-export default AvailableDaysList;
+export default ListViewDateSelector;

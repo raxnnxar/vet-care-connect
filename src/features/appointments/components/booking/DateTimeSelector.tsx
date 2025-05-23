@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, List } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
-import { format, addDays, startOfDay } from 'date-fns';
-import { es } from 'date-fns/locale';
-import AvailableDaysList from './AvailableDaysList';
-import CalendarModal from './CalendarModal';
+import { addDays, startOfDay } from 'date-fns';
+import ListViewDateSelector from './ListViewDateSelector';
+import CalendarViewDateSelector from './CalendarViewDateSelector';
 
 interface DateTimeSelectorProps {
   selectedDate: Date | null;
@@ -20,8 +19,9 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   onDateSelect,
   onTimeSelect
 }) => {
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
   const [availableDays, setAvailableDays] = useState<Date[]>([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     // Generate next 7 days starting from today
@@ -35,6 +35,16 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     setAvailableDays(days);
   }, []);
 
+  const handleViewChange = (newView: 'list' | 'calendar') => {
+    if (newView === currentView) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentView(newView);
+      setIsTransitioning(false);
+    }, 150);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -42,30 +52,31 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setShowCalendar(true)}
-          className="h-10 w-10 rounded-full border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8] hover:text-white"
+          onClick={() => handleViewChange(currentView === 'list' ? 'calendar' : 'list')}
+          className="h-10 w-10 rounded-full border-[#5ECBAD] text-[#5ECBAD] hover:bg-[#5ECBAD] hover:text-white transition-colors"
         >
-          <Calendar size={20} />
+          {currentView === 'list' ? <Calendar size={20} /> : <List size={20} />}
         </Button>
       </div>
 
-      <AvailableDaysList
-        availableDays={availableDays}
-        selectedDate={selectedDate}
-        selectedTime={selectedTime}
-        onDateSelect={onDateSelect}
-        onTimeSelect={onTimeSelect}
-      />
-
-      <CalendarModal
-        open={showCalendar}
-        onOpenChange={setShowCalendar}
-        selectedDate={selectedDate}
-        onDateSelect={(date) => {
-          onDateSelect(date);
-          setShowCalendar(false);
-        }}
-      />
+      <div className={`transition-all duration-300 ${isTransitioning ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
+        {currentView === 'list' ? (
+          <ListViewDateSelector
+            availableDays={availableDays}
+            selectedDate={selectedDate}
+            selectedTime={selectedTime}
+            onDateSelect={onDateSelect}
+            onTimeSelect={onTimeSelect}
+          />
+        ) : (
+          <CalendarViewDateSelector
+            selectedDate={selectedDate}
+            selectedTime={selectedTime}
+            onDateSelect={onDateSelect}
+            onTimeSelect={onTimeSelect}
+          />
+        )}
+      </div>
     </div>
   );
 };

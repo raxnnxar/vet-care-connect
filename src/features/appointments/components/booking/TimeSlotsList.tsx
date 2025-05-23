@@ -50,8 +50,8 @@ const TimeSlotsList: React.FC<TimeSlotsListProps> = ({
                 flex-shrink-0 px-4 py-3 rounded-xl font-medium text-sm
                 transition-all duration-200 min-w-[80px]
                 ${isSelected
-                  ? 'bg-[#4DA6A8] text-white shadow-lg transform scale-105'
-                  : 'bg-[#79D0B8]/10 text-[#4DA6A8] border border-[#79D0B8]/20 hover:bg-[#79D0B8]/20 hover:border-[#79D0B8]/40'
+                  ? 'bg-[#4BA68D] text-white shadow-lg transform scale-105'
+                  : 'bg-[#5ECBAD]/10 text-[#4BA68D] border border-[#5ECBAD]/20 hover:bg-[#5ECBAD]/20 hover:border-[#5ECBAD]/40'
                 }
               `}
             >
