@@ -25,7 +25,7 @@ export const AppointmentStatusBadge: React.FC<AppointmentStatusBadgeProps> = ({
         };
       case APPOINTMENT_STATUS.CONFIRMED:
         return {
-          label: 'Confirmada',
+          label: 'Programada',
           color: 'bg-green-100 text-green-800',
           icon: <CalendarCheck className="h-3 w-3 mr-1" />
         };

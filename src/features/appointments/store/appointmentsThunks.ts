@@ -1,3 +1,4 @@
+
 import { AppDispatch } from '../../../state/store';
 import { appointmentsActions } from './appointmentsSlice';
 import { 
@@ -68,7 +69,13 @@ export const scheduleAppointment = (appointmentData: CreateAppointmentData) => a
   dispatch(appointmentsActions.requestStarted());
   
   try {
-    const { data, error } = await createAppointment(appointmentData);
+    // Ensure the appointment starts with 'pendiente' status
+    const appointmentWithStatus = {
+      ...appointmentData,
+      status: APPOINTMENT_STATUS.PENDING
+    };
+    
+    const { data, error } = await createAppointment(appointmentWithStatus);
     
     if (error) throw new Error(error.message || 'Failed to schedule appointment');
     if (!data) throw new Error('Appointment creation returned no data');

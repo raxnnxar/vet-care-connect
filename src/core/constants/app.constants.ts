@@ -31,7 +31,7 @@ export const PET_GENDER = {
 
 export type PetGenderType = (typeof PET_GENDER)[keyof typeof PET_GENDER];
 
-// Appointment Constants
+// Appointment Constants - Updated to match database values in Spanish
 export const APPOINTMENT_STATUS = {
   PENDING: 'pendiente',
   CONFIRMED: 'programada',
