@@ -3,19 +3,24 @@ import React, { useState } from 'react';
 import { Calendar } from '@/ui/molecules/calendar';
 import { addDays, startOfDay, isSameDay } from 'date-fns';
 import TimeSlotsList from './TimeSlotsList';
+import { Button } from '@/ui/atoms/button';
 
 interface CalendarViewDateSelectorProps {
   selectedDate: Date | null;
   selectedTime: string | null;
   onDateSelect: (date: Date) => void;
   onTimeSelect: (time: string) => void;
+  onContinue: () => void;
+  onGoBack: () => void;
 }
 
 const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
   selectedDate,
   selectedTime,
   onDateSelect,
-  onTimeSelect
+  onTimeSelect,
+  onContinue,
+  onGoBack
 }) => {
   const [availableDates] = useState<Date[]>(() => {
     // Generate available dates for the next 30 days
@@ -54,6 +59,8 @@ const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
   const handleDateSelect = (date: Date | undefined) => {
     if (date && availableDates.some(availableDate => isSameDay(availableDate, date))) {
       onDateSelect(date);
+      // Clear selected time when changing date
+      onTimeSelect('');
     }
   };
 
@@ -85,7 +92,7 @@ const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
       {selectedDate && timeSlots.length > 0 && (
         <div className="bg-white border rounded-xl border-gray-200">
           <div className="p-4 border-b border-gray-200">
-            <h4 className="font-medium text-[#4BA68D]">
+            <h4 className="font-medium text-gray-900">
               Horarios disponibles
             </h4>
           </div>
@@ -105,6 +112,25 @@ const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
           <p className="text-gray-500">No hay horarios disponibles para esta fecha</p>
         </div>
       )}
+
+      {/* Botones de navegación */}
+      <div className="flex gap-4">
+        <Button 
+          variant="outline"
+          className="flex-1"
+          onClick={onGoBack}
+        >
+          Anterior
+        </Button>
+        
+        <Button 
+          className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
+          onClick={onContinue}
+          disabled={!selectedDate || !selectedTime}
+        >
+          Continuar
+        </Button>
+      </div>
     </div>
   );
 };

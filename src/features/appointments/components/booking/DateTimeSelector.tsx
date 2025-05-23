@@ -11,13 +11,17 @@ interface DateTimeSelectorProps {
   selectedTime: string | null;
   onDateSelect: (date: Date) => void;
   onTimeSelect: (time: string) => void;
+  onContinue: () => void;
+  onGoBack: () => void;
 }
 
 const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   selectedDate,
   selectedTime,
   onDateSelect,
-  onTimeSelect
+  onTimeSelect,
+  onContinue,
+  onGoBack
 }) => {
   const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
   const [availableDays, setAvailableDays] = useState<Date[]>([]);
@@ -67,6 +71,8 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
             selectedTime={selectedTime}
             onDateSelect={onDateSelect}
             onTimeSelect={onTimeSelect}
+            onContinue={onContinue}
+            onGoBack={onGoBack}
           />
         ) : (
           <CalendarViewDateSelector
@@ -74,6 +80,8 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
             selectedTime={selectedTime}
             onDateSelect={onDateSelect}
             onTimeSelect={onTimeSelect}
+            onContinue={onContinue}
+            onGoBack={onGoBack}
           />
         )}
       </div>

@@ -74,6 +74,12 @@ const BookAppointmentScreen: React.FC = () => {
     }
   };
 
+  const handleGoBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const formatPrice = (price?: number) => {
     if (price === undefined) return '';
     
@@ -205,6 +211,8 @@ const BookAppointmentScreen: React.FC = () => {
                     selectedTime={selectedTime}
                     onDateSelect={setSelectedDate}
                     onTimeSelect={setSelectedTime}
+                    onContinue={handleContinue}
+                    onGoBack={handleGoBack}
                   />
                 )}
                 
@@ -255,29 +263,32 @@ const BookAppointmentScreen: React.FC = () => {
           </CardContent>
         </Card>
         
-        <div className="flex gap-4">
-          {currentStep > 1 && (
+        {/* Solo mostrar botones de navegación si no estamos en el paso 3 */}
+        {currentStep !== 3 && (
+          <div className="flex gap-4">
+            {currentStep > 1 && (
+              <Button 
+                variant="outline"
+                className="flex-1"
+                onClick={handleGoBack}
+              >
+                Anterior
+              </Button>
+            )}
+            
             <Button 
-              variant="outline"
-              className="flex-1"
-              onClick={() => setCurrentStep(currentStep - 1)}
+              className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
+              onClick={handleContinue}
+              disabled={
+                (currentStep === 1 && !selectedPet) || 
+                (currentStep === 2 && !selectedService) || 
+                (currentStep === 3 && (!selectedDate || !selectedTime))
+              }
             >
-              Anterior
+              {currentStep === 4 ? 'Confirmar Cita' : 'Continuar'}
             </Button>
-          )}
-          
-          <Button 
-            className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
-            onClick={handleContinue}
-            disabled={
-              (currentStep === 1 && !selectedPet) || 
-              (currentStep === 2 && !selectedService) || 
-              (currentStep === 3 && (!selectedDate || !selectedTime))
-            }
-          >
-            {currentStep === 4 ? 'Confirmar Cita' : 'Continuar'}
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
     </LayoutBase>
   );
