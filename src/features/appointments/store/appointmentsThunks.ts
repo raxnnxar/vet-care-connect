@@ -16,7 +16,7 @@ import {
   AppointmentFilters
 } from '../types';
 import { QueryOptions } from '../../../core/api/apiClient';
-import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
+import { APPOINTMENT_STATUS, AppointmentTypeType } from '@/core/constants/app.constants';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -77,7 +77,7 @@ export const scheduleAppointment = (appointmentData: CreateAppointmentData) => a
       pet_id: appointmentData.petId,
       provider_id: appointmentData.vetId,
       owner_id: appointmentData.owner_id,
-      appointment_date: new Date(`${appointmentData.date}T${appointmentData.time}:00.000Z`),
+      appointment_date: new Date(`${appointmentData.date}T${appointmentData.time}:00.000Z`).toISOString(),
       duration: appointmentData.duration || 30,
       service_type: appointmentData.service_type || 'consulta_general',
       reason: appointmentData.reason || 'Consulta general',
