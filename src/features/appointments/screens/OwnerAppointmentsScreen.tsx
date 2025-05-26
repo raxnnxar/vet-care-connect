@@ -33,7 +33,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
           .from('appointments')
           .select(`
             *,
-            pets (
+            pets!pet_id (
               id,
               name,
               profile_picture_url
