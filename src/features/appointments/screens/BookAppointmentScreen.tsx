@@ -12,6 +12,7 @@ import VeterinarianCard from '@/features/appointments/components/booking/Veterin
 import ServiceSelectionStep from '@/features/appointments/components/booking/ServiceSelectionStep';
 import ConfirmationStep from '@/features/appointments/components/booking/ConfirmationStep';
 import NavigationButtons from '@/features/appointments/components/booking/NavigationButtons';
+import { useCreateAppointment } from '@/features/appointments/hooks/useCreateAppointment';
 import { Pet } from '@/features/pets/types';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
@@ -27,6 +28,7 @@ const BookAppointmentScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { createAppointment, isLoading: isCreatingAppointment } = useCreateAppointment();
 
   useEffect(() => {
     const fetchVetDetails = async () => {
@@ -67,12 +69,34 @@ const BookAppointmentScreen: React.FC = () => {
     navigate(-1);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Here would be API call to book appointment
-      navigate(`/owner/appointments`);
+      // Create appointment in database
+      if (selectedPet && selectedService && selectedDate && selectedTime && vetId && user?.id) {
+        const appointmentData = {
+          petId: selectedPet.id,
+          providerId: vetId,
+          appointmentDate: {
+            date: selectedDate.toISOString().split('T')[0],
+            time: selectedTime
+          },
+          serviceType: {
+            id: selectedService.id,
+            name: selectedService.name,
+            price: selectedService.price,
+            description: selectedService.description
+          },
+          ownerId: user.id
+        };
+
+        const result = await createAppointment(appointmentData);
+        
+        if (result) {
+          navigate('/owner/appointments');
+        }
+      }
     }
   };
 
@@ -158,6 +182,7 @@ const BookAppointmentScreen: React.FC = () => {
             selectedTime={selectedTime}
             onGoBack={handleGoBack}
             onContinue={handleContinue}
+            isLoading={isCreatingAppointment}
           />
         )}
       </div>

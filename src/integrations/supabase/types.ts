@@ -11,7 +11,7 @@ export type Database = {
     Tables: {
       appointments: {
         Row: {
-          appointment_date: string
+          appointment_date: Json
           canceled_reason: string | null
           created_at: string | null
           duration: number | null
@@ -22,16 +22,15 @@ export type Database = {
           owner_id: string | null
           payment_status: Database["public"]["Enums"]["payment_status"] | null
           pet_id: string | null
-          price: number | null
           provider_id: string | null
           reason: string | null
           reminder_sent: boolean | null
-          service_type: string | null
+          service_type: Json | null
           status: Database["public"]["Enums"]["appointment_status"] | null
           updated_at: string | null
         }
         Insert: {
-          appointment_date: string
+          appointment_date: Json
           canceled_reason?: string | null
           created_at?: string | null
           duration?: number | null
@@ -42,16 +41,15 @@ export type Database = {
           owner_id?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
           pet_id?: string | null
-          price?: number | null
           provider_id?: string | null
           reason?: string | null
           reminder_sent?: boolean | null
-          service_type?: string | null
+          service_type?: Json | null
           status?: Database["public"]["Enums"]["appointment_status"] | null
           updated_at?: string | null
         }
         Update: {
-          appointment_date?: string
+          appointment_date?: Json
           canceled_reason?: string | null
           created_at?: string | null
           duration?: number | null
@@ -62,22 +60,14 @@ export type Database = {
           owner_id?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
           pet_id?: string | null
-          price?: number | null
           provider_id?: string | null
           reason?: string | null
           reminder_sent?: boolean | null
-          service_type?: string | null
+          service_type?: Json | null
           status?: Database["public"]["Enums"]["appointment_status"] | null
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "appointments_follow_up_appointment_id_fkey"
-            columns: ["follow_up_appointment_id"]
-            isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "appointments_follow_up_appointment_id_fkey"
             columns: ["follow_up_appointment_id"]
@@ -89,22 +79,8 @@ export type Database = {
             foreignKeyName: "appointments_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["owner_id"]
-          },
-          {
-            foreignKeyName: "appointments_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
             referencedRelation: "pet_owners"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "appointments_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["pet_id"]
           },
           {
             foreignKeyName: "appointments_pet_id_fkey"
@@ -124,13 +100,6 @@ export type Database = {
             foreignKeyName: "fk_appointments_owner"
             columns: ["owner_id"]
             isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["owner_id"]
-          },
-          {
-            foreignKeyName: "fk_appointments_owner"
-            columns: ["owner_id"]
-            isOneToOne: false
             referencedRelation: "pet_owners"
             referencedColumns: ["id"]
           },
@@ -138,22 +107,8 @@ export type Database = {
             foreignKeyName: "fk_appointments_pet"
             columns: ["pet_id"]
             isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["pet_id"]
-          },
-          {
-            foreignKeyName: "fk_appointments_pet"
-            columns: ["pet_id"]
-            isOneToOne: false
             referencedRelation: "pets"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_appointments_provider"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["vet_id"]
           },
           {
             foreignKeyName: "fk_appointments_provider"
@@ -248,13 +203,6 @@ export type Database = {
             foreignKeyName: "pet_medical_history_pet_id_fkey"
             columns: ["pet_id"]
             isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["pet_id"]
-          },
-          {
-            foreignKeyName: "pet_medical_history_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
             referencedRelation: "pets"
             referencedColumns: ["id"]
           },
@@ -289,13 +237,6 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pet_owners_primary_vet_id_fkey"
-            columns: ["primary_vet_id"]
-            isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["vet_id"]
           },
           {
             foreignKeyName: "pet_owners_primary_vet_id_fkey"
@@ -357,22 +298,8 @@ export type Database = {
             foreignKeyName: "pets_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["owner_id"]
-          },
-          {
-            foreignKeyName: "pets_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
             referencedRelation: "pet_owners"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pets_primary_vet_id_fkey"
-            columns: ["primary_vet_id"]
-            isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["vet_id"]
           },
           {
             foreignKeyName: "pets_primary_vet_id_fkey"
@@ -442,13 +369,6 @@ export type Database = {
           veterinarian_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "reviews_veterinarian_id_fkey"
-            columns: ["veterinarian_id"]
-            isOneToOne: false
-            referencedRelation: "appointment_details"
-            referencedColumns: ["vet_id"]
-          },
           {
             foreignKeyName: "reviews_veterinarian_id_fkey"
             columns: ["veterinarian_id"]
@@ -563,45 +483,7 @@ export type Database = {
       }
     }
     Views: {
-      appointment_details: {
-        Row: {
-          appointment_date: string | null
-          canceled_reason: string | null
-          duration: number | null
-          id: string | null
-          notes: string | null
-          owner_id: string | null
-          owner_name: string | null
-          payment_status: Database["public"]["Enums"]["payment_status"] | null
-          pet_id: string | null
-          pet_name: string | null
-          pet_species: string | null
-          price: number | null
-          reason: string | null
-          reminder_sent: boolean | null
-          service_type: string | null
-          status: Database["public"]["Enums"]["appointment_status"] | null
-          vet_id: string | null
-          vet_name: string | null
-          vet_specialty: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pet_owners_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "veterinarians_id_fkey"
-            columns: ["vet_id"]
-            isOneToOne: true
-            referencedRelation: "service_providers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       create_pet_grooming: {

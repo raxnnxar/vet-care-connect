@@ -11,6 +11,7 @@ interface NavigationButtonsProps {
   selectedTime: string | null;
   onGoBack: () => void;
   onContinue: () => void;
+  isLoading?: boolean;
 }
 
 const NavigationButtons: React.FC<NavigationButtonsProps> = ({
@@ -20,7 +21,8 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
   selectedDate,
   selectedTime,
   onGoBack,
-  onContinue
+  onContinue,
+  isLoading = false
 }) => {
   const isDisabled = () => {
     switch (currentStep) {
@@ -42,6 +44,7 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
           variant="outline"
           className="flex-1"
           onClick={onGoBack}
+          disabled={isLoading}
         >
           Anterior
         </Button>
@@ -50,9 +53,9 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
       <Button 
         className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
         onClick={onContinue}
-        disabled={isDisabled()}
+        disabled={isDisabled() || isLoading}
       >
-        {currentStep === 4 ? 'Confirmar Cita' : 'Continuar'}
+        {isLoading ? 'Procesando...' : (currentStep === 4 ? 'Confirmar Cita' : 'Continuar')}
       </Button>
     </div>
   );
