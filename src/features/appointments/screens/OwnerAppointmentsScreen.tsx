@@ -24,24 +24,10 @@ const OwnerAppointmentsScreen: React.FC = () => {
       try {
         console.log('Current user ID:', user?.id);
         
-        // Get all appointments with veterinarian data
+        // First get all appointments for this user without date filtering
         const { data: appointmentsData, error: appointmentsError } = await supabase
           .from('appointments')
-          .select(`
-            *,
-            veterinarians!provider_id (
-              id,
-              bio
-            ),
-            service_providers!provider_id (
-              id,
-              business_name
-            ),
-            profiles!provider_id (
-              id,
-              display_name
-            )
-          `)
+          .select('*')
           .eq('owner_id', user?.id)
           .order('created_at', { ascending: false });
 
@@ -64,16 +50,17 @@ const OwnerAppointmentsScreen: React.FC = () => {
           try {
             let appointmentDate: Date;
             
-            // Handle JSONB format from database
-            if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
+            // Handle different appointment_date formats
+            if (typeof appointment.appointment_date === 'string') {
+              appointmentDate = new Date(appointment.appointment_date);
+            } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
+              // Handle JSON format like {date: "2024-01-01", time: "10:00"}
               const dateObj = appointment.appointment_date as any;
               if (dateObj.date && dateObj.time) {
                 appointmentDate = new Date(`${dateObj.date}T${dateObj.time}`);
               } else {
                 return false;
               }
-            } else if (typeof appointment.appointment_date === 'string') {
-              appointmentDate = new Date(appointment.appointment_date);
             } else {
               return false;
             }
@@ -105,6 +92,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
 
           if (petsError) {
             console.error('Error fetching pets:', petsError);
+            // Don't throw error, just continue without pet data
           } else {
             petsData = pets || [];
           }
@@ -120,18 +108,12 @@ const OwnerAppointmentsScreen: React.FC = () => {
         return filteredAppointments.map(appointment => {
           const pet = petsMap.get(appointment.pet_id);
           
-          // Get veterinarian name from multiple possible sources
-          let providerName = 'Veterinario no disponible';
-          if (appointment.profiles && appointment.profiles.display_name) {
-            providerName = appointment.profiles.display_name;
-          } else if (appointment.service_providers && appointment.service_providers.business_name) {
-            providerName = appointment.service_providers.business_name;
-          }
-          
           return {
             ...appointment,
-            // Ensure appointment_date is properly formatted
-            appointment_date: appointment.appointment_date,
+            // Ensure appointment_date is a string for consistency
+            appointment_date: typeof appointment.appointment_date === 'string' 
+              ? appointment.appointment_date 
+              : JSON.stringify(appointment.appointment_date),
             // Extract pet name safely
             pet_name: pet?.name || 'Mascota sin nombre',
             // Add pet object for compatibility
@@ -140,8 +122,6 @@ const OwnerAppointmentsScreen: React.FC = () => {
               name: pet.name,
               profile_picture_url: pet.profile_picture_url
             } : null,
-            // Set provider name
-            provider_name: providerName,
             // Ensure status is properly set
             status: appointment.status || 'pendiente'
           };
@@ -151,7 +131,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
         throw error;
       }
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id, // Only run query when user ID is available
   });
 
   const handleFindVets = () => {

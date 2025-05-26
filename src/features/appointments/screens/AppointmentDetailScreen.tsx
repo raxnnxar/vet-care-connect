@@ -3,19 +3,31 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
-import { ArrowLeft, Calendar, Clock, MapPin, User, FileText, CreditCard, Phone } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
+import { ArrowLeft } from 'lucide-react';
+import { AppointmentHeader } from '../components/AppointmentHeader';
+import { PetInfo } from '../components/PetInfo';
+import { ServiceDetails } from '../components/ServiceDetails';
+import { useAppointments } from '../hooks/useAppointments';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { AppointmentStatusBadge } from '../components/AppointmentStatusBadge';
-import { AppointmentStatusType } from '@/core/constants/app.constants';
+import { Pet } from '@/features/pets/types';
+
+interface AppointmentPetResponse {
+  id: string;
+  name: string;
+  species: string;
+  breed?: string;
+  sex?: string;
+  date_of_birth?: string;
+  profile_picture_url?: string;
+}
 
 const AppointmentDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { appointments } = useAppointments();
 
   const { data: appointmentDetails, isLoading } = useQuery({
     queryKey: ['appointment', id],
@@ -26,24 +38,7 @@ const AppointmentDetailScreen: React.FC = () => {
         .from('appointments')
         .select(`
           *,
-          pets:pet_id(id, name, species, breed, sex, date_of_birth, profile_picture_url),
-          veterinarians!provider_id (
-            id,
-            bio,
-            specialization,
-            years_of_experience
-          ),
-          service_providers!provider_id (
-            id,
-            business_name,
-            phone_number,
-            address
-          ),
-          profiles!provider_id (
-            id,
-            display_name,
-            email
-          )
+          pets:pet_id(id, name, species, breed, sex, date_of_birth, profile_picture_url)
         `)
         .eq('id', id)
         .single();
@@ -60,39 +55,6 @@ const AppointmentDetailScreen: React.FC = () => {
   });
 
   const goBack = () => navigate(-1);
-
-  const formatDateFromJsonb = (dateData: any) => {
-    try {
-      if (typeof dateData === 'object' && dateData !== null) {
-        if (dateData.date && dateData.time) {
-          const date = new Date(`${dateData.date}T${dateData.time}`);
-          return format(date, "d 'de' MMMM, yyyy", { locale: es });
-        }
-      } else if (typeof dateData === 'string') {
-        const date = new Date(dateData);
-        return format(date, "d 'de' MMMM, yyyy", { locale: es });
-      }
-      return 'Fecha no disponible';
-    } catch (err) {
-      return 'Fecha no disponible';
-    }
-  };
-
-  const formatTimeFromJsonb = (dateData: any) => {
-    try {
-      if (typeof dateData === 'object' && dateData !== null) {
-        if (dateData.time) {
-          return dateData.time;
-        }
-      } else if (typeof dateData === 'string') {
-        const date = new Date(dateData);
-        return format(date, "HH:mm");
-      }
-      return 'Hora no disponible';
-    } catch (err) {
-      return 'Hora no disponible';
-    }
-  };
 
   if (isLoading) {
     return (
@@ -144,30 +106,72 @@ const AppointmentDetailScreen: React.FC = () => {
     );
   }
 
-  // Get provider information
-  const providerName = appointmentDetails.profiles?.display_name || 
-                      appointmentDetails.service_providers?.business_name || 
-                      'Veterinario no disponible';
+  // Safely parse appointment date
+  let appointmentDateString = '';
+  let appointmentTime = '';
   
-  const providerPhone = appointmentDetails.service_providers?.phone_number;
-  const providerAddress = appointmentDetails.service_providers?.address || appointmentDetails.location;
-  const providerEmail = appointmentDetails.profiles?.email;
+  if (appointmentDetails.appointment_date) {
+    try {
+      if (typeof appointmentDetails.appointment_date === 'string') {
+        appointmentDateString = appointmentDetails.appointment_date;
+        appointmentTime = format(new Date(appointmentDetails.appointment_date), 'HH:mm');
+      } else if (typeof appointmentDetails.appointment_date === 'object' && appointmentDetails.appointment_date !== null) {
+        // Handle case where appointment_date might be an object with date and time
+        const dateObj = appointmentDetails.appointment_date as any;
+        if (dateObj.date && dateObj.time) {
+          appointmentDateString = `${dateObj.date}T${dateObj.time}`;
+          appointmentTime = dateObj.time;
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing appointment date:', error);
+      appointmentDateString = 'Fecha no disponible';
+      appointmentTime = 'Hora no disponible';
+    }
+  }
 
-  // Get service type information
-  let serviceTypeDisplay = 'Servicio no especificado';
+  // Transform pet data safely to a Pet object only when valid
+  let pet: Pet | null = null;
+  
+  // Use null check before accessing properties
+  if (appointmentDetails.pets && 
+      typeof appointmentDetails.pets === 'object') {
+    
+    // Type assertion after validation
+    const petsData = appointmentDetails.pets as AppointmentPetResponse;
+    
+    // Check if it's a valid pet object with required properties
+    if ('id' in petsData && petsData.id) {
+      pet = {
+        id: petsData.id,
+        name: petsData.name,
+        species: petsData.species,
+        breed: petsData.breed,
+        sex: petsData.sex,
+        date_of_birth: petsData.date_of_birth,
+        profile_picture_url: petsData.profile_picture_url,
+        owner_id: appointmentDetails.owner_id || '',
+        created_at: ''
+      };
+    }
+  }
+
+  // Safely extract service type information
+  let serviceType = '';
   let servicePrice: number | undefined;
   
   if (appointmentDetails.service_type) {
     try {
       if (typeof appointmentDetails.service_type === 'string') {
-        serviceTypeDisplay = appointmentDetails.service_type;
+        serviceType = appointmentDetails.service_type;
       } else if (typeof appointmentDetails.service_type === 'object' && appointmentDetails.service_type !== null) {
         const serviceObj = appointmentDetails.service_type as any;
-        serviceTypeDisplay = serviceObj.name || serviceObj.type || 'Servicio no especificado';
+        serviceType = serviceObj.name || serviceObj.type || 'Servicio no especificado';
         servicePrice = serviceObj.price ? Number(serviceObj.price) : undefined;
       }
     } catch (error) {
       console.error('Error parsing service type:', error);
+      serviceType = 'Servicio no especificado';
     }
   }
 
@@ -183,148 +187,26 @@ const AppointmentDetailScreen: React.FC = () => {
       }
       footer={<NavbarInferior activeTab="appointments" />}
     >
-      <div className="p-4 space-y-4 pb-20">
-        {/* Status and Date Card */}
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg">Estado de la Cita</CardTitle>
-              <AppointmentStatusBadge status={appointmentDetails.status as AppointmentStatusType} />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center">
-              <Calendar className="text-[#79D0B8] mr-3" size={20} />
-              <span className="font-medium">Fecha:</span>
-              <span className="ml-2">{formatDateFromJsonb(appointmentDetails.appointment_date)}</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="text-[#79D0B8] mr-3" size={20} />
-              <span className="font-medium">Hora:</span>
-              <span className="ml-2">{formatTimeFromJsonb(appointmentDetails.appointment_date)}</span>
-            </div>
-            {providerAddress && (
-              <div className="flex items-center">
-                <MapPin className="text-[#79D0B8] mr-3" size={20} />
-                <span className="font-medium">Ubicación:</span>
-                <span className="ml-2">{providerAddress}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Pet Information */}
-        {appointmentDetails.pets && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Información de la Mascota</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-3">
-                <div className="bg-[#79D0B8] p-3 rounded-full">
-                  <User size={24} className="text-white" />
-                </div>
-                <div>
-                  <p className="font-semibold text-lg">{appointmentDetails.pets.name}</p>
-                  <p className="text-gray-500">
-                    {appointmentDetails.pets.species}
-                    {appointmentDetails.pets.breed ? ` - ${appointmentDetails.pets.breed}` : ''}
-                    {appointmentDetails.pets.sex ? ` - ${appointmentDetails.pets.sex === 'male' ? 'Macho' : 'Hembra'}` : ''}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="p-4 space-y-6 pb-20">
+        <AppointmentHeader
+          date={appointmentDateString}
+          time={appointmentTime}
+          status={appointmentDetails.status}
+        />
+        
+        {pet && (
+          <PetInfo pet={pet} />
         )}
 
-        {/* Veterinarian Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Información del Veterinario</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center">
-              <User className="text-[#79D0B8] mr-3" size={20} />
-              <span className="font-medium">Nombre:</span>
-              <span className="ml-2">{providerName}</span>
-            </div>
-            {providerEmail && (
-              <div className="flex items-center">
-                <span className="font-medium">Email:</span>
-                <span className="ml-2">{providerEmail}</span>
-              </div>
-            )}
-            {providerPhone && (
-              <div className="flex items-center">
-                <Phone className="text-[#79D0B8] mr-3" size={20} />
-                <span className="font-medium">Teléfono:</span>
-                <span className="ml-2">{providerPhone}</span>
-              </div>
-            )}
-            {appointmentDetails.veterinarians?.years_of_experience && (
-              <div className="flex items-center">
-                <span className="font-medium">Experiencia:</span>
-                <span className="ml-2">{appointmentDetails.veterinarians.years_of_experience} años</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Service Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Detalles del Servicio</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center">
-              <FileText className="text-[#79D0B8] mr-3" size={20} />
-              <span className="font-medium">Tipo de servicio:</span>
-              <span className="ml-2">{serviceTypeDisplay}</span>
-            </div>
-            {appointmentDetails.duration && (
-              <div className="flex items-center">
-                <Clock className="text-[#79D0B8] mr-3" size={20} />
-                <span className="font-medium">Duración:</span>
-                <span className="ml-2">{appointmentDetails.duration} minutos</span>
-              </div>
-            )}
-            {servicePrice && (
-              <div className="flex items-center">
-                <CreditCard className="text-[#79D0B8] mr-3" size={20} />
-                <span className="font-medium">Precio:</span>
-                <span className="ml-2">${servicePrice}</span>
-              </div>
-            )}
-            {appointmentDetails.payment_status && (
-              <div className="flex items-center">
-                <span className="font-medium">Estado de pago:</span>
-                <span className={`ml-2 ${appointmentDetails.payment_status === 'pagado' ? 'text-green-500' : 'text-yellow-500'}`}>
-                  {appointmentDetails.payment_status === 'pagado' ? 'Pagado' : 'Pendiente'}
-                </span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Notes */}
-        {appointmentDetails.notes && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Notas Adicionales</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-700">{appointmentDetails.notes}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Action Button */}
-        <Button 
-          className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
-          onClick={goBack}
-        >
-          Volver a Mis Citas
-        </Button>
+        <ServiceDetails
+          serviceType={serviceType}
+          duration={appointmentDetails.duration}
+          price={servicePrice}
+          clinicName={appointmentDetails.location || ""}
+          clinicAddress={appointmentDetails.location || ""}
+          notes={appointmentDetails.notes}
+          paymentStatus={appointmentDetails.payment_status}
+        />
       </div>
     </LayoutBase>
   );
