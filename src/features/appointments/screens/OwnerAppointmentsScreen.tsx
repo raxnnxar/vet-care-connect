@@ -22,28 +22,14 @@ const OwnerAppointmentsScreen: React.FC = () => {
       console.log('Fetching appointments for tab:', activeTab);
       
       try {
-        const now = new Date();
-        const nowISOString = now.toISOString();
-        
         console.log('Current user ID:', user?.id);
-        console.log('Current date/time:', nowISOString);
-        console.log('Filtering for', activeTab === 'upcoming' ? 'upcoming' : 'past', 'appointments');
         
-        // First get appointments
-        let appointmentsQuery = supabase
+        // First get all appointments for this user without date filtering
+        const { data: appointmentsData, error: appointmentsError } = await supabase
           .from('appointments')
           .select('*')
           .eq('owner_id', user?.id)
-          .order('appointment_date', { ascending: activeTab === 'upcoming' });
-
-        // Apply date filtering based on tab
-        if (activeTab === 'upcoming') {
-          appointmentsQuery = appointmentsQuery.gte('appointment_date', nowISOString);
-        } else {
-          appointmentsQuery = appointmentsQuery.lt('appointment_date', nowISOString);
-        }
-
-        const { data: appointmentsData, error: appointmentsError } = await appointmentsQuery;
+          .order('created_at', { ascending: false });
 
         if (appointmentsError) {
           console.error('Error fetching appointments:', appointmentsError);
@@ -56,32 +42,70 @@ const OwnerAppointmentsScreen: React.FC = () => {
           return [];
         }
 
-        // Get pet IDs from appointments
-        const petIds = appointmentsData
+        // Filter appointments based on the current time and tab
+        const now = new Date();
+        const filteredAppointments = appointmentsData.filter(appointment => {
+          if (!appointment.appointment_date) return false;
+          
+          try {
+            let appointmentDate: Date;
+            
+            // Handle different appointment_date formats
+            if (typeof appointment.appointment_date === 'string') {
+              appointmentDate = new Date(appointment.appointment_date);
+            } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
+              // Handle JSON format like {date: "2024-01-01", time: "10:00"}
+              const dateObj = appointment.appointment_date as any;
+              if (dateObj.date && dateObj.time) {
+                appointmentDate = new Date(`${dateObj.date}T${dateObj.time}`);
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+            
+            // Filter based on tab
+            if (activeTab === 'upcoming') {
+              return appointmentDate >= now;
+            } else {
+              return appointmentDate < now;
+            }
+          } catch (error) {
+            console.error('Error parsing appointment date:', error);
+            return false;
+          }
+        });
+
+        // Get pet IDs from filtered appointments
+        const petIds = filteredAppointments
           .map(appointment => appointment.pet_id)
           .filter(petId => petId !== null);
 
-        // Fetch pets data separately
-        const { data: petsData, error: petsError } = await supabase
-          .from('pets')
-          .select('id, name, profile_picture_url')
-          .in('id', petIds);
+        // Fetch pets data separately if we have pet IDs
+        let petsData = [];
+        if (petIds.length > 0) {
+          const { data: pets, error: petsError } = await supabase
+            .from('pets')
+            .select('id, name, profile_picture_url')
+            .in('id', petIds);
 
-        if (petsError) {
-          console.error('Error fetching pets:', petsError);
-          // Don't throw error, just continue without pet data
+          if (petsError) {
+            console.error('Error fetching pets:', petsError);
+            // Don't throw error, just continue without pet data
+          } else {
+            petsData = pets || [];
+          }
         }
 
         // Create a map of pet data for easy lookup
         const petsMap = new Map();
-        if (petsData) {
-          petsData.forEach(pet => {
-            petsMap.set(pet.id, pet);
-          });
-        }
+        petsData.forEach(pet => {
+          petsMap.set(pet.id, pet);
+        });
         
         // Transform the data to match the expected format
-        return appointmentsData.map(appointment => {
+        return filteredAppointments.map(appointment => {
           const pet = petsMap.get(appointment.pet_id);
           
           return {
