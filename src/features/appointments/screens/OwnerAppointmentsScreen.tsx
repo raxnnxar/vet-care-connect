@@ -17,7 +17,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('upcoming');
 
   const { data: appointments, isLoading, error, refetch } = useQuery({
-    queryKey: ['appointments', activeTab],
+    queryKey: ['owner-appointments', activeTab, user?.id],
     queryFn: async () => {
       console.log('Fetching appointments for tab:', activeTab);
       
@@ -57,7 +57,19 @@ const OwnerAppointmentsScreen: React.FC = () => {
         }
         
         console.log('Fetched appointments:', data);
-        return data || [];
+        
+        // Transform the data to match the expected format
+        return data?.map(appointment => ({
+          ...appointment,
+          // Ensure appointment_date is a string for consistency
+          appointment_date: typeof appointment.appointment_date === 'string' 
+            ? appointment.appointment_date 
+            : JSON.stringify(appointment.appointment_date),
+          // Extract pet name safely
+          pet_name: appointment.pets?.name || 'Mascota sin nombre',
+          // Ensure status is properly set
+          status: appointment.status || 'pendiente'
+        })) || [];
       } catch (error) {
         console.error('Error in fetchAppointments:', error);
         throw error;
