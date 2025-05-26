@@ -29,47 +29,79 @@ const OwnerAppointmentsScreen: React.FC = () => {
         console.log('Current date/time:', nowISOString);
         console.log('Filtering for', activeTab === 'upcoming' ? 'upcoming' : 'past', 'appointments');
         
-        let query = supabase
+        // First get appointments
+        let appointmentsQuery = supabase
           .from('appointments')
-          .select(`
-            *,
-            pets!pet_id (
-              id,
-              name,
-              profile_picture_url
-            )
-          `)
+          .select('*')
           .eq('owner_id', user?.id)
           .order('appointment_date', { ascending: activeTab === 'upcoming' });
 
         // Apply date filtering based on tab
         if (activeTab === 'upcoming') {
-          query = query.gte('appointment_date', nowISOString);
+          appointmentsQuery = appointmentsQuery.gte('appointment_date', nowISOString);
         } else {
-          query = query.lt('appointment_date', nowISOString);
+          appointmentsQuery = appointmentsQuery.lt('appointment_date', nowISOString);
         }
 
-        const { data, error } = await query;
+        const { data: appointmentsData, error: appointmentsError } = await appointmentsQuery;
 
-        if (error) {
-          console.error('Error fetching appointments:', error);
-          throw error;
+        if (appointmentsError) {
+          console.error('Error fetching appointments:', appointmentsError);
+          throw appointmentsError;
         }
         
-        console.log('Fetched appointments:', data);
+        console.log('Fetched appointments:', appointmentsData);
+
+        if (!appointmentsData || appointmentsData.length === 0) {
+          return [];
+        }
+
+        // Get pet IDs from appointments
+        const petIds = appointmentsData
+          .map(appointment => appointment.pet_id)
+          .filter(petId => petId !== null);
+
+        // Fetch pets data separately
+        const { data: petsData, error: petsError } = await supabase
+          .from('pets')
+          .select('id, name, profile_picture_url')
+          .in('id', petIds);
+
+        if (petsError) {
+          console.error('Error fetching pets:', petsError);
+          // Don't throw error, just continue without pet data
+        }
+
+        // Create a map of pet data for easy lookup
+        const petsMap = new Map();
+        if (petsData) {
+          petsData.forEach(pet => {
+            petsMap.set(pet.id, pet);
+          });
+        }
         
         // Transform the data to match the expected format
-        return data?.map(appointment => ({
-          ...appointment,
-          // Ensure appointment_date is a string for consistency
-          appointment_date: typeof appointment.appointment_date === 'string' 
-            ? appointment.appointment_date 
-            : JSON.stringify(appointment.appointment_date),
-          // Extract pet name safely
-          pet_name: appointment.pets?.name || 'Mascota sin nombre',
-          // Ensure status is properly set
-          status: appointment.status || 'pendiente'
-        })) || [];
+        return appointmentsData.map(appointment => {
+          const pet = petsMap.get(appointment.pet_id);
+          
+          return {
+            ...appointment,
+            // Ensure appointment_date is a string for consistency
+            appointment_date: typeof appointment.appointment_date === 'string' 
+              ? appointment.appointment_date 
+              : JSON.stringify(appointment.appointment_date),
+            // Extract pet name safely
+            pet_name: pet?.name || 'Mascota sin nombre',
+            // Add pet object for compatibility
+            pets: pet ? {
+              id: pet.id,
+              name: pet.name,
+              profile_picture_url: pet.profile_picture_url
+            } : null,
+            // Ensure status is properly set
+            status: appointment.status || 'pendiente'
+          };
+        });
       } catch (error) {
         console.error('Error in fetchAppointments:', error);
         throw error;
