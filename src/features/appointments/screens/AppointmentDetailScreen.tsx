@@ -106,9 +106,29 @@ const AppointmentDetailScreen: React.FC = () => {
     );
   }
 
-  const appointmentTime = appointmentDetails.appointment_date 
-    ? format(new Date(appointmentDetails.appointment_date), 'HH:mm')
-    : '';
+  // Safely parse appointment date
+  let appointmentDateString = '';
+  let appointmentTime = '';
+  
+  if (appointmentDetails.appointment_date) {
+    try {
+      if (typeof appointmentDetails.appointment_date === 'string') {
+        appointmentDateString = appointmentDetails.appointment_date;
+        appointmentTime = format(new Date(appointmentDetails.appointment_date), 'HH:mm');
+      } else if (typeof appointmentDetails.appointment_date === 'object' && appointmentDetails.appointment_date !== null) {
+        // Handle case where appointment_date might be an object with date and time
+        const dateObj = appointmentDetails.appointment_date as any;
+        if (dateObj.date && dateObj.time) {
+          appointmentDateString = `${dateObj.date}T${dateObj.time}`;
+          appointmentTime = dateObj.time;
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing appointment date:', error);
+      appointmentDateString = 'Fecha no disponible';
+      appointmentTime = 'Hora no disponible';
+    }
+  }
 
   // Transform pet data safely to a Pet object only when valid
   let pet: Pet | null = null;
@@ -136,6 +156,25 @@ const AppointmentDetailScreen: React.FC = () => {
     }
   }
 
+  // Safely extract service type information
+  let serviceType = '';
+  let servicePrice: number | undefined;
+  
+  if (appointmentDetails.service_type) {
+    try {
+      if (typeof appointmentDetails.service_type === 'string') {
+        serviceType = appointmentDetails.service_type;
+      } else if (typeof appointmentDetails.service_type === 'object' && appointmentDetails.service_type !== null) {
+        const serviceObj = appointmentDetails.service_type as any;
+        serviceType = serviceObj.name || serviceObj.type || 'Servicio no especificado';
+        servicePrice = serviceObj.price ? Number(serviceObj.price) : undefined;
+      }
+    } catch (error) {
+      console.error('Error parsing service type:', error);
+      serviceType = 'Servicio no especificado';
+    }
+  }
+
   return (
     <LayoutBase
       header={
@@ -150,7 +189,7 @@ const AppointmentDetailScreen: React.FC = () => {
     >
       <div className="p-4 space-y-6 pb-20">
         <AppointmentHeader
-          date={appointmentDetails.appointment_date}
+          date={appointmentDateString}
           time={appointmentTime}
           status={appointmentDetails.status}
         />
@@ -160,9 +199,9 @@ const AppointmentDetailScreen: React.FC = () => {
         )}
 
         <ServiceDetails
-          serviceType={appointmentDetails.service_type}
+          serviceType={serviceType}
           duration={appointmentDetails.duration}
-          price={appointmentDetails.price}
+          price={servicePrice}
           clinicName={appointmentDetails.location || ""}
           clinicAddress={appointmentDetails.location || ""}
           notes={appointmentDetails.notes}

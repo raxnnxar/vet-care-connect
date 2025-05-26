@@ -62,13 +62,41 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
         }
       }
       
+      // Safely parse appointment date
+      let appointmentDateStr = '';
+      let timeFormatted = 'Hora no especificada';
+      
+      if (appointment.appointment_date) {
+        try {
+          if (typeof appointment.appointment_date === 'string') {
+            appointmentDateStr = appointment.appointment_date;
+            timeFormatted = format(parseISO(appointment.appointment_date), 'h:mm a');
+          } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
+            const dateObj = appointment.appointment_date as any;
+            if (dateObj.date && dateObj.time) {
+              appointmentDateStr = `${dateObj.date}T${dateObj.time}`;
+              timeFormatted = dateObj.time;
+            }
+          }
+        } catch (err) {
+          console.error('Error parsing appointment date:', err);
+        }
+      }
+
+      // Extract price from service_type if available
+      let price: number | null = null;
+      if (appointment.service_type && typeof appointment.service_type === 'object') {
+        const serviceObj = appointment.service_type as any;
+        price = serviceObj.price ? Number(serviceObj.price) : null;
+      }
+      
       return {
         ...appointment,
+        appointment_date: appointmentDateStr,
         petName,
-        time: appointment.appointment_date ? 
-          format(parseISO(appointment.appointment_date), 'h:mm a') : 
-          'Hora no especificada'
-      };
+        time: timeFormatted,
+        price
+      } as Appointment;
     });
   } catch (err) {
     console.error('Unexpected error in getVetAppointments:', err);
@@ -116,13 +144,41 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
         }
       }
       
+      // Safely parse appointment date
+      let appointmentDateStr = '';
+      let timeFormatted = 'Hora no especificada';
+      
+      if (appointment.appointment_date) {
+        try {
+          if (typeof appointment.appointment_date === 'string') {
+            appointmentDateStr = appointment.appointment_date;
+            timeFormatted = format(parseISO(appointment.appointment_date), 'h:mm a');
+          } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
+            const dateObj = appointment.appointment_date as any;
+            if (dateObj.date && dateObj.time) {
+              appointmentDateStr = `${dateObj.date}T${dateObj.time}`;
+              timeFormatted = dateObj.time;
+            }
+          }
+        } catch (err) {
+          console.error('Error parsing appointment date:', err);
+        }
+      }
+
+      // Extract price from service_type if available
+      let price: number | null = null;
+      if (appointment.service_type && typeof appointment.service_type === 'object') {
+        const serviceObj = appointment.service_type as any;
+        price = serviceObj.price ? Number(serviceObj.price) : null;
+      }
+      
       return {
         ...appointment,
+        appointment_date: appointmentDateStr,
         petName,
-        time: appointment.appointment_date ? 
-          format(parseISO(appointment.appointment_date), 'h:mm a') : 
-          'Hora no especificada'
-      };
+        time: timeFormatted,
+        price
+      } as Appointment;
     });
   } catch (err) {
     console.error('Unexpected error in getVetAppointmentsByDate:', err);
@@ -152,7 +208,17 @@ export const getVetAppointmentDates = async (providerId: string, startDate: Date
     }
 
     // Convert the appointment dates to Date objects
-    return data.map(item => parseISO(item.appointment_date));
+    return data.map(item => {
+      if (typeof item.appointment_date === 'string') {
+        return parseISO(item.appointment_date);
+      } else if (typeof item.appointment_date === 'object' && item.appointment_date !== null) {
+        const dateObj = item.appointment_date as any;
+        if (dateObj.date) {
+          return parseISO(dateObj.date);
+        }
+      }
+      return new Date(); // fallback
+    }).filter(date => !isNaN(date.getTime()));
   } catch (err) {
     console.error('Unexpected error in getVetAppointmentDates:', err);
     return [];

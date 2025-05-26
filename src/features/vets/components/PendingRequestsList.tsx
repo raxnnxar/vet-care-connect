@@ -67,15 +67,34 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           }
         }
         
+        // Safely parse appointment date
+        let timeFormatted = 'Hora no especificada';
+        let dateFormatted = 'Fecha no especificada';
+        
+        if (appointment.appointment_date) {
+          try {
+            if (typeof appointment.appointment_date === 'string') {
+              const date = new Date(appointment.appointment_date);
+              timeFormatted = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+              dateFormatted = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+            } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
+              const dateObj = appointment.appointment_date as any;
+              if (dateObj.date && dateObj.time) {
+                const date = new Date(`${dateObj.date}T${dateObj.time}`);
+                timeFormatted = dateObj.time;
+                dateFormatted = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+              }
+            }
+          } catch (error) {
+            console.error('Error parsing appointment date:', error);
+          }
+        }
+        
         return {
           id: appointment.id,
           petName,
-          time: appointment.appointment_date ? 
-            new Date(appointment.appointment_date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : 
-            'Hora no especificada',
-          date: appointment.appointment_date ? 
-            new Date(appointment.appointment_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : 
-            'Fecha no especificada'
+          time: timeFormatted,
+          date: dateFormatted
         };
       });
     },

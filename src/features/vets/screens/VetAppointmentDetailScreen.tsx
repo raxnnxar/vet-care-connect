@@ -113,19 +113,34 @@ const VetAppointmentDetailScreen: React.FC = () => {
     );
   }
   
-  const formatAppointmentDate = (dateStr: string) => {
+  const formatAppointmentDate = (dateData: any) => {
     try {
-      const date = parseISO(dateStr);
-      return format(date, "d 'de' MMMM, yyyy", { locale: es });
+      if (typeof dateData === 'string') {
+        const date = parseISO(dateData);
+        return format(date, "d 'de' MMMM, yyyy", { locale: es });
+      } else if (typeof dateData === 'object' && dateData !== null) {
+        if (dateData.date) {
+          const date = parseISO(dateData.date);
+          return format(date, "d 'de' MMMM, yyyy", { locale: es });
+        }
+      }
+      return 'Fecha no disponible';
     } catch (err) {
       return 'Fecha no disponible';
     }
   };
   
-  const formatAppointmentTime = (dateStr: string) => {
+  const formatAppointmentTime = (dateData: any) => {
     try {
-      const date = parseISO(dateStr);
-      return format(date, "h:mm a", { locale: es });
+      if (typeof dateData === 'string') {
+        const date = parseISO(dateData);
+        return format(date, "h:mm a", { locale: es });
+      } else if (typeof dateData === 'object' && dateData !== null) {
+        if (dateData.time) {
+          return dateData.time;
+        }
+      }
+      return 'Hora no disponible';
     } catch (err) {
       return 'Hora no disponible';
     }
@@ -155,6 +170,29 @@ const VetAppointmentDetailScreen: React.FC = () => {
         created_at: ''
       };
     }
+  }
+
+  // Safely extract service type information
+  let serviceTypeDisplay = 'Servicio no especificado';
+  
+  if (appointment.service_type) {
+    try {
+      if (typeof appointment.service_type === 'string') {
+        serviceTypeDisplay = appointment.service_type;
+      } else if (typeof appointment.service_type === 'object' && appointment.service_type !== null) {
+        const serviceObj = appointment.service_type as any;
+        serviceTypeDisplay = serviceObj.name || serviceObj.type || 'Servicio no especificado';
+      }
+    } catch (error) {
+      console.error('Error parsing service type:', error);
+    }
+  }
+
+  // Extract price from service_type if available
+  let servicePrice: number | undefined;
+  if (appointment.service_type && typeof appointment.service_type === 'object') {
+    const serviceObj = appointment.service_type as any;
+    servicePrice = serviceObj.price ? Number(serviceObj.price) : undefined;
   }
   
   return (
@@ -194,12 +232,10 @@ const VetAppointmentDetailScreen: React.FC = () => {
                 <span>{appointment.location}</span>
               </div>
             )}
-            {appointment.service_type && (
-              <div className="flex items-start">
-                <File className="text-[#79D0B8] mr-2 mt-0.5" size={18} />
-                <span>Tipo de servicio: {appointment.service_type}</span>
-              </div>
-            )}
+            <div className="flex items-start">
+              <File className="text-[#79D0B8] mr-2 mt-0.5" size={18} />
+              <span>Tipo de servicio: {serviceTypeDisplay}</span>
+            </div>
           </Card>
         </div>
         
@@ -245,10 +281,10 @@ const VetAppointmentDetailScreen: React.FC = () => {
                 <span>{appointment.duration} minutos</span>
               </div>
             )}
-            {appointment.price && (
+            {servicePrice && (
               <div className="flex justify-between py-2">
                 <span className="text-gray-500">Precio</span>
-                <span>${appointment.price}</span>
+                <span>${servicePrice}</span>
               </div>
             )}
             {appointment.payment_status && (
