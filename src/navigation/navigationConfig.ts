@@ -10,7 +10,26 @@ export const VET_ROUTES = {
   SETTINGS: '/settings',
   PATIENTS: '/patients',
   SCHEDULE: '/schedule',
-  AGENDA: '/agenda'
+  AGENDA: '/agenda',
+  CHATS: '/chats'
+};
+
+// OwnerNavigator routes
+export const OWNER_ROUTES = {
+  HOME: '/',
+  APPOINTMENTS: '/appointments',
+  APPOINTMENT_DETAIL: '/appointments/:id',
+  BOOK_APPOINTMENT: '/appointments/book/:vetId',
+  PROFILE: '/profile',
+  PET_DETAIL: '/pets/:id',
+  FIND_VETS: '/find-vets',
+  VET_DETAIL: '/vets/:id',
+  VET_REVIEW: '/vets/:id/review',
+  SALUD: '/salud',
+  NOTIFICATIONS: '/notifications',
+  SETTINGS: '/settings',
+  CHATS: '/chats'
 };
 
 export type VetRouteType = keyof typeof VET_ROUTES;
+export type OwnerRouteType = keyof typeof OWNER_ROUTES;

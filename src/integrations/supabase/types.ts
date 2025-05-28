@@ -126,6 +126,97 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          id: string
+          last_message: string | null
+          last_updated: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Insert: {
+          id?: string
+          last_message?: string | null
+          last_updated?: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Update: {
+          id?: string
+          last_message?: string | null
+          last_updated?: string | null
+          user1_id?: string
+          user2_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_user1_id_fkey"
+            columns: ["user1_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_user2_id_fkey"
+            columns: ["user2_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          conversation_id: string
+          id: string
+          message: string
+          read: boolean | null
+          receiver_id: string
+          sender_id: string
+          timestamp: string | null
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          message: string
+          read?: boolean | null
+          receiver_id: string
+          sender_id: string
+          timestamp?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          message?: string
+          read?: boolean | null
+          receiver_id?: string
+          sender_id?: string
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pet_grooming: {
         Row: {
           availability: Json | null
