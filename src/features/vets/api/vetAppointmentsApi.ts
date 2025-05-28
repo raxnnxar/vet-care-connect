@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 
 export interface Appointment {
@@ -25,7 +25,6 @@ export interface Appointment {
 interface PetData {
   id: string;
   name: string;
-  // Add other pet fields if needed
 }
 
 /**
@@ -46,44 +45,41 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
       throw error;
     }
 
+    console.log('Raw appointments data:', data);
+
     // Format the appointments with pet names and formatted times
     return data.map(appointment => {
-      // Default pet name if no pet data is available
       let petName = 'Mascota';
       
-      // First check if pets exists and is an object
       if (appointment.pets && typeof appointment.pets === 'object') {
-        // Use type assertion after validating object exists
         const petsData = appointment.pets as PetData;
-        
-        // Then check if it has a name property that's a string
         if ('name' in petsData && typeof petsData.name === 'string') {
           petName = petsData.name;
         }
       }
       
-      // Safely parse appointment date
+      // Handle the JSON date format properly
       let appointmentDateStr = '';
       let timeFormatted = 'Hora no especificada';
       
       if (appointment.appointment_date) {
         try {
-          if (typeof appointment.appointment_date === 'string') {
-            appointmentDateStr = appointment.appointment_date;
-            timeFormatted = format(parseISO(appointment.appointment_date), 'h:mm a');
-          } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
-            const dateObj = appointment.appointment_date as any;
-            if (dateObj.date && dateObj.time) {
-              appointmentDateStr = `${dateObj.date}T${dateObj.time}`;
-              timeFormatted = dateObj.time;
-            }
+          const dateObj = appointment.appointment_date as any;
+          console.log('Processing appointment date:', dateObj);
+          
+          if (typeof dateObj === 'object' && dateObj.date && dateObj.time) {
+            // Format: {"date":"2025-05-29","time":"09:30"}
+            appointmentDateStr = `${dateObj.date}T${dateObj.time}:00`;
+            timeFormatted = format(parseISO(`${dateObj.date}T${dateObj.time}`), 'h:mm a');
+          } else if (typeof dateObj === 'string') {
+            appointmentDateStr = dateObj;
+            timeFormatted = format(parseISO(dateObj), 'h:mm a');
           }
         } catch (err) {
           console.error('Error parsing appointment date:', err);
         }
       }
 
-      // Extract price from service_type if available
       let price: number | null = null;
       if (appointment.service_type && typeof appointment.service_type === 'object') {
         const serviceObj = appointment.service_type as any;
@@ -109,9 +105,10 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
  */
 export const getVetAppointmentsByDate = async (providerId: string, date: Date): Promise<Appointment[]> => {
   try {
-    // Format the date to match the beginning of the day
-    const startOfDay = format(date, 'yyyy-MM-dd');
-    const endOfDay = format(date, 'yyyy-MM-dd 23:59:59');
+    console.log('Fetching appointments for date:', format(date, 'yyyy-MM-dd'));
+    
+    // Get the date in YYYY-MM-DD format to match the JSON structure
+    const targetDate = format(date, 'yyyy-MM-dd');
     
     const { data, error } = await supabase
       .from('appointments')
@@ -119,53 +116,65 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
         *,
         pets!appointments_pet_id_fkey(id, name)
       `)
-      .eq('provider_id', providerId)
-      .gte('appointment_date', startOfDay)
-      .lte('appointment_date', endOfDay);
+      .eq('provider_id', providerId);
     
     if (error) {
       console.error('Error fetching vet appointments by date:', error);
       throw error;
     }
 
+    console.log('All appointments for vet:', data);
+
+    // Filter appointments by date on the client side since the date is stored as JSON
+    const filteredData = data.filter(appointment => {
+      if (!appointment.appointment_date) return false;
+      
+      try {
+        const dateObj = appointment.appointment_date as any;
+        if (typeof dateObj === 'object' && dateObj.date) {
+          return dateObj.date === targetDate;
+        } else if (typeof dateObj === 'string') {
+          const appointmentDate = format(parseISO(dateObj), 'yyyy-MM-dd');
+          return appointmentDate === targetDate;
+        }
+      } catch (err) {
+        console.error('Error comparing appointment date:', err);
+      }
+      return false;
+    });
+
+    console.log('Filtered appointments for date:', filteredData);
+
     // Format the appointments with pet names and formatted times
-    return data.map(appointment => {
-      // Default pet name if no pet data is available
+    return filteredData.map(appointment => {
       let petName = 'Mascota';
       
-      // First check if pets exists and is an object
       if (appointment.pets && typeof appointment.pets === 'object') {
-        // Use type assertion after validating object exists
         const petsData = appointment.pets as PetData;
-        
-        // Then check if it has a name property that's a string
         if ('name' in petsData && typeof petsData.name === 'string') {
           petName = petsData.name;
         }
       }
       
-      // Safely parse appointment date
       let appointmentDateStr = '';
       let timeFormatted = 'Hora no especificada';
       
       if (appointment.appointment_date) {
         try {
-          if (typeof appointment.appointment_date === 'string') {
-            appointmentDateStr = appointment.appointment_date;
-            timeFormatted = format(parseISO(appointment.appointment_date), 'h:mm a');
-          } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
-            const dateObj = appointment.appointment_date as any;
-            if (dateObj.date && dateObj.time) {
-              appointmentDateStr = `${dateObj.date}T${dateObj.time}`;
-              timeFormatted = dateObj.time;
-            }
+          const dateObj = appointment.appointment_date as any;
+          
+          if (typeof dateObj === 'object' && dateObj.date && dateObj.time) {
+            appointmentDateStr = `${dateObj.date}T${dateObj.time}:00`;
+            timeFormatted = format(parseISO(`${dateObj.date}T${dateObj.time}`), 'h:mm a');
+          } else if (typeof dateObj === 'string') {
+            appointmentDateStr = dateObj;
+            timeFormatted = format(parseISO(dateObj), 'h:mm a');
           }
         } catch (err) {
           console.error('Error parsing appointment date:', err);
         }
       }
 
-      // Extract price from service_type if available
       let price: number | null = null;
       if (appointment.service_type && typeof appointment.service_type === 'object') {
         const serviceObj = appointment.service_type as any;
@@ -191,16 +200,10 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
  */
 export const getVetAppointmentDates = async (providerId: string, startDate: Date, endDate: Date): Promise<Date[]> => {
   try {
-    // Format the dates for the query
-    const startDateStr = format(startDate, 'yyyy-MM-dd');
-    const endDateStr = format(endDate, 'yyyy-MM-dd 23:59:59');
-    
     const { data, error } = await supabase
       .from('appointments')
       .select('appointment_date')
-      .eq('provider_id', providerId)
-      .gte('appointment_date', startDateStr)
-      .lte('appointment_date', endDateStr);
+      .eq('provider_id', providerId);
     
     if (error) {
       console.error('Error fetching vet appointment dates:', error);
@@ -209,13 +212,15 @@ export const getVetAppointmentDates = async (providerId: string, startDate: Date
 
     // Convert the appointment dates to Date objects
     return data.map(item => {
-      if (typeof item.appointment_date === 'string') {
-        return parseISO(item.appointment_date);
-      } else if (typeof item.appointment_date === 'object' && item.appointment_date !== null) {
+      try {
         const dateObj = item.appointment_date as any;
-        if (dateObj.date) {
+        if (typeof dateObj === 'object' && dateObj.date) {
           return parseISO(dateObj.date);
+        } else if (typeof dateObj === 'string') {
+          return parseISO(dateObj);
         }
+      } catch (err) {
+        console.error('Error parsing appointment date:', err);
       }
       return new Date(); // fallback
     }).filter(date => !isNaN(date.getTime()));

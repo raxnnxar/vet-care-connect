@@ -13,17 +13,11 @@ import VetCalendar from '../components/VetCalendar';
 import VetAppointmentsList from '../components/VetAppointmentsList';
 import PendingRequestsList from '../components/PendingRequestsList';
 
-// Sample data for pending requests (this will stay static for now)
-const pendingRequests = [
-  { id: '1', petName: 'Mía', time: '4:00 PM', date: '25 abr' },
-];
-
 const VetDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  // Initialize selectedDate to current date (start of day for consistency)
   const [selectedDate, setSelectedDate] = useState(() => startOfDay(new Date()));
   const [weeks, setWeeks] = useState<Date[][]>([]);
-  const [currentWeekIndex, setCurrentWeekIndex] = useState(5); // Start at the middle (current week)
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(5);
   const { user } = useSelector((state: any) => state.auth);
   
   // State for appointments
@@ -37,12 +31,10 @@ const VetDashboard: React.FC = () => {
       const weeksArray: Date[][] = [];
       const currentDate = new Date();
       
-      // Generate 10 weeks (past, current, and future)
       for (let i = -5; i < 5; i++) {
         const weekStartDate = startOfWeek(addWeeks(currentDate, i), { weekStartsOn: 1 });
         const weekDays: Date[] = [];
         
-        // Generate 7 days for each week (Monday to Sunday)
         for (let j = 0; j < 7; j++) {
           weekDays.push(addDays(weekStartDate, j));
         }
@@ -63,21 +55,34 @@ const VetDashboard: React.FC = () => {
       
       setIsLoading(true);
       try {
+        console.log('Fetching appointments for vet:', user.id);
+        
         // Fetch all appointments for the logged-in vet
         const allAppointments = await getVetAppointments(user.id);
+        console.log('All vet appointments:', allAppointments);
         
-        // Filter only confirmed appointments for today
-        const todayConfirmedAppointments = allAppointments.filter(appointment => 
-          isSameDay(parseDate(appointment.appointment_date), new Date()) &&
+        // Extract unique dates for the appointment indicators (all statuses)
+        const dates = allAppointments.map(app => {
+          try {
+            if (app.appointment_date.includes('T')) {
+              return new Date(app.appointment_date);
+            }
+            return new Date(app.appointment_date);
+          } catch (err) {
+            console.error('Error parsing appointment date for calendar:', err);
+            return new Date();
+          }
+        });
+        setAppointmentDates(dates);
+        
+        // Get today's confirmed appointments by default
+        const todayAppointments = await getVetAppointmentsByDate(user.id, selectedDate);
+        const confirmedTodayAppointments = todayAppointments.filter(appointment => 
           appointment.status === APPOINTMENT_STATUS.CONFIRMED
         );
         
-        // Extract unique dates for the appointment indicators (all statuses)
-        const dates = allAppointments.map(app => parseDate(app.appointment_date));
-        setAppointmentDates(dates);
-        
-        // Set today's confirmed appointments by default
-        setAppointments(todayConfirmedAppointments);
+        console.log('Today confirmed appointments:', confirmedTodayAppointments);
+        setAppointments(confirmedTodayAppointments);
       } catch (error) {
         console.error('Error fetching vet appointments:', error);
         toast.error('Error al cargar las citas');
@@ -87,7 +92,7 @@ const VetDashboard: React.FC = () => {
     };
     
     fetchAppointments();
-  }, [user?.id]);
+  }, [user?.id, selectedDate]);
 
   // Fetch confirmed appointments for the selected date
   useEffect(() => {
@@ -96,11 +101,17 @@ const VetDashboard: React.FC = () => {
       
       setIsLoading(true);
       try {
+        console.log('Fetching appointments for selected date:', format(selectedDate, 'yyyy-MM-dd'));
+        
         const dateAppointments = await getVetAppointmentsByDate(user.id, selectedDate);
-        // Filter only confirmed appointments
+        console.log('Appointments for selected date:', dateAppointments);
+        
+        // Filter only confirmed appointments (programada)
         const confirmedAppointments = dateAppointments.filter(appointment => 
           appointment.status === APPOINTMENT_STATUS.CONFIRMED
         );
+        
+        console.log('Confirmed appointments for selected date:', confirmedAppointments);
         setAppointments(confirmedAppointments);
       } catch (error) {
         console.error('Error fetching appointments by date:', error);
@@ -113,20 +124,6 @@ const VetDashboard: React.FC = () => {
     fetchAppointmentsByDate();
   }, [selectedDate, user?.id]);
 
-  // Helper function to parse date strings
-  const parseDate = (dateString: string): Date => {
-    return new Date(dateString);
-  };
-  
-  // Helper function to check if two dates are on the same day
-  const isSameDay = (date1: Date, date2: Date): boolean => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  };
-  
   // Handle date selection
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
