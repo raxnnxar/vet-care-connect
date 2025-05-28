@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowRight } from 'lucide-react';
@@ -24,7 +23,7 @@ const VetDashboard: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [appointmentDates, setAppointmentDates] = useState<Date[]>([]);
-  
+
   // Generate weeks of days
   useEffect(() => {
     const generateWeeks = () => {
@@ -135,14 +134,7 @@ const VetDashboard: React.FC = () => {
       footer={<NavbarInferior activeTab="home" />}
     >
       <div className="flex flex-col gap-6 p-4 pb-20 overflow-y-auto">
-        {/* Today's Confirmed Appointments Section */}
-        <VetAppointmentsList 
-          appointments={appointments} 
-          selectedDate={selectedDate} 
-          isLoading={isLoading} 
-        />
-
-        {/* Calendar Section */}
+        {/* Calendar Section - Now first */}
         <VetCalendar 
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
@@ -151,6 +143,13 @@ const VetDashboard: React.FC = () => {
           setCurrentWeekIndex={setCurrentWeekIndex}
           appointmentDates={appointmentDates}
           isLoading={isLoading}
+        />
+
+        {/* Scheduled Appointments Section - Now second */}
+        <VetAppointmentsList 
+          appointments={appointments} 
+          selectedDate={selectedDate} 
+          isLoading={isLoading} 
         />
 
         {/* Pending Requests Section */}
