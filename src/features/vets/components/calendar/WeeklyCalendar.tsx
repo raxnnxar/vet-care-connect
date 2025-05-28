@@ -23,18 +23,29 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
 }) => {
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to current week on mount
+  // Scroll to current week on mount and when weeks change
   useEffect(() => {
     if (calendarRef.current && weeks.length > 0) {
-      const weekWidth = calendarRef.current.scrollWidth / weeks.length;
-      const scrollPosition = currentWeekIndex * weekWidth;
-      
-      // Use requestAnimationFrame to ensure the DOM is ready
-      requestAnimationFrame(() => {
+      const scrollToCurrentWeek = () => {
         if (calendarRef.current) {
+          const weekWidth = calendarRef.current.scrollWidth / weeks.length;
+          const scrollPosition = currentWeekIndex * weekWidth;
+          
+          // Scroll immediately without animation for initial load
           calendarRef.current.scrollLeft = scrollPosition;
         }
-      });
+      };
+
+      // Use multiple methods to ensure the scroll happens
+      scrollToCurrentWeek();
+      
+      // Also use setTimeout to ensure it happens after render
+      const timeoutId = setTimeout(scrollToCurrentWeek, 50);
+      
+      // And requestAnimationFrame for good measure
+      requestAnimationFrame(scrollToCurrentWeek);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [weeks, currentWeekIndex]);
 
