@@ -33,13 +33,14 @@ const AppNavigator = () => {
         location.pathname === ROUTES.VET_PROFILE_SETUP ||
         location.pathname === ROUTES.POST_SIGNUP_ROLE || 
         location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE ||
-        location.pathname.includes('/vet/profile')
+        location.pathname.includes('/profile') ||
+        location.pathname.includes('/chats')
       ) {
-        console.log('User is on a setup/profile screen, allowing completion of flow');
+        console.log('User is on a setup/profile/chat screen, allowing completion of flow');
         return;
       }
       
-      // If user is already in the owner or vet section (except profile), don't redirect
+      // If user is already in the owner or vet section (except profile/chat), don't redirect
       if (
         (location.pathname.startsWith('/owner') && !location.pathname.includes('/profile')) || 
         (location.pathname.startsWith('/vet') && !location.pathname.includes('/profile'))

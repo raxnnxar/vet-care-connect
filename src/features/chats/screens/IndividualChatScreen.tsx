@@ -37,9 +37,15 @@ const IndividualChatScreen: React.FC = () => {
 
   useEffect(() => {
     const fetchConversationData = async () => {
-      if (!conversationId || !user?.id) return;
+      if (!conversationId || !user?.id) {
+        console.error('Missing conversation ID or user ID');
+        setLoading(false);
+        return;
+      }
 
       try {
+        console.log('Fetching conversation data for:', conversationId);
+        
         // Get conversation details and other user info
         const { data: conversation, error: convError } = await supabase
           .from('conversations')
@@ -47,12 +53,19 @@ const IndividualChatScreen: React.FC = () => {
           .eq('id', conversationId)
           .single();
 
-        if (convError) throw convError;
+        if (convError) {
+          console.error('Conversation error:', convError);
+          throw convError;
+        }
+
+        console.log('Conversation data:', conversation);
 
         // Determine other user ID
         const otherUserId = conversation.user1_id === user.id 
           ? conversation.user2_id 
           : conversation.user1_id;
+
+        console.log('Other user ID:', otherUserId);
 
         // Get other user's profile info
         const { data: profile, error: profileError } = await supabase
@@ -61,7 +74,12 @@ const IndividualChatScreen: React.FC = () => {
           .eq('id', otherUserId)
           .single();
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error('Profile error:', profileError);
+          throw profileError;
+        }
+
+        console.log('Profile data:', profile);
 
         // Check if it's a veterinarian and get profile image
         const { data: vetData } = await supabase
@@ -69,6 +87,8 @@ const IndividualChatScreen: React.FC = () => {
           .select('profile_image_url')
           .eq('id', otherUserId)
           .single();
+
+        console.log('Vet data:', vetData);
 
         setOtherUser({
           id: profile.id,
@@ -83,8 +103,12 @@ const IndividualChatScreen: React.FC = () => {
           .eq('conversation_id', conversationId)
           .order('timestamp', { ascending: true });
 
-        if (messagesError) throw messagesError;
+        if (messagesError) {
+          console.error('Messages error:', messagesError);
+          throw messagesError;
+        }
 
+        console.log('Messages data:', messagesData);
         setMessages(messagesData || []);
       } catch (error) {
         console.error('Error fetching conversation data:', error);
@@ -206,8 +230,29 @@ const IndividualChatScreen: React.FC = () => {
   if (loading) {
     return (
       <LayoutBase header={<Header />} footer={null}>
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#79D0B8]"></div>
+        <div className="flex items-center justify-center h-full p-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#79D0B8] mx-auto mb-4"></div>
+            <p className="text-gray-600">Cargando conversación...</p>
+          </div>
+        </div>
+      </LayoutBase>
+    );
+  }
+
+  if (!otherUser) {
+    return (
+      <LayoutBase header={<Header />} footer={null}>
+        <div className="flex items-center justify-center h-full p-8">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">No se pudo cargar la conversación</p>
+            <Button 
+              onClick={() => navigate(-1)}
+              className="bg-[#79D0B8] hover:bg-[#4DA6A8]"
+            >
+              Volver
+            </Button>
+          </div>
         </div>
       </LayoutBase>
     );
@@ -217,28 +262,37 @@ const IndividualChatScreen: React.FC = () => {
     <LayoutBase header={<Header />} footer={null}>
       <div className="flex flex-col h-[calc(100vh-60px)]">
         {/* Messages area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.sender_id === user.id ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[70%] p-3 rounded-2xl ${
-                  message.sender_id === user.id
-                    ? 'bg-[#79D0B8] text-white'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
-              >
-                <p className="text-sm">{message.message}</p>
-                <p className={`text-xs mt-1 ${
-                  message.sender_id === user.id ? 'text-white/70' : 'text-gray-500'
-                }`}>
-                  {formatTime(message.timestamp)}
-                </p>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          {messages.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <p className="text-gray-500 mb-2">No hay mensajes aún</p>
+                <p className="text-gray-400 text-sm">Envía el primer mensaje para comenzar la conversación</p>
               </div>
             </div>
-          ))}
+          ) : (
+            messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender_id === user.id ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[70%] p-3 rounded-2xl ${
+                    message.sender_id === user.id
+                      ? 'bg-[#79D0B8] text-white'
+                      : 'bg-white text-gray-900 shadow-sm'
+                  }`}
+                >
+                  <p className="text-sm">{message.message}</p>
+                  <p className={`text-xs mt-1 ${
+                    message.sender_id === user.id ? 'text-white/70' : 'text-gray-500'
+                  }`}>
+                    {formatTime(message.timestamp)}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
           <div ref={messagesEndRef} />
         </div>
 

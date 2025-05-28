@@ -67,18 +67,23 @@ export const useVetDetail = (id: string | undefined) => {
 
   const handleBookAppointment = () => {
     if (!id) return;
-    navigate(`/owner/appointments/book/${id}`);
+    navigate(`/appointments/book/${id}`);
   };
 
   const handleReviewClick = () => {
     if (!id) return;
-    navigate(`/owner/vets/${id}/review`);
+    navigate(`/vets/${id}/review`);
   };
 
   const handleSendMessage = async () => {
-    if (!id || !user?.id) return;
+    if (!id || !user?.id) {
+      console.error('Missing vet ID or user ID');
+      return;
+    }
     
     try {
+      console.log('Creating conversation between:', user.id, 'and', id);
+      
       // Create or get existing conversation
       const { data: conversationId, error } = await supabase.rpc(
         'get_or_create_conversation',
@@ -93,6 +98,8 @@ export const useVetDetail = (id: string | undefined) => {
         return;
       }
 
+      console.log('Conversation ID:', conversationId);
+      
       // Navigate to chat screen with conversation ID
       navigate(`/chats/${conversationId}`);
     } catch (error) {
