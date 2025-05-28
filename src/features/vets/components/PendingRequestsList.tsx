@@ -14,6 +14,7 @@ interface PendingRequest {
   petName: string;
   time: string;
   date: string;
+  serviceType: string;
 }
 
 interface PendingRequestsListProps {
@@ -23,7 +24,6 @@ interface PendingRequestsListProps {
 interface PetData {
   id: string;
   name: string;
-  // Add other pet fields if needed
 }
 
 const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: initialRequests }) => {
@@ -42,10 +42,11 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
         .select(`
           id,
           appointment_date,
+          service_type,
           pets:pet_id(id, name)
         `)
         .eq('provider_id', user.user.id)
-        .eq('status', APPOINTMENT_STATUS.PENDING);
+        .eq('status', 'pendiente');
       
       if (error) {
         console.error('Error fetching pending requests:', error);
@@ -89,12 +90,28 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
             console.error('Error parsing appointment date:', error);
           }
         }
+
+        // Safely parse service type
+        let serviceType = 'Servicio no especificado';
+        if (appointment.service_type) {
+          try {
+            if (typeof appointment.service_type === 'string') {
+              serviceType = appointment.service_type;
+            } else if (typeof appointment.service_type === 'object' && appointment.service_type !== null) {
+              const serviceObj = appointment.service_type as any;
+              serviceType = serviceObj.name || serviceObj.type || 'Servicio no especificado';
+            }
+          } catch (error) {
+            console.error('Error parsing service type:', error);
+          }
+        }
         
         return {
           id: appointment.id,
           petName,
           time: timeFormatted,
-          date: dateFormatted
+          date: dateFormatted,
+          serviceType
         };
       });
     },
@@ -109,7 +126,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: APPOINTMENT_STATUS.CONFIRMED })
+        .update({ status: 'confirmado' })
         .eq('id', requestId)
         .select();
       
@@ -122,6 +139,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       
       // Also invalidate any appointment-related queries
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
       
       toast.success('Cita aprobada correctamente');
     } catch (error) {
@@ -134,7 +152,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: APPOINTMENT_STATUS.CANCELLED })
+        .update({ status: 'cancelado' })
         .eq('id', requestId)
         .select();
       
@@ -147,6 +165,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       
       // Also invalidate any appointment-related queries
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
       
       toast.success('Cita rechazada correctamente');
     } catch (error) {
@@ -177,6 +196,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
                 <div>
                   <p className="font-medium text-lg">{request.petName}</p>
                   <p className="text-gray-500">{request.date} — {request.time}</p>
+                  <p className="text-sm text-gray-600">{request.serviceType}</p>
                 </div>
               </div>
             </div>
