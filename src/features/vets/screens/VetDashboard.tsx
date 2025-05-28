@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowRight } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
-import { format, addDays, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
+import { format, addDays, startOfWeek, endOfWeek, addWeeks, subWeeks, startOfDay } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { getVetAppointments, getVetAppointmentsByDate, getVetAppointmentDates, Appointment } from '../api/vetAppointmentsApi';
 import { toast } from 'sonner';
@@ -18,7 +19,8 @@ const pendingRequests = [
 
 const VetDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  // Initialize selectedDate to current date (start of day for consistency)
+  const [selectedDate, setSelectedDate] = useState(() => startOfDay(new Date()));
   const [weeks, setWeeks] = useState<Date[][]>([]);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const { user } = useSelector((state: any) => state.auth);
@@ -126,22 +128,12 @@ const VetDashboard: React.FC = () => {
     setSelectedDate(date);
   };
 
-  // Get doctor's name from Redux state
-  const doctorName = user?.user_metadata?.name || "García";
-
   return (
     <LayoutBase
       header={<VetSearchHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
       footer={<NavbarInferior activeTab="home" />}
     >
       <div className="flex flex-col gap-6 p-4 pb-20 overflow-y-auto">
-        {/* Greeting Section */}
-        <div className="mt-2">
-          <h1 className="text-2xl font-semibold text-[#1F2937]">
-            👋 Hola, Dr. {doctorName}. Estas son tus citas de hoy:
-          </h1>
-        </div>
-
         {/* Today's Appointments Section */}
         <VetAppointmentsList 
           appointments={appointments} 
