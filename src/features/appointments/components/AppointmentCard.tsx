@@ -26,51 +26,65 @@ interface AppointmentCardProps {
 
 const formatDate = (dateString: string | any) => {
   try {
-    // Handle different date formats
     let dateToFormat: Date;
     
     if (typeof dateString === 'string') {
       dateToFormat = new Date(dateString);
     } else if (typeof dateString === 'object' && dateString !== null) {
-      // Handle JSON format like {date: "2024-01-01", time: "10:00"}
-      if (dateString.date && dateString.time) {
-        dateToFormat = new Date(`${dateString.date}T${dateString.time}`);
+      const dateObj = dateString as any;
+      if (dateObj.date && dateObj.time) {
+        dateToFormat = new Date(`${dateObj.date}T${dateObj.time}`);
       } else {
-        dateToFormat = new Date();
+        console.warn('Invalid date object:', dateString);
+        return 'Fecha pendiente';
       }
     } else {
-      dateToFormat = new Date();
+      console.warn('Unknown date format:', dateString);
+      return 'Fecha pendiente';
     }
     
-    return format(dateToFormat, "d 'de' MMMM',' yyyy", { locale: es });
+    // Check if date is valid
+    if (isNaN(dateToFormat.getTime())) {
+      console.warn('Invalid date:', dateString);
+      return 'Fecha pendiente';
+    }
+    
+    return format(dateToFormat, "d 'de' MMMM, yyyy", { locale: es });
   } catch (error) {
     console.error('Error formatting date:', error, dateString);
-    return 'Fecha no válida';
+    return 'Fecha pendiente';
   }
 };
 
 const formatTime = (dateString: string | any) => {
   try {
-    // Handle different date formats
     let dateToFormat: Date;
     
     if (typeof dateString === 'string') {
       dateToFormat = new Date(dateString);
     } else if (typeof dateString === 'object' && dateString !== null) {
-      // Handle JSON format like {date: "2024-01-01", time: "10:00"}
-      if (dateString.date && dateString.time) {
-        dateToFormat = new Date(`${dateString.date}T${dateString.time}`);
+      const dateObj = dateString as any;
+      if (dateObj.date && dateObj.time) {
+        dateToFormat = new Date(`${dateObj.date}T${dateObj.time}`);
       } else {
-        dateToFormat = new Date();
+        console.warn('Invalid time object:', dateString);
+        return 'Hora pendiente';
       }
     } else {
-      dateToFormat = new Date();
+      console.warn('Unknown time format:', dateString);
+      return 'Hora pendiente';
+    }
+    
+    // Check if date is valid
+    if (isNaN(dateToFormat.getTime())) {
+      console.warn('Invalid time:', dateString);
+      return 'Hora pendiente';
     }
     
     return format(dateToFormat, 'HH:mm');
   } catch (error) {
     console.error('Error formatting time:', error, dateString);
-    return 'Hora no válida';
+    return 'Hora pendiente';
   }
 };
 
@@ -101,14 +115,14 @@ export const AppointmentCard = ({ appointment, onClick }: AppointmentCardProps) 
           <div className="flex items-center">
             <Calendar className="h-4 w-4 text-[#79D0B8] mr-2" />
             <span className="text-sm">
-              {appointment.appointment_date ? formatDate(appointment.appointment_date) : 'Fecha pendiente'}
+              {formatDate(appointment.appointment_date)}
             </span>
           </div>
           
           <div className="flex items-center">
             <Clock className="h-4 w-4 text-[#79D0B8] mr-2" />
             <span className="text-sm">
-              {appointment.appointment_date ? formatTime(appointment.appointment_date) : 'Hora pendiente'}
+              {formatTime(appointment.appointment_date)}
             </span>
           </div>
           

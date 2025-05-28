@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -24,10 +23,23 @@ const OwnerAppointmentsScreen: React.FC = () => {
       try {
         console.log('Current user ID:', user?.id);
         
-        // First get all appointments for this user without date filtering
+        // Get appointments with veterinarian information
         const { data: appointmentsData, error: appointmentsError } = await supabase
           .from('appointments')
-          .select('*')
+          .select(`
+            *,
+            pets:pet_id (
+              id,
+              name,
+              profile_picture_url
+            ),
+            veterinarians:provider_id (
+              id,
+              profiles:id (
+                display_name
+              )
+            )
+          `)
           .eq('owner_id', user?.id)
           .order('created_at', { ascending: false });
 
@@ -36,7 +48,7 @@ const OwnerAppointmentsScreen: React.FC = () => {
           throw appointmentsError;
         }
         
-        console.log('Fetched appointments:', appointmentsData);
+        console.log('Fetched appointments with vet info:', appointmentsData);
 
         if (!appointmentsData || appointmentsData.length === 0) {
           return [];
@@ -77,43 +89,21 @@ const OwnerAppointmentsScreen: React.FC = () => {
           }
         });
 
-        // Get pet IDs from filtered appointments
-        const petIds = filteredAppointments
-          .map(appointment => appointment.pet_id)
-          .filter(petId => petId !== null);
-
-        // Fetch pets data separately if we have pet IDs
-        let petsData = [];
-        if (petIds.length > 0) {
-          const { data: pets, error: petsError } = await supabase
-            .from('pets')
-            .select('id, name, profile_picture_url')
-            .in('id', petIds);
-
-          if (petsError) {
-            console.error('Error fetching pets:', petsError);
-            // Don't throw error, just continue without pet data
-          } else {
-            petsData = pets || [];
-          }
-        }
-
-        // Create a map of pet data for easy lookup
-        const petsMap = new Map();
-        petsData.forEach(pet => {
-          petsMap.set(pet.id, pet);
-        });
-        
         // Transform the data to match the expected format
         return filteredAppointments.map(appointment => {
-          const pet = petsMap.get(appointment.pet_id);
+          const pet = appointment.pets;
+          const veterinarian = appointment.veterinarians;
+          
+          // Get veterinarian name
+          let vetName = 'Por confirmar';
+          if (veterinarian && veterinarian.profiles) {
+            vetName = veterinarian.profiles.display_name || 'Por confirmar';
+          }
           
           return {
             ...appointment,
-            // Ensure appointment_date is a string for consistency
-            appointment_date: typeof appointment.appointment_date === 'string' 
-              ? appointment.appointment_date 
-              : JSON.stringify(appointment.appointment_date),
+            // Keep appointment_date as is for proper formatting in components
+            appointment_date: appointment.appointment_date,
             // Extract pet name safely
             pet_name: pet?.name || 'Mascota sin nombre',
             // Add pet object for compatibility
@@ -122,6 +112,8 @@ const OwnerAppointmentsScreen: React.FC = () => {
               name: pet.name,
               profile_picture_url: pet.profile_picture_url
             } : null,
+            // Add provider name
+            provider_name: vetName,
             // Ensure status is properly set
             status: appointment.status || 'pendiente'
           };
