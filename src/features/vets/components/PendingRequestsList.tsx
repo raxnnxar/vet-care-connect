@@ -46,7 +46,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           pets:pet_id(id, name)
         `)
         .eq('provider_id', user.user.id)
-        .eq('status', 'pendiente');
+        .eq('status', APPOINTMENT_STATUS.PENDING);
       
       if (error) {
         console.error('Error fetching pending requests:', error);
@@ -126,7 +126,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: 'confirmado' })
+        .update({ status: APPOINTMENT_STATUS.CONFIRMED })
         .eq('id', requestId)
         .select();
       
@@ -152,7 +152,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: 'cancelado' })
+        .update({ status: APPOINTMENT_STATUS.CANCELLED })
         .eq('id', requestId)
         .select();
       
