@@ -22,7 +22,7 @@ const VetDashboard: React.FC = () => {
   // Initialize selectedDate to current date (start of day for consistency)
   const [selectedDate, setSelectedDate] = useState(() => startOfDay(new Date()));
   const [weeks, setWeeks] = useState<Date[][]>([]);
-  const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(5); // Start at the middle (current week)
   const { user } = useSelector((state: any) => state.auth);
   
   // State for appointments
@@ -49,8 +49,6 @@ const VetDashboard: React.FC = () => {
         weeksArray.push(weekDays);
       }
       
-      // Set the current week index to the middle of the array (current week)
-      setCurrentWeekIndex(5);
       return weeksArray;
     };
     

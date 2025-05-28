@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { format, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import '../styles/calendar.css';
@@ -22,6 +22,21 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   appointmentDates,
 }) => {
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to current week on mount
+  useEffect(() => {
+    if (calendarRef.current && weeks.length > 0) {
+      const weekWidth = calendarRef.current.scrollWidth / weeks.length;
+      const scrollPosition = currentWeekIndex * weekWidth;
+      
+      // Use requestAnimationFrame to ensure the DOM is ready
+      requestAnimationFrame(() => {
+        if (calendarRef.current) {
+          calendarRef.current.scrollLeft = scrollPosition;
+        }
+      });
+    }
+  }, [weeks, currentWeekIndex]);
 
   // Check if a date has appointments
   const hasAppointmentsOnDate = (date: Date): boolean => {
