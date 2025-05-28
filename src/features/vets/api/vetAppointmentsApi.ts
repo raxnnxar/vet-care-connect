@@ -37,7 +37,7 @@ export const getVetAppointments = async (providerId: string): Promise<Appointmen
       .from('appointments')
       .select(`
         *,
-        pets:pet_id(id, name)
+        pets!appointments_pet_id_fkey(id, name)
       `)
       .eq('provider_id', providerId);
     
@@ -117,7 +117,7 @@ export const getVetAppointmentsByDate = async (providerId: string, date: Date): 
       .from('appointments')
       .select(`
         *,
-        pets:pet_id(id, name)
+        pets!appointments_pet_id_fkey(id, name)
       `)
       .eq('provider_id', providerId)
       .gte('appointment_date', startOfDay)

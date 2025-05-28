@@ -43,7 +43,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           id,
           appointment_date,
           service_type,
-          pets:pet_id(id, name)
+          pets!appointments_pet_id_fkey(id, name)
         `)
         .eq('provider_id', user.user.id)
         .eq('status', APPOINTMENT_STATUS.PENDING);
