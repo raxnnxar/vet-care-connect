@@ -26,13 +26,54 @@ const VetWeeklyAgendaScreen: React.FC = () => {
     addDays(currentWeekStart, i)
   );
 
-  // Generate time slots based on vet availability
+  // Get dynamic time range based on vet availability
+  const getDynamicTimeRange = () => {
+    if (!vetProfile?.availability) return { start: '09:00', end: '18:00' };
+    
+    let earliestStart = '23:59';
+    let latestEnd = '00:00';
+    
+    const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    
+    dayKeys.forEach(dayKey => {
+      const daySchedule = vetProfile.availability[dayKey as keyof typeof vetProfile.availability];
+      if (daySchedule?.isAvailable) {
+        const startTime = daySchedule.startTime || '09:00';
+        const endTime = daySchedule.endTime || '18:00';
+        
+        if (startTime < earliestStart) earliestStart = startTime;
+        if (endTime > latestEnd) latestEnd = endTime;
+      }
+    });
+    
+    return {
+      start: earliestStart !== '23:59' ? earliestStart : '09:00',
+      end: latestEnd !== '00:00' ? latestEnd : '18:00'
+    };
+  };
+
+  // Generate time slots based on dynamic range
   const generateTimeSlots = () => {
+    const { start, end } = getDynamicTimeRange();
     const slots = [];
-    for (let hour = 6; hour <= 22; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    
+    const [startHour, startMinute] = start.split(':').map(Number);
+    const [endHour, endMinute] = end.split(':').map(Number);
+    
+    let currentHour = startHour;
+    let currentMinute = startMinute;
+    
+    while (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute)) {
+      const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      slots.push(timeStr);
+      
+      currentMinute += 30;
+      if (currentMinute >= 60) {
+        currentMinute = 0;
+        currentHour++;
+      }
     }
+    
     return slots;
   };
 
@@ -83,7 +124,7 @@ const VetWeeklyAgendaScreen: React.FC = () => {
     };
   };
 
-  // Check if time slot is within working hours
+  // Check if time slot is within working hours for a specific day
   const isTimeSlotAvailable = (date: Date, timeSlot: string) => {
     if (!isVetAvailable(date)) return false;
     
@@ -189,23 +230,26 @@ const VetWeeklyAgendaScreen: React.FC = () => {
         {/* Week header */}
         <div className="grid grid-cols-8 gap-1 mb-4 sticky top-0 bg-white z-10 py-2">
           <div className="text-xs font-medium text-gray-500 p-2">Hora</div>
-          {weekDays.map((day, index) => (
-            <div key={index} className="text-center p-2">
-              <div className="text-xs font-medium text-gray-500 uppercase">
-                {format(day, 'EEE', { locale: es })}
+          {weekDays.map((day, index) => {
+            const dayAvailable = isVetAvailable(day);
+            return (
+              <div key={index} className="text-center p-2">
+                <div className="text-xs font-medium text-gray-500 uppercase">
+                  {format(day, 'EEE', { locale: es })}
+                </div>
+                <div className="text-lg font-semibold text-[#1F2937] mt-1">
+                  {format(day, 'd')}
+                </div>
+                {!dayAvailable && (
+                  <div className="text-xs text-red-500 mt-1">Cerrado</div>
+                )}
               </div>
-              <div className="text-lg font-semibold text-[#1F2937] mt-1">
-                {format(day, 'd')}
-              </div>
-              {!isVetAvailable(day) && (
-                <div className="text-xs text-red-500 mt-1">No disponible</div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Time slots grid */}
-        <div className="space-y-0">
+        <div className="space-y-0 max-h-[70vh] overflow-y-auto">
           {timeSlots.map((timeSlot, timeIndex) => (
             <div key={timeIndex} className="grid grid-cols-8 gap-1 border-b border-gray-100">
               {/* Time label */}
@@ -215,22 +259,38 @@ const VetWeeklyAgendaScreen: React.FC = () => {
               
               {/* Day columns */}
               {weekDays.map((day, dayIndex) => {
-                const isAvailable = isTimeSlotAvailable(day, timeSlot);
+                const isDayAvailable = isVetAvailable(day);
+                const isSlotAvailable = isTimeSlotAvailable(day, timeSlot);
                 const appointment = getAppointmentForSlot(day, timeSlot);
+                
+                // If day is not available, show closed column
+                if (!isDayAvailable) {
+                  return (
+                    <div 
+                      key={dayIndex} 
+                      className="h-8 bg-red-100 border-r border-gray-200"
+                    />
+                  );
+                }
+                
+                // If slot is not within working hours, show empty
+                if (!isSlotAvailable) {
+                  return (
+                    <div 
+                      key={dayIndex} 
+                      className="h-8 bg-gray-50 border-r border-gray-100"
+                    />
+                  );
+                }
                 
                 return (
                   <div 
                     key={dayIndex} 
-                    className={`h-8 border-r border-gray-100 ${
-                      isAvailable 
-                        ? 'bg-[#79D0B8]/10' 
-                        : 'bg-gray-50'
-                    }`}
+                    className="h-8 bg-[#79D0B8]/10 border-r border-gray-100 relative"
                   >
                     {appointment && (
-                      <div className="h-full bg-[#79D0B8] text-white text-xs p-1 rounded flex items-center justify-center space-x-1 overflow-hidden">
+                      <div className="h-full bg-[#79D0B8] text-white text-xs p-1 rounded flex items-center justify-center overflow-hidden">
                         {getPetIcon(appointment.petName || '')}
-                        <span className="truncate">{appointment.petName}</span>
                       </div>
                     )}
                   </div>
