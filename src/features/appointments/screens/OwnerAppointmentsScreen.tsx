@@ -23,21 +23,15 @@ const OwnerAppointmentsScreen: React.FC = () => {
       try {
         console.log('Current user ID:', user?.id);
         
-        // Get appointments with veterinarian information
+        // Get appointments with pet and veterinarian information
         const { data: appointmentsData, error: appointmentsError } = await supabase
           .from('appointments')
           .select(`
             *,
-            pets:pet_id (
+            pets!inner (
               id,
               name,
               profile_picture_url
-            ),
-            veterinarians:provider_id (
-              id,
-              profiles:id (
-                display_name
-              )
             )
           `)
           .eq('owner_id', user?.id)
@@ -48,15 +42,40 @@ const OwnerAppointmentsScreen: React.FC = () => {
           throw appointmentsError;
         }
         
-        console.log('Fetched appointments with vet info:', appointmentsData);
+        console.log('Fetched appointments with pet info:', appointmentsData);
 
         if (!appointmentsData || appointmentsData.length === 0) {
           return [];
         }
 
+        // Get veterinarian information for each appointment
+        const appointmentsWithVetInfo = await Promise.all(
+          appointmentsData.map(async (appointment) => {
+            let vetName = 'Por confirmar';
+            
+            if (appointment.provider_id) {
+              // Get veterinarian profile information
+              const { data: vetProfile, error: vetError } = await supabase
+                .from('profiles')
+                .select('display_name')
+                .eq('id', appointment.provider_id)
+                .single();
+              
+              if (!vetError && vetProfile) {
+                vetName = vetProfile.display_name;
+              }
+            }
+            
+            return {
+              ...appointment,
+              provider_name: vetName
+            };
+          })
+        );
+
         // Filter appointments based on the current time and tab
         const now = new Date();
-        const filteredAppointments = appointmentsData.filter(appointment => {
+        const filteredAppointments = appointmentsWithVetInfo.filter(appointment => {
           if (!appointment.appointment_date) return false;
           
           try {
@@ -92,13 +111,6 @@ const OwnerAppointmentsScreen: React.FC = () => {
         // Transform the data to match the expected format
         return filteredAppointments.map(appointment => {
           const pet = appointment.pets;
-          const veterinarian = appointment.veterinarians;
-          
-          // Get veterinarian name
-          let vetName = 'Por confirmar';
-          if (veterinarian && veterinarian.profiles) {
-            vetName = veterinarian.profiles.display_name || 'Por confirmar';
-          }
           
           return {
             ...appointment,
@@ -112,8 +124,6 @@ const OwnerAppointmentsScreen: React.FC = () => {
               name: pet.name,
               profile_picture_url: pet.profile_picture_url
             } : null,
-            // Add provider name
-            provider_name: vetName,
             // Ensure status is properly set
             status: appointment.status || 'pendiente'
           };
