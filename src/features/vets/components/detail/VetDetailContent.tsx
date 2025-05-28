@@ -18,12 +18,14 @@ interface VetDetailContentProps {
   data: any;
   onBookAppointment: () => void;
   onReviewClick: () => void;
+  onSendMessage: () => void;
 }
 
 const VetDetailContent: React.FC<VetDetailContentProps> = ({
   data,
   onBookAppointment,
   onReviewClick,
+  onSendMessage,
 }) => {
   const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
   const navigate = useNavigate();
@@ -31,18 +33,15 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
   // Format veterinarian name using display_name from profiles
   const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
   
-  // Para el prefijo de género (Dr/Dra), we'll check if the name seems feminine (ends with 'a')
   const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
   const vetName = displayName 
     ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`.trim()
     : `Dr. ${data.id.substring(0, 5)}`;
   
-  // Extract specializations and format them
   const specializations = Array.isArray(data.specialization) && data.specialization.length > 0
     ? data.specialization.map((spec: string) => translateSpecialization(spec)).join(', ')
     : 'Medicina General';
     
-  // Helper function to translate specialization
   function translateSpecialization(spec: string): string {
     const translations: Record<string, string> = {
       'cardiology': 'Cardiología',
@@ -128,6 +127,7 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         {/* Action Buttons */}
         <VetActionButtons 
           onBookAppointment={onBookAppointment}
+          onSendMessage={onSendMessage}
         />
 
         {/* Reviews Dialog */}

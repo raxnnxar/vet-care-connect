@@ -19,7 +19,8 @@ const VetDetailScreen = () => {
     loading, 
     error, 
     handleBookAppointment, 
-    handleReviewClick 
+    handleReviewClick,
+    handleSendMessage
   } = useVetDetail(id);
 
   // Create header component for all states
@@ -58,6 +59,7 @@ const VetDetailScreen = () => {
         data={data}
         onBookAppointment={handleBookAppointment}
         onReviewClick={handleReviewClick}
+        onSendMessage={handleSendMessage}
       />
     </LayoutBase>
   );

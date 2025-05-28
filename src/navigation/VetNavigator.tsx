@@ -9,6 +9,7 @@ import VetProfileScreen from '@/features/vets/screens/VetProfileScreen';
 import VetScheduleScreen from '@/features/vets/screens/VetScheduleScreen';
 import VetWeeklyAgendaScreen from '@/features/vets/screens/VetWeeklyAgendaScreen';
 import ChatsScreen from '@/features/chats/screens/ChatsScreen';
+import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
 
 interface UnderConstructionPageProps {
   title: string;
@@ -45,6 +46,7 @@ const VetNavigator: React.FC = () => {
       <Route path={VET_ROUTES.PATIENTS} element={<UnderConstructionPage title="Pacientes" />} />
       <Route path={VET_ROUTES.SCHEDULE} element={<VetScheduleScreen />} />
       <Route path={VET_ROUTES.CHATS} element={<ChatsScreen />} />
+      <Route path={VET_ROUTES.INDIVIDUAL_CHAT} element={<IndividualChatScreen />} />
       <Route path="/agenda" element={<VetWeeklyAgendaScreen />} />
       <Route path="*" element={<VetDashboard />} />
     </Routes>

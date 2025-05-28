@@ -1,10 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useVetDetail = (id: string | undefined) => {
   const navigate = useNavigate();
+  const { user } = useSelector((state: any) => state.auth);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,11 +75,37 @@ export const useVetDetail = (id: string | undefined) => {
     navigate(`/owner/vets/${id}/review`);
   };
 
+  const handleSendMessage = async () => {
+    if (!id || !user?.id) return;
+    
+    try {
+      // Create or get existing conversation
+      const { data: conversationId, error } = await supabase.rpc(
+        'get_or_create_conversation',
+        {
+          user1_uuid: user.id,
+          user2_uuid: id
+        }
+      );
+
+      if (error) {
+        console.error('Error creating conversation:', error);
+        return;
+      }
+
+      // Navigate to chat screen with conversation ID
+      navigate(`/chats/${conversationId}`);
+    } catch (error) {
+      console.error('Error handling send message:', error);
+    }
+  };
+
   return {
     data,
     loading,
     error,
     handleBookAppointment,
-    handleReviewClick
+    handleReviewClick,
+    handleSendMessage
   };
 };

@@ -593,6 +593,19 @@ export type Database = {
         Args: { vet_id: string }
         Returns: undefined
       }
+      get_or_create_conversation: {
+        Args: { user1_uuid: string; user2_uuid: string }
+        Returns: string
+      }
+      send_message: {
+        Args: {
+          conversation_uuid: string
+          sender_uuid: string
+          receiver_uuid: string
+          message_text: string
+        }
+        Returns: string
+      }
       update_provider_type: {
         Args: { provider_id: string; provider_type_val: string }
         Returns: undefined

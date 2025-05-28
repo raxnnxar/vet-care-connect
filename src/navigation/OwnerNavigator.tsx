@@ -15,6 +15,7 @@ import SaludScreen from '@/features/health/screens/SaludScreen';
 import NotificationsScreen from '@/features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import ChatsScreen from '@/features/chats/screens/ChatsScreen';
+import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
 
 const OwnerNavigator: React.FC = () => {
   return (
@@ -32,6 +33,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.NOTIFICATIONS} element={<NotificationsScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.CHATS} element={<ChatsScreen />} />
+      <Route path={OWNER_ROUTES.INDIVIDUAL_CHAT} element={<IndividualChatScreen />} />
       <Route path="*" element={<OwnerHomeScreen />} />
     </Routes>
   );

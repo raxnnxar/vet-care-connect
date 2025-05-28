@@ -11,7 +11,8 @@ export const VET_ROUTES = {
   PATIENTS: '/patients',
   SCHEDULE: '/schedule',
   AGENDA: '/agenda',
-  CHATS: '/chats'
+  CHATS: '/chats',
+  INDIVIDUAL_CHAT: '/chats/:conversationId'
 };
 
 // OwnerNavigator routes
@@ -28,7 +29,8 @@ export const OWNER_ROUTES = {
   SALUD: '/salud',
   NOTIFICATIONS: '/notifications',
   SETTINGS: '/settings',
-  CHATS: '/chats'
+  CHATS: '/chats',
+  INDIVIDUAL_CHAT: '/chats/:conversationId'
 };
 
 export type VetRouteType = keyof typeof VET_ROUTES;
