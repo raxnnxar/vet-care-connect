@@ -7,6 +7,7 @@ import { format, addDays, startOfWeek, endOfWeek, addWeeks, subWeeks, startOfDay
 import { useSelector } from 'react-redux';
 import { getVetAppointments, getVetAppointmentsByDate, getVetAppointmentDates, Appointment } from '../api/vetAppointmentsApi';
 import { toast } from 'sonner';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 import VetSearchHeader from '../components/VetSearchHeader';
 import VetCalendar from '../components/VetCalendar';
 import VetAppointmentsList from '../components/VetAppointmentsList';
@@ -65,17 +66,18 @@ const VetDashboard: React.FC = () => {
         // Fetch all appointments for the logged-in vet
         const allAppointments = await getVetAppointments(user.id);
         
-        // Get today's appointments
-        const todayAppointments = allAppointments.filter(appointment => 
-          isSameDay(parseDate(appointment.appointment_date), new Date())
+        // Filter only confirmed appointments for today
+        const todayConfirmedAppointments = allAppointments.filter(appointment => 
+          isSameDay(parseDate(appointment.appointment_date), new Date()) &&
+          appointment.status === APPOINTMENT_STATUS.CONFIRMED
         );
         
-        // Extract unique dates for the appointment indicators
+        // Extract unique dates for the appointment indicators (all statuses)
         const dates = allAppointments.map(app => parseDate(app.appointment_date));
         setAppointmentDates(dates);
         
-        // Set today's appointments by default
-        setAppointments(todayAppointments);
+        // Set today's confirmed appointments by default
+        setAppointments(todayConfirmedAppointments);
       } catch (error) {
         console.error('Error fetching vet appointments:', error);
         toast.error('Error al cargar las citas');
@@ -87,7 +89,7 @@ const VetDashboard: React.FC = () => {
     fetchAppointments();
   }, [user?.id]);
 
-  // Fetch appointments for the selected date
+  // Fetch confirmed appointments for the selected date
   useEffect(() => {
     const fetchAppointmentsByDate = async () => {
       if (!user?.id) return;
@@ -95,7 +97,11 @@ const VetDashboard: React.FC = () => {
       setIsLoading(true);
       try {
         const dateAppointments = await getVetAppointmentsByDate(user.id, selectedDate);
-        setAppointments(dateAppointments);
+        // Filter only confirmed appointments
+        const confirmedAppointments = dateAppointments.filter(appointment => 
+          appointment.status === APPOINTMENT_STATUS.CONFIRMED
+        );
+        setAppointments(confirmedAppointments);
       } catch (error) {
         console.error('Error fetching appointments by date:', error);
         toast.error('Error al cargar las citas para la fecha seleccionada');
@@ -132,7 +138,7 @@ const VetDashboard: React.FC = () => {
       footer={<NavbarInferior activeTab="home" />}
     >
       <div className="flex flex-col gap-6 p-4 pb-20 overflow-y-auto">
-        {/* Today's Appointments Section */}
+        {/* Today's Confirmed Appointments Section */}
         <VetAppointmentsList 
           appointments={appointments} 
           selectedDate={selectedDate} 
