@@ -23,12 +23,12 @@ const OwnerAppointmentsScreen: React.FC = () => {
       try {
         console.log('Current user ID:', user?.id);
         
-        // Get appointments with pet and veterinarian information
+        // Get appointments with pet information using explicit column hint
         const { data: appointmentsData, error: appointmentsError } = await supabase
           .from('appointments')
           .select(`
             *,
-            pets!inner (
+            pets:pet_id (
               id,
               name,
               profile_picture_url
