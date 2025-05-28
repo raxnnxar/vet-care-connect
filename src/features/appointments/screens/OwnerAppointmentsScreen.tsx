@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -23,17 +24,10 @@ const OwnerAppointmentsScreen: React.FC = () => {
       try {
         console.log('Current user ID:', user?.id);
         
-        // Get appointments with pet information using explicit column hint
+        // First, get appointments only
         const { data: appointmentsData, error: appointmentsError } = await supabase
           .from('appointments')
-          .select(`
-            *,
-            pets:pet_id (
-              id,
-              name,
-              profile_picture_url
-            )
-          `)
+          .select('*')
           .eq('owner_id', user?.id)
           .order('created_at', { ascending: false });
 
@@ -42,19 +36,33 @@ const OwnerAppointmentsScreen: React.FC = () => {
           throw appointmentsError;
         }
         
-        console.log('Fetched appointments with pet info:', appointmentsData);
+        console.log('Fetched appointments:', appointmentsData);
 
         if (!appointmentsData || appointmentsData.length === 0) {
           return [];
         }
 
-        // Get veterinarian information for each appointment
-        const appointmentsWithVetInfo = await Promise.all(
+        // Get pet information for each appointment
+        const appointmentsWithDetails = await Promise.all(
           appointmentsData.map(async (appointment) => {
+            let petInfo = null;
             let vetName = 'Por confirmar';
             
+            // Get pet information if pet_id exists
+            if (appointment.pet_id) {
+              const { data: petData, error: petError } = await supabase
+                .from('pets')
+                .select('id, name, profile_picture_url')
+                .eq('id', appointment.pet_id)
+                .single();
+              
+              if (!petError && petData) {
+                petInfo = petData;
+              }
+            }
+            
+            // Get veterinarian information if provider_id exists
             if (appointment.provider_id) {
-              // Get veterinarian profile information
               const { data: vetProfile, error: vetError } = await supabase
                 .from('profiles')
                 .select('display_name')
@@ -68,14 +76,15 @@ const OwnerAppointmentsScreen: React.FC = () => {
             
             return {
               ...appointment,
-              provider_name: vetName
+              provider_name: vetName,
+              pets: petInfo
             };
           })
         );
 
         // Filter appointments based on the current time and tab
         const now = new Date();
-        const filteredAppointments = appointmentsWithVetInfo.filter(appointment => {
+        const filteredAppointments = appointmentsWithDetails.filter(appointment => {
           if (!appointment.appointment_date) return false;
           
           try {
