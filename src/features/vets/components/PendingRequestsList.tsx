@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
+import { useEffect } from 'react';
 
 interface PendingRequest {
   id: string;
@@ -30,12 +31,14 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Fetch pending appointment requests from Supabase
-  const { data: requests, isLoading } = useQuery({
+  // Fetch pending appointment requests from Supabase with real-time updates
+  const { data: requests, isLoading, refetch } = useQuery({
     queryKey: ['pending-requests'],
     queryFn: async () => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error('No user logged in');
+
+      console.log('Fetching pending requests for user:', user.user.id);
 
       const { data, error } = await supabase
         .from('appointments')
@@ -46,12 +49,15 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           pets!appointments_pet_id_fkey(id, name)
         `)
         .eq('provider_id', user.user.id)
-        .eq('status', APPOINTMENT_STATUS.PENDING);
+        .eq('status', APPOINTMENT_STATUS.PENDING)
+        .order('appointment_date', { ascending: true });
       
       if (error) {
         console.error('Error fetching pending requests:', error);
         throw error;
       }
+      
+      console.log('Raw pending appointments data:', data);
       
       return data.map(appointment => {
         // Default pet name
@@ -115,8 +121,73 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
         };
       });
     },
-    initialData: initialRequests
+    initialData: initialRequests,
+    refetchInterval: 10000, // Refetch every 10 seconds
+    staleTime: 0, // Consider data stale immediately
   });
+
+  // Set up real-time subscription for appointments table
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: user } = await supabase.auth.getUser();
+      return user.user;
+    };
+
+    const setupRealtimeSubscription = async () => {
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      console.log('Setting up real-time subscription for pending requests');
+
+      const channel = supabase
+        .channel('pending-appointments-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+            schema: 'public',
+            table: 'appointments',
+            filter: `provider_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('Real-time change detected in appointments:', payload);
+            
+            // Check if the change is related to pending status
+            const newRecord = payload.new as any;
+            const oldRecord = payload.old as any;
+            
+            if (
+              (payload.eventType === 'INSERT' && newRecord?.status === APPOINTMENT_STATUS.PENDING) ||
+              (payload.eventType === 'UPDATE' && (
+                newRecord?.status === APPOINTMENT_STATUS.PENDING || 
+                oldRecord?.status === APPOINTMENT_STATUS.PENDING
+              )) ||
+              payload.eventType === 'DELETE'
+            ) {
+              console.log('Invalidating pending requests query due to relevant change');
+              // Invalidate and refetch the pending requests
+              queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+            }
+          }
+        )
+        .subscribe((status) => {
+          console.log('Real-time subscription status:', status);
+        });
+
+      return () => {
+        console.log('Cleaning up real-time subscription');
+        supabase.removeChannel(channel);
+      };
+    };
+
+    setupRealtimeSubscription();
+  }, [queryClient]);
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    console.log('Manual refresh triggered');
+    refetch();
+  };
 
   const handleViewRequest = (requestId: string) => {
     navigate(`/vet/appointments/${requestId}`);
@@ -124,6 +195,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
 
   const handleApproveRequest = async (requestId: string) => {
     try {
+      console.log('Approving request:', requestId);
       const { data, error } = await supabase
         .from('appointments')
         .update({ status: APPOINTMENT_STATUS.CONFIRMED })
@@ -133,6 +205,8 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       if (error) {
         throw error;
       }
+      
+      console.log('Request approved successfully:', data);
       
       // Invalidate and refetch the pending requests
       queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
@@ -150,6 +224,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
 
   const handleRejectRequest = async (requestId: string) => {
     try {
+      console.log('Rejecting request:', requestId);
       const { data, error } = await supabase
         .from('appointments')
         .update({ status: APPOINTMENT_STATUS.CANCELLED })
@@ -159,6 +234,8 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       if (error) {
         throw error;
       }
+      
+      console.log('Request rejected successfully:', data);
       
       // Invalidate and refetch the pending requests
       queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
@@ -176,7 +253,17 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
 
   return (
     <div>
-      <h2 className="text-xl font-medium text-[#1F2937] mb-3">Solicitudes pendientes</h2>
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-xl font-medium text-[#1F2937]">Solicitudes pendientes</h2>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleRefresh}
+          className="text-xs"
+        >
+          Actualizar
+        </Button>
+      </div>
       
       {isLoading ? (
         <Card className="p-4 text-center">
