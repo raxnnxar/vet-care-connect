@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
-import { ArrowLeft, Dog, Cat } from 'lucide-react';
+import { ArrowLeft, Cat } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay, parseISO } from 'date-fns';
@@ -188,7 +188,6 @@ const VetWeeklyAgendaScreen: React.FC = () => {
   };
 
   const getPetIcon = (petName: string) => {
-    // Simple logic to determine pet type based on name or could be improved with actual pet data
     return <Cat size={16} className="text-[#4DA6A8]" />;
   };
 
@@ -196,108 +195,118 @@ const VetWeeklyAgendaScreen: React.FC = () => {
     <LayoutBase
       header={
         <div className="flex items-center justify-between px-4 py-3 bg-[#79D0B8]">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => navigate('/vet')}
-              className="p-1 rounded-full hover:bg-white/20 transition-colors"
-            >
-              <ArrowLeft size={24} className="text-white" />
-            </button>
-            <h1 className="text-white font-medium text-lg">Agenda Semanal</h1>
-          </div>
-          <div className="flex items-center space-x-2">
+          <button
+            onClick={() => navigate('/vet')}
+            className="p-1 rounded-full hover:bg-white/20 transition-colors"
+          >
+            <ArrowLeft size={24} className="text-white" />
+          </button>
+          
+          <div className="flex items-center space-x-4">
             <button
               onClick={goToPreviousWeek}
-              className="p-2 rounded-full hover:bg-white/20 text-white"
+              className="p-2 rounded-full hover:bg-white/20 text-white transition-colors"
             >
-              ‹
+              <span className="text-lg">‹</span>
             </button>
-            <span className="text-white font-medium">
+            <span className="text-white font-medium text-lg">
               {format(currentWeekStart, 'd MMM', { locale: es })} - {format(addDays(currentWeekStart, 6), 'd MMM yyyy', { locale: es })}
             </span>
             <button
               onClick={goToNextWeek}
-              className="p-2 rounded-full hover:bg-white/20 text-white"
+              className="p-2 rounded-full hover:bg-white/20 text-white transition-colors"
             >
-              ›
+              <span className="text-lg">›</span>
             </button>
           </div>
+          
+          <div className="w-10"></div>
         </div>
       }
       footer={<NavbarInferior activeTab="home" />}
     >
-      <div className="p-4 pb-20">
-        {/* Week header */}
-        <div className="grid grid-cols-8 gap-1 mb-4 sticky top-0 bg-white z-10 py-2">
-          <div className="text-xs font-medium text-gray-500 p-2">Hora</div>
-          {weekDays.map((day, index) => {
-            const dayAvailable = isVetAvailable(day);
-            return (
-              <div key={index} className="text-center p-2">
-                <div className="text-xs font-medium text-gray-500 uppercase">
-                  {format(day, 'EEE', { locale: es })}
+      <div className="flex flex-col h-full">
+        {/* Fixed Week header with rounded design */}
+        <div className="bg-white shadow-sm border-b border-gray-100">
+          <div className="grid grid-cols-8 gap-1 p-4">
+            <div className="text-xs font-medium text-gray-500 p-2">Hora</div>
+            {weekDays.map((day, index) => {
+              const dayAvailable = isVetAvailable(day);
+              return (
+                <div 
+                  key={index} 
+                  className={`text-center p-3 rounded-xl ${
+                    dayAvailable 
+                      ? 'bg-gray-50' 
+                      : 'bg-red-100'
+                  }`}
+                >
+                  <div className="text-xs font-medium text-gray-500 uppercase">
+                    {format(day, 'EEE', { locale: es })}
+                  </div>
+                  <div className={`text-lg font-semibold mt-1 ${
+                    dayAvailable ? 'text-[#1F2937]' : 'text-red-500'
+                  }`}>
+                    {format(day, 'd')}
+                  </div>
                 </div>
-                <div className="text-lg font-semibold text-[#1F2937] mt-1">
-                  {format(day, 'd')}
-                </div>
-                {!dayAvailable && (
-                  <div className="text-xs text-red-500 mt-1">Cerrado</div>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        {/* Time slots grid */}
-        <div className="space-y-0 max-h-[70vh] overflow-y-auto">
-          {timeSlots.map((timeSlot, timeIndex) => (
-            <div key={timeIndex} className="grid grid-cols-8 gap-1 border-b border-gray-100">
-              {/* Time label */}
-              <div className="text-xs text-gray-500 p-2 text-right pr-4">
-                {timeSlot}
+        {/* Scrollable Time slots grid */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="space-y-0">
+            {timeSlots.map((timeSlot, timeIndex) => (
+              <div key={timeIndex} className="grid grid-cols-8 gap-1 border-b border-gray-100 px-4">
+                {/* Time label */}
+                <div className="text-xs text-gray-500 p-2 text-right pr-4">
+                  {timeSlot}
+                </div>
+                
+                {/* Day columns */}
+                {weekDays.map((day, dayIndex) => {
+                  const isDayAvailable = isVetAvailable(day);
+                  const isSlotAvailable = isTimeSlotAvailable(day, timeSlot);
+                  const appointment = getAppointmentForSlot(day, timeSlot);
+                  
+                  // If day is not available, show closed column
+                  if (!isDayAvailable) {
+                    return (
+                      <div 
+                        key={dayIndex} 
+                        className="h-8 bg-red-100 border-r border-gray-200 rounded-sm"
+                      />
+                    );
+                  }
+                  
+                  // If slot is not within working hours, show empty
+                  if (!isSlotAvailable) {
+                    return (
+                      <div 
+                        key={dayIndex} 
+                        className="h-8 bg-gray-50 border-r border-gray-100 rounded-sm"
+                      />
+                    );
+                  }
+                  
+                  return (
+                    <div 
+                      key={dayIndex} 
+                      className="h-8 bg-[#79D0B8]/10 border-r border-gray-100 relative rounded-sm"
+                    >
+                      {appointment && (
+                        <div className="h-full bg-[#79D0B8] text-white text-xs p-1 rounded-sm flex items-center justify-center overflow-hidden">
+                          {getPetIcon(appointment.petName || '')}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              
-              {/* Day columns */}
-              {weekDays.map((day, dayIndex) => {
-                const isDayAvailable = isVetAvailable(day);
-                const isSlotAvailable = isTimeSlotAvailable(day, timeSlot);
-                const appointment = getAppointmentForSlot(day, timeSlot);
-                
-                // If day is not available, show closed column
-                if (!isDayAvailable) {
-                  return (
-                    <div 
-                      key={dayIndex} 
-                      className="h-8 bg-red-100 border-r border-gray-200"
-                    />
-                  );
-                }
-                
-                // If slot is not within working hours, show empty
-                if (!isSlotAvailable) {
-                  return (
-                    <div 
-                      key={dayIndex} 
-                      className="h-8 bg-gray-50 border-r border-gray-100"
-                    />
-                  );
-                }
-                
-                return (
-                  <div 
-                    key={dayIndex} 
-                    className="h-8 bg-[#79D0B8]/10 border-r border-gray-100 relative"
-                  >
-                    {appointment && (
-                      <div className="h-full bg-[#79D0B8] text-white text-xs p-1 rounded flex items-center justify-center overflow-hidden">
-                        {getPetIcon(appointment.petName || '')}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </LayoutBase>
