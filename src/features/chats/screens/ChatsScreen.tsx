@@ -9,15 +9,18 @@ import { EmptyChatsState } from '../components/EmptyChatsState';
 import { NewChatButton } from '../components/NewChatButton';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
+import { useUser } from '@/contexts/UserContext';
 
 const ChatsScreen: React.FC = () => {
   const navigate = useNavigate();
+  const { userRole } = useUser();
   const { data: conversations, isLoading, error, refetch } = useConversations();
 
   const handleConversationClick = (conversationId: string) => {
-    // Por ahora solo mostramos un log, después se puede implementar la navegación al chat específico
     console.log('Clicked conversation:', conversationId);
-    // navigate(`/chat/${conversationId}`);
+    // Navigate to the individual chat screen with correct role prefix
+    const rolePrefix = userRole === 'pet_owner' ? '/owner' : '/vet';
+    navigate(`${rolePrefix}/chats/${conversationId}`);
   };
 
   const handleNewChat = () => {

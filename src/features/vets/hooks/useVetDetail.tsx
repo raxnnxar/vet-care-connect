@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { supabase } from '@/integrations/supabase/client';
+import { useUser } from '@/contexts/UserContext';
 
 export const useVetDetail = (id: string | undefined) => {
   const navigate = useNavigate();
   const { user } = useSelector((state: any) => state.auth);
+  const { userRole } = useUser();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,8 +102,9 @@ export const useVetDetail = (id: string | undefined) => {
 
       console.log('Conversation ID:', conversationId);
       
-      // Navigate to chat screen with conversation ID
-      navigate(`/chats/${conversationId}`);
+      // Navigate to chat screen with the correct role prefix
+      const rolePrefix = userRole === 'pet_owner' ? '/owner' : '/vet';
+      navigate(`${rolePrefix}/chats/${conversationId}`);
     } catch (error) {
       console.error('Error handling send message:', error);
     }
