@@ -31,7 +31,7 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
   const navigate = useNavigate();
 
   // Format veterinarian name using display_name from profiles
-  const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
+  const displayName = data.service_providers?.profiles?.display_name || '';
   
   const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
   const vetName = displayName 
