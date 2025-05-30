@@ -69,7 +69,8 @@ export const useVetDetail = (id: string | undefined) => {
 
   const handleBookAppointment = () => {
     if (!id) return;
-    navigate(`/appointments/book/${id}`);
+    // Navigate to the booking flow with the correct path format
+    navigate(`/owner/appointments/book/${id}`);
   };
 
   const handleReviewClick = () => {
