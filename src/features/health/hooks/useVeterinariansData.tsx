@@ -26,7 +26,7 @@ export const useVeterinariansData = () => {
         setLoading(true);
         setError(null);
 
-        // Consulta modificada para seguir la ruta de relación correcta
+        // Updated query to work with the new database structure
         const { data: veterinarians, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
@@ -36,8 +36,8 @@ export const useVeterinariansData = () => {
             average_rating,
             total_reviews,
             animals_treated,
+            clinic_address,
             service_providers (
-              business_name,
               provider_type,
               profiles (
                 display_name
@@ -46,8 +46,8 @@ export const useVeterinariansData = () => {
           `)
           .order('average_rating', { ascending: false });
 
-        console.log('Datos obtenidos:', veterinarians); // Para depuración
-        console.log('Error si existe:', vetError); // Para depuración
+        console.log('Datos obtenidos:', veterinarians);
+        console.log('Error si existe:', vetError);
 
         if (vetError) {
           throw vetError;
@@ -69,7 +69,7 @@ export const useVeterinariansData = () => {
         // Map the database data to our frontend model
         const formattedVets: Veterinarian[] = veterinarians.map(vet => {
           // Get display name from profiles through service_providers relation
-          const displayName = vet.service_providers?.profiles?.display_name || vet.service_providers?.business_name || 'Sin nombre';
+          const displayName = vet.service_providers?.profiles?.display_name || 'Sin nombre';
           
           // For firstName and lastName, we'll use parts of displayName
           let firstName = '', lastName = '';

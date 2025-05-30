@@ -303,6 +303,8 @@ export type Database = {
         Row: {
           address: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           phone_number: string | null
           primary_vet_id: string | null
           profile_picture_url: string | null
@@ -310,6 +312,8 @@ export type Database = {
         Insert: {
           address?: string | null
           id: string
+          latitude?: number | null
+          longitude?: number | null
           phone_number?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
@@ -317,6 +321,8 @@ export type Database = {
         Update: {
           address?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           phone_number?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
@@ -403,7 +409,6 @@ export type Database = {
       }
       profiles: {
         Row: {
-          address: string | null
           created_at: string | null
           display_name: string
           email: string
@@ -412,7 +417,6 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          address?: string | null
           created_at?: string | null
           display_name: string
           email: string
@@ -421,7 +425,6 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          address?: string | null
           created_at?: string | null
           display_name?: string
           email?: string
@@ -471,30 +474,18 @@ export type Database = {
       }
       service_providers: {
         Row: {
-          address: string | null
-          business_hours: Json | null
-          business_name: string | null
           created_at: string | null
           id: string
-          phone_number: string | null
           provider_type: string
         }
         Insert: {
-          address?: string | null
-          business_hours?: Json | null
-          business_name?: string | null
           created_at?: string | null
           id: string
-          phone_number?: string | null
           provider_type: string
         }
         Update: {
-          address?: string | null
-          business_hours?: Json | null
-          business_name?: string | null
           created_at?: string | null
           id?: string
-          phone_number?: string | null
           provider_type?: string
         }
         Relationships: [
@@ -514,6 +505,9 @@ export type Database = {
           average_rating: number | null
           bio: string | null
           certifications: Json | null
+          clinic_address: string | null
+          clinic_latitude: number | null
+          clinic_longitude: number | null
           education: Json | null
           emergency_services: boolean | null
           id: string
@@ -532,6 +526,9 @@ export type Database = {
           average_rating?: number | null
           bio?: string | null
           certifications?: Json | null
+          clinic_address?: string | null
+          clinic_latitude?: number | null
+          clinic_longitude?: number | null
           education?: Json | null
           emergency_services?: boolean | null
           id: string
@@ -550,6 +547,9 @@ export type Database = {
           average_rating?: number | null
           bio?: string | null
           certifications?: Json | null
+          clinic_address?: string | null
+          clinic_latitude?: number | null
+          clinic_longitude?: number | null
           education?: Json | null
           emergency_services?: boolean | null
           id?: string
