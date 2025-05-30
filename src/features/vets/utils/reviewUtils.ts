@@ -67,8 +67,7 @@ export async function fetchVetDetails(id: string | undefined) {
       service_providers (
         profiles (
           display_name
-        ),
-        business_name
+        )
       )
     `)
     .eq('id', id)
