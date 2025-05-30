@@ -43,11 +43,15 @@ export const useVetAvailability = (vetId: string) => {
           .from('appointments')
           .select('appointment_date, status')
           .eq('provider_id', vetId)
-          .in('status', ['programada', 'confirmada', 'confirmed']);
+          .in('status', ['programada', 'pendiente']);
 
         if (appointmentsError) throw appointmentsError;
 
-        setAvailability(vetData?.availability || {});
+        // Properly handle the availability data
+        const availabilityData = vetData?.availability;
+        if (availabilityData && typeof availabilityData === 'object') {
+          setAvailability(availabilityData as VetAvailability);
+        }
         setExistingAppointments(appointmentsData || []);
       } catch (error) {
         console.error('Error fetching vet availability:', error);
