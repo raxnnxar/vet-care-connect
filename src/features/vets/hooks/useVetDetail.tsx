@@ -32,10 +32,8 @@ export const useVetDetail = (id: string | undefined) => {
             certifications,
             services_offered,
             license_number,
-            clinic_address,
-            clinic_latitude,
-            clinic_longitude,
             service_providers (
+              business_name,
               provider_type,
               profiles (
                 display_name,

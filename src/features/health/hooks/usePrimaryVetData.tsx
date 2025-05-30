@@ -75,6 +75,7 @@ export const usePrimaryVetData = (petId?: string) => {
             profile_image_url, 
             specialization,
             service_providers (
+              business_name,
               profiles (
                 display_name
               )
@@ -90,7 +91,9 @@ export const usePrimaryVetData = (petId?: string) => {
         
         if (vetData) {
           // Format the vet data
-          const displayName = vetData.service_providers?.profiles?.display_name || 'Sin nombre';
+          const displayName = vetData.service_providers?.profiles?.display_name || 
+                            vetData.service_providers?.business_name || 
+                            'Sin nombre';
           
           // For gender prefix (Dr/Dra), check if the name seems feminine (ends with 'a')
           const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
