@@ -5,6 +5,8 @@ import { Button } from '@/ui/atoms/button';
 import { addDays, startOfDay } from 'date-fns';
 import ListViewDateSelector from './ListViewDateSelector';
 import CalendarViewDateSelector from './CalendarViewDateSelector';
+import { useVetAvailability } from '../../hooks/useVetAvailability';
+import { useParams } from 'react-router-dom';
 
 interface DateTimeSelectorProps {
   selectedDate: Date | null;
@@ -26,18 +28,26 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
   const [availableDays, setAvailableDays] = useState<Date[]>([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const { vetId } = useParams<{ vetId: string }>();
+  const { isDateAvailable, isLoading } = useVetAvailability(vetId || '');
 
   useEffect(() => {
-    // Generate next 7 days starting from today
-    const days = [];
-    const today = startOfDay(new Date());
-    
-    for (let i = 0; i < 7; i++) {
-      days.push(addDays(today, i));
+    if (!isLoading) {
+      // Generate next 7 days starting from today, but only include available days
+      const days = [];
+      const today = startOfDay(new Date());
+      
+      for (let i = 0; i < 30; i++) { // Check more days to find 7 available ones
+        const date = addDays(today, i);
+        if (isDateAvailable(date)) {
+          days.push(date);
+        }
+        if (days.length >= 7) break; // Stop when we have 7 available days
+      }
+      
+      setAvailableDays(days);
     }
-    
-    setAvailableDays(days);
-  }, []);
+  }, [isDateAvailable, isLoading]);
 
   const handleViewChange = (newView: 'list' | 'calendar') => {
     if (newView === currentView) return;
@@ -48,6 +58,16 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
       setIsTransitioning(false);
     }, 150);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8">
+          <p className="text-gray-500">Cargando disponibilidad...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

@@ -22,7 +22,10 @@ const TimeSlotsList: React.FC<TimeSlotsListProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleTimeSelect = (time: string) => {
-    onDateSelect(currentDate);
+    // Ensure the date is selected when selecting a time
+    if (!selectedDate || !isSameDay(selectedDate, currentDate)) {
+      onDateSelect(currentDate);
+    }
     onTimeSelect(time);
   };
 

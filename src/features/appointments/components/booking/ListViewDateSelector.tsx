@@ -4,6 +4,8 @@ import { format, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import TimeSlotsList from './TimeSlotsList';
 import { Button } from '@/ui/atoms/button';
+import { useVetAvailability } from '../../hooks/useVetAvailability';
+import { useParams } from 'react-router-dom';
 
 interface ListViewDateSelectorProps {
   availableDays: Date[];
@@ -24,24 +26,8 @@ const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
   onContinue,
   onGoBack
 }) => {
-  // Generate time slots for a day (9:00 AM to 6:00 PM, 30-minute intervals)
-  const generateTimeSlots = (date: Date): string[] => {
-    const slots = [];
-    const startHour = 9;
-    const endHour = 18;
-    
-    for (let hour = startHour; hour < endHour; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-    
-    // Mock: Remove some random slots to simulate unavailability
-    const availableSlots = slots.filter((_, index) => {
-      return Math.random() > 0.3;
-    });
-    
-    return availableSlots;
-  };
+  const { vetId } = useParams<{ vetId: string }>();
+  const { isDateAvailable, getAvailableTimeSlotsForDate, isLoading } = useVetAvailability(vetId || '');
 
   const formatDayName = (date: Date): string => {
     if (isToday(date)) {
@@ -50,11 +36,24 @@ const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
     return format(date, 'EEEE', { locale: es });
   };
 
+  // Filter available days based on vet's availability
+  const actuallyAvailableDays = availableDays.filter(day => isDateAvailable(day));
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8">
+          <p className="text-gray-500">Cargando disponibilidad...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-4 max-h-96 overflow-y-auto">
-        {availableDays.map((day) => {
-          const timeSlots = generateTimeSlots(day);
+        {actuallyAvailableDays.map((day) => {
+          const timeSlots = getAvailableTimeSlotsForDate(day);
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           
           return (
@@ -100,6 +99,12 @@ const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
           );
         })}
       </div>
+
+      {actuallyAvailableDays.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No hay días disponibles para este veterinario</p>
+        </div>
+      )}
 
       {/* Navigation buttons */}
       <div className="flex gap-4">

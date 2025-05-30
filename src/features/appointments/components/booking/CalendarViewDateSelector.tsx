@@ -4,6 +4,8 @@ import { Calendar } from '@/ui/molecules/calendar';
 import { addDays, startOfDay, isSameDay } from 'date-fns';
 import TimeSlotsList from './TimeSlotsList';
 import { Button } from '@/ui/atoms/button';
+import { useVetAvailability } from '../../hooks/useVetAvailability';
+import { useParams } from 'react-router-dom';
 
 interface CalendarViewDateSelectorProps {
   selectedDate: Date | null;
@@ -22,49 +24,43 @@ const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
   onContinue,
   onGoBack
 }) => {
+  const { vetId } = useParams<{ vetId: string }>();
+  const { isDateAvailable, getAvailableTimeSlotsForDate, isLoading } = useVetAvailability(vetId || '');
+
   const [availableDates] = useState<Date[]>(() => {
     // Generate available dates for the next 30 days
     const dates = [];
     const today = startOfDay(new Date());
     
     for (let i = 0; i < 30; i++) {
-      // Simulate some unavailable dates
-      if (Math.random() > 0.2) {
-        dates.push(addDays(today, i));
+      const date = addDays(today, i);
+      if (isDateAvailable(date)) {
+        dates.push(date);
       }
     }
     
     return dates;
   });
 
-  // Generate time slots for a selected date
-  const generateTimeSlots = (date: Date): string[] => {
-    const slots = [];
-    const startHour = 9;
-    const endHour = 18;
-    
-    for (let hour = startHour; hour < endHour; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-    
-    // Mock: Remove some random slots to simulate unavailability
-    const availableSlots = slots.filter((_, index) => {
-      return Math.random() > 0.3;
-    });
-    
-    return availableSlots;
-  };
-
   const handleDateSelect = (date: Date | undefined) => {
-    if (date && availableDates.some(availableDate => isSameDay(availableDate, date))) {
+    if (date && isDateAvailable(date)) {
       onDateSelect(date);
       // Clear selected time when changing date
       onTimeSelect('');
     }
   };
 
-  const timeSlots = selectedDate ? generateTimeSlots(selectedDate) : [];
+  const timeSlots = selectedDate ? getAvailableTimeSlotsForDate(selectedDate) : [];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8">
+          <p className="text-gray-500">Cargando disponibilidad...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -76,7 +72,7 @@ const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
           disabled={(date) => {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            return date < today || !availableDates.some(availableDate => isSameDay(availableDate, date));
+            return date < today || !isDateAvailable(date);
           }}
           modifiers={{
             available: availableDates,
