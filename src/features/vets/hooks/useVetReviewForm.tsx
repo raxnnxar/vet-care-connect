@@ -28,9 +28,7 @@ export const useVetReviewForm = () => {
         const data = await fetchVetDetails(id);
         
         if (data) {
-          const displayName = data.service_providers?.profiles?.display_name || 
-                            data.service_providers?.business_name || 
-                            'Veterinario';
+          const displayName = data.service_providers?.profiles?.display_name || 'Veterinario';
           
           // Para el prefijo de género (Dr/Dra)
           const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
