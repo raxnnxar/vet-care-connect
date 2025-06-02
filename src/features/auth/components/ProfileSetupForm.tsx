@@ -4,13 +4,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import PhoneNumberField from './PhoneNumberField';
-import ProfileAddressField from './ProfileAddressField';
 import ProfileImageUploader from './ProfileImageUploader';
-import FinishSetupButton from './FinishSetupButton';
 
 const profileSchema = z.object({
   phoneNumber: z.string().min(1, 'El número de teléfono es requerido'),
-  address: z.string().min(1, 'La dirección es requerida'),
 });
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -65,13 +62,6 @@ const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({
         onChange={(value) => form.setValue('phoneNumber', value)}
         label="Número de teléfono"
         placeholder="Ingresa tu número de teléfono"
-      />
-      
-      <ProfileAddressField
-        value={form.watch('address')}
-        onChange={(value) => form.setValue('address', value)}
-        label="Dirección"
-        placeholder="Ingresa tu dirección"
       />
       
       <p className="text-white text-sm">

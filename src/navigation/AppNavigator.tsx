@@ -9,6 +9,7 @@ import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
 import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
 import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
 import ProfileSetupScreen from '../features/auth/screens/ProfileSetupScreen';
+import LocationSetupScreen from '../features/auth/screens/LocationSetupScreen';
 import VetProfileSetupScreen from '../features/auth/screens/VetProfileSetupScreen';
 import { ROUTES } from '@/frontend/shared/constants/routes';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +31,7 @@ const AppNavigator = () => {
       // Added specific check to exclude the profile routes from this check
       if (
         location.pathname === ROUTES.PROFILE_SETUP || 
+        location.pathname === '/location-setup' ||
         location.pathname === ROUTES.VET_PROFILE_SETUP ||
         location.pathname === ROUTES.POST_SIGNUP_ROLE || 
         location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE ||
@@ -101,6 +103,7 @@ const AppNavigator = () => {
       <Route path={ROUTES.POST_SIGNUP_ROLE} element={<PostSignupRoleScreen />} />
       <Route path={ROUTES.POST_SIGNUP_SERVICE_TYPE} element={<PostSignupServiceTypeScreen />} />
       <Route path={ROUTES.PROFILE_SETUP} element={<ProfileSetupScreen />} />
+      <Route path="/location-setup" element={<LocationSetupScreen />} />
       <Route path={ROUTES.VET_PROFILE_SETUP} element={<VetProfileSetupScreen />} />
       
       {/* Nested navigators */}

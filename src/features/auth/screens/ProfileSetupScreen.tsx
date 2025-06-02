@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAppSelector } from '@/state/store';
 import { supabase } from '@/integrations/supabase/client';
-import { ROUTES } from '@/frontend/shared/constants/routes';
 import { Pet } from '@/features/pets/types';
 import { usePets } from '@/features/pets/hooks';
 import { profileImageService } from '../api/profileImageService';
@@ -21,6 +20,7 @@ const ProfileSetupScreen = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { getCurrentUserPets } = usePets();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const ProfileSetupScreen = () => {
         try {
           const { data: ownerExists, error: ownerCheckError } = await supabase
             .from('pet_owners')
-            .select('id, phone_number, address')
+            .select('id, phone_number')
             .eq('id', user.id)
             .single();
           
@@ -83,7 +83,7 @@ const ProfileSetupScreen = () => {
         return;
       }
       
-      setIsUploadingImage(true);
+      setIsSaving(true);
       let profilePictureUrl = null;
       
       if (profileImageFile) {
@@ -102,7 +102,6 @@ const ProfileSetupScreen = () => {
         .from('pet_owners')
         .update({
           phone_number: values.phoneNumber,
-          address: values.address,
           ...(profilePictureUrl && { profile_picture_url: profilePictureUrl }),
         })
         .eq('id', user.id);
@@ -111,25 +110,13 @@ const ProfileSetupScreen = () => {
         throw error;
       }
       
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          address: values.address,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-        
-      if (profileError) {
-        console.error('Error updating profile address:', profileError);
-      }
-      
-      toast.success('Perfil actualizado con éxito');
-      navigate(ROUTES.OWNER);
+      toast.success('Información guardada con éxito');
+      navigate('/location-setup');
     } catch (error) {
-      console.error('Error al actualizar el perfil:', error);
-      toast.error('Error al actualizar el perfil');
+      console.error('Error al guardar la información:', error);
+      toast.error('Error al guardar la información');
     } finally {
-      setIsUploadingImage(false);
+      setIsSaving(false);
     }
   };
 
@@ -138,7 +125,7 @@ const ProfileSetupScreen = () => {
     setCurrentPets(prevPets => [...prevPets, newPet]);
   };
 
-  const isFormValid = true; // Simplificado para este ejemplo, ajustar según tus necesidades reales
+  const isFormValid = true; // Simplificado para este ejemplo
 
   if (isProfileLoading) {
     return (
@@ -161,7 +148,6 @@ const ProfileSetupScreen = () => {
           <ProfileSetupForm
             initialValues={{
               phoneNumber: '',
-              address: '',
             }}
             onSubmit={handleProfileSubmit}
             isLoading={isUploadingImage}
@@ -186,9 +172,9 @@ const ProfileSetupScreen = () => {
           <FinishSetupButton
             onClick={() => handleProfileSubmit({
               phoneNumber: '',  // Deberías obtener los valores reales del formulario aquí
-              address: ''
             })}
-            disabled={!isFormValid || isUploadingImage}
+            disabled={!isFormValid || isSaving}
+            text="Guardar y continuar"
           />
         </div>
       </div>
