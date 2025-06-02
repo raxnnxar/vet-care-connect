@@ -2,6 +2,8 @@
 import React, { useRef, useState } from 'react';
 import { Loader2, Pencil } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/atoms/avatar';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface ProfileImageUploaderProps {
   profileImage: string | null;
@@ -9,6 +11,7 @@ interface ProfileImageUploaderProps {
   setProfileImageFile: (file: File | null) => void;
   isUploading: boolean;
   displayName?: string;
+  userId?: string;
 }
 
 const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
@@ -17,6 +20,7 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
   setProfileImageFile,
   isUploading,
   displayName,
+  userId,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,11 +37,19 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    const fileSize = file.size / 1024 / 1024; // in MB
+    
+    if (fileSize > 5) {
+      toast.error('La imagen no debe exceder 5MB');
+      return;
+    }
+    
     try {
+      // Create preview URL for immediate display
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -48,8 +60,32 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
       
       setProfileImageFile(file);
       
-    } catch (error) {
+      // If userId is provided, upload to Supabase
+      if (userId) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${userId}/profile.${fileExt}`;
+        
+        const { error } = await supabase.storage
+          .from('profile_pictures')
+          .upload(fileName, file, {
+            upsert: true
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        const { data } = supabase.storage
+          .from('profile_pictures')
+          .getPublicUrl(fileName);
+
+        setProfileImage(data.publicUrl);
+        toast.success('Imagen de perfil actualizada');
+      }
+      
+    } catch (error: any) {
       console.error('Error handling image:', error);
+      toast.error('Error al procesar la imagen: ' + error.message);
     }
   };
 

@@ -39,18 +39,23 @@ const ProfileImageSection: React.FC<ProfileImageSectionProps> = ({
     setProfileImageFile(file);
     
     try {
-      const filePath = `${userId}/${Date.now()}_${file.name}`;
+      // Use the profile_pictures bucket with user folder structure
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/profile.${fileExt}`;
+      
       const { error } = await supabase.storage
-        .from('vet-profile-images')
-        .upload(filePath, file);
+        .from('profile_pictures')
+        .upload(fileName, file, {
+          upsert: true // This allows overwriting existing profile pictures
+        });
 
       if (error) {
         throw error;
       }
 
       const { data } = supabase.storage
-        .from('vet-profile-images')
-        .getPublicUrl(filePath);
+        .from('profile_pictures')
+        .getPublicUrl(fileName);
 
       setValue('profile_image_url', data.publicUrl);
       toast.success('Imagen de perfil actualizada');
