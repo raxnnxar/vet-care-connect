@@ -101,41 +101,27 @@ export const usePets = () => {
 
   const updatePet = async (petId: string, petData: Partial<Pet>) => {
     try {
-      // Check if medicalHistory is present in the petData and handle it separately
-      const { medicalHistory, ...restPetData } = petData as any;
-      
-      // First update the pet's basic information
+      console.log('Updating pet with ID:', petId);
+      console.log('Pet data to update:', petData);
+
+      // Only update basic pet information, not medical history
       const { data, error } = await supabase
         .from('pets')
-        .update(restPetData)
+        .update(petData)
         .eq('id', petId)
         .eq('owner_id', user?.id)  // Ensure the user can only update their own pets
         .select()
         .single();
 
       if (error) {
+        console.error('Error updating pet:', error);
         throw error;
       }
 
-      // If there's medical history data, handle it separately
-      if (medicalHistory) {
-        const { error: medicalError } = await supabase
-          .from('pet_medical_history')
-          .upsert({
-            pet_id: petId,
-            ...medicalHistory
-          })
-          .select()
-          .single();
-
-        if (medicalError) {
-          console.error('Error updating medical history:', medicalError);
-          // Don't throw here, we already have updated the pet information
-        }
-      }
-
+      console.log('Pet updated successfully:', data);
+      
       setPets(prevPets =>
-        prevPets.map(pet => (pet.id === petId ? { ...pet, ...restPetData } as Pet : pet))
+        prevPets.map(pet => (pet.id === petId ? { ...pet, ...petData } as Pet : pet))
       );
       toast.success('Mascota actualizada exitosamente');
       return data;

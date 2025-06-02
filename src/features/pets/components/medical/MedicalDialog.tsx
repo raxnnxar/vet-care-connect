@@ -11,7 +11,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/ui/atoms/button';
 import { Syringe } from 'lucide-react';
 import { toast } from 'sonner';
-import { usePets } from '../../hooks';
+import { supabase } from '@/integrations/supabase/client';
 import VaccineDocumentUpload from './VaccineDocumentUpload';
 import MedicationsSection from './MedicationsSection';
 import SurgeriesSection from './SurgeriesSection';
@@ -27,7 +27,6 @@ interface MedicalDialogProps {
 
 const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { updatePet } = usePets();
 
   const { register, handleSubmit, control } = useForm<MedicalFormValues>({
     defaultValues: {
@@ -49,21 +48,60 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
       setIsSubmitting(true);
       console.log('Submitting medical data for pet:', pet.id);
       
-      // Format data for medical history update
-      const medicalHistory = {
+      // Prepare medical history data
+      const medicalHistoryData = {
         pet_id: pet.id,
         current_medications: data.medications.filter(m => m.name.trim() !== ''),
         previous_surgeries: data.surgeries.filter(s => s.type.trim() !== ''),
-        allergies: data.allergies,
-        chronic_conditions: data.chronicConditions
+        allergies: data.allergies || null,
+        chronic_conditions: data.chronicConditions || null
       };
 
-      console.log('Formatted medical history data:', medicalHistory);
+      console.log('Medical history data to save:', medicalHistoryData);
       
-      // Update pet with medical history
-      const result = await updatePet(pet.id, { medicalHistory });
-      console.log('Update pet result:', result);
-      
+      // Check if medical history already exists for this pet
+      const { data: existingHistory, error: fetchError } = await supabase
+        .from('pet_medical_history')
+        .select('id')
+        .eq('pet_id', pet.id)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('Error checking existing medical history:', fetchError);
+        throw fetchError;
+      }
+
+      let result;
+      if (existingHistory) {
+        // Update existing medical history
+        const { data: updateData, error: updateError } = await supabase
+          .from('pet_medical_history')
+          .update(medicalHistoryData)
+          .eq('pet_id', pet.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Error updating medical history:', updateError);
+          throw updateError;
+        }
+        result = updateData;
+      } else {
+        // Create new medical history
+        const { data: insertData, error: insertError } = await supabase
+          .from('pet_medical_history')
+          .insert(medicalHistoryData)
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Error creating medical history:', insertError);
+          throw insertError;
+        }
+        result = insertData;
+      }
+
+      console.log('Medical history saved successfully:', result);
       toast.success('Información médica guardada exitosamente');
       onClose();
     } catch (error) {

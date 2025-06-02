@@ -30,6 +30,15 @@ const PetMedicalForm: React.FC<PetMedicalFormProps> = ({ pet, onComplete, onSkip
           <Syringe className="h-4 w-4" />
           Agregar información médica
         </Button>
+        
+        <Button 
+          type="button" 
+          onClick={onSkip}
+          variant="outline"
+          className="w-full py-4 px-6 text-base font-medium"
+        >
+          Omitir por ahora
+        </Button>
       </div>
 
       {showMedicalDialog && (
