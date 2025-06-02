@@ -24,35 +24,26 @@ const FormFooter: React.FC<FormFooterProps> = ({
   };
 
   return (
-    <div className="sticky bottom-6 z-10 mt-8">
-      <div className="bg-white rounded-xl shadow-lg p-4 flex justify-between items-center">
-        <div>
-          {hasErrors && (
-            <p className="text-red-500 text-sm">
-              Hay campos con errores, pero puedes guardar de todos modos.
-            </p>
-          )}
-        </div>
-        <Button 
-          type="submit" 
-          disabled={isSubmitting} 
-          className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
-          size="lg"
-          onClick={handleButtonClick}
-        >
-          {isSubmitting ? (
-            <>
-              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-              Guardando...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              Guardar Perfil
-            </>
-          )}
-        </Button>
-      </div>
+    <div className="flex justify-center mt-8 mb-6">
+      <Button 
+        type="submit" 
+        disabled={isSubmitting} 
+        className="bg-[#79D0B8] hover:bg-[#5FBFB3] px-8 py-3"
+        size="lg"
+        onClick={handleButtonClick}
+      >
+        {isSubmitting ? (
+          <>
+            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+            Guardando...
+          </>
+        ) : (
+          <>
+            <Save className="h-4 w-4 mr-2" />
+            Guardar y Continuar
+          </>
+        )}
+      </Button>
     </div>
   );
 };

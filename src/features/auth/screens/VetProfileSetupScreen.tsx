@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
-import { ROUTES } from '@/frontend/shared/constants/routes';
 import { VeterinarianProfile } from '../types/veterinarianTypes';
 import VetProfileForm from '../components/vet/VetProfileForm';
 import VetProfileLoading from '../components/vet/VetProfileLoading';
@@ -48,8 +47,8 @@ const VetProfileSetupScreen = () => {
       
       await updateVeterinarianProfile(userId, safeProfileData);
       toast.success('Perfil actualizado con éxito');
-      // Redirect to vet dashboard immediately after success
-      navigate(ROUTES.VET);
+      // Redirect to vet location setup screen
+      navigate('/vet-location-setup');
     } catch (error: any) {
       console.error("Error details:", error);
       toast.error(`Error al actualizar el perfil: ${error.message}`);
