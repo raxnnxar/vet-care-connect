@@ -1,10 +1,12 @@
 
 import React from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
-import { ChevronRight, Moon, Bell, Lock, HelpCircle, LifeBuoy, LogOut, Globe, Palette } from 'lucide-react';
+import { ChevronRight, Moon, Bell, Lock, HelpCircle, LifeBuoy, LogOut, Globe, Palette, MapPin } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Switch } from '@/ui/atoms/switch';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '@/contexts/UserContext';
+import { useLocationSharing } from '../hooks/useLocationSharing';
 
 const SettingItem: React.FC<{
   icon: React.ReactNode;
@@ -35,6 +37,13 @@ const SettingItem: React.FC<{
 
 const SettingsScreen = () => {
   const navigate = useNavigate();
+  const { userRole } = useUser();
+  const { shareLocation, isLoading, updateLocationSharing } = useLocationSharing();
+
+  const handleLocationSharingToggle = async () => {
+    if (isLoading) return;
+    await updateLocationSharing(!shareLocation);
+  };
 
   return (
     <LayoutBase
@@ -83,6 +92,29 @@ const SettingsScreen = () => {
             />
           </div>
         </div>
+
+        {/* Location Settings - Only for pet owners */}
+        {userRole === 'pet_owner' && (
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-gray-50">
+              <h2 className="font-medium">Ubicación</h2>
+            </div>
+            <div>
+              <SettingItem
+                icon={<MapPin className="h-5 w-5 text-[#5FBFB3]" />}
+                title="Compartir ubicación constantemente"
+                description="Permite que la app acceda a tu ubicación puntual cada vez que la abras para mejorar la precisión de los servicios cercanos."
+                rightElement={
+                  <Switch 
+                    checked={shareLocation}
+                    onCheckedChange={handleLocationSharingToggle}
+                    disabled={isLoading}
+                  />
+                }
+              />
+            </div>
+          </div>
+        )}
 
         {/* Language Settings */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">

@@ -7,8 +7,12 @@ import { NavbarInferior } from '@/frontend/navigation/components';
 import ServiceCategoryGrid from '../components/ServiceCategoryGrid';
 import PetFriendlyMap from '../components/PetFriendlyMap';
 import VeterinariansMap from '../components/VeterinariansMap';
+import { useAppLocationUpdate } from '@/features/settings/hooks/useAppLocationUpdate';
 
 const OwnerHomeScreen = () => {
+  // Update location on app start if user has location sharing enabled
+  useAppLocationUpdate();
+
   return (
     <LayoutBase
       header={

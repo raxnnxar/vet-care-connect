@@ -308,6 +308,7 @@ export type Database = {
           phone_number: string | null
           primary_vet_id: string | null
           profile_picture_url: string | null
+          share_location: boolean | null
         }
         Insert: {
           address?: string | null
@@ -317,6 +318,7 @@ export type Database = {
           phone_number?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
+          share_location?: boolean | null
         }
         Update: {
           address?: string | null
@@ -326,6 +328,7 @@ export type Database = {
           phone_number?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
+          share_location?: boolean | null
         }
         Relationships: [
           {
