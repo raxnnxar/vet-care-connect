@@ -102,8 +102,8 @@ const SettingsScreen = () => {
             <div>
               <SettingItem
                 icon={<MapPin className="h-5 w-5 text-[#5FBFB3]" />}
-                title="Compartir ubicación constantemente"
-                description="Permite que la app acceda a tu ubicación puntual cada vez que la abras para mejorar la precisión de los servicios cercanos."
+                title="Compartir ubicación"
+                description="Encuentra lo que necesites cerca de ti"
                 rightElement={
                   <Switch 
                     checked={shareLocation}
