@@ -5,7 +5,6 @@ import VettLogo from '@/ui/atoms/VettLogo';
 import { LayoutBase } from '@/frontend/navigation/components';
 import { NavbarInferior } from '@/frontend/navigation/components';
 import ServiceCategoryGrid from '../components/ServiceCategoryGrid';
-import PetFriendlyMap from '../components/PetFriendlyMap';
 import VeterinariansMap from '../components/VeterinariansMap';
 import { useAppLocationUpdate } from '@/features/settings/hooks/useAppLocationUpdate';
 
@@ -41,7 +40,6 @@ const OwnerHomeScreen = () => {
         </div>
 
         <ServiceCategoryGrid />
-        <PetFriendlyMap />
         <VeterinariansMap />
       </div>
     </LayoutBase>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -149,7 +148,7 @@ const VeterinariansMap = () => {
     return (
       <div className="rounded-lg overflow-hidden">
         <div className="bg-[#5FBFB3]/5 p-4">
-          <h2 className="text-lg font-semibold mb-2">Veterinarios cerca de ti</h2>
+          <h2 className="text-lg font-semibold mb-2">Todo para tu mascota cerca de ti</h2>
           <div className="relative bg-gray-100 h-64 rounded-lg overflow-hidden">
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-[#5FBFB3] animate-pulse">
@@ -167,7 +166,7 @@ const VeterinariansMap = () => {
     return (
       <div className="rounded-lg overflow-hidden">
         <div className="bg-[#5FBFB3]/5 p-4">
-          <h2 className="text-lg font-semibold mb-2">Veterinarios cerca de ti</h2>
+          <h2 className="text-lg font-semibold mb-2">Todo para tu mascota cerca de ti</h2>
           <div className="relative bg-gray-100 h-64 rounded-lg overflow-hidden">
             <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
               <div className="text-orange-500 mb-2">
@@ -195,7 +194,7 @@ const VeterinariansMap = () => {
   return (
     <div className="rounded-lg overflow-hidden">
       <div className="bg-[#5FBFB3]/5 p-4">
-        <h2 className="text-lg font-semibold mb-2">Veterinarios cerca de ti</h2>
+        <h2 className="text-lg font-semibold mb-2">Todo para tu mascota cerca de ti</h2>
         <div className="relative">
           <div 
             ref={mapContainer} 
