@@ -6,6 +6,7 @@ import { LayoutBase } from '@/frontend/navigation/components';
 import { NavbarInferior } from '@/frontend/navigation/components';
 import ServiceCategoryGrid from '../components/ServiceCategoryGrid';
 import PetFriendlyMap from '../components/PetFriendlyMap';
+import VeterinariansMap from '../components/VeterinariansMap';
 
 const OwnerHomeScreen = () => {
   return (
@@ -37,6 +38,7 @@ const OwnerHomeScreen = () => {
 
         <ServiceCategoryGrid />
         <PetFriendlyMap />
+        <VeterinariansMap />
       </div>
     </LayoutBase>
   );
