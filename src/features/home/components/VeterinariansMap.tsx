@@ -5,6 +5,7 @@ import { MapPin, Navigation, Settings } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/ui/molecules/card';
+import { useNavigate } from 'react-router-dom';
 
 // Mapbox token
 mapboxgl.accessToken = 'pk.eyJ1IjoiZW1pbGlvcGMiLCJhIjoiY21iZmJjM3p1MW9xczJrcTE1ZWozejV0MyJ9.yZoV_UkRYXdeVObla8Ky7A';
@@ -23,6 +24,7 @@ interface Veterinarian {
 }
 
 const VeterinariansMap = () => {
+  const navigate = useNavigate();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -136,7 +138,14 @@ const VeterinariansMap = () => {
   };
 
   const handleViewProfile = (vetId: string) => {
-    window.open(`/owner/vets/${vetId}`, '_self');
+    if (!vetId) {
+      console.error('No veterinarian ID provided');
+      // You could show a toast notification here
+      return;
+    }
+    
+    console.log('Navigating to vet profile:', vetId);
+    navigate(`/owner/vets/${vetId}`);
   };
 
   const handleGetDirections = (address: string) => {
