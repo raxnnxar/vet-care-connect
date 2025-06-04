@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import { Stethoscope, Scissors } from 'lucide-react';
 import { AppDispatch, RootState } from '@/state/store';
 import { updateServiceType } from '../store/authThunks';
 import { SERVICE_TYPES, ServiceTypeType } from '../types/serviceTypes';
@@ -66,62 +67,92 @@ const PostSignupServiceTypeScreen: React.FC = () => {
     <div className="min-h-screen p-4 bg-gradient-to-b from-[#7ECEC4] to-[#79D0B8]">
       <div className="max-w-md mx-auto pt-8">
         <h1 className="text-white text-3xl font-bold text-center mb-8">
-          ¿Qué tipo de servicio ofreces?
+          Selecciona el tipo de servicio que ofreces
         </h1>
         
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <div className="space-y-4">
+            {/* Veterinario Card */}
             <div 
               onClick={() => setSelectedType(SERVICE_TYPES.VETERINARIAN)}
-              className={`p-4 border rounded-lg cursor-pointer transition-all ${
+              className={`relative p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md ${
                 selectedType === SERVICE_TYPES.VETERINARIAN 
-                  ? 'border-[#79D0B8] bg-[#F0FFFA]' 
-                  : 'border-gray-200 hover:border-[#79D0B8]/50'
+                  ? 'border-[#79D0B8] bg-[#79D0B8]/5 shadow-md' 
+                  : 'border-gray-200 hover:border-[#79D0B8]/30'
               }`}
             >
-              <div className="flex items-center">
-                <input 
-                  type="radio" 
-                  checked={selectedType === SERVICE_TYPES.VETERINARIAN}
-                  onChange={() => setSelectedType(SERVICE_TYPES.VETERINARIAN)}
-                  className="h-4 w-4 text-[#79D0B8]" 
-                />
-                <div className="ml-3">
-                  <span className="font-medium">Veterinario</span>
-                  <p className="text-sm text-gray-500">Ofrezco servicios médicos para mascotas</p>
+              <div className="flex items-start space-x-4">
+                <div className={`p-3 rounded-full transition-colors ${
+                  selectedType === SERVICE_TYPES.VETERINARIAN 
+                    ? 'bg-[#79D0B8] text-white' 
+                    : 'bg-gray-100 text-[#79D0B8]'
+                }`}>
+                  <Stethoscope size={24} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    Veterinario
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Ofrezco servicios médicos y de salud para mascotas
+                  </p>
                 </div>
               </div>
+              
+              {/* Selection indicator */}
+              {selectedType === SERVICE_TYPES.VETERINARIAN && (
+                <div className="absolute top-4 right-4">
+                  <div className="w-6 h-6 bg-[#79D0B8] rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
+                </div>
+              )}
             </div>
             
+            {/* Estética Card */}
             <div 
               onClick={() => setSelectedType(SERVICE_TYPES.GROOMING)}
-              className={`p-4 border rounded-lg cursor-pointer transition-all ${
+              className={`relative p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md ${
                 selectedType === SERVICE_TYPES.GROOMING 
-                  ? 'border-[#79D0B8] bg-[#F0FFFA]' 
-                  : 'border-gray-200 hover:border-[#79D0B8]/50'
+                  ? 'border-[#79D0B8] bg-[#79D0B8]/5 shadow-md' 
+                  : 'border-gray-200 hover:border-[#79D0B8]/30'
               }`}
             >
-              <div className="flex items-center">
-                <input 
-                  type="radio" 
-                  checked={selectedType === SERVICE_TYPES.GROOMING}
-                  onChange={() => setSelectedType(SERVICE_TYPES.GROOMING)}
-                  className="h-4 w-4 text-[#79D0B8]" 
-                />
-                <div className="ml-3">
-                  <span className="font-medium">Estilista</span>
-                  <p className="text-sm text-gray-500">Ofrezco servicios de peluquería y estética para mascotas</p>
+              <div className="flex items-start space-x-4">
+                <div className={`p-3 rounded-full transition-colors ${
+                  selectedType === SERVICE_TYPES.GROOMING 
+                    ? 'bg-[#79D0B8] text-white' 
+                    : 'bg-gray-100 text-[#79D0B8]'
+                }`}>
+                  <Scissors size={24} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    Estética
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Ofrezco servicios de peluquería, baño y grooming para mascotas
+                  </p>
                 </div>
               </div>
+              
+              {/* Selection indicator */}
+              {selectedType === SERVICE_TYPES.GROOMING && (
+                <div className="absolute top-4 right-4">
+                  <div className="w-6 h-6 bg-[#79D0B8] rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           
           <button
             onClick={() => selectedType && handleServiceTypeSelection(selectedType)}
             disabled={!selectedType || isLoading}
-            className={`w-full py-3 px-4 mt-8 rounded-lg text-white font-medium transition-colors ${
+            className={`w-full py-4 px-6 mt-8 rounded-xl text-white font-semibold text-lg transition-all duration-200 ${
               selectedType && !isLoading
-                ? 'bg-[#79D0B8] hover:bg-[#6ABFA9]'
+                ? 'bg-[#79D0B8] hover:bg-[#6ABFA9] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                 : 'bg-gray-300 cursor-not-allowed'
             }`}
           >

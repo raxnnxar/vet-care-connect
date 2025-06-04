@@ -219,34 +219,43 @@ export type Database = {
       }
       pet_grooming: {
         Row: {
+          animals_accepted: Json | null
           availability: Json | null
+          business_name: string | null
           created_at: string | null
           id: string
-          pricing_info: Json | null
+          latitude: number | null
+          location: string | null
+          longitude: number | null
+          profile_image_url: string | null
           services_offered: Json | null
-          specialization: string | null
           updated_at: string | null
-          years_of_experience: number | null
         }
         Insert: {
+          animals_accepted?: Json | null
           availability?: Json | null
+          business_name?: string | null
           created_at?: string | null
           id?: string
-          pricing_info?: Json | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          profile_image_url?: string | null
           services_offered?: Json | null
-          specialization?: string | null
           updated_at?: string | null
-          years_of_experience?: number | null
         }
         Update: {
+          animals_accepted?: Json | null
           availability?: Json | null
+          business_name?: string | null
           created_at?: string | null
           id?: string
-          pricing_info?: Json | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          profile_image_url?: string | null
           services_offered?: Json | null
-          specialization?: string | null
           updated_at?: string | null
-          years_of_experience?: number | null
         }
         Relationships: [
           {
