@@ -16,6 +16,7 @@ export const ROUTES = {
   PROFILE_SETUP: '/profile-setup',
   VET_PROFILE_SETUP: '/vet-profile-setup',
   GROOMING_PROFILE_SETUP: '/grooming-profile-setup',
+  GROOMING_LOCATION_SETUP: '/grooming-location-setup',
   
   // Owner routes
   OWNER: '/owner',

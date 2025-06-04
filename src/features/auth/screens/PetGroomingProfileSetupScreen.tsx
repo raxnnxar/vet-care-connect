@@ -14,6 +14,7 @@ import GroomingProfileImageSection from '../components/grooming/GroomingProfileI
 import GroomingAvailabilitySection from '../components/grooming/GroomingAvailabilitySection';
 import AnimalsAcceptedSection from '../components/grooming/AnimalsAcceptedSection';
 import ServicesOfferedSection from '../components/grooming/ServicesOfferedSection';
+import { ROUTES } from '@/frontend/shared/constants/routes';
 
 const PetGroomingProfileSetupScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -83,8 +84,8 @@ const PetGroomingProfileSetupScreen: React.FC = () => {
 
       toast.success('Perfil de grooming guardado exitosamente');
       
-      // Por ahora solo guardamos, no navegamos a ningún lado
-      console.log('Perfil guardado:', data);
+      // Redirigir a la pantalla de ubicación
+      navigate(ROUTES.GROOMING_LOCATION_SETUP);
       
     } catch (error: any) {
       console.error('Error saving grooming profile:', error);
