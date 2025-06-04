@@ -15,8 +15,9 @@ interface NavbarInferiorProps {
 const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) => {
   const location = useLocation();
   
-  // Get the current path to determine if we're in the vet section
+  // Get the current path to determine if we're in the vet or grooming section
   const isVetPath = location.pathname.includes('/vet');
+  const isGroomingPath = location.pathname.includes('/grooming');
   
   // Create the proper styling for the nav bar to ensure it doesn't overlap with content
   return (
@@ -24,31 +25,31 @@ const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) =
       <NavItem 
         icon={<Calendar size={24} />} 
         label="Citas" 
-        to={isVetPath ? VET_ROUTES.APPOINTMENTS : ROUTES.OWNER_APPOINTMENTS || '/owner/appointments'} 
+        to={isVetPath ? VET_ROUTES.APPOINTMENTS : isGroomingPath ? '/grooming/appointments' : ROUTES.OWNER_APPOINTMENTS || '/owner/appointments'} 
         isActive={activeTab === 'appointments'} 
       />
       <NavItem 
         icon={<Home size={24} />} 
         label="Inicio" 
-        to={isVetPath ? VET_ROUTES.DASHBOARD : ROUTES.OWNER} 
+        to={isVetPath ? VET_ROUTES.DASHBOARD : isGroomingPath ? '/grooming' : ROUTES.OWNER} 
         isActive={activeTab === 'home'} 
       />
       <NavItem 
         icon={<MessageSquare size={24} />} 
         label="Chats" 
-        to={isVetPath ? '/vet/chats' : '/owner/chats'} 
+        to={isVetPath ? '/vet/chats' : isGroomingPath ? '/grooming/chats' : '/owner/chats'} 
         isActive={activeTab === 'chats'} 
       />
       <NavItem 
         icon={<Settings size={24} />} 
         label="Ajustes" 
-        to={isVetPath ? VET_ROUTES.SETTINGS : ROUTES.OWNER_SETTINGS || '/owner/settings'} 
+        to={isVetPath ? VET_ROUTES.SETTINGS : isGroomingPath ? '/grooming/settings' : ROUTES.OWNER_SETTINGS || '/owner/settings'} 
         isActive={activeTab === 'settings'} 
       />
       <NavItem 
         icon={<User size={24} />} 
         label="Perfil" 
-        to={isVetPath ? '/vet/profile' : ROUTES.OWNER_PROFILE} 
+        to={isVetPath ? '/vet/profile' : isGroomingPath ? '/grooming/profile' : ROUTES.OWNER_PROFILE} 
         isActive={activeTab === 'profile'} 
       />
     </div>

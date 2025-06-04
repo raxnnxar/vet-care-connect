@@ -7,7 +7,6 @@ import { RootState } from '@/state/store';
 import { MapPin, Navigation } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
-import { ROUTES } from '@/frontend/shared/constants/routes';
 import { supabase } from '@/integrations/supabase/client';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -175,8 +174,8 @@ const GroomingLocationSetupScreen: React.FC = () => {
       if (error) throw error;
 
       toast.success('Ubicación de la estética guardada correctamente');
-      // Redirigir al dashboard o home después de completar la configuración
-      navigate('/');
+      // Redirigir al dashboard de grooming después de completar la configuración
+      navigate('/grooming');
     } catch (error: any) {
       console.error('Error saving grooming location:', error);
       toast.error(`Error al guardar la ubicación: ${error.message}`);

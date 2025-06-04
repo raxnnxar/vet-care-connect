@@ -47,6 +47,15 @@ export const ROUTES = {
   VET_NOTIFICATIONS: '/vet/notifications',
   VET_SETTINGS: '/vet/settings',
   
+  // Grooming routes
+  GROOMING: '/grooming',
+  GROOMING_HOME: '/grooming',
+  GROOMING_PROFILE: '/grooming/profile',
+  GROOMING_APPOINTMENTS: '/grooming/appointments',
+  GROOMING_APPOINTMENT_DETAIL: '/grooming/appointments/:id',
+  GROOMING_NOTIFICATIONS: '/grooming/notifications',
+  GROOMING_SETTINGS: '/grooming/settings',
+  
   // Common routes
   NOTIFICATIONS: '/notifications',
   SETTINGS: '/settings',

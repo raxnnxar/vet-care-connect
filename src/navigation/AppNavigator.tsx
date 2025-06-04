@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import AuthNavigator from './AuthNavigator';
 import OwnerNavigator from './OwnerNavigator';
 import VetNavigator from './VetNavigator';
+import GroomingNavigator from './GroomingNavigator';
 import { UserRoleType, USER_ROLES } from '@/core/constants/app.constants';
 import PostSignupRoleScreen from '../features/auth/screens/PostSignupRoleScreen';
 import PostSignupServiceTypeScreen from '../features/auth/screens/PostSignupServiceTypeScreen';
@@ -48,10 +49,11 @@ const AppNavigator = () => {
         return;
       }
       
-      // If user is already in the owner or vet section (except profile/chat), don't redirect
+      // If user is already in the owner, vet, or grooming section (except profile/chat), don't redirect
       if (
         (location.pathname.startsWith('/owner') && !location.pathname.includes('/profile')) || 
-        (location.pathname.startsWith('/vet') && !location.pathname.includes('/profile'))
+        (location.pathname.startsWith('/vet') && !location.pathname.includes('/profile')) ||
+        (location.pathname.startsWith('/grooming') && !location.pathname.includes('/profile'))
       ) {
         console.log('User is in a section (not profile), no redirect needed');
         return;
@@ -80,6 +82,9 @@ const AppNavigator = () => {
           if (providerType === 'veterinarian') {
             console.log('Redirecting vet to vet home');
             navigate(ROUTES.VET);
+          } else if (providerType === 'grooming') {
+            console.log('Redirecting groomer to grooming home');
+            navigate(ROUTES.GROOMING);
           } else {
             console.log('Redirecting service provider to appropriate home page');
             navigate(ROUTES.VET);
@@ -118,6 +123,7 @@ const AppNavigator = () => {
       {/* Nested navigators */}
       <Route path={`${ROUTES.OWNER}/*`} element={<OwnerNavigator />} />
       <Route path={`${ROUTES.VET}/*`} element={<VetNavigator />} />
+      <Route path={`${ROUTES.GROOMING}/*`} element={<GroomingNavigator />} />
       
       {/* Auth routes - should be last to catch all other routes when not authenticated */}
       <Route path="/*" element={<AuthNavigator />} />
