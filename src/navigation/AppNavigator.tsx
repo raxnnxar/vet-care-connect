@@ -12,6 +12,7 @@ import ProfileSetupScreen from '../features/auth/screens/ProfileSetupScreen';
 import LocationSetupScreen from '../features/auth/screens/LocationSetupScreen';
 import VetProfileSetupScreen from '../features/auth/screens/VetProfileSetupScreen';
 import VetLocationSetupScreen from '../features/auth/screens/VetLocationSetupScreen';
+import PetGroomingProfileSetupScreen from '../features/auth/screens/PetGroomingProfileSetupScreen';
 import { ROUTES } from '@/frontend/shared/constants/routes';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/contexts/UserContext';
@@ -34,6 +35,7 @@ const AppNavigator = () => {
         location.pathname === ROUTES.PROFILE_SETUP || 
         location.pathname === '/location-setup' ||
         location.pathname === ROUTES.VET_PROFILE_SETUP ||
+        location.pathname === ROUTES.GROOMING_PROFILE_SETUP ||
         location.pathname === '/vet-location-setup' ||
         location.pathname === ROUTES.POST_SIGNUP_ROLE || 
         location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE ||
@@ -107,6 +109,7 @@ const AppNavigator = () => {
       <Route path={ROUTES.PROFILE_SETUP} element={<ProfileSetupScreen />} />
       <Route path="/location-setup" element={<LocationSetupScreen />} />
       <Route path={ROUTES.VET_PROFILE_SETUP} element={<VetProfileSetupScreen />} />
+      <Route path={ROUTES.GROOMING_PROFILE_SETUP} element={<PetGroomingProfileSetupScreen />} />
       <Route path="/vet-location-setup" element={<VetLocationSetupScreen />} />
       
       {/* Nested navigators */}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,6 +50,9 @@ const PostSignupServiceTypeScreen: React.FC = () => {
         if (serviceType === SERVICE_TYPES.VETERINARIAN) {
           console.log('Redirecting to VET_PROFILE_SETUP');
           navigate(ROUTES.VET_PROFILE_SETUP);
+        } else if (serviceType === SERVICE_TYPES.GROOMING) {
+          console.log('Redirecting to GROOMING_PROFILE_SETUP');
+          navigate(ROUTES.GROOMING_PROFILE_SETUP);
         } else {
           console.log('Redirecting to PROFILE_SETUP');
           navigate(ROUTES.PROFILE_SETUP);

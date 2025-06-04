@@ -15,6 +15,7 @@ export const ROUTES = {
   POST_SIGNUP_SERVICE_TYPE: '/post-signup-service-type',
   PROFILE_SETUP: '/profile-setup',
   VET_PROFILE_SETUP: '/vet-profile-setup',
+  GROOMING_PROFILE_SETUP: '/grooming-profile-setup',
   
   // Owner routes
   OWNER: '/owner',
