@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Control, FieldErrors } from 'react-hook-form';
-import DesktopAvailabilityView from '../vet/form-sections/availability/DesktopAvailabilityView';
-import MobileAvailabilityView from '../vet/form-sections/availability/MobileAvailabilityView';
+import GroomingDesktopAvailabilityView from './availability/GroomingDesktopAvailabilityView';
+import GroomingMobileAvailabilityView from './availability/GroomingMobileAvailabilityView';
 import { GroomingProfile } from '../../types/groomingTypes';
 
 interface GroomingAvailabilitySectionProps {
@@ -16,8 +16,8 @@ const GroomingAvailabilitySection: React.FC<GroomingAvailabilitySectionProps> = 
 }) => {
   return (
     <div className="space-y-4">
-      <DesktopAvailabilityView control={control as any} />
-      <MobileAvailabilityView control={control as any} />
+      <GroomingDesktopAvailabilityView control={control} errors={errors} />
+      <GroomingMobileAvailabilityView control={control} />
     </div>
   );
 };
