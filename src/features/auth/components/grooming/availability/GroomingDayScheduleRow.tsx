@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Controller, Control, useFormContext } from 'react-hook-form';
+import { Controller, Control } from 'react-hook-form';
 import { Switch } from '@/ui/atoms/switch';
 import TimeSelect from '../../vet/form-sections/availability/TimeSelect';
 import { GroomingProfile } from '../../../types/groomingTypes';
@@ -89,7 +89,7 @@ const GroomingDayScheduleRow: React.FC<GroomingDayScheduleRowProps> = ({ day, co
                 field.onChange(checked);
                 
                 if (checked) {
-                  // Cuando se activa el switch, asegurar valores por defecto
+                  // When activating the switch, ensure default values
                   const currentFieldValue = control._getWatch(fieldPath as any) as DaySchedule | undefined;
                   
                   const defaultDaySchedule = {
@@ -98,10 +98,8 @@ const GroomingDayScheduleRow: React.FC<GroomingDayScheduleRowProps> = ({ day, co
                     endTime: currentFieldValue?.endTime || '18:00'
                   };
                   
-                  control._subjects.values.next({
-                    ...control._formValues,
-                    [fieldPath]: defaultDaySchedule
-                  });
+                  // Use setValue instead of accessing internal _subjects
+                  control.setValue(fieldPath as any, defaultDaySchedule);
                 }
               }}
               id={`${dayId}-available`}

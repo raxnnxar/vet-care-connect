@@ -34,7 +34,7 @@ const GroomingMobileAvailabilityView: React.FC<GroomingMobileAvailabilityViewPro
                         field.onChange(checked);
                         
                         if (checked) {
-                          // Cuando se activa el switch, asegurar valores por defecto
+                          // When activating the switch, ensure default values
                           const currentFieldValue = control._getWatch(fieldPath as any);
                           
                           const defaultDaySchedule = {
@@ -43,10 +43,8 @@ const GroomingMobileAvailabilityView: React.FC<GroomingMobileAvailabilityViewPro
                             endTime: currentFieldValue?.endTime || '18:00'
                           };
                           
-                          control._subjects.values.next({
-                            ...control._formValues,
-                            [fieldPath]: defaultDaySchedule
-                          });
+                          // Use setValue instead of accessing internal _subjects
+                          control.setValue(fieldPath as any, defaultDaySchedule);
                         }
                       }}
                       id={`${dayId}-available-mobile`}
