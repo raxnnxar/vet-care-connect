@@ -10,8 +10,8 @@ import { Label } from '@/ui/atoms/label';
 import { RootState } from '@/state/store';
 import { supabase } from '@/integrations/supabase/client';
 import { GroomingProfile } from '../types/groomingTypes';
-import ProfileImageSection from '../components/vet/form/ProfileImageSection';
-import AvailabilitySection from '../components/vet/form-sections/AvailabilitySection';
+import GroomingProfileImageSection from '../components/grooming/GroomingProfileImageSection';
+import GroomingAvailabilitySection from '../components/grooming/GroomingAvailabilitySection';
 import AnimalsAcceptedSection from '../components/grooming/AnimalsAcceptedSection';
 import ServicesOfferedSection from '../components/grooming/ServicesOfferedSection';
 
@@ -27,6 +27,7 @@ const PetGroomingProfileSetupScreen: React.FC = () => {
     formState: { errors },
     setValue,
     watch,
+    register,
   } = useForm<GroomingProfile>({
     defaultValues: {
       business_name: '',
@@ -64,16 +65,16 @@ const PetGroomingProfileSetupScreen: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Guardar en la tabla pet_grooming
+      // Guardar en la tabla pet_grooming - casting data to Json type for Supabase
       const { error } = await supabase
         .from('pet_grooming')
         .upsert({
           id: user.id,
           business_name: data.business_name,
           profile_image_url: data.profile_image_url || null,
-          animals_accepted: data.animals_accepted,
-          availability: data.availability,
-          services_offered: data.services_offered,
+          animals_accepted: data.animals_accepted as any,
+          availability: data.availability as any,
+          services_offered: data.services_offered as any,
         });
 
       if (error) {
@@ -108,7 +109,7 @@ const PetGroomingProfileSetupScreen: React.FC = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-8">
           {/* Imagen de perfil */}
-          <ProfileImageSection
+          <GroomingProfileImageSection
             control={control}
             errors={errors}
             profileImageUrl={profileImageUrl}
@@ -124,7 +125,7 @@ const PetGroomingProfileSetupScreen: React.FC = () => {
             </Label>
             <Input
               id="business_name"
-              {...control.register?.('business_name', {
+              {...register('business_name', {
                 required: 'El nombre del negocio es requerido',
               })}
               placeholder="Ej. Estética Canina Paticlín"
@@ -146,7 +147,7 @@ const PetGroomingProfileSetupScreen: React.FC = () => {
             <p className="text-sm text-gray-600 mb-4">
               Establece tu horario de atención para que los clientes puedan programar citas
             </p>
-            <AvailabilitySection control={control} errors={errors} />
+            <GroomingAvailabilitySection control={control} errors={errors} />
           </div>
 
           {/* Servicios ofrecidos */}
