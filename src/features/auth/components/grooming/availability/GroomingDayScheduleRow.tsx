@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Controller, Control } from 'react-hook-form';
+import { Controller, Control, UseFormSetValue } from 'react-hook-form';
 import { Switch } from '@/ui/atoms/switch';
 import TimeSelect from '../../vet/form-sections/availability/TimeSelect';
 import { GroomingProfile } from '../../../types/groomingTypes';
@@ -19,9 +19,10 @@ interface Day {
 interface GroomingDayScheduleRowProps {
   day: Day;
   control: Control<GroomingProfile>;
+  setValue: UseFormSetValue<GroomingProfile>;
 }
 
-const GroomingDayScheduleRow: React.FC<GroomingDayScheduleRowProps> = ({ day, control }) => {
+const GroomingDayScheduleRow: React.FC<GroomingDayScheduleRowProps> = ({ day, control, setValue }) => {
   const dayId = day.id;
   const fieldPath = `availability.${dayId}` as const;
   const isAvailablePath = `availability.${dayId}.isAvailable` as const;
@@ -99,7 +100,7 @@ const GroomingDayScheduleRow: React.FC<GroomingDayScheduleRowProps> = ({ day, co
                   };
                   
                   // Use setValue instead of accessing internal _subjects
-                  control.setValue(fieldPath as any, defaultDaySchedule);
+                  setValue(fieldPath as any, defaultDaySchedule);
                 }
               }}
               id={`${dayId}-available`}

@@ -147,7 +147,7 @@ const PetGroomingProfileSetupScreen: React.FC = () => {
             <p className="text-sm text-gray-600 mb-4">
               Establece tu horario de atención para que los clientes puedan programar citas
             </p>
-            <GroomingAvailabilitySection control={control} errors={errors} />
+            <GroomingAvailabilitySection control={control} errors={errors} setValue={setValue} />
           </div>
 
           {/* Servicios ofrecidos */}

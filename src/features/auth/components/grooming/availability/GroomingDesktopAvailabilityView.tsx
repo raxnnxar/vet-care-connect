@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Control, FieldErrors } from 'react-hook-form';
+import { Control, FieldErrors, UseFormSetValue } from 'react-hook-form';
 import { GroomingProfile } from '../../../types/groomingTypes';
 import { WEEKDAYS } from '../../vet/form-sections/availability/constants';
 import GroomingDayScheduleRow from './GroomingDayScheduleRow';
@@ -8,10 +8,12 @@ import GroomingDayScheduleRow from './GroomingDayScheduleRow';
 interface GroomingDesktopAvailabilityViewProps {
   control: Control<GroomingProfile>;
   errors: FieldErrors<GroomingProfile>;
+  setValue: UseFormSetValue<GroomingProfile>;
 }
 
 const GroomingDesktopAvailabilityView: React.FC<GroomingDesktopAvailabilityViewProps> = ({ 
-  control 
+  control,
+  setValue
 }) => {
   return (
     <div className="hidden md:block">
@@ -31,7 +33,7 @@ const GroomingDesktopAvailabilityView: React.FC<GroomingDesktopAvailabilityViewP
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {WEEKDAYS.map((day) => (
-            <GroomingDayScheduleRow key={day.id} day={day} control={control} />
+            <GroomingDayScheduleRow key={day.id} day={day} control={control} setValue={setValue} />
           ))}
         </tbody>
       </table>

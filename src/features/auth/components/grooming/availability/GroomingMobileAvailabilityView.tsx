@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Controller, Control } from 'react-hook-form';
+import { Controller, Control, UseFormSetValue } from 'react-hook-form';
 import { Switch } from '@/ui/atoms/switch';
 import { WEEKDAYS } from '../../vet/form-sections/availability/constants';
 import { GroomingProfile } from '../../../types/groomingTypes';
@@ -8,9 +8,10 @@ import GroomingMobileTimeSlots from './GroomingMobileTimeSlots';
 
 interface GroomingMobileAvailabilityViewProps {
   control: Control<GroomingProfile>;
+  setValue: UseFormSetValue<GroomingProfile>;
 }
 
-const GroomingMobileAvailabilityView: React.FC<GroomingMobileAvailabilityViewProps> = ({ control }) => {
+const GroomingMobileAvailabilityView: React.FC<GroomingMobileAvailabilityViewProps> = ({ control, setValue }) => {
   return (
     <div className="md:hidden">
       <div className="divide-y border rounded-lg">
@@ -44,7 +45,7 @@ const GroomingMobileAvailabilityView: React.FC<GroomingMobileAvailabilityViewPro
                           };
                           
                           // Use setValue instead of accessing internal _subjects
-                          control.setValue(fieldPath as any, defaultDaySchedule);
+                          setValue(fieldPath as any, defaultDaySchedule);
                         }
                       }}
                       id={`${dayId}-available-mobile`}
