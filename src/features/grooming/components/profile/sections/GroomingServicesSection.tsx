@@ -29,7 +29,10 @@ const GroomingServicesSection: React.FC<GroomingServicesSectionProps> = ({
   addService,
   removeService
 }) => {
-  const [newService, setNewService] = useState<GroomingService>({
+  const [newService, setNewService] = useState<{
+    nombre: string;
+    precio: number;
+  }>({
     nombre: '',
     precio: 0
   });
@@ -43,6 +46,14 @@ const GroomingServicesSection: React.FC<GroomingServicesSectionProps> = ({
 
   const hasServiceSizes = (service: GroomingService): service is { nombre: string; tamaños: Array<{ tipo: 'pequeño' | 'mediano' | 'grande'; precio: number }> } => {
     return 'tamaños' in service;
+  };
+
+  const getServicePrice = (service: GroomingService): string => {
+    if (hasServiceSizes(service)) {
+      return service.tamaños.map(size => `${size.tipo}: $${size.precio}`).join(', ');
+    } else {
+      return `$${service.precio}`;
+    }
   };
 
   return (

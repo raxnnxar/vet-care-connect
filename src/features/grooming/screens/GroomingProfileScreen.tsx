@@ -32,12 +32,19 @@ const GroomingProfileScreen: React.FC = () => {
 
       if (error) throw error;
 
+      // Safe type conversion with proper defaults
       const groomingProfile: GroomingProfile = {
         business_name: data.business_name || '',
         profile_image_url: data.profile_image_url || '',
-        animals_accepted: Array.isArray(data.animals_accepted) ? data.animals_accepted : [],
-        availability: data.availability || {},
-        services_offered: Array.isArray(data.services_offered) ? data.services_offered : []
+        animals_accepted: Array.isArray(data.animals_accepted) 
+          ? (data.animals_accepted as string[])
+          : [],
+        availability: (data.availability && typeof data.availability === 'object') 
+          ? (data.availability as Record<string, any>)
+          : {},
+        services_offered: Array.isArray(data.services_offered) 
+          ? (data.services_offered as any[])
+          : []
       };
 
       setProfileData(groomingProfile);
@@ -73,9 +80,25 @@ const GroomingProfileScreen: React.FC = () => {
       
       setProfileData(updatedProfileData);
       
+      // Convert the data to the format expected by Supabase
+      const updateData: any = {};
+      
+      if (sectionData.business_name !== undefined) {
+        updateData.business_name = sectionData.business_name;
+      }
+      if (sectionData.animals_accepted !== undefined) {
+        updateData.animals_accepted = sectionData.animals_accepted;
+      }
+      if (sectionData.availability !== undefined) {
+        updateData.availability = sectionData.availability;
+      }
+      if (sectionData.services_offered !== undefined) {
+        updateData.services_offered = sectionData.services_offered;
+      }
+      
       const { error } = await supabase
         .from('pet_grooming')
-        .update(sectionData)
+        .update(updateData)
         .eq('id', userId);
 
       if (error) throw error;
