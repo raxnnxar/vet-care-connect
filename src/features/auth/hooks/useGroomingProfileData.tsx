@@ -25,7 +25,22 @@ export const useGroomingProfileData = (userId: string | undefined) => {
         if (error) throw error;
 
         if (data) {
-          setInitialData(data as GroomingProfile);
+          // Safe type conversion with proper defaults
+          const groomingProfile: GroomingProfile = {
+            business_name: data.business_name || '',
+            profile_image_url: data.profile_image_url || '',
+            animals_accepted: Array.isArray(data.animals_accepted) 
+              ? (data.animals_accepted as string[])
+              : [],
+            availability: (data.availability && typeof data.availability === 'object') 
+              ? (data.availability as Record<string, any>)
+              : {},
+            services_offered: Array.isArray(data.services_offered) 
+              ? (data.services_offered as any[])
+              : []
+          };
+
+          setInitialData(groomingProfile);
         }
       } catch (err: any) {
         console.error('Error fetching grooming profile:', err);
