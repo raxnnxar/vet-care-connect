@@ -39,7 +39,7 @@ export const useCreateAppointment = () => {
         appointment_date: appointmentData.appointmentDate,
         service_type: appointmentData.serviceType,
         owner_id: appointmentData.ownerId,
-        status: APPOINTMENT_STATUS.PENDING as const,
+        status: APPOINTMENT_STATUS.PENDING,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
