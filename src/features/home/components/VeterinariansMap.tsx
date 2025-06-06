@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -68,7 +67,7 @@ const VeterinariansMap = () => {
   };
 
   // Get user's current location with better error handling
-  const getUserLocation = () => {
+  const getUserLocation = (showSuccessToast = false) => {
     if (!navigator.geolocation) {
       setLocationError('Tu navegador no soporta geolocalización');
       setUserLocation(defaultLocation);
@@ -83,10 +82,14 @@ const VeterinariansMap = () => {
         setLocationError(null);
         setLocationPermissionDenied(false);
         setIsLoading(false);
-        toast({
-          title: "Ubicación detectada",
-          description: "Tu ubicación se ha detectado correctamente",
-        });
+        
+        // Solo mostrar toast de éxito cuando el usuario explícitamente solicite la ubicación
+        if (showSuccessToast) {
+          toast({
+            title: "Ubicación detectada",
+            description: "Tu ubicación se ha detectado correctamente",
+          });
+        }
       },
       (error) => {
         console.error('Error getting location:', error);
@@ -109,11 +112,14 @@ const VeterinariansMap = () => {
         setUserLocation(defaultLocation); // Use default location as fallback
         setIsLoading(false);
         
-        toast({
-          title: "Error de ubicación",
-          description: `${errorMessage}. Mostrando ubicación por defecto.`,
-          variant: "destructive",
-        });
+        // Solo mostrar toast de error cuando sea crítico
+        if (showSuccessToast) {
+          toast({
+            title: "Error de ubicación",
+            description: `${errorMessage}. Mostrando ubicación por defecto.`,
+            variant: "destructive",
+          });
+        }
       },
       {
         enableHighAccuracy: false, // Less accurate but more reliable
@@ -125,7 +131,7 @@ const VeterinariansMap = () => {
 
   // Initialize map
   useEffect(() => {
-    getUserLocation();
+    getUserLocation(false); // No mostrar toast en carga inicial
     fetchVeterinarians();
   }, []);
 
@@ -173,7 +179,7 @@ const VeterinariansMap = () => {
     setLocationError(null);
     setLocationPermissionDenied(false);
     setIsLoading(true);
-    getUserLocation();
+    getUserLocation(true); // Mostrar toast solo cuando usuario hace click explícito
   };
 
   const handleViewProfile = (vetId: string) => {

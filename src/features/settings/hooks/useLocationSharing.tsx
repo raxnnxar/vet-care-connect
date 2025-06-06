@@ -56,7 +56,7 @@ export const useLocationSharing = () => {
         await requestCurrentLocation();
       } else {
         toast({
-          title: "Éxito",
+          title: "Configuración actualizada",
           description: "Compartir ubicación desactivado",
         });
       }
@@ -104,8 +104,8 @@ export const useLocationSharing = () => {
             
             console.log('Location updated:', { latitude, longitude });
             toast({
-              title: "Éxito",
-              description: "Ubicación actualizada correctamente",
+              title: "Configuración actualizada",
+              description: "Ubicación activada y guardada correctamente",
             });
             resolve();
           } catch (error) {

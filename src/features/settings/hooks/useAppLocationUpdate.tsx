@@ -23,7 +23,7 @@ export const useAppLocationUpdate = () => {
 
         if (error || !data?.share_location) return;
 
-        // If enabled, request and update location with better error handling
+        // If enabled, request and update location silently (no toast notifications)
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -35,7 +35,7 @@ export const useAppLocationUpdate = () => {
                   .update({ latitude, longitude })
                   .eq('id', user.id);
                 
-                console.log('Location updated on app start:', { latitude, longitude });
+                console.log('Location updated silently on app start:', { latitude, longitude });
               } catch (error) {
                 console.error('Error updating location on app start:', error);
               }
