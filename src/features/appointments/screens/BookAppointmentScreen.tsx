@@ -111,8 +111,11 @@ const BookAppointmentScreen: React.FC = () => {
             price: selectedService.price || selectedService.precio,
             description: selectedService.description
           },
-          ownerId: user.id
+          ownerId: user.id,
+          providerType: providerType
         };
+
+        console.log('Attempting to create appointment:', appointmentData);
 
         const result = await createAppointment(appointmentData);
         

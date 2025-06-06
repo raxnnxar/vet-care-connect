@@ -18,6 +18,7 @@ interface CreateAppointmentData {
     description?: string;
   };
   ownerId: string;
+  providerType?: 'vet' | 'grooming' | null;
 }
 
 export const useCreateAppointment = () => {
@@ -28,18 +29,25 @@ export const useCreateAppointment = () => {
     setIsLoading(true);
     
     try {
+      console.log('Creating appointment with data:', appointmentData);
+
+      // Create the appointment record
+      const appointmentRecord = {
+        pet_id: appointmentData.petId,
+        provider_id: appointmentData.providerId,
+        appointment_date: appointmentData.appointmentDate,
+        service_type: appointmentData.serviceType,
+        owner_id: appointmentData.ownerId,
+        status: 'pendiente',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('Inserting appointment record:', appointmentRecord);
+
       const { data, error } = await supabase
         .from('appointments')
-        .insert({
-          pet_id: appointmentData.petId,
-          provider_id: appointmentData.providerId,
-          appointment_date: appointmentData.appointmentDate,
-          service_type: appointmentData.serviceType,
-          owner_id: appointmentData.ownerId,
-          status: 'pendiente',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+        .insert(appointmentRecord)
         .select()
         .single();
 
@@ -52,6 +60,8 @@ export const useCreateAppointment = () => {
         });
         return null;
       }
+
+      console.log('Appointment created successfully:', data);
 
       toast({
         title: "¡Cita creada con éxito!",

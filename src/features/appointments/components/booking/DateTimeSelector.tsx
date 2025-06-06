@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Calendar, List } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { addDays, startOfDay } from 'date-fns';
@@ -30,7 +30,6 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   providerType
 }) => {
   const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
-  const [availableDays, setAvailableDays] = useState<Date[]>([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Use the appropriate hook based on provider type
@@ -41,22 +40,22 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   const availability = providerType === 'grooming' ? groomingAvailability : vetAvailability;
   const { isDateAvailable, isLoading } = availability;
 
-  useEffect(() => {
-    if (!isLoading && isDateAvailable) {
-      // Generate next 7 days starting from today, but only include available days
-      const days = [];
-      const today = startOfDay(new Date());
-      
-      for (let i = 0; i < 30; i++) { // Check more days to find 7 available ones
-        const date = addDays(today, i);
-        if (isDateAvailable(date)) {
-          days.push(date);
-        }
-        if (days.length >= 7) break; // Stop when we have 7 available days
+  // Memoize available days to prevent infinite re-renders
+  const availableDays = useMemo(() => {
+    if (isLoading || !isDateAvailable) return [];
+    
+    const days = [];
+    const today = startOfDay(new Date());
+    
+    for (let i = 0; i < 30; i++) {
+      const date = addDays(today, i);
+      if (isDateAvailable(date)) {
+        days.push(date);
       }
-      
-      setAvailableDays(days);
+      if (days.length >= 7) break;
     }
+    
+    return days;
   }, [isDateAvailable, isLoading]);
 
   const handleViewChange = (newView: 'list' | 'calendar') => {
