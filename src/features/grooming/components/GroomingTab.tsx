@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchBar from '@/features/health/components/SearchBar';
 import GroomingList from './GroomingList';
 import { GroomingBusiness } from '../hooks/useGroomingData';
@@ -11,11 +12,16 @@ interface GroomingTabProps {
 }
 
 const GroomingTab: React.FC<GroomingTabProps> = ({ groomingBusinesses, onGroomingClick }) => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleGroomingClick = (groomingId: string) => {
+    navigate(`/owner/groomers/${groomingId}`);
   };
 
   const filteredGrooming = useMemo(() => {
@@ -48,7 +54,7 @@ const GroomingTab: React.FC<GroomingTabProps> = ({ groomingBusinesses, onGroomin
           <p>No se encontraron estéticas que coincidan con tu búsqueda.</p>
         </div>
       ) : (
-        <GroomingList groomingBusinesses={filteredGrooming} onGroomingClick={onGroomingClick} />
+        <GroomingList groomingBusinesses={filteredGrooming} onGroomingClick={handleGroomingClick} />
       )}
     </>
   );
