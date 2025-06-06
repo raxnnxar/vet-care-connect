@@ -23,7 +23,7 @@ export const useAppLocationUpdate = () => {
 
         if (error || !data?.share_location) return;
 
-        // If enabled, request and update location
+        // If enabled, request and update location with better error handling
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -42,11 +42,12 @@ export const useAppLocationUpdate = () => {
             },
             (error) => {
               console.error('Error getting location on app start:', error);
+              // Don't show toast on app start failures to avoid annoying users
             },
             {
-              enableHighAccuracy: true,
+              enableHighAccuracy: false, // Less accurate but more reliable
               timeout: 10000,
-              maximumAge: 300000 // 5 minutes
+              maximumAge: 600000 // 10 minutes
             }
           );
         }

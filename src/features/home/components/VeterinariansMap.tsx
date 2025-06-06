@@ -1,11 +1,13 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MapPin, Navigation, Settings } from 'lucide-react';
+import { MapPin, Navigation, Settings, AlertCircle } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/ui/molecules/card';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 // Mapbox token
 mapboxgl.accessToken = 'pk.eyJ1IjoiZW1pbGlvcGMiLCJhIjoiY21iZmJjM3p1MW9xczJrcTE1ZWozejV0MyJ9.yZoV_UkRYXdeVObla8Ky7A';
@@ -25,6 +27,7 @@ interface Veterinarian {
 
 const VeterinariansMap = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -32,6 +35,10 @@ const VeterinariansMap = () => {
   const [veterinarians, setVeterinarians] = useState<Veterinarian[]>([]);
   const [selectedVet, setSelectedVet] = useState<Veterinarian | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+
+  // Default location (Mexico City) as fallback
+  const defaultLocation = { lat: 19.4326, lng: -99.1332 };
 
   // Fetch veterinarians from Supabase
   const fetchVeterinarians = async () => {
@@ -60,10 +67,11 @@ const VeterinariansMap = () => {
     }
   };
 
-  // Get user's current location
+  // Get user's current location with better error handling
   const getUserLocation = () => {
     if (!navigator.geolocation) {
       setLocationError('Tu navegador no soporta geolocalización');
+      setUserLocation(defaultLocation);
       setIsLoading(false);
       return;
     }
@@ -73,17 +81,44 @@ const VeterinariansMap = () => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
         setLocationError(null);
+        setLocationPermissionDenied(false);
         setIsLoading(false);
+        toast({
+          title: "Ubicación detectada",
+          description: "Tu ubicación se ha detectado correctamente",
+        });
       },
       (error) => {
         console.error('Error getting location:', error);
-        setLocationError('No se pudo obtener tu ubicación');
+        let errorMessage = 'No se pudo obtener tu ubicación';
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Permisos de ubicación denegados';
+            setLocationPermissionDenied(true);
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Ubicación no disponible';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Tiempo de espera agotado';
+            break;
+        }
+        
+        setLocationError(errorMessage);
+        setUserLocation(defaultLocation); // Use default location as fallback
         setIsLoading(false);
+        
+        toast({
+          title: "Error de ubicación",
+          description: `${errorMessage}. Mostrando ubicación por defecto.`,
+          variant: "destructive",
+        });
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000 // 5 minutes
+        enableHighAccuracy: false, // Less accurate but more reliable
+        timeout: 15000,
+        maximumAge: 600000 // 10 minutes
       }
     );
   };
@@ -109,7 +144,8 @@ const VeterinariansMap = () => {
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // Add user location marker
-    new mapboxgl.Marker({ color: '#79D0B8' })
+    const userMarkerColor = locationPermissionDenied ? '#FF8A65' : '#79D0B8';
+    new mapboxgl.Marker({ color: userMarkerColor })
       .setLngLat([userLocation.lng, userLocation.lat])
       .addTo(map.current);
 
@@ -130,17 +166,24 @@ const VeterinariansMap = () => {
     return () => {
       map.current?.remove();
     };
-  }, [userLocation, veterinarians]);
+  }, [userLocation, veterinarians, locationPermissionDenied]);
 
-  const handleGoToSettings = () => {
-    // This would typically open device settings or show location permission dialog
+  const handleRequestPermission = () => {
+    // Reset states and try again
+    setLocationError(null);
+    setLocationPermissionDenied(false);
+    setIsLoading(true);
     getUserLocation();
   };
 
   const handleViewProfile = (vetId: string) => {
     if (!vetId) {
       console.error('No veterinarian ID provided');
-      // You could show a toast notification here
+      toast({
+        title: "Error",
+        description: "No se pudo acceder al perfil del veterinario",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -171,44 +214,39 @@ const VeterinariansMap = () => {
     );
   }
 
-  if (locationError) {
-    return (
-      <div className="rounded-lg overflow-hidden">
-        <div className="bg-[#5FBFB3]/5 p-4">
-          <h2 className="text-lg font-semibold mb-2">Todo para tu mascota cerca de ti</h2>
-          <div className="relative bg-gray-100 h-64 rounded-lg overflow-hidden">
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-              <div className="text-orange-500 mb-2">
-                <Navigation size={32} />
-              </div>
-              <p className="text-sm text-gray-600 text-center mb-4">
-                Activa tu ubicación para ver servicios cercanos a ti
-              </p>
-              <Button
-                onClick={handleGoToSettings}
-                variant="outline"
-                size="sm"
-                className="bg-white"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Activar ubicación
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="rounded-lg overflow-hidden">
       <div className="bg-[#5FBFB3]/5 p-4">
         <h2 className="text-lg font-semibold mb-2">Todo para tu mascota cerca de ti</h2>
+        
+        {/* Show location status */}
+        {locationError && (
+          <div className="mb-3 p-2 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-orange-600" />
+            <span className="text-sm text-orange-700">{locationError}</span>
+          </div>
+        )}
+        
         <div className="relative">
           <div 
             ref={mapContainer} 
             className="w-full h-64 rounded-lg border border-gray-200 overflow-hidden"
           />
+          
+          {/* Location permission button */}
+          {(locationError || locationPermissionDenied) && (
+            <div className="absolute top-4 left-4 z-10">
+              <Button
+                onClick={handleRequestPermission}
+                variant="outline"
+                size="sm"
+                className="bg-white shadow-md"
+              >
+                <Navigation className="h-4 w-4 mr-2" />
+                {locationPermissionDenied ? 'Permitir ubicación' : 'Reintentar ubicación'}
+              </Button>
+            </div>
+          )}
           
           {/* Veterinarian details popup */}
           {selectedVet && (
