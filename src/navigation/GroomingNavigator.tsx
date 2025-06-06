@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import GroomingDashboard from '@/features/grooming/screens/GroomingDashboard';
 import GroomingProfileScreen from '@/features/grooming/screens/GroomingProfileScreen';
+import GroomingWeeklyAgendaScreen from '@/features/grooming/screens/GroomingWeeklyAgendaScreen';
 import ChatsScreen from '@/features/chats/screens/ChatsScreen';
 import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
 
@@ -41,7 +42,7 @@ const GroomingNavigator: React.FC = () => {
       <Route path="/settings" element={<UnderConstructionPage title="Configuración" />} />
       <Route path="/chats" element={<ChatsScreen />} />
       <Route path="/chats/:conversationId" element={<IndividualChatScreen />} />
-      <Route path="/agenda" element={<UnderConstructionPage title="Agenda" />} />
+      <Route path="/agenda" element={<GroomingWeeklyAgendaScreen />} />
       <Route path="*" element={<GroomingDashboard />} />
     </Routes>
   );
