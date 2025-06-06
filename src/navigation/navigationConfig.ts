@@ -27,6 +27,7 @@ export const OWNER_ROUTES = {
   VET_DETAIL: '/vets/:id',
   VET_REVIEW: '/vets/:id/review',
   SALUD: '/salud',
+  ESTETICA: '/estetica',
   NOTIFICATIONS: '/notifications',
   SETTINGS: '/settings',
   CHATS: '/chats',
