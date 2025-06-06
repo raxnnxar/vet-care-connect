@@ -6,9 +6,15 @@ import { Button } from '@/ui/atoms/button';
 
 interface ServiceOffered {
   id?: string;
-  name: string;
+  name?: string;
+  nombre?: string;
   description?: string;
   price?: number;
+  precio?: number;
+  tamaños?: Array<{
+    tipo: 'pequeño' | 'mediano' | 'grande';
+    precio: number;
+  }>;
 }
 
 interface GroomingServicesSectionProps {
@@ -47,23 +53,40 @@ const GroomingServicesSection: React.FC<GroomingServicesSectionProps> = ({ servi
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
-        {displayServices.map((service, index) => (
-          <div key={service.id || index} className="py-3 border-b last:border-0">
-            <div className="flex justify-between">
-              <div className="flex-1">
-                <span className="font-medium">{service.name}</span>
-                {service.description && (
-                  <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+        {displayServices.map((service, index) => {
+          const serviceName = service.name || service.nombre || 'Servicio';
+          const servicePrice = service.price || service.precio;
+          
+          return (
+            <div key={service.id || index} className="py-3 border-b last:border-0">
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <span className="font-medium">{serviceName}</span>
+                  {service.description && (
+                    <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                  )}
+                  {service.tamaños && service.tamaños.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {service.tamaños.map((tamaño, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span className="text-gray-600 capitalize">{tamaño.tipo}</span>
+                          <span className="text-green-600 font-medium">
+                            {formatPrice(tamaño.precio)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {servicePrice !== undefined && !service.tamaños && (
+                  <div className="text-green-600 font-medium">
+                    {formatPrice(servicePrice)}
+                  </div>
                 )}
               </div>
-              {service.price !== undefined && (
-                <div className="text-green-600 font-medium">
-                  {formatPrice(service.price)}
-                </div>
-              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </CardContent>
       {servicesList.length > 3 && (
         <CardFooter className="flex justify-center pt-0 pb-4">

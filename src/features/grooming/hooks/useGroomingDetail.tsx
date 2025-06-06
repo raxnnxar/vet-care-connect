@@ -34,14 +34,27 @@ export const useGroomingDetail = (id: string | undefined) => {
 
         if (error) throw error;
         
-        // Ensure services_offered is an array
+        // Ensure services_offered is an array and properly formatted
         if (data) {
-          data.services_offered = Array.isArray(data.services_offered) 
-            ? data.services_offered 
-            : [];
+          console.log('Raw grooming data:', data);
+          
+          // Process services_offered to ensure it's an array
+          let servicesOffered = [];
+          if (data.services_offered) {
+            if (Array.isArray(data.services_offered)) {
+              servicesOffered = data.services_offered;
+            } else if (typeof data.services_offered === 'object') {
+              // If it's an object, try to convert it to array
+              servicesOffered = Object.values(data.services_offered);
+            }
+          }
+          
+          data.services_offered = servicesOffered;
           data.animals_accepted = Array.isArray(data.animals_accepted) 
             ? data.animals_accepted 
             : [];
+          
+          console.log('Processed services:', data.services_offered);
         }
         
         setData(data);

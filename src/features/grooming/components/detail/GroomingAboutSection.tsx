@@ -14,14 +14,14 @@ const GroomingAboutSection: React.FC<GroomingAboutSectionProps> = ({ location })
 
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold flex items-center">
           <MapPin className="mr-2 h-5 w-5 text-[#4DA6A8]" />
           Ubicación
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
-        <p className="text-gray-700">{location}</p>
+        <p className="text-gray-700 leading-relaxed">{location}</p>
       </CardContent>
     </Card>
   );

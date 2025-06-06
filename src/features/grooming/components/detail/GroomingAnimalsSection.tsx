@@ -19,15 +19,19 @@ const animalTranslations: Record<string, string> = {
   'horse': 'Caballo',
   'exotic': 'Exótico',
   'farm_animals': 'Animales de Granja',
-  'small_mammals': 'Pequeños Mamíferos'
+  'small_mammals': 'Pequeños Mamíferos',
+  'perro': 'Perro',
+  'gato': 'Gato'
 };
 
 // Function to get the appropriate icon for each animal
 const AnimalIcon = ({ animalType }: { animalType: string }) => {
   switch (animalType.toLowerCase()) {
     case 'dog':
+    case 'perro':
       return <Dog className="w-6 h-6" />;
     case 'cat':
+    case 'gato':
       return <Cat className="w-6 h-6" />;
     default:
       return <PawPrint className="w-6 h-6" />;
