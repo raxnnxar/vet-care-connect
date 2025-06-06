@@ -5,7 +5,7 @@ import { es } from 'date-fns/locale';
 import TimeSlotsList from './TimeSlotsList';
 import { Button } from '@/ui/atoms/button';
 import { useVetAvailability } from '../../hooks/useVetAvailability';
-import { useParams } from 'react-router-dom';
+import { useGroomingAvailability } from '../../hooks/useGroomingAvailability';
 
 interface ListViewDateSelectorProps {
   availableDays: Date[];
@@ -15,6 +15,8 @@ interface ListViewDateSelectorProps {
   onTimeSelect: (time: string) => void;
   onContinue: () => void;
   onGoBack: () => void;
+  providerId?: string;
+  providerType?: 'vet' | 'grooming' | null;
 }
 
 const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
@@ -24,10 +26,17 @@ const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
   onDateSelect,
   onTimeSelect,
   onContinue,
-  onGoBack
+  onGoBack,
+  providerId,
+  providerType
 }) => {
-  const { vetId } = useParams<{ vetId: string }>();
-  const { isDateAvailable, getAvailableTimeSlotsForDate, isLoading } = useVetAvailability(vetId || '');
+  // Use the appropriate hook based on provider type
+  const vetAvailability = useVetAvailability(providerType === 'vet' ? (providerId || '') : '');
+  const groomingAvailability = useGroomingAvailability(providerType === 'grooming' ? (providerId || '') : '');
+  
+  // Select the right availability data based on provider type
+  const availability = providerType === 'grooming' ? groomingAvailability : vetAvailability;
+  const { isDateAvailable, getAvailableTimeSlotsForDate, isLoading } = availability;
 
   const formatDayName = (date: Date): string => {
     if (isToday(date)) {
@@ -36,7 +45,7 @@ const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
     return format(date, 'EEEE', { locale: es });
   };
 
-  // Filter available days based on vet's availability
+  // Filter available days based on provider's availability
   const actuallyAvailableDays = availableDays.filter(day => isDateAvailable(day));
 
   if (isLoading) {
@@ -102,7 +111,7 @@ const ListViewDateSelector: React.FC<ListViewDateSelectorProps> = ({
 
       {actuallyAvailableDays.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-gray-500">No hay días disponibles para este veterinario</p>
+          <p className="text-gray-500">No hay días disponibles para este proveedor</p>
         </div>
       )}
 

@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { Calendar } from '@/ui/molecules/calendar';
-import { addDays, startOfDay, isSameDay } from 'date-fns';
+import { addDays, startOfDay } from 'date-fns';
 import TimeSlotsList from './TimeSlotsList';
 import { Button } from '@/ui/atoms/button';
 import { useVetAvailability } from '../../hooks/useVetAvailability';
-import { useParams } from 'react-router-dom';
+import { useGroomingAvailability } from '../../hooks/useGroomingAvailability';
 
 interface CalendarViewDateSelectorProps {
   selectedDate: Date | null;
@@ -14,6 +14,8 @@ interface CalendarViewDateSelectorProps {
   onTimeSelect: (time: string) => void;
   onContinue: () => void;
   onGoBack: () => void;
+  providerId?: string;
+  providerType?: 'vet' | 'grooming' | null;
 }
 
 const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
@@ -22,10 +24,17 @@ const CalendarViewDateSelector: React.FC<CalendarViewDateSelectorProps> = ({
   onDateSelect,
   onTimeSelect,
   onContinue,
-  onGoBack
+  onGoBack,
+  providerId,
+  providerType
 }) => {
-  const { vetId } = useParams<{ vetId: string }>();
-  const { isDateAvailable, getAvailableTimeSlotsForDate, isLoading } = useVetAvailability(vetId || '');
+  // Use the appropriate hook based on provider type
+  const vetAvailability = useVetAvailability(providerType === 'vet' ? (providerId || '') : '');
+  const groomingAvailability = useGroomingAvailability(providerType === 'grooming' ? (providerId || '') : '');
+  
+  // Select the right availability data based on provider type
+  const availability = providerType === 'grooming' ? groomingAvailability : vetAvailability;
+  const { isDateAvailable, getAvailableTimeSlotsForDate, isLoading } = availability;
 
   const [availableDates] = useState<Date[]>(() => {
     // Generate available dates for the next 30 days

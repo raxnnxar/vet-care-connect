@@ -21,7 +21,8 @@ const BookAppointmentScreen: React.FC = () => {
   const { vetId } = useParams<{ vetId: string }>();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [veterinarian, setVeterinarian] = useState<any>(null);
+  const [provider, setProvider] = useState<any>(null);
+  const [providerType, setProviderType] = useState<'vet' | 'grooming' | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [selectedService, setSelectedService] = useState<any>(null);
@@ -31,11 +32,12 @@ const BookAppointmentScreen: React.FC = () => {
   const { createAppointment, isLoading: isCreatingAppointment } = useCreateAppointment();
 
   useEffect(() => {
-    const fetchVetDetails = async () => {
+    const fetchProviderDetails = async () => {
       try {
         setIsLoading(true);
         
-        const { data, error } = await supabase
+        // First try to fetch from veterinarians table
+        const { data: vetData, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
             id,
@@ -51,17 +53,38 @@ const BookAppointmentScreen: React.FC = () => {
           .eq('id', vetId)
           .maybeSingle();
 
-        if (error) throw error;
-        setVeterinarian(data);
+        if (vetData && !vetError) {
+          setProvider(vetData);
+          setProviderType('vet');
+        } else {
+          // If not found in veterinarians, try pet_grooming
+          const { data: groomingData, error: groomingError } = await supabase
+            .from('pet_grooming')
+            .select(`
+              id,
+              business_name,
+              services_offered,
+              availability
+            `)
+            .eq('id', vetId)
+            .maybeSingle();
+
+          if (groomingData && !groomingError) {
+            setProvider(groomingData);
+            setProviderType('grooming');
+          } else {
+            throw new Error('Provider not found');
+          }
+        }
       } catch (error) {
-        console.error('Error fetching veterinarian details:', error);
+        console.error('Error fetching provider details:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
     if (vetId) {
-      fetchVetDetails();
+      fetchProviderDetails();
     }
   }, [vetId]);
 
@@ -84,8 +107,8 @@ const BookAppointmentScreen: React.FC = () => {
           },
           serviceType: {
             id: selectedService.id,
-            name: selectedService.name,
-            price: selectedService.price,
+            name: selectedService.name || selectedService.nombre,
+            price: selectedService.price || selectedService.precio,
             description: selectedService.description
           },
           ownerId: user.id
@@ -118,9 +141,10 @@ const BookAppointmentScreen: React.FC = () => {
       case 2:
         return (
           <ServiceSelectionStep
-            veterinarian={veterinarian}
+            veterinarian={provider}
             selectedService={selectedService}
             onServiceSelect={setSelectedService}
+            providerType={providerType}
           />
         );
       case 3:
@@ -132,6 +156,8 @@ const BookAppointmentScreen: React.FC = () => {
             onTimeSelect={setSelectedTime}
             onContinue={handleContinue}
             onGoBack={handleGoBack}
+            providerId={vetId}
+            providerType={providerType}
           />
         );
       case 4:
@@ -141,7 +167,7 @@ const BookAppointmentScreen: React.FC = () => {
             selectedService={selectedService}
             selectedDate={selectedDate}
             selectedTime={selectedTime}
-            veterinarian={veterinarian}
+            veterinarian={provider}
           />
         );
       default:
@@ -165,9 +191,10 @@ const BookAppointmentScreen: React.FC = () => {
         <StepsIndicator currentStep={currentStep} totalSteps={4} />
         
         <VeterinarianCard 
-          veterinarian={veterinarian}
+          veterinarian={provider}
           isLoading={isLoading}
           currentStep={currentStep}
+          providerType={providerType}
         >
           {renderStepContent()}
         </VeterinarianCard>

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Skeleton } from '@/ui/atoms/skeleton';
 import { Card, CardContent } from '@/ui/molecules/card';
 
 interface VeterinarianCardProps {
@@ -7,43 +8,77 @@ interface VeterinarianCardProps {
   isLoading: boolean;
   currentStep: number;
   children: React.ReactNode;
+  providerType?: 'vet' | 'grooming' | null;
 }
 
 const VeterinarianCard: React.FC<VeterinarianCardProps> = ({ 
   veterinarian, 
   isLoading, 
   currentStep, 
-  children 
+  children,
+  providerType 
 }) => {
-  const getVetName = () => {
-    if (!veterinarian) return '';
-    
-    const displayName = veterinarian.service_providers?.profiles?.display_name 
-      || veterinarian.service_providers?.business_name 
-      || '';
-      
-    const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
-    return displayName ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}` : '';
+  if (isLoading) {
+    return (
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-3 mb-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const getProviderName = () => {
+    if (providerType === 'grooming') {
+      return veterinarian?.business_name || 'Estética';
+    }
+    return veterinarian?.service_providers?.business_name || 
+           veterinarian?.service_providers?.profiles?.display_name || 
+           'Veterinario';
+  };
+
+  const getProviderType = () => {
+    return providerType === 'grooming' ? 'Estética' : 'Veterinario';
   };
 
   return (
-    <Card className="mb-6">
-      <CardContent className="p-4">
-        {!isLoading && currentStep !== 3 && (
-          <h2 className="text-lg font-medium mb-1">{getVetName()}</h2>
-        )}
-        {isLoading ? (
-          <div className="h-20 flex items-center justify-center">
-            <div className="animate-pulse w-full">
-              <div className="h-6 bg-gray-200 rounded mb-3 w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+    <div className="space-y-6">
+      {/* Provider info card - only show on first step */}
+      {currentStep === 1 && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-600">
+                  {getProviderName().charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">{getProviderName()}</h3>
+                <p className="text-sm text-gray-500">{getProviderType()}</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          children
-        )}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Step content */}
+      <Card>
+        <CardContent className="p-6">
+          {children}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

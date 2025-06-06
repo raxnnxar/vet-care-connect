@@ -6,7 +6,7 @@ import { addDays, startOfDay } from 'date-fns';
 import ListViewDateSelector from './ListViewDateSelector';
 import CalendarViewDateSelector from './CalendarViewDateSelector';
 import { useVetAvailability } from '../../hooks/useVetAvailability';
-import { useParams } from 'react-router-dom';
+import { useGroomingAvailability } from '../../hooks/useGroomingAvailability';
 
 interface DateTimeSelectorProps {
   selectedDate: Date | null;
@@ -15,6 +15,8 @@ interface DateTimeSelectorProps {
   onTimeSelect: (time: string) => void;
   onContinue: () => void;
   onGoBack: () => void;
+  providerId?: string;
+  providerType?: 'vet' | 'grooming' | null;
 }
 
 const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
@@ -23,16 +25,24 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   onDateSelect,
   onTimeSelect,
   onContinue,
-  onGoBack
+  onGoBack,
+  providerId,
+  providerType
 }) => {
   const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
   const [availableDays, setAvailableDays] = useState<Date[]>([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const { vetId } = useParams<{ vetId: string }>();
-  const { isDateAvailable, isLoading } = useVetAvailability(vetId || '');
+  
+  // Use the appropriate hook based on provider type
+  const vetAvailability = useVetAvailability(providerType === 'vet' ? (providerId || '') : '');
+  const groomingAvailability = useGroomingAvailability(providerType === 'grooming' ? (providerId || '') : '');
+  
+  // Select the right availability data based on provider type
+  const availability = providerType === 'grooming' ? groomingAvailability : vetAvailability;
+  const { isDateAvailable, isLoading } = availability;
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && isDateAvailable) {
       // Generate next 7 days starting from today, but only include available days
       const days = [];
       const today = startOfDay(new Date());
@@ -93,6 +103,8 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
             onTimeSelect={onTimeSelect}
             onContinue={onContinue}
             onGoBack={onGoBack}
+            providerId={providerId}
+            providerType={providerType}
           />
         ) : (
           <CalendarViewDateSelector
@@ -102,6 +114,8 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
             onTimeSelect={onTimeSelect}
             onContinue={onContinue}
             onGoBack={onGoBack}
+            providerId={providerId}
+            providerType={providerType}
           />
         )}
       </div>

@@ -5,12 +5,14 @@ interface ServiceSelectionStepProps {
   veterinarian: any;
   selectedService: any;
   onServiceSelect: (service: any) => void;
+  providerType?: 'vet' | 'grooming' | null;
 }
 
 const ServiceSelectionStep: React.FC<ServiceSelectionStepProps> = ({
   veterinarian,
   selectedService,
-  onServiceSelect
+  onServiceSelect,
+  providerType
 }) => {
   const formatPrice = (price?: number) => {
     if (price === undefined) return '';
@@ -27,37 +29,65 @@ const ServiceSelectionStep: React.FC<ServiceSelectionStepProps> = ({
     return [];
   };
 
+  const renderService = (service: any, index: number) => {
+    const serviceName = service.name || service.nombre || 'Servicio';
+    const servicePrice = service.price || service.precio;
+    const serviceId = service.id || `service-${index}`;
+    
+    return (
+      <div 
+        key={serviceId}
+        onClick={() => onServiceSelect({
+          ...service,
+          id: serviceId,
+          name: serviceName,
+          price: servicePrice
+        })}
+        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+          selectedService?.id === serviceId 
+            ? 'border-[#79D0B8] bg-[#e8f7f3]' 
+            : 'border-gray-200 hover:border-[#79D0B8]'
+        }`}
+      >
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <h4 className="font-medium">{serviceName}</h4>
+            {service.description && (
+              <p className="text-sm text-gray-600 mt-1">
+                {service.description}
+              </p>
+            )}
+            {/* Handle services with size-based pricing */}
+            {service.tamaños && Array.isArray(service.tamaños) && (
+              <div className="mt-2 space-y-1">
+                {service.tamaños.map((tamaño: any, idx: number) => (
+                  <div key={idx} className="flex justify-between text-sm">
+                    <span className="text-gray-600 capitalize">{tamaño.tipo}</span>
+                    <span className="text-green-600 font-medium">
+                      {formatPrice(tamaño.precio)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {servicePrice !== undefined && !service.tamaños && (
+            <div className="text-green-600 font-medium whitespace-nowrap ml-2">
+              {formatPrice(servicePrice)}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <h3 className="font-medium text-gray-700 mb-4">Selecciona un servicio</h3>
       <div className="space-y-3">
-        {getServicesOffered().map((service: any) => (
-          <div 
-            key={service.id}
-            onClick={() => onServiceSelect(service)}
-            className={`p-3 border rounded-lg cursor-pointer transition-all ${
-              selectedService?.id === service.id 
-                ? 'border-[#79D0B8] bg-[#e8f7f3]' 
-                : 'border-gray-200 hover:border-[#79D0B8]'
-            }`}
-          >
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <h4 className="font-medium">{service.name}</h4>
-                {service.description && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {service.description}
-                  </p>
-                )}
-              </div>
-              {service.price !== undefined && (
-                <div className="text-green-600 font-medium whitespace-nowrap ml-2">
-                  {formatPrice(service.price)}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+        {getServicesOffered().map((service: any, index: number) => 
+          renderService(service, index)
+        )}
         
         {getServicesOffered().length === 0 && (
           <div className="p-4 text-center text-gray-500">
