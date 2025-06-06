@@ -3,6 +3,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import GroomingDashboard from '@/features/grooming/screens/GroomingDashboard';
+import GroomingProfileScreen from '@/features/grooming/screens/GroomingProfileScreen';
 
 interface UnderConstructionPageProps {
   title: string;
@@ -34,7 +35,7 @@ const GroomingNavigator: React.FC = () => {
       <Route path="/" element={<GroomingDashboard />} />
       <Route path="/appointments" element={<UnderConstructionPage title="Citas" />} />
       <Route path="/appointments/:id" element={<UnderConstructionPage title="Detalle de Cita" />} />
-      <Route path="/profile" element={<UnderConstructionPage title="Perfil" />} />
+      <Route path="/profile" element={<GroomingProfileScreen />} />
       <Route path="/settings" element={<UnderConstructionPage title="Configuración" />} />
       <Route path="/chats" element={<UnderConstructionPage title="Chats" />} />
       <Route path="/agenda" element={<UnderConstructionPage title="Agenda" />} />
