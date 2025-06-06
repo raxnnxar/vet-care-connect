@@ -1,83 +1,71 @@
 
 import React from 'react';
-import { Heart, Scissors, Store, Dog, Map, Building } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-type ServiceCategory = {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  isComingSoon?: boolean;
-  route?: string;
-};
+import { Stethoscope, Calendar, Scissors, MapPin } from 'lucide-react';
 
 const ServiceCategoryGrid = () => {
   const navigate = useNavigate();
-  
-  const serviceCategories: ServiceCategory[] = [
+
+  const serviceCategories = [
     {
       id: 'health',
-      name: 'Salud',
-      icon: <Heart className="w-6 h-6" />,
-      route: '/owner/salud',
+      title: 'Salud',
+      icon: Stethoscope,
+      color: 'bg-blue-500',
+      description: 'Encuentra veterinarios',
+      route: '/owner/salud'
     },
     {
-      id: 'spa',
-      name: 'Estética y spa',
-      icon: <Scissors className="w-6 h-6" />,
-      isComingSoon: true,
+      id: 'grooming',
+      title: 'Estética',
+      icon: Scissors,
+      color: 'bg-purple-500',
+      description: 'Servicios de belleza',
+      route: '/owner/estetica'
     },
     {
-      id: 'store',
-      name: 'Tienda',
-      icon: <Store className="w-6 h-6" />,
-      isComingSoon: true,
+      id: 'appointments',
+      title: 'Citas',
+      icon: Calendar,
+      color: 'bg-green-500',
+      description: 'Gestiona tus citas',
+      route: '/owner/appointments'
     },
     {
-      id: 'training',
-      name: 'Entrenamiento',
-      icon: <Dog className="w-6 h-6" />,
-      isComingSoon: true,
-    },
-    {
-      id: 'walks',
-      name: 'Paseos',
-      icon: <Map className="w-6 h-6" />,
-      isComingSoon: true,
-    },
-    {
-      id: 'boarding',
-      name: 'Hospedaje',
-      icon: <Building className="w-6 h-6" />,
-      isComingSoon: true,
-    },
+      id: 'nearby',
+      title: 'Cerca de ti',
+      icon: MapPin,
+      color: 'bg-orange-500',
+      description: 'Servicios cercanos',
+      route: '/owner/find-vets'
+    }
   ];
 
-  const handleCategoryClick = (category: ServiceCategory) => {
-    if (!category.isComingSoon && category.route) {
-      navigate(category.route);
-    }
+  const handleCategoryClick = (route: string) => {
+    navigate(route);
   };
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {serviceCategories.map((category) => (
-        <button
-          key={category.id}
-          className={`relative flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-sm border border-gray-100
-                     transition-all duration-200 ${category.isComingSoon ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md active:scale-95'}`}
-          disabled={category.isComingSoon}
-          onClick={() => handleCategoryClick(category)}
-        >
-          <div className="text-[#5FBFB3] mb-2">{category.icon}</div>
-          <span className="text-sm font-medium text-gray-700">{category.name}</span>
-          {category.isComingSoon && (
-            <span className="absolute top-2 right-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-              Próximamente
-            </span>
-          )}
-        </button>
-      ))}
+    <div>
+      <h2 className="text-lg font-semibold mb-4 text-gray-800">Servicios</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {serviceCategories.map((category) => {
+          const IconComponent = category.icon;
+          return (
+            <button
+              key={category.id}
+              onClick={() => handleCategoryClick(category.route)}
+              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-left"
+            >
+              <div className={`${category.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3`}>
+                <IconComponent className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-medium text-gray-800 mb-1">{category.title}</h3>
+              <p className="text-sm text-gray-600">{category.description}</p>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

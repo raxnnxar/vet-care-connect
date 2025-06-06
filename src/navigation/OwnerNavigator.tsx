@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { OWNER_ROUTES } from './navigationConfig';
@@ -12,6 +11,7 @@ import FindVetsScreen from '@/features/vets/screens/FindVetsScreen';
 import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
 import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
 import SaludScreen from '@/features/health/screens/SaludScreen';
+import EsteticaScreen from '@/features/grooming/screens/EsteticaScreen';
 import NotificationsScreen from '@/features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import ChatsScreen from '@/features/chats/screens/ChatsScreen';
@@ -30,6 +30,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
       <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />
       <Route path={OWNER_ROUTES.SALUD} element={<SaludScreen />} />
+      <Route path={OWNER_ROUTES.ESTETICA} element={<EsteticaScreen />} />
       <Route path={OWNER_ROUTES.NOTIFICATIONS} element={<NotificationsScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.CHATS} element={<ChatsScreen />} />

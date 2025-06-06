@@ -315,6 +315,7 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           phone_number: string | null
+          primary_grooming_id: string | null
           primary_vet_id: string | null
           profile_picture_url: string | null
           share_location: boolean | null
@@ -325,6 +326,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           phone_number?: string | null
+          primary_grooming_id?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
           share_location?: boolean | null
@@ -335,11 +337,19 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           phone_number?: string | null
+          primary_grooming_id?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
           share_location?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_primary_grooming"
+            columns: ["primary_grooming_id"]
+            isOneToOne: false
+            referencedRelation: "pet_grooming"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "pet_owners_id_fkey"
             columns: ["id"]
