@@ -30,9 +30,22 @@ const GroomingAvailabilitySection: React.FC<GroomingAvailabilitySectionProps> = 
     { key: 'sunday', label: 'Domingo' }
   ];
 
-  const formatTimeSlot = (slot: any) => {
-    if (!slot || typeof slot !== 'object') return 'No especificado';
-    return `${slot.start || 'N/A'} - ${slot.end || 'N/A'}`;
+  const formatTimeSlot = (dayData: any) => {
+    if (!dayData || typeof dayData !== 'object') return 'Cerrado';
+    
+    // Check if the day is available
+    if (!dayData.isAvailable && !dayData.available) return 'Cerrado';
+    
+    // Format time slots
+    if (dayData.startTime && dayData.endTime) {
+      return `${dayData.startTime} - ${dayData.endTime}`;
+    }
+    
+    if (dayData.start && dayData.end) {
+      return `${dayData.start} - ${dayData.end}`;
+    }
+    
+    return 'Horario no especificado';
   };
 
   return (
@@ -46,7 +59,8 @@ const GroomingAvailabilitySection: React.FC<GroomingAvailabilitySectionProps> = 
       <div className="space-y-3">
         {daysOfWeek.map((day) => {
           const dayAvailability = availability[day.key];
-          const isAvailable = dayAvailability && dayAvailability.available;
+          const timeSlot = formatTimeSlot(dayAvailability);
+          const isAvailable = timeSlot !== 'Cerrado';
           
           return (
             <div key={day.key} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
@@ -57,7 +71,7 @@ const GroomingAvailabilitySection: React.FC<GroomingAvailabilitySectionProps> = 
               <div className="text-right">
                 {isAvailable ? (
                   <span className="text-[#79D0B8] font-medium">
-                    {formatTimeSlot(dayAvailability)}
+                    {timeSlot}
                   </span>
                 ) : (
                   <span className="text-gray-400">Cerrado</span>

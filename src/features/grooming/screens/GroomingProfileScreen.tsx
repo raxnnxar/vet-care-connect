@@ -12,7 +12,7 @@ import GroomingProfileLoading from '../components/profile/GroomingProfileLoading
 
 const GroomingProfileScreen: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [profileData, setProfileData] = useState<GroomingProfile | null>(null);
+  const [profileData, setProfileData] = useState<(GroomingProfile & { location?: string }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const userId = user?.id || '';
@@ -33,9 +33,10 @@ const GroomingProfileScreen: React.FC = () => {
       if (error) throw error;
 
       // Safe type conversion with proper defaults
-      const groomingProfile: GroomingProfile = {
+      const groomingProfile: GroomingProfile & { location?: string } = {
         business_name: data.business_name || '',
         profile_image_url: data.profile_image_url || '',
+        location: data.location || '',
         animals_accepted: Array.isArray(data.animals_accepted) 
           ? (data.animals_accepted as string[])
           : [],
@@ -56,6 +57,7 @@ const GroomingProfileScreen: React.FC = () => {
       setProfileData({
         business_name: '',
         profile_image_url: '',
+        location: '',
         animals_accepted: [],
         availability: {},
         services_offered: []
@@ -65,7 +67,7 @@ const GroomingProfileScreen: React.FC = () => {
     }
   };
 
-  const handleSaveSection = async (sectionData: Partial<GroomingProfile>, sectionName: string) => {
+  const handleSaveSection = async (sectionData: Partial<GroomingProfile> & { location?: string }, sectionName: string) => {
     if (!userId || !profileData) {
       toast.error('No se pudo identificar al usuario o cargar los datos del perfil');
       return;
@@ -94,6 +96,9 @@ const GroomingProfileScreen: React.FC = () => {
       }
       if (sectionData.services_offered !== undefined) {
         updateData.services_offered = sectionData.services_offered;
+      }
+      if (sectionData.location !== undefined) {
+        updateData.location = sectionData.location;
       }
       
       const { error } = await supabase

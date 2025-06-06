@@ -10,9 +10,10 @@ import GroomingBusinessInfoSection from './sections/GroomingBusinessInfoSection'
 import GroomingServicesSection from './sections/GroomingServicesSection';
 import GroomingAnimalsSection from './sections/GroomingAnimalsSection';
 import GroomingAvailabilitySection from './sections/GroomingAvailabilitySection';
+import GroomingLocationSection from './sections/GroomingLocationSection';
 
 interface GroomingProfilePreviewProps {
-  profileData: GroomingProfile;
+  profileData: GroomingProfile & { location?: string };
   userId: string;
   isLoading: boolean;
   onSaveSection: (sectionData: Partial<GroomingProfile>, sectionName: string) => Promise<void>;
@@ -29,11 +30,14 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
     editedBusinessName,
     editedServices,
     editedAnimals,
+    editedLocation,
     setEditedBusinessName,
+    setEditedLocation,
     toggleEditSection,
     handleSaveBusinessInfo,
     handleSaveServices,
     handleSaveAnimals,
+    handleSaveLocation,
     handleSaveAvailability,
     addService,
     removeService,
@@ -45,8 +49,13 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
   
   return (
     <div className="max-w-3xl mx-auto bg-gray-50 rounded-lg shadow overflow-hidden">
-      {/* Hero section with profile image */}
-      <GroomingProfileHero userId={userId} profileData={profileData} />
+      {/* Hero section with profile image - centered layout like vet profile */}
+      <GroomingProfileHero 
+        userId={userId} 
+        profileData={profileData}
+        averageRating={0} // TODO: Add rating functionality for grooming
+        totalReviews={0}  // TODO: Add reviews functionality for grooming
+      />
       
       {/* Content section */}
       <div className="p-4 space-y-6">
@@ -63,20 +72,19 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
         
         <Separator className="my-4 bg-gray-200" />
         
-        {/* Servicios ofrecidos */}
-        <GroomingServicesSection 
-          services={profileData.services_offered || []}
-          isEditing={editingSections.services}
-          toggleEditing={() => toggleEditSection('services')}
-          handleSave={handleSaveServices}
+        {/* Ubicación */}
+        <GroomingLocationSection 
+          location={profileData.location || ''}
+          isEditing={editingSections.location}
+          toggleEditing={() => toggleEditSection('location')}
+          handleSave={handleSaveLocation}
           isLoading={isLoading}
-          editedServices={editedServices}
-          addService={addService}
-          removeService={removeService}
+          editedLocation={editedLocation}
+          setEditedLocation={setEditedLocation}
         />
-
+        
         <Separator className="my-4 bg-gray-200" />
-
+        
         {/* Animales que acepta */}
         <GroomingAnimalsSection 
           animals={profileData.animals_accepted || []}
@@ -89,6 +97,20 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
           toggleAnimal={toggleAnimal}
         />
         
+        <Separator className="my-4 bg-gray-200" />
+        
+        {/* Servicios ofrecidos */}
+        <GroomingServicesSection 
+          services={profileData.services_offered || []}
+          isEditing={editingSections.services}
+          toggleEditing={() => toggleEditSection('services')}
+          handleSave={handleSaveServices}
+          isLoading={isLoading}
+          editedServices={editedServices}
+          addService={addService}
+          removeService={removeService}
+        />
+
         <Separator className="my-4 bg-gray-200" />
         
         {/* Disponibilidad */}
