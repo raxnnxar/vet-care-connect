@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Pet } from '@/features/pets/types';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 
 interface CreateAppointmentData {
   petId: string;
@@ -38,7 +39,7 @@ export const useCreateAppointment = () => {
         appointment_date: appointmentData.appointmentDate,
         service_type: appointmentData.serviceType,
         owner_id: appointmentData.ownerId,
-        status: 'pendiente',
+        status: APPOINTMENT_STATUS.PENDING as const,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
