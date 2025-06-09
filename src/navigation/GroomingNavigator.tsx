@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { GROOMING_ROUTES } from './navigationConfig';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import GroomingDashboard from '@/features/grooming/screens/GroomingDashboard';
 import GroomingProfileScreen from '@/features/grooming/screens/GroomingProfileScreen';
 import GroomingWeeklyAgendaScreen from '@/features/grooming/screens/GroomingWeeklyAgendaScreen';
 import ChatsScreen from '@/features/chats/screens/ChatsScreen';
 import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
+import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 
 interface UnderConstructionPageProps {
   title: string;
@@ -35,14 +37,14 @@ const UnderConstructionPage: React.FC<UnderConstructionPageProps> = ({ title }) 
 const GroomingNavigator: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<GroomingDashboard />} />
-      <Route path="/appointments" element={<UnderConstructionPage title="Citas" />} />
-      <Route path="/appointments/:id" element={<UnderConstructionPage title="Detalle de Cita" />} />
-      <Route path="/profile" element={<GroomingProfileScreen />} />
-      <Route path="/settings" element={<UnderConstructionPage title="Configuración" />} />
-      <Route path="/chats" element={<ChatsScreen />} />
-      <Route path="/chats/:conversationId" element={<IndividualChatScreen />} />
-      <Route path="/agenda" element={<GroomingWeeklyAgendaScreen />} />
+      <Route path={GROOMING_ROUTES.DASHBOARD} element={<GroomingDashboard />} />
+      <Route path={GROOMING_ROUTES.APPOINTMENTS} element={<UnderConstructionPage title="Citas" />} />
+      <Route path={GROOMING_ROUTES.APPOINTMENT_DETAIL} element={<UnderConstructionPage title="Detalle de Cita" />} />
+      <Route path={GROOMING_ROUTES.PROFILE} element={<GroomingProfileScreen />} />
+      <Route path={GROOMING_ROUTES.SETTINGS} element={<SettingsScreen />} />
+      <Route path={GROOMING_ROUTES.CHATS} element={<ChatsScreen />} />
+      <Route path={GROOMING_ROUTES.INDIVIDUAL_CHAT} element={<IndividualChatScreen />} />
+      <Route path={GROOMING_ROUTES.AGENDA} element={<GroomingWeeklyAgendaScreen />} />
       <Route path="*" element={<GroomingDashboard />} />
     </Routes>
   );

@@ -35,5 +35,18 @@ export const OWNER_ROUTES = {
   INDIVIDUAL_CHAT: '/chats/:conversationId'
 };
 
+// GroomingNavigator routes
+export const GROOMING_ROUTES = {
+  DASHBOARD: '/',
+  APPOINTMENTS: '/appointments',
+  APPOINTMENT_DETAIL: '/appointments/:id',
+  PROFILE: '/profile',
+  SETTINGS: '/settings',
+  CHATS: '/chats',
+  INDIVIDUAL_CHAT: '/chats/:conversationId',
+  AGENDA: '/agenda'
+};
+
 export type VetRouteType = keyof typeof VET_ROUTES;
 export type OwnerRouteType = keyof typeof OWNER_ROUTES;
+export type GroomingRouteType = keyof typeof GROOMING_ROUTES;
