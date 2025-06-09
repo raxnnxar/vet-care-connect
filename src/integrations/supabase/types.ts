@@ -111,13 +111,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_appointments_provider"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "veterinarians"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_provider"
             columns: ["provider_id"]
             isOneToOne: false
