@@ -66,22 +66,16 @@ export const updateVeterinarianProfile = async (
         services_offered: completeProfile.services_offered as any,
         profile_image_url: completeProfile.profile_image_url,
         languages_spoken: completeProfile.languages_spoken as any,
-        emergency_services: completeProfile.emergency_services
+        emergency_services: completeProfile.emergency_services,
+        clinic_address: completeProfile.clinic_address,
+        clinic_latitude: completeProfile.clinic_latitude,
+        clinic_longitude: completeProfile.clinic_longitude
       })
       .eq('id', userId);
 
     if (updateError) {
       throw updateError;
     }
-
-    // Also update the service provider record to ensure consistency
-    await supabase
-      .from('service_providers')
-      .update({
-        provider_type: 'veterinarian',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', userId);
 
     return true;
   } catch (error: any) {
