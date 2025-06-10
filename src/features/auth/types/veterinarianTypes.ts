@@ -15,6 +15,9 @@ export interface VeterinarianProfile {
   emergency_services: boolean;
   average_rating?: number;  // Added missing property
   total_reviews?: number;   // Added missing property
+  clinic_address?: string;
+  clinic_latitude?: number;
+  clinic_longitude?: number;
 }
 
 export interface AvailabilitySchedule {
