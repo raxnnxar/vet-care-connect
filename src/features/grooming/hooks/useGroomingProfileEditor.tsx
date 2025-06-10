@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { GroomingService, GroomingProfile } from '@/features/auth/types/groomingTypes';
 
 interface UseGroomingProfileEditorProps {
-  profileData: GroomingProfile;
-  onSaveSection: (sectionData: Partial<GroomingProfile>, sectionName: string) => Promise<void>;
+  profileData: GroomingProfile & { latitude?: number; longitude?: number };
+  onSaveSection: (sectionData: Partial<GroomingProfile & { latitude?: number; longitude?: number }>, sectionName: string) => Promise<void>;
 }
 
 export const useGroomingProfileEditor = ({ 
@@ -30,6 +30,11 @@ export const useGroomingProfileEditor = ({
   const [editedLocation, setEditedLocation] = useState(
     (profileData as any).location || ''
   );
+  const [editedCoordinates, setEditedCoordinates] = useState<{ lat: number; lng: number } | null>(
+    profileData.latitude && profileData.longitude 
+      ? { lat: profileData.latitude, lng: profileData.longitude }
+      : null
+  );
   
   // Update local state when profileData changes
   useEffect(() => {
@@ -37,6 +42,11 @@ export const useGroomingProfileEditor = ({
     setEditedServices(profileData.services_offered || []);
     setEditedAnimals(profileData.animals_accepted || []);
     setEditedLocation((profileData as any).location || '');
+    setEditedCoordinates(
+      profileData.latitude && profileData.longitude 
+        ? { lat: profileData.latitude, lng: profileData.longitude }
+        : null
+    );
   }, [profileData]);
   
   const toggleEditSection = (section: string) => {
@@ -55,6 +65,11 @@ export const useGroomingProfileEditor = ({
         setEditedAnimals([...(profileData.animals_accepted || [])]);
       } else if (section === 'location') {
         setEditedLocation((profileData as any).location || '');
+        setEditedCoordinates(
+          profileData.latitude && profileData.longitude 
+            ? { lat: profileData.latitude, lng: profileData.longitude }
+            : null
+        );
       }
     }
   };
@@ -72,7 +87,12 @@ export const useGroomingProfileEditor = ({
   };
   
   const handleSaveLocation = async () => {
-    return await onSaveSection({ location: editedLocation } as any, 'ubicación');
+    const locationData = {
+      location: editedLocation,
+      latitude: editedCoordinates?.lat || null,
+      longitude: editedCoordinates?.lng || null
+    };
+    return await onSaveSection(locationData, 'ubicación');
   };
   
   const handleSaveAvailability = async () => {
@@ -102,8 +122,10 @@ export const useGroomingProfileEditor = ({
     editedServices,
     editedAnimals,
     editedLocation,
+    editedCoordinates,
     setEditedBusinessName,
     setEditedLocation,
+    setEditedCoordinates,
     toggleEditSection,
     handleSaveBusinessInfo,
     handleSaveServices,

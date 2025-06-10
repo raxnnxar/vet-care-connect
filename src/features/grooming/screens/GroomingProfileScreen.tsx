@@ -12,7 +12,7 @@ import GroomingProfileLoading from '../components/profile/GroomingProfileLoading
 
 const GroomingProfileScreen: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [profileData, setProfileData] = useState<(GroomingProfile & { location?: string }) | null>(null);
+  const [profileData, setProfileData] = useState<(GroomingProfile & { location?: string; latitude?: number; longitude?: number }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const userId = user?.id || '';
@@ -33,10 +33,12 @@ const GroomingProfileScreen: React.FC = () => {
       if (error) throw error;
 
       // Safe type conversion with proper defaults
-      const groomingProfile: GroomingProfile & { location?: string } = {
+      const groomingProfile: GroomingProfile & { location?: string; latitude?: number; longitude?: number } = {
         business_name: data.business_name || '',
         profile_image_url: data.profile_image_url || '',
         location: data.location || '',
+        latitude: data.latitude || null,
+        longitude: data.longitude || null,
         animals_accepted: Array.isArray(data.animals_accepted) 
           ? (data.animals_accepted as string[])
           : [],
@@ -58,6 +60,8 @@ const GroomingProfileScreen: React.FC = () => {
         business_name: '',
         profile_image_url: '',
         location: '',
+        latitude: null,
+        longitude: null,
         animals_accepted: [],
         availability: {},
         services_offered: []
@@ -67,7 +71,7 @@ const GroomingProfileScreen: React.FC = () => {
     }
   };
 
-  const handleSaveSection = async (sectionData: Partial<GroomingProfile> & { location?: string }, sectionName: string) => {
+  const handleSaveSection = async (sectionData: Partial<GroomingProfile & { latitude?: number; longitude?: number }>, sectionName: string) => {
     if (!userId || !profileData) {
       toast.error('No se pudo identificar al usuario o cargar los datos del perfil');
       return;
@@ -99,6 +103,12 @@ const GroomingProfileScreen: React.FC = () => {
       }
       if (sectionData.location !== undefined) {
         updateData.location = sectionData.location;
+      }
+      if (sectionData.latitude !== undefined) {
+        updateData.latitude = sectionData.latitude;
+      }
+      if (sectionData.longitude !== undefined) {
+        updateData.longitude = sectionData.longitude;
       }
       
       const { error } = await supabase

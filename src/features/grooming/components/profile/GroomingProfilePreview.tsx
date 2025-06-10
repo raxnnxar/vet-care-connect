@@ -13,10 +13,10 @@ import GroomingAvailabilitySection from './sections/GroomingAvailabilitySection'
 import GroomingLocationSection from './sections/GroomingLocationSection';
 
 interface GroomingProfilePreviewProps {
-  profileData: GroomingProfile & { location?: string };
+  profileData: GroomingProfile & { location?: string; latitude?: number; longitude?: number };
   userId: string;
   isLoading: boolean;
-  onSaveSection: (sectionData: Partial<GroomingProfile>, sectionName: string) => Promise<void>;
+  onSaveSection: (sectionData: Partial<GroomingProfile & { latitude?: number; longitude?: number }>, sectionName: string) => Promise<void>;
 }
 
 const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({ 
@@ -31,8 +31,10 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
     editedServices,
     editedAnimals,
     editedLocation,
+    editedCoordinates,
     setEditedBusinessName,
     setEditedLocation,
+    setEditedCoordinates,
     toggleEditSection,
     handleSaveBusinessInfo,
     handleSaveServices,
@@ -68,19 +70,6 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
           isLoading={isLoading}
           editedBusinessName={editedBusinessName}
           setEditedBusinessName={setEditedBusinessName}
-        />
-        
-        <Separator className="my-4 bg-gray-200" />
-        
-        {/* Ubicación */}
-        <GroomingLocationSection 
-          location={profileData.location || ''}
-          isEditing={editingSections.location}
-          toggleEditing={() => toggleEditSection('location')}
-          handleSave={handleSaveLocation}
-          isLoading={isLoading}
-          editedLocation={editedLocation}
-          setEditedLocation={setEditedLocation}
         />
         
         <Separator className="my-4 bg-gray-200" />
@@ -121,6 +110,23 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
           toggleEditing={() => toggleEditSection('availability')}
           handleSave={handleSaveAvailability}
           isLoading={isLoading}
+        />
+
+        <Separator className="my-4 bg-gray-200" />
+        
+        {/* Ubicación - Now moved below availability with full map functionality */}
+        <GroomingLocationSection 
+          location={profileData.location || ''}
+          latitude={profileData.latitude}
+          longitude={profileData.longitude}
+          isEditing={editingSections.location}
+          toggleEditing={() => toggleEditSection('location')}
+          handleSave={handleSaveLocation}
+          isLoading={isLoading}
+          editedLocation={editedLocation}
+          setEditedLocation={setEditedLocation}
+          editedCoordinates={editedCoordinates}
+          setEditedCoordinates={setEditedCoordinates}
         />
       </div>
     </div>
