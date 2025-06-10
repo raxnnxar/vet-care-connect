@@ -48,6 +48,15 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
     navigate(-1);
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with back button */}
@@ -70,14 +79,17 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
       <div className="max-w-3xl mx-auto p-4 space-y-6">
         {/* Hero section */}
         <GroomingProfileHero 
-          userId={data.id}
-          profileData={data}
+          businessName={data.business_name}
+          profileImageUrl={data.profile_image_url}
           averageRating={data.average_rating || 0}
           totalReviews={data.total_reviews || 0}
+          getInitials={getInitials}
+          onRatingClick={onReviewClick}
+          groomingId={data.id}
         />
 
         {/* About section */}
-        <GroomingAboutSection businessName={data.business_name} />
+        <GroomingAboutSection location={data.location} />
 
         {/* Animals accepted section */}
         <GroomingAnimalsSection animals={data.animals_accepted} />
