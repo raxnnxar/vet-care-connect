@@ -17,6 +17,7 @@ export type GroomingService = ServiceWithSizes | ServiceWithoutSizes;
 export interface GroomingProfile {
   business_name: string;
   profile_image_url?: string;
+  location?: string;
   animals_accepted: string[];
   availability: Record<string, any>;
   services_offered: GroomingService[];
