@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 
 // Import existing sections
 import GroomingProfileHero from './GroomingProfileHero';
-import GroomingAboutSection from './GroomingAboutSection';
 import GroomingAnimalsSection from './GroomingAnimalsSection';
 import GroomingServicesSection from './GroomingServicesSection';
 import GroomingLocationSection from './GroomingLocationSection';
@@ -59,55 +58,55 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with back button */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="flex items-center justify-between p-4">
+      {/* Content */}
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Hero section with green background and back button */}
+        <div className="relative">
+          {/* Back button positioned absolutely */}
           <Button
             variant="ghost"
             onClick={handleGoBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="absolute top-4 left-4 z-20 flex items-center gap-2 text-white hover:bg-white/20"
           >
             <ArrowLeft className="h-5 w-5" />
-            Volver
           </Button>
-          <h1 className="text-lg font-semibold text-gray-900">Perfil de Estética</h1>
-          <div className="w-20" /> {/* Spacer for centering */}
+          
+          <GroomingProfileHero 
+            businessName={data.business_name}
+            profileImageUrl={data.profile_image_url}
+            averageRating={data.average_rating || 0}
+            totalReviews={data.total_reviews || 0}
+            getInitials={getInitials}
+            onRatingClick={onReviewClick}
+            groomingId={data.id}
+          />
         </div>
+
+        {/* Content sections with padding */}
+        <div className="p-4 space-y-6">
+          {/* Animals accepted section */}
+          <GroomingAnimalsSection animals={data.animals_accepted} />
+
+          {/* Services section */}
+          <GroomingServicesSection services={data.services_offered} />
+
+          {/* Location section - only show if location data exists */}
+          {data.location && data.latitude && data.longitude && (
+            <GroomingLocationSection 
+              location={data.location}
+              latitude={data.latitude}
+              longitude={data.longitude}
+            />
+          )}
+        </div>
+
+        {/* Bottom spacing for fixed footer */}
+        <div className="pb-32" />
       </div>
 
-      {/* Content */}
-      <div className="max-w-3xl mx-auto p-4 space-y-6">
-        {/* Hero section */}
-        <GroomingProfileHero 
-          businessName={data.business_name}
-          profileImageUrl={data.profile_image_url}
-          averageRating={data.average_rating || 0}
-          totalReviews={data.total_reviews || 0}
-          getInitials={getInitials}
-          onRatingClick={onReviewClick}
-          groomingId={data.id}
-        />
-
-        {/* About section */}
-        <GroomingAboutSection location={data.location} />
-
-        {/* Animals accepted section */}
-        <GroomingAnimalsSection animals={data.animals_accepted} />
-
-        {/* Services section */}
-        <GroomingServicesSection services={data.services_offered} />
-
-        {/* Location section - only show if location data exists */}
-        {data.location && data.latitude && data.longitude && (
-          <GroomingLocationSection 
-            location={data.location}
-            latitude={data.latitude}
-            longitude={data.longitude}
-          />
-        )}
-
-        {/* Action buttons */}
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+      {/* Fixed action buttons footer */}
+      <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg border-t border-gray-200 z-10">
+        <div className="max-w-3xl mx-auto">
           <div className="flex flex-col gap-3">
             <Button
               onClick={onBookAppointment}
@@ -139,9 +138,6 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Bottom spacing for navigation */}
-      <div className="pb-24" />
     </div>
   );
 };
