@@ -21,7 +21,8 @@ export const useVetProfileEditor = ({
     specializations: false,
     availability: false,
     education: false,
-    certifications: false
+    certifications: false,
+    location: false
   });
   
   // Local state for editing sections
@@ -34,6 +35,12 @@ export const useVetProfileEditor = ({
   );
   const [editedSpecializations, setEditedSpecializations] = useState<string[]>(
     profileData.specializations || []
+  );
+  const [editedAddress, setEditedAddress] = useState(profileData.clinic_address || '');
+  const [editedCoordinates, setEditedCoordinates] = useState<{ lat: number; lng: number } | null>(
+    profileData.clinic_latitude && profileData.clinic_longitude 
+      ? { lat: profileData.clinic_latitude, lng: profileData.clinic_longitude }
+      : null
   );
   const [newService, setNewService] = useState<ServiceOffered>({
     id: '',
@@ -48,6 +55,12 @@ export const useVetProfileEditor = ({
     setEditedServices(profileData.services_offered || []);
     setEditedAnimals(profileData.animals_treated || []);
     setEditedSpecializations(profileData.specializations || []);
+    setEditedAddress(profileData.clinic_address || '');
+    setEditedCoordinates(
+      profileData.clinic_latitude && profileData.clinic_longitude 
+        ? { lat: profileData.clinic_latitude, lng: profileData.clinic_longitude }
+        : null
+    );
   }, [profileData]);
   
   const toggleEditSection = (section: string) => {
@@ -66,6 +79,13 @@ export const useVetProfileEditor = ({
         setEditedAnimals([...(profileData.animals_treated || [])]);
       } else if (section === 'specializations') {
         setEditedSpecializations([...(profileData.specializations || [])]);
+      } else if (section === 'location') {
+        setEditedAddress(profileData.clinic_address || '');
+        setEditedCoordinates(
+          profileData.clinic_latitude && profileData.clinic_longitude 
+            ? { lat: profileData.clinic_latitude, lng: profileData.clinic_longitude }
+            : null
+        );
       }
     }
   };
@@ -84,6 +104,15 @@ export const useVetProfileEditor = ({
   
   const handleSaveSpecializations = async () => {
     return await onSaveSection({ specializations: editedSpecializations }, 'especialidades');
+  };
+  
+  const handleSaveLocation = async () => {
+    const locationData: Partial<VeterinarianProfile> = {
+      clinic_address: editedAddress,
+      clinic_latitude: editedCoordinates?.lat || null,
+      clinic_longitude: editedCoordinates?.lng || null
+    };
+    return await onSaveSection(locationData, 'ubicación');
   };
   
   const handleSaveEducation = async () => {
@@ -148,15 +177,20 @@ export const useVetProfileEditor = ({
     editedServices,
     editedAnimals,
     editedSpecializations,
+    editedAddress,
+    editedCoordinates,
     newService,
     setEditedBio,
     setEditedServices,
+    setEditedAddress,
+    setEditedCoordinates,
     setNewService,
     toggleEditSection,
     handleSaveBasicInfo,
     handleSaveServices,
     handleSaveAnimals,
     handleSaveSpecializations,
+    handleSaveLocation,
     handleSaveEducation,
     handleSaveCertifications,
     handleSaveAvailability,

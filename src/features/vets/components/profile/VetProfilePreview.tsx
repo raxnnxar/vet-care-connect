@@ -14,6 +14,7 @@ import AvailabilitySection from './sections/AvailabilitySection';
 import EmergencyServiceSection from './sections/EmergencyServiceSection';
 import EducationSection from './sections/EducationSection';
 import CertificationsSection from './sections/CertificationsSection';
+import LocationSection from './sections/LocationSection';
 
 interface VetProfilePreviewProps {
   profileData: VeterinarianProfile;
@@ -36,15 +37,20 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({
     editedServices,
     editedAnimals,
     editedSpecializations,
+    editedAddress,
+    editedCoordinates,
     newService,
     setEditedBio,
     setEditedServices,
+    setEditedAddress,
+    setEditedCoordinates,
     setNewService,
     toggleEditSection,
     handleSaveBasicInfo,
     handleSaveServices,
     handleSaveAnimals,
     handleSaveSpecializations,
+    handleSaveLocation,
     handleSaveEducation,
     handleSaveCertifications,
     handleSaveAvailability,
@@ -156,6 +162,23 @@ const VetProfilePreview: React.FC<VetProfilePreviewProps> = ({
           handleSave={handleSaveAvailability}
           isLoading={isLoading}
           onAvailabilityUpdated={onAvailabilityUpdated}
+        />
+        
+        <Separator className="my-4 bg-gray-200" />
+        
+        {/* SECCIÓN: Ubicación */}
+        <LocationSection 
+          clinicAddress={profileData.clinic_address || ''}
+          clinicLatitude={profileData.clinic_latitude}
+          clinicLongitude={profileData.clinic_longitude}
+          isEditing={editingSections.location}
+          toggleEditing={() => toggleEditSection('location')}
+          handleSave={handleSaveLocation}
+          isLoading={isLoading}
+          editedAddress={editedAddress}
+          setEditedAddress={setEditedAddress}
+          editedCoordinates={editedCoordinates}
+          setEditedCoordinates={setEditedCoordinates}
         />
         
         <Separator className="my-4 bg-gray-200" />
