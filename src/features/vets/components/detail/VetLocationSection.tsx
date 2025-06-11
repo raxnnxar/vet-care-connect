@@ -23,10 +23,18 @@ const VetLocationSection: React.FC<VetLocationSectionProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
 
+  // Debug logs
+  console.log('VetLocationSection props:', { address, latitude, longitude });
+
   useEffect(() => {
-    if (!mapContainer.current || !latitude || !longitude) return;
+    if (!mapContainer.current || !latitude || !longitude) {
+      console.log('Missing map requirements:', { hasContainer: !!mapContainer.current, latitude, longitude });
+      return;
+    }
 
     try {
+      console.log('Initializing map with coordinates:', [longitude, latitude]);
+      
       // Initialize map
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -67,8 +75,11 @@ const VetLocationSection: React.FC<VetLocationSectionProps> = ({
 
   // Don't render if no location data
   if (!address || !latitude || !longitude) {
+    console.log('VetLocationSection not rendering due to missing data:', { address, latitude, longitude });
     return null;
   }
+
+  console.log('VetLocationSection rendering with data:', { address, latitude, longitude });
 
   return (
     <Card>

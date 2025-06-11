@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +28,14 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
 }) => {
   const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Debug log for veterinarian data
+  console.log('VetDetailContent data:', data);
+  console.log('Clinic location data:', {
+    clinic_address: data.clinic_address,
+    clinic_latitude: data.clinic_latitude,
+    clinic_longitude: data.clinic_longitude
+  });
 
   // Format veterinarian name using display_name from profiles
   const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
