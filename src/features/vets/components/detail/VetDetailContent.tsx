@@ -30,6 +30,14 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
   const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Debug: Log the complete data object to see what we're receiving
+  console.log('VetDetailContent - Complete data object:', data);
+  console.log('VetDetailContent - Location data:', {
+    clinic_address: data.clinic_address,
+    clinic_latitude: data.clinic_latitude,
+    clinic_longitude: data.clinic_longitude
+  });
+
   // Format veterinarian name using display_name from profiles
   const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
   

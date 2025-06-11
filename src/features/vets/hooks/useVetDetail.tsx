@@ -1,114 +1,96 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { supabase } from '@/integrations/supabase/client';
-import { useUser } from '@/contexts/UserContext';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 
 export const useVetDetail = (id: string | undefined) => {
-  const navigate = useNavigate();
-  const { user } = useSelector((state: any) => state.auth);
-  const { userRole } = useUser();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    const fetchVetDetails = async () => {
+    const fetchVetDetail = async () => {
+      if (!id) {
+        setError('ID de veterinario no especificado');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         
-        const { data, error } = await supabase
+        const { data: vetData, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
-            id,
-            specialization,
-            profile_image_url,
-            average_rating,
-            total_reviews,
-            bio,
-            animals_treated,
-            education,
-            certifications,
-            services_offered,
-            license_number,
+            *,
             service_providers (
-              business_name,
-              provider_type,
               profiles (
                 display_name,
                 email
-              )
+              ),
+              business_name,
+              provider_type
             )
           `)
           .eq('id', id)
-          .maybeSingle();
+          .single();
 
-        if (error) throw error;
-        
-        // Ensure services_offered is an array
-        if (data) {
-          data.services_offered = Array.isArray(data.services_offered) 
-            ? data.services_offered 
-            : [];
+        if (vetError) {
+          console.error('Error fetching vet:', vetError);
+          setError('Error al cargar los datos del veterinario');
+          return;
         }
-        
-        setData(data);
-      } catch (error) {
-        console.error('Error fetching veterinarian details:', error);
-        setError('No se pudo cargar la información del veterinario');
+
+        if (!vetData) {
+          setError('Veterinario no encontrado');
+          return;
+        }
+
+        // Debug: Log location data specifically
+        console.log('Vet location data:', {
+          clinic_address: vetData.clinic_address,
+          clinic_latitude: vetData.clinic_latitude,
+          clinic_longitude: vetData.clinic_longitude
+        });
+
+        setData(vetData);
+      } catch (err: any) {
+        console.error('Error en useVetDetail:', err);
+        setError('Error inesperado al cargar los datos');
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchVetDetails();
-    }
+    fetchVetDetail();
   }, [id]);
 
   const handleBookAppointment = () => {
-    if (!id) return;
-    // Navigate to the booking flow with the correct path format
+    if (!user?.id) {
+      navigate('/login');
+      return;
+    }
     navigate(`/owner/appointments/book/${id}`);
   };
 
   const handleReviewClick = () => {
-    if (!id) return;
-    navigate(`/vets/${id}/review`);
-  };
-
-  const handleSendMessage = async () => {
-    if (!id || !user?.id) {
-      console.error('Missing vet ID or user ID');
+    if (!user?.id) {
+      navigate('/login');
       return;
     }
-    
-    try {
-      console.log('Creating conversation between:', user.id, 'and', id);
-      
-      // Create or get existing conversation
-      const { data: conversationId, error } = await supabase.rpc(
-        'get_or_create_conversation',
-        {
-          user1_uuid: user.id,
-          user2_uuid: id
-        }
-      );
+    navigate('/vet-review', { state: { veterinarianId: id } });
+  };
 
-      if (error) {
-        console.error('Error creating conversation:', error);
-        return;
-      }
-
-      console.log('Conversation ID:', conversationId);
-      
-      // Navigate to chat screen with the correct role prefix
-      const rolePrefix = userRole === 'pet_owner' ? '/owner' : '/vet';
-      navigate(`${rolePrefix}/chats/${conversationId}`);
-    } catch (error) {
-      console.error('Error handling send message:', error);
+  const handleSendMessage = () => {
+    if (!user?.id) {
+      navigate('/login');
+      return;
     }
+    console.log('Enviando mensaje al veterinario:', id);
   };
 
   return {

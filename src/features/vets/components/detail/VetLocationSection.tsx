@@ -23,10 +23,28 @@ const VetLocationSection: React.FC<VetLocationSectionProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
 
+  // Debug: Log the props received
+  console.log('VetLocationSection props:', {
+    address,
+    latitude,
+    longitude,
+    hasAddress: !!address,
+    hasCoordinates: !!(latitude && longitude)
+  });
+
   useEffect(() => {
-    if (!mapContainer.current || !latitude || !longitude) return;
+    if (!mapContainer.current || !latitude || !longitude) {
+      console.log('Map initialization skipped:', {
+        hasContainer: !!mapContainer.current,
+        hasLatitude: !!latitude,
+        hasLongitude: !!longitude
+      });
+      return;
+    }
 
     try {
+      console.log('Initializing map with coordinates:', { latitude, longitude });
+      
       // Initialize map
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -42,6 +60,8 @@ const VetLocationSection: React.FC<VetLocationSectionProps> = ({
       marker.current = new mapboxgl.Marker({ color: '#79D0B8' })
         .setLngLat([longitude, latitude])
         .addTo(map.current);
+
+      console.log('Map initialized successfully');
 
     } catch (error) {
       console.error('Error initializing map:', error);
