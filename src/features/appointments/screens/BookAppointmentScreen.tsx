@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -108,21 +107,7 @@ const BookAppointmentScreen: React.FC = () => {
 
   const handleServiceSelect = (service: any) => {
     setSelectedService(service);
-    setSelectedServiceSize(null); // Reset size selection when service changes
-    
-    // If service has sizes, stay on current step to show size selection
-    // If service doesn't have sizes, move to next step
-    if (!service.tamaños || !Array.isArray(service.tamaños)) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleServiceSizeSelect = (size: any) => {
-    setSelectedServiceSize(size);
-  };
-
-  const handleSizeSelectionBack = () => {
-    setSelectedServiceSize(null);
+    setCurrentStep(currentStep + 1);
   };
 
   const handleContinue = async () => {
@@ -131,21 +116,23 @@ const BookAppointmentScreen: React.FC = () => {
     } else {
       // Create appointment in database
       if (selectedPet && selectedService && selectedDate && selectedTime && vetId && user?.id) {
-        // Prepare service data based on whether size was selected
+        // Prepare service data - now we handle expanded services differently
         let serviceData;
-        if (selectedServiceSize) {
+        if (selectedService.isExpandedSize) {
+          // Service with size selection
           serviceData = {
-            id: `${selectedService.id}-${selectedServiceSize.tipo}`,
-            nombre: selectedService.nombre || selectedService.name,
-            tipo: selectedServiceSize.tipo,
-            precio: selectedServiceSize.precio,
+            id: selectedService.id,
+            nombre: selectedService.name,
+            tipo: selectedService.sizeType,
+            precio: selectedService.price,
             description: selectedService.description
           };
         } else {
+          // Regular service without sizes
           serviceData = {
             id: selectedService.id,
-            name: selectedService.nombre || selectedService.name,
-            price: selectedService.precio || selectedService.price,
+            name: selectedService.name,
+            price: selectedService.price,
             description: selectedService.description
           };
         }
@@ -189,18 +176,6 @@ const BookAppointmentScreen: React.FC = () => {
           />
         );
       case 2:
-        // Check if we need to show size selection
-        if (selectedService?.tamaños && Array.isArray(selectedService.tamaños) && !selectedServiceSize) {
-          return (
-            <ServiceSizeSelectionStep
-              selectedService={selectedService}
-              selectedSize={selectedServiceSize}
-              onSizeSelect={handleServiceSizeSelect}
-              onGoBack={handleSizeSelectionBack}
-            />
-          );
-        }
-        
         return (
           <ServiceSelectionStep
             veterinarian={provider}
@@ -227,7 +202,6 @@ const BookAppointmentScreen: React.FC = () => {
           <ConfirmationStep
             selectedPet={selectedPet}
             selectedService={selectedService}
-            selectedServiceSize={selectedServiceSize}
             selectedDate={selectedDate}
             selectedTime={selectedTime}
             veterinarian={provider}
@@ -244,11 +218,6 @@ const BookAppointmentScreen: React.FC = () => {
       case 1:
         return !!selectedPet;
       case 2:
-        // If service has sizes, we need both service and size selected
-        if (selectedService?.tamaños && Array.isArray(selectedService.tamaños)) {
-          return !!selectedService && !!selectedServiceSize;
-        }
-        // If service doesn't have sizes, we just need service selected
         return !!selectedService;
       case 3:
         return !!selectedDate && !!selectedTime;
@@ -260,14 +229,7 @@ const BookAppointmentScreen: React.FC = () => {
   // Check if we should show navigation buttons
   const shouldShowNavigationButtons = () => {
     // Don't show on step 3 (DateTimeSelector has its own buttons)
-    if (currentStep === 3) return false;
-    
-    // Don't show if we're on step 2 and showing size selection
-    if (currentStep === 2 && selectedService?.tamaños && Array.isArray(selectedService.tamaños) && !selectedServiceSize) {
-      return false;
-    }
-    
-    return true;
+    return currentStep !== 3;
   };
 
   return (
@@ -299,7 +261,6 @@ const BookAppointmentScreen: React.FC = () => {
             currentStep={currentStep}
             selectedPet={selectedPet}
             selectedService={selectedService}
-            selectedServiceSize={selectedServiceSize}
             selectedDate={selectedDate}
             selectedTime={selectedTime}
             onGoBack={handleGoBack}

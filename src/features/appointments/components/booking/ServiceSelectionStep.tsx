@@ -23,26 +23,64 @@ const ServiceSelectionStep: React.FC<ServiceSelectionStepProps> = ({
     }).format(price);
   };
 
+  const capitalizeFirst = (text: string) => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
+
   const getServicesOffered = () => {
     if (!veterinarian?.services_offered) return [];
     if (Array.isArray(veterinarian.services_offered)) return veterinarian.services_offered;
     return [];
   };
 
-  const renderService = (service: any, index: number) => {
-    const serviceName = service.name || service.nombre || 'Servicio';
-    const servicePrice = service.price || service.precio;
-    const serviceId = service.id || `service-${index}`;
+  const expandServicesWithSizes = () => {
+    const services = getServicesOffered();
+    const expandedServices: any[] = [];
+
+    services.forEach((service: any, serviceIndex: number) => {
+      const serviceName = service.name || service.nombre || 'Servicio';
+      const servicePrice = service.price || service.precio;
+      const baseServiceId = service.id || `service-${serviceIndex}`;
+
+      // If service has sizes, create individual options for each size
+      if (service.tamaños && Array.isArray(service.tamaños)) {
+        service.tamaños.forEach((tamaño: any, sizeIndex: number) => {
+          expandedServices.push({
+            ...service,
+            id: `${baseServiceId}-${tamaño.tipo}`,
+            name: serviceName,
+            displayName: `${serviceName} (${capitalizeFirst(tamaño.tipo)})`,
+            price: tamaño.precio,
+            sizeType: tamaño.tipo,
+            originalService: service,
+            isExpandedSize: true
+          });
+        });
+      } else {
+        // Regular service without sizes
+        expandedServices.push({
+          ...service,
+          id: baseServiceId,
+          name: serviceName,
+          displayName: serviceName,
+          price: servicePrice,
+          isExpandedSize: false
+        });
+      }
+    });
+
+    return expandedServices;
+  };
+
+  const renderService = (service: any) => {
+    const serviceName = service.displayName || service.name;
+    const servicePrice = service.price;
+    const serviceId = service.id;
     
     return (
       <div 
         key={serviceId}
-        onClick={() => onServiceSelect({
-          ...service,
-          id: serviceId,
-          name: serviceName,
-          price: servicePrice
-        })}
+        onClick={() => onServiceSelect(service)}
         className={`p-3 border rounded-lg cursor-pointer transition-all ${
           selectedService?.id === serviceId 
             ? 'border-[#79D0B8] bg-[#e8f7f3]' 
@@ -57,21 +95,8 @@ const ServiceSelectionStep: React.FC<ServiceSelectionStepProps> = ({
                 {service.description}
               </p>
             )}
-            {/* Handle services with size-based pricing */}
-            {service.tamaños && Array.isArray(service.tamaños) && (
-              <div className="mt-2 space-y-1">
-                {service.tamaños.map((tamaño: any, idx: number) => (
-                  <div key={idx} className="flex justify-between text-sm">
-                    <span className="text-gray-600 capitalize">{tamaño.tipo}</span>
-                    <span className="text-green-600 font-medium">
-                      {formatPrice(tamaño.precio)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
-          {servicePrice !== undefined && !service.tamaños && (
+          {servicePrice !== undefined && (
             <div className="text-green-600 font-medium whitespace-nowrap ml-2">
               {formatPrice(servicePrice)}
             </div>
@@ -81,15 +106,17 @@ const ServiceSelectionStep: React.FC<ServiceSelectionStepProps> = ({
     );
   };
 
+  const expandedServices = expandServicesWithSizes();
+
   return (
     <>
       <h3 className="font-medium text-gray-700 mb-4">Selecciona un servicio</h3>
       <div className="space-y-3">
-        {getServicesOffered().map((service: any, index: number) => 
-          renderService(service, index)
+        {expandedServices.map((service: any) => 
+          renderService(service)
         )}
         
-        {getServicesOffered().length === 0 && (
+        {expandedServices.length === 0 && (
           <div className="p-4 text-center text-gray-500">
             No hay servicios disponibles
           </div>

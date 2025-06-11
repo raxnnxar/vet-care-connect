@@ -7,7 +7,6 @@ interface NavigationButtonsProps {
   currentStep: number;
   selectedPet: Pet | null;
   selectedService: any;
-  selectedServiceSize?: any;
   selectedDate: Date | null;
   selectedTime: string | null;
   onGoBack: () => void;
@@ -20,7 +19,6 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
   currentStep,
   selectedPet,
   selectedService,
-  selectedServiceSize,
   selectedDate,
   selectedTime,
   onGoBack,
@@ -37,11 +35,6 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
       case 1:
         return !selectedPet;
       case 2:
-        // If service has sizes, we need both service and size selected
-        if (selectedService?.tamaños && Array.isArray(selectedService.tamaños)) {
-          return !selectedService || !selectedServiceSize;
-        }
-        // If service doesn't have sizes, we just need service selected
         return !selectedService;
       case 3:
         return !selectedDate || !selectedTime;

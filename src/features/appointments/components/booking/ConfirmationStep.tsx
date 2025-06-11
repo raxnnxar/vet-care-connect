@@ -8,7 +8,6 @@ import { es } from 'date-fns/locale';
 interface ConfirmationStepProps {
   selectedPet: Pet | null;
   selectedService: any;
-  selectedServiceSize?: any;
   selectedDate: Date | null;
   selectedTime: string | null;
   veterinarian: any;
@@ -17,7 +16,6 @@ interface ConfirmationStepProps {
 const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
   selectedPet,
   selectedService,
-  selectedServiceSize,
   selectedDate,
   selectedTime,
   veterinarian
@@ -46,16 +44,18 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
   const getServiceDisplayInfo = () => {
     if (!selectedService) return { name: '', price: undefined };
     
-    if (selectedServiceSize) {
+    // Handle expanded services (with size selection)
+    if (selectedService.isExpandedSize) {
       return {
-        name: `${selectedService.nombre || selectedService.name} (${selectedServiceSize.tipo})`,
-        price: selectedServiceSize.precio
+        name: selectedService.displayName || `${selectedService.name} (${selectedService.sizeType})`,
+        price: selectedService.price
       };
     }
     
+    // Handle regular services
     return {
-      name: selectedService.nombre || selectedService.name,
-      price: selectedService.precio || selectedService.price
+      name: selectedService.name || selectedService.displayName,
+      price: selectedService.price
     };
   };
 
