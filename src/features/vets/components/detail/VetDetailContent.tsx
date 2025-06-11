@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
 import VetProfileHero from './VetProfileHero';
 import VetAboutSection from './VetAboutSection';
-import VetContactSection from './VetContactSection';
+import VetLocationSection from './VetLocationSection';
 import VetActionButtons from './VetActionButtons';
 import VetEducationSection from './VetEducationSection';
 import VetCertificationsSection from './VetCertificationsSection';
@@ -119,9 +119,13 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
           <VetCertificationsSection certifications={data.certifications || []} />
         </div>
         
-        {/* Contact Section */}
+        {/* Location Section */}
         <div className="mb-6">
-          <VetContactSection email={data.service_providers?.profiles?.email} />
+          <VetLocationSection 
+            address={data.clinic_address}
+            latitude={data.clinic_latitude}
+            longitude={data.clinic_longitude}
+          />
         </div>
         
         {/* Action Buttons */}
