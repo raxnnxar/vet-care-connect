@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft } from 'lucide-react';
@@ -19,6 +18,7 @@ import { RootState } from '@/state/store';
 
 const BookAppointmentScreen: React.FC = () => {
   const { vetId } = useParams<{ vetId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [provider, setProvider] = useState<any>(null);
@@ -36,28 +36,12 @@ const BookAppointmentScreen: React.FC = () => {
       try {
         setIsLoading(true);
         
-        // First try to fetch from veterinarians table
-        const { data: vetData, error: vetError } = await supabase
-          .from('veterinarians')
-          .select(`
-            id,
-            service_providers (
-              business_name,
-              profiles (
-                display_name
-              )
-            ),
-            services_offered,
-            availability
-          `)
-          .eq('id', vetId)
-          .maybeSingle();
-
-        if (vetData && !vetError) {
-          setProvider(vetData);
-          setProviderType('vet');
-        } else {
-          // If not found in veterinarians, try pet_grooming
+        // Get the type from search params
+        const typeParam = searchParams.get('type');
+        console.log('Type from URL params:', typeParam);
+        
+        if (typeParam === 'grooming') {
+          // Fetch from pet_grooming table
           const { data: groomingData, error: groomingError } = await supabase
             .from('pet_grooming')
             .select(`
@@ -72,12 +56,39 @@ const BookAppointmentScreen: React.FC = () => {
           if (groomingData && !groomingError) {
             setProvider(groomingData);
             setProviderType('grooming');
+            console.log('Successfully fetched grooming provider:', groomingData);
           } else {
-            throw new Error('Provider not found');
+            throw new Error('Grooming provider not found');
+          }
+        } else {
+          // Try to fetch from veterinarians table (default behavior)
+          const { data: vetData, error: vetError } = await supabase
+            .from('veterinarians')
+            .select(`
+              id,
+              service_providers (
+                business_name,
+                profiles (
+                  display_name
+                )
+              ),
+              services_offered,
+              availability
+            `)
+            .eq('id', vetId)
+            .maybeSingle();
+
+          if (vetData && !vetError) {
+            setProvider(vetData);
+            setProviderType('vet');
+            console.log('Successfully fetched vet provider:', vetData);
+          } else {
+            throw new Error('Veterinarian not found');
           }
         }
       } catch (error) {
         console.error('Error fetching provider details:', error);
+        setIsLoading(false);
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +97,7 @@ const BookAppointmentScreen: React.FC = () => {
     if (vetId) {
       fetchProviderDetails();
     }
-  }, [vetId]);
+  }, [vetId, searchParams]);
 
   const goBack = () => {
     navigate(-1);

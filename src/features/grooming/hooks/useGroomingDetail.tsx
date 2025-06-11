@@ -85,8 +85,8 @@ export const useGroomingDetail = (id?: string) => {
   const handleBookAppointment = () => {
     if (!data) return;
     
-    // Navigate to appointment booking
-    navigate(`/owner/book-appointment?groomerId=${data.id}&type=grooming`);
+    // Navigate to appointment booking with vetId parameter (BookAppointmentScreen expects vetId)
+    navigate(`/owner/appointments/book/${data.id}?type=grooming`);
   };
 
   const handleReviewClick = () => {

@@ -20,28 +20,47 @@ const GroomingLocationSection: React.FC<GroomingLocationSectionProps> = ({
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const marker = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     if (!mapContainer.current || !latitude || !longitude) return;
 
-    // Initialize map
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [longitude, latitude],
-      zoom: 15
-    });
+    try {
+      // Initialize map
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [longitude, latitude],
+        zoom: 15
+      });
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-    // Add static marker for the grooming location
-    new mapboxgl.Marker({ color: '#79D0B8' })
-      .setLngLat([longitude, latitude])
-      .addTo(map.current);
+      // Add static marker for the grooming location
+      marker.current = new mapboxgl.Marker({ color: '#79D0B8' })
+        .setLngLat([longitude, latitude])
+        .addTo(map.current);
+
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
 
     return () => {
-      map.current?.remove();
+      try {
+        // Clean up marker first
+        if (marker.current) {
+          marker.current.remove();
+          marker.current = null;
+        }
+        // Clean up map
+        if (map.current) {
+          map.current.remove();
+          map.current = null;
+        }
+      } catch (error) {
+        console.error('Error cleaning up map:', error);
+      }
     };
   }, [latitude, longitude]);
 
