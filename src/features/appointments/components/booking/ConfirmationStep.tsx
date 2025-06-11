@@ -8,6 +8,7 @@ import { es } from 'date-fns/locale';
 interface ConfirmationStepProps {
   selectedPet: Pet | null;
   selectedService: any;
+  selectedServiceSize?: any;
   selectedDate: Date | null;
   selectedTime: string | null;
   veterinarian: any;
@@ -16,6 +17,7 @@ interface ConfirmationStepProps {
 const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
   selectedPet,
   selectedService,
+  selectedServiceSize,
   selectedDate,
   selectedTime,
   veterinarian
@@ -34,11 +36,30 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
     
     const displayName = veterinarian.service_providers?.profiles?.display_name 
       || veterinarian.service_providers?.business_name 
+      || veterinarian.business_name // For grooming providers
       || '';
       
     const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
     return displayName ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}` : '';
   };
+
+  const getServiceDisplayInfo = () => {
+    if (!selectedService) return { name: '', price: undefined };
+    
+    if (selectedServiceSize) {
+      return {
+        name: `${selectedService.nombre || selectedService.name} (${selectedServiceSize.tipo})`,
+        price: selectedServiceSize.precio
+      };
+    }
+    
+    return {
+      name: selectedService.nombre || selectedService.name,
+      price: selectedService.precio || selectedService.price
+    };
+  };
+
+  const serviceInfo = getServiceDisplayInfo();
 
   return (
     <>
@@ -56,9 +77,9 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         
         <div>
           <span className="text-sm text-gray-500">Servicio</span>
-          <div className="font-medium">{selectedService?.name}</div>
-          {selectedService?.price !== undefined && (
-            <div className="text-green-600">{formatPrice(selectedService.price)}</div>
+          <div className="font-medium">{serviceInfo.name}</div>
+          {serviceInfo.price !== undefined && (
+            <div className="text-green-600">{formatPrice(serviceInfo.price)}</div>
           )}
         </div>
         
@@ -76,7 +97,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         <Separator />
         
         <div>
-          <span className="text-sm text-gray-500">Veterinario</span>
+          <span className="text-sm text-gray-500">Proveedor</span>
           <div className="font-medium">{getVetName()}</div>
         </div>
       </div>
