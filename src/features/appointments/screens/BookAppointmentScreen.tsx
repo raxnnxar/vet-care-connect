@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -221,6 +222,8 @@ const BookAppointmentScreen: React.FC = () => {
         return !!selectedService;
       case 3:
         return !!selectedDate && !!selectedTime;
+      case 4:
+        return !!selectedPet && !!selectedService && !!selectedDate && !!selectedTime;
       default:
         return false;
     }

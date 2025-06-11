@@ -38,6 +38,9 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
         return !selectedService;
       case 3:
         return !selectedDate || !selectedTime;
+      case 4:
+        // For confirmation step, allow if we have all required data
+        return !selectedPet || !selectedService || !selectedDate || !selectedTime;
       default:
         return false;
     }
