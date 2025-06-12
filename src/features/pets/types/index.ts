@@ -1,3 +1,4 @@
+
 /**
  * Core pet entity type
  */
@@ -44,6 +45,7 @@ export interface CreatePetData {
   sex?: string;
   temperament?: string;
   additional_notes?: string;
+  profile_picture_url?: string;
   petPhotoFile?: File;
   medicalHistory?: PetMedicalHistory;
 }
