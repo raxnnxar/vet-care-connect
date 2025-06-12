@@ -123,7 +123,10 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Vaccine Document Upload Section */}
-          <VaccineDocumentUpload petId={pet.id} />
+          <VaccineDocumentUpload 
+            petId={pet.id} 
+            petOwnerId={pet.owner_id}
+          />
         
           {/* Medications Section */}
           <MedicationsSection 

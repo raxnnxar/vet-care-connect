@@ -525,6 +525,48 @@ export type Database = {
           },
         ]
       }
+      vaccine_documents: {
+        Row: {
+          document_url: string
+          id: string
+          notes: string | null
+          pet_id: string | null
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          document_url: string
+          id?: string
+          notes?: string | null
+          pet_id?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          document_url?: string
+          id?: string
+          notes?: string | null
+          pet_id?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccine_documents_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaccine_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       veterinarians: {
         Row: {
           animals_treated: Json | null
