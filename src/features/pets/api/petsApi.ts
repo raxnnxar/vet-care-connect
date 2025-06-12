@@ -60,13 +60,21 @@ export const petsApi: IPetsApi = {
     try {
       console.log('Creating pet with data:', petData);
       
-      // Extract petPhotoFile from petData to handle separately
-      const { petPhotoFile, ...petDetails } = petData;
+      // Remove any petPhotoFile from the data and handle profile_picture_url separately
+      const { petPhotoFile, profile_picture_url, ...cleanPetData } = petData;
       
-      // First, insert the pet record only (without photo)
+      // Prepare the pet data for database insertion
+      const petInsertData = {
+        ...cleanPetData,
+        profile_picture_url: profile_picture_url || null // Use the URL if provided
+      };
+      
+      console.log('Clean pet data for insertion:', petInsertData);
+      
+      // Insert the pet record
       const { data: newPetData, error: petError } = await supabase
         .from('pets')
-        .insert(petDetails)
+        .insert(petInsertData)
         .select()
         .single();
       
@@ -76,35 +84,6 @@ export const petsApi: IPetsApi = {
       }
       
       console.log('Pet created successfully:', newPetData);
-      
-      // If there's a photo file, upload it and update the pet record
-      if (petPhotoFile && newPetData.id) {
-        try {
-          const { data: uploadResult, error: uploadError } = await this.uploadPetProfilePicture(newPetData.id, petPhotoFile);
-          
-          if (uploadError) {
-            console.error('Error uploading pet profile picture:', uploadError);
-            // Don't fail the whole operation just because the image upload failed
-            // Just return the pet data without the image
-          } else if (uploadResult && uploadResult.publicUrl) {
-            // Update the pet with the profile picture URL
-            const { data: updatedPet, error: updateError } = await supabase
-              .from('pets')
-              .update({ profile_picture_url: uploadResult.publicUrl })
-              .eq('id', newPetData.id)
-              .select()
-              .single();
-              
-            if (!updateError && updatedPet) {
-              return { data: updatedPet, error: null };
-            }
-          }
-        } catch (uploadError) {
-          console.error('Error uploading pet photo:', uploadError);
-          // Continue with the pet creation without the photo
-        }
-      }
-      
       return { data: newPetData, error: null };
     } catch (error) {
       console.error('Error in createPet:', error);

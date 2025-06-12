@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ScrollArea } from '@/ui/molecules/scroll-area';
@@ -134,9 +133,30 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
         transformedData.date_of_birth = approximateBirthDate.toISOString().split('T')[0];
       }
       
-      console.log('Submitting pet data (before image upload):', transformedData);
+      // If there's a photo file, first upload it and get the URL
+      if (petPhotoFile) {
+        try {
+          console.log('Uploading pet photo before creating pet record');
+          
+          // Create a temporary pet ID for the upload
+          const tempPetId = `temp_${Date.now()}`;
+          const imageUrl = await uploadProfilePicture(tempPetId, petPhotoFile);
+          
+          if (imageUrl) {
+            console.log('Photo uploaded successfully:', imageUrl);
+            transformedData.profile_picture_url = imageUrl;
+          } else {
+            console.warn('Failed to upload photo, proceeding without it');
+          }
+        } catch (uploadError) {
+          console.error('Error uploading photo:', uploadError);
+          toast.error('No se pudo subir la foto, pero se guardará la mascota sin imagen');
+        }
+      }
       
-      // First create the pet without the photo
+      console.log('Submitting pet data:', transformedData);
+      
+      // Create the pet with the transformed data (including photo URL if available)
       const result = await onSubmit(transformedData);
       
       if (!result) {
@@ -146,23 +166,19 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
       
       console.log('Pet created successfully:', result);
       
-      // If there's a photo file and we have a pet ID, upload the photo
-      if (petPhotoFile && result.id) {
+      // If we had uploaded a photo with a temp ID, update it to use the real pet ID
+      if (petPhotoFile && transformedData.profile_picture_url && result.id) {
         try {
-          console.log('Uploading profile picture for pet:', result.id);
-          const imageUrl = await uploadProfilePicture(result.id, petPhotoFile);
+          console.log('Updating photo path for real pet ID:', result.id);
+          const finalImageUrl = await uploadProfilePicture(result.id, petPhotoFile);
           
-          if (imageUrl) {
-            console.log('Profile picture uploaded successfully:', imageUrl);
-            // Update the result with the new image URL
-            result.profile_picture_url = imageUrl;
-          } else {
-            console.warn('Failed to upload profile picture, but pet was created');
-            toast.error('La mascota se guardó pero no se pudo subir la foto de perfil');
+          if (finalImageUrl) {
+            console.log('Final profile picture uploaded successfully:', finalImageUrl);
+            result.profile_picture_url = finalImageUrl;
           }
         } catch (uploadError) {
-          console.error('Error uploading profile picture:', uploadError);
-          toast.error('La mascota se guardó pero no se pudo subir la foto de perfil');
+          console.error('Error updating photo with real pet ID:', uploadError);
+          // Don't fail the whole operation for this
         }
       }
       
