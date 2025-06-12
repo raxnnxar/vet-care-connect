@@ -44,38 +44,13 @@ export const usePetFileUploads = () => {
       
       console.log('Dispatching uploadVaccineDocument with petId:', petId, 'and file:', file.name);
       
-      // Create a form data object for the file
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('petId', petId);
-      
-      // Directly attempt to upload via fetch to debug the issue
-      try {
-        const response = await fetch(`/api/pets/${petId}/vaccine-documents`, {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Direct upload successful, URL:', data.url);
-          toast.success('Documento subido exitosamente');
-          return data.url;
-        } else {
-          console.error('Direct upload failed:', response.statusText);
-          // Fall back to the Redux approach
-        }
-      } catch (directError) {
-        console.error('Direct upload attempt failed:', directError);
-        // Continue with Redux approach
-      }
-      
-      // If direct approach failed, try with Redux
+      // Use the Redux thunk for vaccine document upload
       const resultAction = await dispatch(uploadVaccineDocument({ petId, file }));
       
       if (uploadVaccineDocument.fulfilled.match(resultAction)) {
         const { url } = resultAction.payload;
         console.log('Vaccine document uploaded successfully via Redux, URL:', url);
+        toast.success('Documento subido exitosamente');
         return url;
       }
       
