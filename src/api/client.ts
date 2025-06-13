@@ -68,13 +68,14 @@ export const apiRequest = async <T>(
   } catch (error) {
     if (error instanceof ApiError) {
       // Log API errors and show a toast notification
+      // Only log serializable data, not complex objects
       console.error(`API Error (${error.status}):`, error.message);
       toast.error(error.message || 'An error occurred while communicating with the server');
       throw error;
     }
     
     // Handle network/other errors
-    console.error('Request failed:', error);
+    console.error('Request failed:', error instanceof Error ? error.message : 'Unknown error');
     toast.error('Network error. Please check your connection and try again.');
     throw new ApiError(
       'Network error. Please check your connection.', 
