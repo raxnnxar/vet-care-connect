@@ -5,9 +5,10 @@ import { Pet } from '@/features/pets/types';
 interface PetListProps {
   pets: Pet[];
   isLoading: boolean;
+  onPetClick?: (pet: Pet) => void;
 }
 
-const PetList: React.FC<PetListProps> = ({ pets, isLoading }) => {
+const PetList: React.FC<PetListProps> = ({ pets, isLoading, onPetClick }) => {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -40,7 +41,10 @@ const PetList: React.FC<PetListProps> = ({ pets, isLoading }) => {
       {pets.map((pet) => (
         <div
           key={pet.id}
-          className="bg-white/90 p-4 rounded-lg shadow-sm flex items-center gap-3"
+          className={`bg-white/90 p-4 rounded-lg shadow-sm flex items-center gap-3 ${
+            onPetClick ? 'cursor-pointer hover:bg-white transition-colors' : ''
+          }`}
+          onClick={() => onPetClick?.(pet)}
         >
           <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary font-semibold overflow-hidden">
             {pet.profile_picture_url ? (

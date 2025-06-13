@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { OWNER_ROUTES } from './navigationConfig';
@@ -7,6 +8,7 @@ import AppointmentDetailScreen from '@/features/appointments/screens/Appointment
 import BookAppointmentScreen from '@/features/appointments/screens/BookAppointmentScreen';
 import OwnerProfileScreen from '@/features/owner/screens/OwnerProfileScreen';
 import PetDetailScreen from '@/features/pets/screens/PetDetailScreen';
+import PetEditScreen from '@/features/pets/screens/PetEditScreen';
 import FindVetsScreen from '@/features/vets/screens/FindVetsScreen';
 import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
 import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
@@ -27,6 +29,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.BOOK_APPOINTMENT} element={<BookAppointmentScreen />} />
       <Route path={OWNER_ROUTES.PROFILE} element={<OwnerProfileScreen />} />
       <Route path={OWNER_ROUTES.PET_DETAIL} element={<PetDetailScreen />} />
+      <Route path="/pets/:id/edit" element={<PetEditScreen />} />
       <Route path={OWNER_ROUTES.FIND_VETS} element={<FindVetsScreen />} />
       <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
       <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />

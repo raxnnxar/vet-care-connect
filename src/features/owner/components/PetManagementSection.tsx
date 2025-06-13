@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
@@ -43,6 +44,7 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   showPetForm,
   setShowPetForm,
 }) => {
+  const navigate = useNavigate();
   // Use local state if the props are not provided
   const [localShowPetForm, setLocalShowPetForm] = useState(false);
   const [localShowMedicalDialog, setLocalShowMedicalDialog] = useState(false);
@@ -123,7 +125,8 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     if (handlePetClick) {
       handlePetClick(pet);
     } else {
-      actualSetSelectedPet(pet);
+      // Navigate to pet edit screen
+      navigate(`/owner/pets/${pet.id}/edit`);
     }
   };
 
@@ -131,10 +134,56 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Tus mascotas</h3>
       
-      <PetList 
-        pets={actualPets} 
-        isLoading={isLoading} 
-      />
+      <div className="space-y-3">
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="bg-white/30 backdrop-blur-sm border border-white/30 p-4 rounded-lg animate-pulse flex items-center gap-3"
+              >
+                <div className="w-12 h-12 rounded-full bg-white/30"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-24 bg-white/30 rounded"></div>
+                  <div className="h-3 w-16 bg-white/30 rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : !actualPets.length ? (
+          <div className="text-center py-6 bg-white/20 backdrop-blur-sm rounded-lg border border-white/20">
+            <p className="text-gray-600 text-sm">No tienes mascotas registradas</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {actualPets.map((pet) => (
+              <div
+                key={pet.id}
+                className="bg-white/90 p-4 rounded-lg shadow-sm flex items-center gap-3 cursor-pointer hover:bg-white transition-colors"
+                onClick={() => handleLocalPetClick(pet)}
+              >
+                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary font-semibold overflow-hidden">
+                  {pet.profile_picture_url ? (
+                    <img 
+                      src={pet.profile_picture_url} 
+                      alt={pet.name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    pet.name ? pet.name.substring(0, 2).toUpperCase() : 'P'
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-800">{pet.name}</h4>
+                  <p className="text-sm text-gray-500">
+                    {pet.species}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       
       <Button 
         variant="outline" 
