@@ -373,6 +373,7 @@ export type Database = {
           sex: string | null
           species: string
           temperament: string | null
+          updated_at: string | null
           weight: number | null
         }
         Insert: {
@@ -388,6 +389,7 @@ export type Database = {
           sex?: string | null
           species: string
           temperament?: string | null
+          updated_at?: string | null
           weight?: number | null
         }
         Update: {
@@ -403,6 +405,7 @@ export type Database = {
           sex?: string | null
           species?: string
           temperament?: string | null
+          updated_at?: string | null
           weight?: number | null
         }
         Relationships: [

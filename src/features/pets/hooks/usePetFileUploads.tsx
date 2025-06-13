@@ -15,6 +15,13 @@ export const usePetFileUploads = () => {
         return null;
       }
 
+      // Validate that petId is a valid UUID, not a temporary ID
+      if (petId.startsWith('temp_')) {
+        console.error('Cannot upload profile picture with temporary pet ID:', petId);
+        toast.error('Error: La mascota debe estar guardada antes de subir la foto');
+        return null;
+      }
+
       console.log('Dispatching uploadPetProfilePicture with petId:', petId);
       const resultAction = await dispatch(uploadPetProfilePicture({ petId, file }));
       
