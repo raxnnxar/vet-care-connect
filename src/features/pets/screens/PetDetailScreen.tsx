@@ -4,11 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
-import { ArrowLeft, Edit, Trash2, Calendar } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, Heart } from 'lucide-react';
 import { usePets } from '@/features/pets/hooks/usePets';
 import { Pet } from '@/features/pets/types';
 import { useToast } from "@/hooks/use-toast";
 import { toast } from 'sonner';
+import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
 
 const PetDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +18,7 @@ const PetDetailScreen: React.FC = () => {
   const { getPetById, deletePet } = usePets();
   const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showMedicalDialog, setShowMedicalDialog] = useState(false);
 
   useEffect(() => {
     const fetchPet = async () => {
@@ -205,6 +207,20 @@ const PetDetailScreen: React.FC = () => {
           </div>
         </Card>
 
+        {/* Medical Information Section */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <Button 
+              variant="outline" 
+              className="w-full border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10"
+              onClick={() => setShowMedicalDialog(true)}
+            >
+              <Heart className="w-4 h-4 mr-2" />
+              Ver información médica
+            </Button>
+          </div>
+        </Card>
+
         {/* Actions */}
         <div className="grid grid-cols-1 gap-4 mt-4">
           <Button 
@@ -235,6 +251,16 @@ const PetDetailScreen: React.FC = () => {
             </Button>
           </div>
         </div>
+
+        {/* Medical Dialog */}
+        {showMedicalDialog && (
+          <MedicalDialog
+            pet={pet}
+            open={showMedicalDialog}
+            onClose={() => setShowMedicalDialog(false)}
+            mode="view"
+          />
+        )}
       </div>
     </LayoutBase>
   );

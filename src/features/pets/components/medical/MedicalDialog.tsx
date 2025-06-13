@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogFooter,
 } from '@/ui/molecules/dialog';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/ui/atoms/button';
@@ -17,15 +16,17 @@ import MedicationsSection from './MedicationsSection';
 import SurgeriesSection from './SurgeriesSection';
 import MedicalConditionsSection from './MedicalConditionsSection';
 import MedicalDialogHeader from './MedicalDialogHeader';
+import MedicalInfoViewer from './MedicalInfoViewer';
 import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface MedicalDialogProps {
   pet: Pet;
   onClose: () => void;
   open: boolean;
+  mode?: 'edit' | 'view';
 }
 
-const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => {
+const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode = 'edit' }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, control } = useForm<MedicalFormValues>({
@@ -121,43 +122,47 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
           />
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Vaccine Document Upload Section */}
-          <VaccineDocumentUpload 
-            petId={pet.id} 
-            petOwnerId={pet.owner_id}
-          />
-        
-          {/* Medications Section */}
-          <MedicationsSection 
-            medicationFields={medicationFields}
-            appendMedication={appendMedication}
-            removeMedication={removeMedication}
-            register={register}
-          />
+        {mode === 'view' ? (
+          <MedicalInfoViewer pet={pet} />
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Vaccine Document Upload Section */}
+            <VaccineDocumentUpload 
+              petId={pet.id} 
+              petOwnerId={pet.owner_id}
+            />
           
-          {/* Medical Conditions Section */}
-          <MedicalConditionsSection register={register} />
-          
-          {/* Surgeries Section */}
-          <SurgeriesSection 
-            surgeryFields={surgeryFields}
-            appendSurgery={appendSurgery}
-            removeSurgery={removeSurgery}
-            register={register}
-          />
+            {/* Medications Section */}
+            <MedicationsSection 
+              medicationFields={medicationFields}
+              appendMedication={appendMedication}
+              removeMedication={removeMedication}
+              register={register}
+            />
+            
+            {/* Medical Conditions Section */}
+            <MedicalConditionsSection register={register} />
+            
+            {/* Surgeries Section */}
+            <SurgeriesSection 
+              surgeryFields={surgeryFields}
+              appendSurgery={appendSurgery}
+              removeSurgery={removeSurgery}
+              register={register}
+            />
 
-          <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4">
-            <Button 
-              type="submit" 
-              className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
-              disabled={isSubmitting}
-            >
-              <Syringe className="h-4 w-4 mr-2" />
-              {isSubmitting ? 'Guardando...' : 'Guardar información médica'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button 
+                type="submit" 
+                className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
+                disabled={isSubmitting}
+              >
+                <Syringe className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Guardando...' : 'Guardar información médica'}
+              </Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
