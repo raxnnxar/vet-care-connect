@@ -5,7 +5,6 @@ import { Button } from '@/ui/atoms/button';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
 import PetForm from '@/features/pets/components/PetForm';
-import PetList from '@/features/auth/components/PetList';
 import PetDetailModal from '@/features/pets/components/PetDetailModal';
 import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
 import { usePets } from '@/features/pets/hooks';
@@ -65,7 +64,12 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   const handleLocalPetSubmit = async (petData: any): Promise<Pet | null> => {
     try {
       if (handlePetFormSubmit) {
-        return await handlePetFormSubmit(petData);
+        const result = await handlePetFormSubmit(petData);
+        if (result) {
+          setLastCreatedPet(result);
+          setLocalShowMedicalDialog(true);
+        }
+        return result;
       }
       
       if (!petData) {

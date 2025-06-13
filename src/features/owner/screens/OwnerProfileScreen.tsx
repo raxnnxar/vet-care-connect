@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { useSelector } from 'react-redux';
@@ -25,7 +24,7 @@ const OwnerProfileScreen = () => {
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const { getCurrentUserPets, createPet, updatePet } = usePets();
   const [userPets, setUserPets] = useState<Pet[]>([]);
-  const [isLoadingPets, setIsLoadingPets] = useState(true); // Add loading state
+  const [isLoadingPets, setIsLoadingPets] = useState(true);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -46,7 +45,7 @@ const OwnerProfileScreen = () => {
           setEditedAddress(data.address || '');
         }
 
-        setIsLoadingPets(true); // Start loading pets
+        setIsLoadingPets(true);
         try {
           const petsResult = await getCurrentUserPets();
           
@@ -57,7 +56,7 @@ const OwnerProfileScreen = () => {
           console.error('Error fetching pets:', error);
           setUserPets([]);
         } finally {
-          setIsLoadingPets(false); // End loading regardless of result
+          setIsLoadingPets(false);
         }
       }
     };
@@ -71,7 +70,6 @@ const OwnerProfileScreen = () => {
 
   const handlePetFormSubmit = async (petData: any): Promise<Pet | null> => {
     try {
-      // Make sure we assign the owner ID if it's not already set
       if (!petData.owner_id && user?.id) {
         petData.owner_id = user.id;
       }
@@ -151,7 +149,6 @@ const OwnerProfileScreen = () => {
     }
   };
 
-  // Handler for when a pet is added - update userPets array
   const handlePetAdded = (pet: Pet) => {
     setUserPets(prev => [...prev, pet]);
   };
