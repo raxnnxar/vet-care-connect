@@ -25,7 +25,7 @@ interface MedicalInfoViewerProps {
 const MedicalInfoViewer: React.FC<MedicalInfoViewerProps> = ({ pet }) => {
   const [medicalHistory, setMedicalHistory] = useState<MedicalHistory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const vaccineHook = useVaccineDocuments(pet.id, pet.owner_id);
+  const vaccineHook = useVaccineDocuments(pet.id);
 
   useEffect(() => {
     const fetchMedicalHistory = async () => {
@@ -107,10 +107,8 @@ const MedicalInfoViewer: React.FC<MedicalInfoViewerProps> = ({ pet }) => {
             <h4 className="font-medium text-gray-800">Documentos de Vacunas</h4>
           </div>
           <VaccineDocumentsList 
-            documents={vaccineHook.documents}
-            onDelete={vaccineHook.deleteDocument}
-            onUpdateNotes={vaccineHook.updateDocumentNotes}
-            readOnly={true}
+            petId={pet.id}
+            petOwnerId={pet.owner_id}
           />
         </Card>
       )}
