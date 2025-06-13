@@ -21,7 +21,7 @@ interface MedicalHistory {
 const MedicalInfoViewer: React.FC<MedicalInfoViewerProps> = ({ pet }) => {
   const [medicalHistory, setMedicalHistory] = useState<MedicalHistory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { vaccineDocuments, isLoading: documentsLoading } = useVaccineDocuments(pet.id);
+  const { documents: vaccineDocuments, isLoading: documentsLoading } = useVaccineDocuments(pet.id);
 
   useEffect(() => {
     const fetchMedicalHistory = async () => {
@@ -38,7 +38,20 @@ const MedicalInfoViewer: React.FC<MedicalInfoViewerProps> = ({ pet }) => {
           return;
         }
 
-        setMedicalHistory(data);
+        if (data) {
+          // Safely parse JSON fields
+          const parsedHistory: MedicalHistory = {
+            current_medications: Array.isArray(data.current_medications) 
+              ? data.current_medications as Array<{ name: string; dosage: string; frequency: string }>
+              : [],
+            previous_surgeries: Array.isArray(data.previous_surgeries)
+              ? data.previous_surgeries as Array<{ type: string; date: string }>
+              : [],
+            allergies: data.allergies || undefined,
+            chronic_conditions: data.chronic_conditions || undefined,
+          };
+          setMedicalHistory(parsedHistory);
+        }
       } catch (error) {
         console.error('Error fetching medical history:', error);
       } finally {
