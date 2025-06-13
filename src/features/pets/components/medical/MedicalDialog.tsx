@@ -9,7 +9,7 @@ import {
 } from '@/ui/molecules/dialog';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/ui/atoms/button';
-import { Syringe } from 'lucide-react';
+import { Syringe, Edit, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import VaccineDocumentUpload from './VaccineDocumentUpload';
@@ -17,6 +17,7 @@ import MedicationsSection from './MedicationsSection';
 import SurgeriesSection from './SurgeriesSection';
 import MedicalConditionsSection from './MedicalConditionsSection';
 import MedicalDialogHeader from './MedicalDialogHeader';
+import MedicalInfoViewer from './MedicalInfoViewer';
 import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface MedicalDialogProps {
@@ -27,6 +28,7 @@ interface MedicalDialogProps {
 
 const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { register, handleSubmit, control } = useForm<MedicalFormValues>({
     defaultValues: {
@@ -103,7 +105,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
 
       console.log('Medical history saved successfully:', result);
       toast.success('Información médica guardada exitosamente');
-      onClose();
+      setIsEditing(false);
     } catch (error) {
       console.error('Error saving medical information:', error);
       toast.error('Error al guardar la información médica');
@@ -116,48 +118,84 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open }) => 
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader className="mb-4">
-          <MedicalDialogHeader 
-            petName={pet.name}
-          />
+          <div className="flex items-center justify-between">
+            <MedicalDialogHeader petName={pet.name} />
+            {!isEditing && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="text-[#79D0B8] hover:bg-[#79D0B8]/10"
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                Editar
+              </Button>
+            )}
+          </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Vaccine Document Upload Section */}
-          <VaccineDocumentUpload 
-            petId={pet.id} 
-            petOwnerId={pet.owner_id}
-          />
-        
-          {/* Medications Section */}
-          <MedicationsSection 
-            medicationFields={medicationFields}
-            appendMedication={appendMedication}
-            removeMedication={removeMedication}
-            register={register}
-          />
+        {isEditing ? (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Vaccine Document Upload Section */}
+            <VaccineDocumentUpload 
+              petId={pet.id} 
+              petOwnerId={pet.owner_id}
+            />
           
-          {/* Medical Conditions Section */}
-          <MedicalConditionsSection register={register} />
-          
-          {/* Surgeries Section */}
-          <SurgeriesSection 
-            surgeryFields={surgeryFields}
-            appendSurgery={appendSurgery}
-            removeSurgery={removeSurgery}
-            register={register}
-          />
+            {/* Medications Section */}
+            <MedicationsSection 
+              medicationFields={medicationFields}
+              appendMedication={appendMedication}
+              removeMedication={removeMedication}
+              register={register}
+            />
+            
+            {/* Medical Conditions Section */}
+            <MedicalConditionsSection register={register} />
+            
+            {/* Surgeries Section */}
+            <SurgeriesSection 
+              surgeryFields={surgeryFields}
+              appendSurgery={appendSurgery}
+              removeSurgery={removeSurgery}
+              register={register}
+            />
 
-          <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4">
-            <Button 
-              type="submit" 
-              className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
-              disabled={isSubmitting}
-            >
-              <Syringe className="h-4 w-4 mr-2" />
-              {isSubmitting ? 'Guardando...' : 'Guardar información médica'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditing(false)}
+                className="w-full sm:w-auto"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="submit" 
+                className="w-full sm:w-auto bg-[#79D0B8] hover:bg-[#5FBFB3]"
+                disabled={isSubmitting}
+              >
+                <Syringe className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Guardando...' : 'Guardar información médica'}
+              </Button>
+            </DialogFooter>
+          </form>
+        ) : (
+          <div className="space-y-6">
+            <MedicalInfoViewer pet={pet} />
+            
+            <DialogFooter className="pt-4">
+              <Button 
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Editar información médica
+              </Button>
+            </DialogFooter>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
