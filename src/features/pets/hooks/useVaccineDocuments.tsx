@@ -45,7 +45,7 @@ export const useVaccineDocuments = (petId: string) => {
       
       if (error) {
         console.error('Error uploading vaccine document:', error);
-        toast.error('No se pudo subir el documento. Revisa el archivo o vuelve a intentarlo.');
+        toast.error('No se pudo guardar el documento. Asegúrate de que estás subiendo un archivo válido y que tienes acceso a esta mascota.');
         return false;
       }
       
@@ -58,7 +58,7 @@ export const useVaccineDocuments = (petId: string) => {
       return false;
     } catch (error) {
       console.error('Error uploading vaccine document:', error);
-      toast.error('No se pudo subir el documento. Revisa el archivo o vuelve a intentarlo.');
+      toast.error('No se pudo guardar el documento. Asegúrate de que estás subiendo un archivo válido y que tienes acceso a esta mascota.');
       return false;
     } finally {
       setIsUploading(false);
