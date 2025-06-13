@@ -90,9 +90,8 @@ const PetEditScreen: React.FC = () => {
       [PET_CATEGORIES.DOG]: 'Perro',
       [PET_CATEGORIES.CAT]: 'Gato',
       [PET_CATEGORIES.BIRD]: 'Ave',
-      [PET_CATEGORIES.FISH]: 'Pez',
-      [PET_CATEGORIES.RABBIT]: 'Conejo',
-      [PET_CATEGORIES.HAMSTER]: 'Hámster',
+      [PET_CATEGORIES.REPTILE]: 'Pez',
+      [PET_CATEGORIES.SMALL_MAMMAL]: 'Conejo',
       [PET_CATEGORIES.OTHER]: 'Otro'
     };
     return speciesMapping[dbSpecies] || 'Otro';
@@ -103,9 +102,9 @@ const PetEditScreen: React.FC = () => {
       'Perro': PET_CATEGORIES.DOG,
       'Gato': PET_CATEGORIES.CAT,
       'Ave': PET_CATEGORIES.BIRD,
-      'Pez': PET_CATEGORIES.FISH,
-      'Conejo': PET_CATEGORIES.RABBIT,
-      'Hámster': PET_CATEGORIES.HAMSTER,
+      'Pez': PET_CATEGORIES.REPTILE,
+      'Conejo': PET_CATEGORIES.SMALL_MAMMAL,
+      'Hámster': PET_CATEGORIES.SMALL_MAMMAL,
       'Otro': PET_CATEGORIES.OTHER
     };
     return speciesMapping[uiSpecies] || PET_CATEGORIES.OTHER;
