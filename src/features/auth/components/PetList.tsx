@@ -42,8 +42,16 @@ const PetList: React.FC<PetListProps> = ({ pets, isLoading }) => {
           key={pet.id}
           className="bg-white/90 p-4 rounded-lg shadow-sm flex items-center gap-3"
         >
-          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary font-semibold">
-            {pet.name ? pet.name.substring(0, 2).toUpperCase() : 'P'}
+          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary font-semibold overflow-hidden">
+            {pet.profile_picture_url ? (
+              <img 
+                src={pet.profile_picture_url} 
+                alt={pet.name}
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              pet.name ? pet.name.substring(0, 2).toUpperCase() : 'P'
+            )}
           </div>
           <div>
             <h4 className="font-medium text-gray-800">{pet.name}</h4>
