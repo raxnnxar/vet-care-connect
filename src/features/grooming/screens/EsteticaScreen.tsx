@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavbarInferior from '@/frontend/navigation/components/NavbarInferior';
 import SaludHeader from '@/features/health/components/SaludHeader';
+import PetSelector from '@/features/health/components/PetSelector';
 import PrimaryGrooming from '../components/PrimaryGrooming';
 import GroomingTabs from '../components/GroomingTabs';
 import { useGroomingData } from '../hooks/useGroomingData';
@@ -16,8 +17,9 @@ import { Button } from '@/ui/atoms/button';
 const EsteticaScreen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('esteticas');
+  const [selectedPetId, setSelectedPetId] = useState<string | undefined>(undefined);
   const { groomingBusinesses, loading: loadingGrooming, error: groomingError } = useGroomingData();
-  const { primaryGrooming, loading: loadingPrimary, error: primaryError } = usePrimaryGroomingData();
+  const { primaryGrooming, loading: loadingPrimary, error: primaryError } = usePrimaryGroomingData(selectedPetId);
   const { setAsPrimary } = usePrimaryGrooming();
   
   const handleBackClick = () => {
@@ -45,10 +47,20 @@ const EsteticaScreen = () => {
     window.location.reload();
   };
 
+  const handlePetChange = (petId: string) => {
+    setSelectedPetId(petId);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
       <SaludHeader onBackClick={handleBackClick}>
-        <span className="text-white font-semibold">Estética</span>
+        <div className="flex items-center justify-between w-full">
+          <span className="text-white font-semibold">Estética</span>
+          <PetSelector 
+            selectedPetId={selectedPetId} 
+            onPetChange={handlePetChange}
+          />
+        </div>
       </SaludHeader>
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
