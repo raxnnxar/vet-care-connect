@@ -23,6 +23,24 @@ export const defaultVetProfile: VeterinarianProfile = {
   emergency_services: false
 };
 
+// Function to get user role from user object
+export const getUserRole = (user: any): string => {
+  if (!user) return 'pet_owner';
+  
+  // Check in raw_user_meta_data first
+  if (user.raw_user_meta_data?.role) {
+    return user.raw_user_meta_data.role;
+  }
+  
+  // Check in user_metadata as fallback
+  if (user.user_metadata?.role) {
+    return user.user_metadata.role;
+  }
+  
+  // Default to pet_owner
+  return 'pet_owner';
+};
+
 // Helper functions to safely convert JSON data to typed objects
 export const parseAvailability = (json: any): AvailabilitySchedule => {
   if (!json || typeof json !== 'object') return {} as AvailabilitySchedule;
