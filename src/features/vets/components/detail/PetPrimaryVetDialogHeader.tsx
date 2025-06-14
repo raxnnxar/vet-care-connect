@@ -4,21 +4,17 @@ import { SheetHeader, SheetTitle } from '@/ui/molecules/sheet';
 
 interface PetPrimaryVetDialogHeaderProps {
   vetName: string;
-  title?: string;
 }
 
-const PetPrimaryVetDialogHeader: React.FC<PetPrimaryVetDialogHeaderProps> = ({ 
-  vetName, 
-  title = "Veterinario de cabecera" 
-}) => {
+const PetPrimaryVetDialogHeader: React.FC<PetPrimaryVetDialogHeaderProps> = ({ vetName }) => {
   return (
-    <SheetHeader className="mb-6">
-      <SheetTitle className="text-xl font-bold text-gray-800 mb-2">
-        {title}
+    <SheetHeader className="pb-4 border-b border-gray-100">
+      <SheetTitle className="text-center text-xl font-semibold text-gray-800">
+        <span className="block">Veterinario de cabecera</span>
+        <span className="block text-sm text-gray-500 font-normal mt-1">
+          Selecciona las mascotas para {vetName}
+        </span>
       </SheetTitle>
-      <p className="text-gray-600 text-sm">
-        Selecciona las mascotas para {vetName}
-      </p>
     </SheetHeader>
   );
 };

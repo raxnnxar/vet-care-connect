@@ -1,45 +1,67 @@
 
 import React from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
+
+// Import hooks
 import { useGroomingDetail } from '../hooks/useGroomingDetail';
+
+// Import components
+import GroomingDetailHeader from '../components/detail/GroomingDetailHeader';
 import GroomingDetailContent from '../components/detail/GroomingDetailContent';
 import LoadingState from '../components/detail/LoadingState';
 import ErrorState from '../components/detail/ErrorState';
 
 const GroomingDetailScreen = () => {
-  const { groomingId } = useParams<{ groomingId: string }>();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const selectedPetId = searchParams.get('petId') || undefined;
-  
-  console.log('GroomingDetailScreen - groomingId:', groomingId);
-  console.log('GroomingDetailScreen - selectedPetId:', selectedPetId);
-  
-  const { data, loading, error, handleBookAppointment, handleReviewClick, handleSendMessage } = useGroomingDetail(groomingId!);
+  const { id } = useParams();
+  const { 
+    data, 
+    loading, 
+    error, 
+    handleBookAppointment, 
+    handleReviewClick,
+    handleSendMessage
+  } = useGroomingDetail(id);
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
+  // Create header component for all states
+  const Header = () => (
+    <GroomingDetailHeader title={loading ? "Cargando..." : error ? "Error" : "Perfil de Estética"} />
+  );
 
   if (loading) {
-    return <LoadingState />;
+    return (
+      <LayoutBase
+        header={<Header />}
+        footer={<NavbarInferior activeTab="home" />}
+      >
+        <LoadingState />
+      </LayoutBase>
+    );
   }
 
   if (error || !data) {
-    console.error('Error in GroomingDetailScreen:', error);
-    return <ErrorState message={error || "No se pudo cargar la información de la estética"} onGoBack={handleGoBack} />;
+    return (
+      <LayoutBase
+        header={<Header />}
+        footer={<NavbarInferior activeTab="home" />}
+      >
+        <ErrorState message={error} onGoBack={() => window.history.back()} />
+      </LayoutBase>
+    );
   }
 
-  console.log('GroomingDetailScreen - data loaded successfully:', data);
-
   return (
-    <GroomingDetailContent
-      data={data}
-      onBookAppointment={handleBookAppointment}
-      onReviewClick={handleReviewClick}
-      onSendMessage={handleSendMessage}
-      selectedPetId={selectedPetId}
-    />
+    <LayoutBase
+      header={null}
+      footer={<NavbarInferior activeTab="home" />}
+    >
+      <GroomingDetailContent
+        data={data}
+        onBookAppointment={handleBookAppointment}
+        onReviewClick={handleReviewClick}
+        onSendMessage={handleSendMessage}
+      />
+    </LayoutBase>
   );
 };
 

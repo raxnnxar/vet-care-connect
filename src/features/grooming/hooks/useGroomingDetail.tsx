@@ -25,18 +25,16 @@ export const useGroomingDetail = (id?: string) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchGroomingDetail = async () => {
-      if (!id) {
-        setError('ID de estética no válido');
-        setLoading(false);
-        return;
-      }
+    if (!id) {
+      setError('ID de estética no válido');
+      setLoading(false);
+      return;
+    }
 
+    const fetchGroomingDetail = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        console.log('Fetching grooming detail for ID:', id);
 
         const { data: groomingData, error: groomingError } = await supabase
           .from('pet_grooming')
@@ -44,17 +42,11 @@ export const useGroomingDetail = (id?: string) => {
           .eq('id', id)
           .single();
 
-        if (groomingError) {
-          console.error('Supabase error:', groomingError);
-          throw groomingError;
-        }
+        if (groomingError) throw groomingError;
 
         if (!groomingData) {
-          console.error('No grooming data found for ID:', id);
           throw new Error('No se encontró la estética');
         }
-
-        console.log('Grooming data found:', groomingData);
 
         // Format the data
         const formattedData: GroomingDetailData = {
@@ -93,7 +85,7 @@ export const useGroomingDetail = (id?: string) => {
   const handleBookAppointment = () => {
     if (!data) return;
     
-    // Navigate to appointment booking with grooming ID and type parameter
+    // Navigate to appointment booking with vetId parameter (BookAppointmentScreen expects vetId)
     navigate(`/owner/appointments/book/${data.id}?type=grooming`);
   };
 
