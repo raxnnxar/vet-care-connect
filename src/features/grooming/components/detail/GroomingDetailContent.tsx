@@ -32,13 +32,15 @@ interface GroomingDetailContentProps {
   onBookAppointment: () => void;
   onReviewClick: () => void;
   onSendMessage: () => void;
+  selectedPetId?: string;
 }
 
 const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
   data,
   onBookAppointment,
   onReviewClick,
-  onSendMessage
+  onSendMessage,
+  selectedPetId
 }) => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -79,6 +81,7 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
             getInitials={getInitials}
             onRatingClick={onReviewClick}
             groomingId={data.id}
+            selectedPetId={selectedPetId}
           />
         </div>
 

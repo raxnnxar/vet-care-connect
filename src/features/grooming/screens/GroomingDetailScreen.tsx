@@ -1,67 +1,49 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
-
-// Import hooks
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useGroomingDetail } from '../hooks/useGroomingDetail';
-
-// Import components
-import GroomingDetailHeader from '../components/detail/GroomingDetailHeader';
 import GroomingDetailContent from '../components/detail/GroomingDetailContent';
 import LoadingState from '../components/detail/LoadingState';
 import ErrorState from '../components/detail/ErrorState';
 
 const GroomingDetailScreen = () => {
-  const { id } = useParams();
-  const { 
-    data, 
-    loading, 
-    error, 
-    handleBookAppointment, 
-    handleReviewClick,
-    handleSendMessage
-  } = useGroomingDetail(id);
+  const { groomingId } = useParams<{ groomingId: string }>();
+  const [searchParams] = useSearchParams();
+  const selectedPetId = searchParams.get('petId') || undefined;
+  
+  const { grooming, loading, error } = useGroomingDetail(groomingId!);
 
-  // Create header component for all states
-  const Header = () => (
-    <GroomingDetailHeader title={loading ? "Cargando..." : error ? "Error" : "Perfil de Estética"} />
-  );
+  const handleBookAppointment = () => {
+    console.log('Book appointment with grooming:', groomingId);
+    // TODO: Navigate to appointment booking screen
+  };
+
+  const handleReviewClick = () => {
+    console.log('Open reviews for grooming:', groomingId);
+    // TODO: Navigate to reviews screen
+  };
+
+  const handleSendMessage = () => {
+    console.log('Send message to grooming:', groomingId);
+    // TODO: Navigate to chat screen
+  };
 
   if (loading) {
-    return (
-      <LayoutBase
-        header={<Header />}
-        footer={<NavbarInferior activeTab="home" />}
-      >
-        <LoadingState />
-      </LayoutBase>
-    );
+    return <LoadingState />;
   }
 
-  if (error || !data) {
-    return (
-      <LayoutBase
-        header={<Header />}
-        footer={<NavbarInferior activeTab="home" />}
-      >
-        <ErrorState message={error} onGoBack={() => window.history.back()} />
-      </LayoutBase>
-    );
+  if (error || !grooming) {
+    return <ErrorState message={error || "No se pudo cargar la información de la estética"} />;
   }
 
   return (
-    <LayoutBase
-      header={null}
-      footer={<NavbarInferior activeTab="home" />}
-    >
-      <GroomingDetailContent
-        data={data}
-        onBookAppointment={handleBookAppointment}
-        onReviewClick={handleReviewClick}
-        onSendMessage={handleSendMessage}
-      />
-    </LayoutBase>
+    <GroomingDetailContent
+      data={grooming}
+      onBookAppointment={handleBookAppointment}
+      onReviewClick={handleReviewClick}
+      onSendMessage={handleSendMessage}
+      selectedPetId={selectedPetId}
+    />
   );
 };
 
