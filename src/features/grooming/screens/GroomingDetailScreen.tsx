@@ -12,6 +12,9 @@ const GroomingDetailScreen = () => {
   const navigate = useNavigate();
   const selectedPetId = searchParams.get('petId') || undefined;
   
+  console.log('GroomingDetailScreen - groomingId:', groomingId);
+  console.log('GroomingDetailScreen - selectedPetId:', selectedPetId);
+  
   const { data, loading, error, handleBookAppointment, handleReviewClick, handleSendMessage } = useGroomingDetail(groomingId!);
 
   const handleGoBack = () => {
@@ -23,8 +26,11 @@ const GroomingDetailScreen = () => {
   }
 
   if (error || !data) {
+    console.error('Error in GroomingDetailScreen:', error);
     return <ErrorState message={error || "No se pudo cargar la información de la estética"} onGoBack={handleGoBack} />;
   }
+
+  console.log('GroomingDetailScreen - data loaded successfully:', data);
 
   return (
     <GroomingDetailContent
