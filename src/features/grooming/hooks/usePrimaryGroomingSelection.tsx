@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,8 +15,8 @@ export const usePrimaryGroomingSelection = (groomingId: string, groomingName: st
   const [feedbackPet, setFeedbackPet] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const loadPets = async () => {
-    if (!user?.id) return;
+  const loadPets = useCallback(async () => {
+    if (!user?.id || loading) return;
     
     setLoading(true);
     try {
@@ -43,7 +43,7 @@ export const usePrimaryGroomingSelection = (groomingId: string, groomingName: st
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, groomingId, toast, loading]);
 
   const handleTogglePet = async (petId: string) => {
     if (saving) return;

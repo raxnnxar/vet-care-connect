@@ -44,10 +44,10 @@ const PetPrimaryProviderDialog: React.FC<PetPrimaryProviderDialogProps> = ({
 }) => {
   
   useEffect(() => {
-    if (open) {
+    if (open && pets.length === 0 && !loading) {
       onLoadPets();
     }
-  }, [open, onLoadPets]);
+  }, [open, pets.length, loading, onLoadPets]);
 
   const getHeaderText = () => {
     return providerType === 'vet' 
@@ -78,7 +78,7 @@ const PetPrimaryProviderDialog: React.FC<PetPrimaryProviderDialogProps> = ({
         ) : (
           <div className="mt-4 space-y-4">
             {/* Stats section */}
-            <PetPrimaryVetStats primaryVetCount={primaryCount} />
+            <PetPrimaryVetStats primaryVetCount={primaryCount} providerType={providerType} />
             
             {/* Pet list */}
             <div className="space-y-3 max-h-[60vh] overflow-y-auto py-2 px-1">
