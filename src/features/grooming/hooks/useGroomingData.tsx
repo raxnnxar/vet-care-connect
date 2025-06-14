@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { calculateDistance, getUserLocation } from '@/utils/distanceUtils';
 
 export interface GroomingBusiness {
   id: string;
@@ -20,6 +21,16 @@ export const useGroomingData = () => {
   const [groomingBusinesses, setGroomingBusinesses] = useState<GroomingBusiness[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // Get user location on hook initialization
+  useEffect(() => {
+    const fetchUserLocation = async () => {
+      const location = await getUserLocation();
+      setUserLocation(location);
+    };
+    fetchUserLocation();
+  }, []);
 
   useEffect(() => {
     const fetchGroomingBusinesses = async () => {
@@ -74,6 +85,16 @@ export const useGroomingData = () => {
             }
           }
 
+          // Calculate distance using user location and grooming coordinates
+          const distance = userLocation 
+            ? calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                grooming.latitude,
+                grooming.longitude
+              )
+            : "Calculando...";
+
           return {
             id: grooming.id,
             business_name: grooming.business_name || 'Estética Sin Nombre',
@@ -83,7 +104,7 @@ export const useGroomingData = () => {
             location: grooming.location || '',
             latitude: grooming.latitude || 0,
             longitude: grooming.longitude || 0,
-            distance: "1.5 km", // Mock distance data
+            distance: distance,
             rating: 4.5, // Mock rating data
             reviewCount: 12 // Mock review count
           };
@@ -99,7 +120,7 @@ export const useGroomingData = () => {
     };
 
     fetchGroomingBusinesses();
-  }, []);
+  }, [userLocation]); // Re-fetch when user location changes
 
   return { groomingBusinesses, loading, error };
 };

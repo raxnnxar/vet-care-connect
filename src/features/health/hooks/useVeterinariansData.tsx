@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { calculateDistance, getUserLocation } from '@/utils/distanceUtils';
 
 export interface Veterinarian {
   id: string;
@@ -13,12 +14,24 @@ export interface Veterinarian {
   reviewCount: number;
   distance: string;
   animalsTreated: string[];
+  latitude?: number;
+  longitude?: number;
 }
 
 export const useVeterinariansData = () => {
   const [vets, setVets] = useState<Veterinarian[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // Get user location on hook initialization
+  useEffect(() => {
+    const fetchUserLocation = async () => {
+      const location = await getUserLocation();
+      setUserLocation(location);
+    };
+    fetchUserLocation();
+  }, []);
 
   useEffect(() => {
     const fetchVeterinarians = async () => {
@@ -36,6 +49,8 @@ export const useVeterinariansData = () => {
             average_rating,
             total_reviews,
             animals_treated,
+            clinic_latitude,
+            clinic_longitude,
             service_providers (
               business_name,
               provider_type,
@@ -46,8 +61,8 @@ export const useVeterinariansData = () => {
           `)
           .order('average_rating', { ascending: false });
 
-        console.log('Datos obtenidos:', veterinarians); // Para depuración
-        console.log('Error si existe:', vetError); // Para depuración
+        console.log('Datos obtenidos:', veterinarians);
+        console.log('Error si existe:', vetError);
 
         if (vetError) {
           throw vetError;
@@ -124,6 +139,16 @@ export const useVeterinariansData = () => {
             }
           }
 
+          // Calculate distance using user location and vet coordinates
+          const distance = userLocation 
+            ? calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                vet.clinic_latitude,
+                vet.clinic_longitude
+              )
+            : "Calculando...";
+
           // Get image URL - we only have profile_image_url from veterinarians now
           const imageUrl = vet.profile_image_url || '';
 
@@ -137,8 +162,10 @@ export const useVeterinariansData = () => {
             imageUrl: imageUrl,
             rating: vet.average_rating || 0,
             reviewCount: vet.total_reviews || 0,
-            distance: "1.2 km", // Mocked distance data
-            animalsTreated: animalsTreated
+            distance: distance,
+            animalsTreated: animalsTreated,
+            latitude: vet.clinic_latitude,
+            longitude: vet.clinic_longitude
           };
         });
 
@@ -152,7 +179,7 @@ export const useVeterinariansData = () => {
     };
 
     fetchVeterinarians();
-  }, []);
+  }, [userLocation]); // Re-fetch when user location changes
 
   return { vets, loading, error };
 };
