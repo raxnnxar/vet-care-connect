@@ -14,8 +14,9 @@ import GroomingNavigator from './GroomingNavigator';
 import { getUserRole } from '@/features/auth/utils/vetProfileUtils';
 
 const AppNavigator = () => {
-  const { user, session } = useSelector((state: RootState) => state.auth);
-  const isAuthenticated = !!session && !!user;
+  const authState = useSelector((state: RootState) => state.auth);
+  const { user } = authState;
+  const isAuthenticated = !!user;
 
   console.log('AppNavigator - User state:', { user, isAuthenticated });
 
@@ -35,7 +36,7 @@ const AppNavigator = () => {
       return <OwnerNavigator />;
     case 'service_provider':
       // Check provider type
-      const providerType = user.raw_user_meta_data?.provider_type;
+      const providerType = user.serviceType || user.service_type;
       if (providerType === 'grooming') {
         return <GroomingNavigator />;
       } else {
