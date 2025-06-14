@@ -9,10 +9,42 @@ import { ChevronDown } from 'lucide-react';
 
 interface PetPrimaryVetStatsProps {
   primaryVetCount: number;
+  providerType?: 'vet' | 'grooming';
 }
 
-const PetPrimaryVetStats: React.FC<PetPrimaryVetStatsProps> = ({ primaryVetCount }) => {
+const PetPrimaryVetStats: React.FC<PetPrimaryVetStatsProps> = ({ 
+  primaryVetCount, 
+  providerType = 'vet' 
+}) => {
   const [expanded, setExpanded] = useState(false);
+
+  const getProviderText = () => {
+    if (providerType === 'grooming') {
+      return {
+        title: "No es estética de confianza para ninguna mascota",
+        selected: `Es estética de confianza para ${primaryVetCount} ${primaryVetCount === 1 ? 'mascota' : 'mascotas'}`,
+        description: "La estética de confianza:",
+        benefits: [
+          "Conoce las preferencias de cuidado de tu mascota",
+          "Puede hacer seguimiento a tratamientos estéticos",
+          "Recibe notificaciones sobre el historial de grooming"
+        ]
+      };
+    }
+    
+    return {
+      title: "No es veterinario de cabecera para ninguna mascota",
+      selected: `Es veterinario de cabecera para ${primaryVetCount} ${primaryVetCount === 1 ? 'mascota' : 'mascotas'}`,
+      description: "El veterinario de cabecera:",
+      benefits: [
+        "Conoce el historial médico completo de tu mascota",
+        "Puede hacer seguimiento continuo a tratamientos",
+        "Recibe notificaciones cuando hay cambios en la salud de tu mascota"
+      ]
+    };
+  };
+
+  const texts = getProviderText();
 
   return (
     <Collapsible 
@@ -25,9 +57,7 @@ const PetPrimaryVetStats: React.FC<PetPrimaryVetStatsProps> = ({ primaryVetCount
           <div>
             <h3 className="font-medium text-gray-800">Estado actual</h3>
             <p className="text-sm text-gray-600">
-              {primaryVetCount === 0 
-                ? "No es veterinario de cabecera para ninguna mascota" 
-                : `Es veterinario de cabecera para ${primaryVetCount} ${primaryVetCount === 1 ? 'mascota' : 'mascotas'}`}
+              {primaryVetCount === 0 ? texts.title : texts.selected}
             </p>
           </div>
           <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform ${expanded ? 'transform rotate-180' : ''}`} />
@@ -36,12 +66,12 @@ const PetPrimaryVetStats: React.FC<PetPrimaryVetStatsProps> = ({ primaryVetCount
       
       <CollapsibleContent className="pt-3">
         <p className="text-sm text-gray-600 mb-1">
-          El veterinario de cabecera:
+          {texts.description}
         </p>
         <ul className="text-xs text-gray-600 list-disc list-inside space-y-1">
-          <li>Conoce el historial médico completo de tu mascota</li>
-          <li>Puede hacer seguimiento continuo a tratamientos</li>
-          <li>Recibe notificaciones cuando hay cambios en la salud de tu mascota</li>
+          {texts.benefits.map((benefit, index) => (
+            <li key={index}>{benefit}</li>
+          ))}
         </ul>
       </CollapsibleContent>
     </Collapsible>

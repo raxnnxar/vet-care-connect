@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import { Star, Heart, Scissors } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { usePrimaryGrooming } from '../../hooks/usePrimaryGrooming';
-import { usePrimaryGroomingData } from '../../hooks/usePrimaryGroomingData';
+import { usePrimaryGroomingSelection } from '../../hooks/usePrimaryGroomingSelection';
+import PetPrimaryProviderDialog from '@/features/shared/components/PetPrimaryProviderDialog';
 import { 
   Tooltip,
   TooltipContent,
@@ -30,11 +29,20 @@ const GroomingProfileHero: React.FC<GroomingProfileHeroProps> = ({
   onRatingClick,
   groomingId,
 }) => {
-  const { loading } = usePrimaryGrooming();
-  const { primaryGrooming } = usePrimaryGroomingData();
-  const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
   
-  const isPrimaryGrooming = primaryGrooming?.id === groomingId;
+  const {
+    pets,
+    selectedPets,
+    loading,
+    saving,
+    feedbackPet,
+    loadPets,
+    handleTogglePet,
+    primaryGroomingCount
+  } = usePrimaryGroomingSelection(groomingId, businessName);
+  
+  const isPrimaryGrooming = primaryGroomingCount > 0;
   
   const handleSetAsPrimary = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,11 +50,7 @@ const GroomingProfileHero: React.FC<GroomingProfileHeroProps> = ({
     
     if (loading) return;
     
-    // TODO: Implement primary grooming selection logic
-    toast({
-      title: "Funcionalidad próximamente",
-      description: "La selección de estética de confianza estará disponible pronto",
-    });
+    setDialogOpen(true);
   };
   
   // Format rating to display with one decimal place
@@ -69,64 +73,82 @@ const GroomingProfileHero: React.FC<GroomingProfileHeroProps> = ({
   };
 
   return (
-    <div className="bg-[#79D0B8] pt-20 pb-6 flex flex-col items-center text-white relative">
-      {/* Primary Grooming Button */}
-      <div className="absolute top-4 right-4 z-10">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button 
-                onClick={handleSetAsPrimary}
-                disabled={loading}
-                className={`bg-white/20 p-2 rounded-full transition-colors ${loading ? 'opacity-50' : 'hover:bg-white/30'}`}
-              >
-                <Heart 
-                  size={24} 
-                  className={isPrimaryGrooming ? "fill-white text-white" : "text-white"} 
-                />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="bg-white text-gray-800 text-xs">
-              {isPrimaryGrooming 
-                ? "Gestionar estética de confianza" 
-                : "Establecer como estética de confianza"}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      
-      <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center overflow-hidden mb-4 border-4 border-white">
-        {profileImageUrl ? (
-          <img 
-            src={profileImageUrl} 
-            alt={businessName}
-            className="w-full h-full object-cover" 
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white bg-[#4DA6A8]">
-            <Scissors className="w-12 h-12" />
-          </div>
-        )}
-      </div>
-      
-      <h1 className="text-2xl font-bold mb-1 text-center">{businessName}</h1>
-      
-      <p className="text-sm mb-3 text-white/90">Estética</p>
-      
-      {/* Clickable rating stars */}
-      <div 
-        className="flex items-center bg-[#4DA6A8] rounded-full px-4 py-1 mt-1 mb-2 cursor-pointer"
-        onClick={onRatingClick}
-      >
-        <span className="text-lg font-bold mr-2">{formattedRating}</span>
-        <div className="flex">
-          {renderRatingStars()}
+    <>
+      <div className="bg-[#79D0B8] pt-20 pb-6 flex flex-col items-center text-white relative">
+        {/* Primary Grooming Button */}
+        <div className="absolute top-4 right-4 z-10">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={handleSetAsPrimary}
+                  disabled={loading}
+                  className={`bg-white/20 p-2 rounded-full transition-colors ${loading ? 'opacity-50' : 'hover:bg-white/30'}`}
+                >
+                  <Heart 
+                    size={24} 
+                    className={isPrimaryGrooming ? "fill-white text-white" : "text-white"} 
+                  />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="bg-white text-gray-800 text-xs">
+                {isPrimaryGrooming 
+                  ? "Gestionar estética de confianza" 
+                  : "Establecer como estética de confianza"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <span className="ml-2 text-sm">
-          ({totalReviews} {totalReviews === 1 ? 'reseña' : 'reseñas'})
-        </span>
+        
+        <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center overflow-hidden mb-4 border-4 border-white">
+          {profileImageUrl ? (
+            <img 
+              src={profileImageUrl} 
+              alt={businessName}
+              className="w-full h-full object-cover" 
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white bg-[#4DA6A8]">
+              <Scissors className="w-12 h-12" />
+            </div>
+          )}
+        </div>
+        
+        <h1 className="text-2xl font-bold mb-1 text-center">{businessName}</h1>
+        
+        <p className="text-sm mb-3 text-white/90">Estética</p>
+        
+        {/* Clickable rating stars */}
+        <div 
+          className="flex items-center bg-[#4DA6A8] rounded-full px-4 py-1 mt-1 mb-2 cursor-pointer"
+          onClick={onRatingClick}
+        >
+          <span className="text-lg font-bold mr-2">{formattedRating}</span>
+          <div className="flex">
+            {renderRatingStars()}
+          </div>
+          <span className="ml-2 text-sm">
+            ({totalReviews} {totalReviews === 1 ? 'reseña' : 'reseñas'})
+          </span>
+        </div>
       </div>
-    </div>
+
+      {/* Pet Selection Dialog */}
+      <PetPrimaryProviderDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        providerName={businessName}
+        providerType="grooming"
+        pets={pets}
+        selectedPets={selectedPets}
+        loading={loading}
+        saving={saving}
+        feedbackPet={feedbackPet}
+        primaryCount={primaryGroomingCount}
+        onLoadPets={loadPets}
+        onTogglePet={handleTogglePet}
+      />
+    </>
   );
 };
 
