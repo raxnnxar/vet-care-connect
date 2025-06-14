@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useGroomingDetail } from '../hooks/useGroomingDetail';
 import GroomingDetailContent from '../components/detail/GroomingDetailContent';
 import LoadingState from '../components/detail/LoadingState';
@@ -9,36 +9,26 @@ import ErrorState from '../components/detail/ErrorState';
 const GroomingDetailScreen = () => {
   const { groomingId } = useParams<{ groomingId: string }>();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const selectedPetId = searchParams.get('petId') || undefined;
   
-  const { grooming, loading, error } = useGroomingDetail(groomingId!);
+  const { data, loading, error, handleBookAppointment, handleReviewClick, handleSendMessage } = useGroomingDetail(groomingId!);
 
-  const handleBookAppointment = () => {
-    console.log('Book appointment with grooming:', groomingId);
-    // TODO: Navigate to appointment booking screen
-  };
-
-  const handleReviewClick = () => {
-    console.log('Open reviews for grooming:', groomingId);
-    // TODO: Navigate to reviews screen
-  };
-
-  const handleSendMessage = () => {
-    console.log('Send message to grooming:', groomingId);
-    // TODO: Navigate to chat screen
+  const handleGoBack = () => {
+    navigate(-1);
   };
 
   if (loading) {
     return <LoadingState />;
   }
 
-  if (error || !grooming) {
-    return <ErrorState message={error || "No se pudo cargar la información de la estética"} />;
+  if (error || !data) {
+    return <ErrorState message={error || "No se pudo cargar la información de la estética"} onGoBack={handleGoBack} />;
   }
 
   return (
     <GroomingDetailContent
-      data={grooming}
+      data={data}
       onBookAppointment={handleBookAppointment}
       onReviewClick={handleReviewClick}
       onSendMessage={handleSendMessage}
