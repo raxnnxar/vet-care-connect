@@ -466,7 +466,6 @@ export type Database = {
         Row: {
           comment: string | null
           created_at: string | null
-          grooming_id: string | null
           id: string
           pet_owner_id: string
           rating: number
@@ -476,7 +475,6 @@ export type Database = {
         Insert: {
           comment?: string | null
           created_at?: string | null
-          grooming_id?: string | null
           id?: string
           pet_owner_id: string
           rating: number
@@ -486,7 +484,6 @@ export type Database = {
         Update: {
           comment?: string | null
           created_at?: string | null
-          grooming_id?: string | null
           id?: string
           pet_owner_id?: string
           rating?: number
@@ -494,13 +491,6 @@ export type Database = {
           veterinarian_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "reviews_grooming_id_fkey"
-            columns: ["grooming_id"]
-            isOneToOne: false
-            referencedRelation: "pet_grooming"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "reviews_veterinarian_id_fkey"
             columns: ["veterinarian_id"]

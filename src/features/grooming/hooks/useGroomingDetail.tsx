@@ -48,21 +48,6 @@ export const useGroomingDetail = (id?: string) => {
           throw new Error('No se encontró la estética');
         }
 
-        // Calculate average rating and total reviews from reviews table
-        const { data: reviewsData, error: reviewsError } = await supabase
-          .from('reviews')
-          .select('rating')
-          .eq('grooming_id', id);
-
-        if (reviewsError) {
-          console.error('Error fetching reviews:', reviewsError);
-        }
-
-        const totalReviews = reviewsData?.length || 0;
-        const averageRating = totalReviews > 0 
-          ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / totalReviews 
-          : 0;
-
         // Format the data
         const formattedData: GroomingDetailData = {
           id: groomingData.id,
@@ -80,8 +65,9 @@ export const useGroomingDetail = (id?: string) => {
           availability: (groomingData.availability && typeof groomingData.availability === 'object') 
             ? groomingData.availability as Record<string, any>
             : {},
-          average_rating: averageRating,
-          total_reviews: totalReviews
+          // TODO: Add rating functionality for grooming
+          average_rating: 0,
+          total_reviews: 0
         };
 
         setData(formattedData);
@@ -106,8 +92,8 @@ export const useGroomingDetail = (id?: string) => {
   const handleReviewClick = () => {
     if (!data) return;
     
-    // Navigate to grooming review screen
-    navigate(`/owner/grooming/${data.id}/review`);
+    // TODO: Navigate to review screen for grooming
+    toast.info('Función de reseñas próximamente');
   };
 
   const handleSendMessage = () => {

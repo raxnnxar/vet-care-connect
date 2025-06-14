@@ -11,7 +11,6 @@ import GroomingProfileHero from './GroomingProfileHero';
 import GroomingAnimalsSection from './GroomingAnimalsSection';
 import GroomingServicesSection from './GroomingServicesSection';
 import GroomingLocationSection from './GroomingLocationSection';
-import ReviewsSection from '@/features/shared/components/ReviewsSection';
 
 export interface GroomingDetailData {
   id: string;
@@ -90,13 +89,6 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
 
           {/* Services section */}
           <GroomingServicesSection services={data.services_offered} />
-
-          {/* Reviews section */}
-          <ReviewsSection 
-            providerId={data.id}
-            providerType="grooming"
-            providerName="estética"
-          />
 
           {/* Location section - only show if location data exists */}
           {data.location && data.latitude && data.longitude && (
