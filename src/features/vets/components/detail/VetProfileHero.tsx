@@ -35,7 +35,7 @@ const VetProfileHero: React.FC<VetProfileHeroProps> = ({
   onRatingClick,
   vetId,
 }) => {
-  const { loading } = usePrimaryVet();
+  const { loading } = usePrimaryVet(vetId, displayName);
   const { primaryVet } = usePrimaryVetData();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
