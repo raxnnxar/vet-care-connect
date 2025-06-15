@@ -59,7 +59,7 @@ const GroomingReviewsSection: React.FC<GroomingReviewsSectionProps> = ({
             <ReviewItem
               key={review.id}
               id={review.id}
-              ownerName={review.pet_owner.profiles.display_name}
+              reviewerName={review.pet_owner.profiles.display_name}
               rating={review.rating}
               comment={review.comment}
               createdAt={review.created_at}
