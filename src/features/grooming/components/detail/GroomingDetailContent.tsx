@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
@@ -11,7 +10,7 @@ import GroomingProfileHero from './GroomingProfileHero';
 import GroomingAnimalsSection from './GroomingAnimalsSection';
 import GroomingServicesSection from './GroomingServicesSection';
 import GroomingLocationSection from './GroomingLocationSection';
-import { ReviewsDialog } from '../utils/groomingReviewUtils';
+import { ReviewsDialog } from '../../utils/groomingReviewUtils';
 
 export interface GroomingDetailData {
   id: string;
