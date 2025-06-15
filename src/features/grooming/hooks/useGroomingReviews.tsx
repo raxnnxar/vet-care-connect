@@ -38,8 +38,9 @@ export const useGroomingReviews = (groomingId: string) => {
           comment,
           created_at,
           updated_at,
-          pet_owner:pet_owners!pet_owner_id (
-            profiles:profiles!id (
+          pet_owner_id!inner (
+            id,
+            profiles!inner (
               display_name
             )
           )
@@ -49,7 +50,17 @@ export const useGroomingReviews = (groomingId: string) => {
 
       if (error) throw error;
 
-      setReviews(data || []);
+      // Transform the data to match our expected structure
+      const transformedReviews = (data || []).map(review => ({
+        ...review,
+        pet_owner: {
+          profiles: {
+            display_name: review.pet_owner_id?.profiles?.display_name || 'Usuario anónimo'
+          }
+        }
+      }));
+
+      setReviews(transformedReviews);
     } catch (err: any) {
       console.error('Error fetching grooming reviews:', err);
       setError(err.message);

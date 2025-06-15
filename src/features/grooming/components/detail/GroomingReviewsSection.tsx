@@ -30,10 +30,7 @@ const GroomingReviewsSection: React.FC<GroomingReviewsSectionProps> = ({
           <Star className="w-5 h-5 mr-2 text-[#79D0B8]" />
           Reseñas
         </h3>
-        <ReviewsStateMessage 
-          message="Error al cargar las reseñas" 
-          type="error" 
-        />
+        <ReviewsStateMessage message="Error al cargar las reseñas" />
       </div>
     );
   }
@@ -55,25 +52,17 @@ const GroomingReviewsSection: React.FC<GroomingReviewsSectionProps> = ({
       </div>
 
       {reviews.length === 0 ? (
-        <ReviewsStateMessage 
-          message="Aún no hay reseñas para esta estética" 
-          type="empty" 
-        />
+        <ReviewsStateMessage message="Aún no hay reseñas para esta estética" />
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
             <ReviewItem
               key={review.id}
-              review={{
-                id: review.id,
-                pet_owner_id: review.pet_owner_id,
-                veterinarian_id: '', // Not used for grooming
-                rating: review.rating,
-                comment: review.comment,
-                created_at: review.created_at,
-                updated_at: review.updated_at,
-                pet_owner: review.pet_owner
-              }}
+              id={review.id}
+              ownerName={review.pet_owner.profiles.display_name}
+              rating={review.rating}
+              comment={review.comment}
+              createdAt={review.created_at}
             />
           ))}
         </div>
