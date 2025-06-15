@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -35,13 +36,17 @@ const VeterinariansMap = () => {
   const [selectedVet, setSelectedVet] = useState<Veterinarian | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [hasFetchedVets, setHasFetchedVets] = useState(false);
 
   // Default location (Mexico City) as fallback
   const defaultLocation = { lat: 19.4326, lng: -99.1332 };
 
-  // Fetch veterinarians from Supabase
+  // Fetch veterinarians from Supabase with optimization
   const fetchVeterinarians = async () => {
+    if (hasFetchedVets) return; // Avoid duplicate calls
+    
     try {
+      console.log('Fetching veterinarians...');
       const { data, error } = await supabase
         .from('veterinarians')
         .select(`
@@ -59,10 +64,17 @@ const VeterinariansMap = () => {
         .not('clinic_latitude', 'is', null)
         .not('clinic_longitude', 'is', null);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Veterinarians fetched successfully:', data?.length || 0);
       setVeterinarians(data || []);
+      setHasFetchedVets(true);
     } catch (error) {
       console.error('Error fetching veterinarians:', error);
+      setHasFetchedVets(true); // Prevent retry loops
     }
   };
 
@@ -83,7 +95,6 @@ const VeterinariansMap = () => {
         setLocationPermissionDenied(false);
         setIsLoading(false);
         
-        // Solo mostrar toast de éxito cuando el usuario explícitamente solicite la ubicación
         if (showSuccessToast) {
           toast({
             title: "Ubicación detectada",
@@ -109,10 +120,9 @@ const VeterinariansMap = () => {
         }
         
         setLocationError(errorMessage);
-        setUserLocation(defaultLocation); // Use default location as fallback
+        setUserLocation(defaultLocation);
         setIsLoading(false);
         
-        // Solo mostrar toast de error cuando sea crítico
         if (showSuccessToast) {
           toast({
             title: "Error de ubicación",
@@ -122,19 +132,20 @@ const VeterinariansMap = () => {
         }
       },
       {
-        enableHighAccuracy: false, // Less accurate but more reliable
+        enableHighAccuracy: false,
         timeout: 15000,
-        maximumAge: 600000 // 10 minutes
+        maximumAge: 600000
       }
     );
   };
 
-  // Initialize map
+  // Initialize data - single call
   useEffect(() => {
-    getUserLocation(false); // No mostrar toast en carga inicial
+    getUserLocation(false);
     fetchVeterinarians();
   }, []);
 
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || !userLocation) return;
 
@@ -163,7 +174,6 @@ const VeterinariansMap = () => {
         .setLngLat([vet.clinic_longitude, vet.clinic_latitude])
         .addTo(map.current);
 
-      // Add click event to marker
       marker.getElement().addEventListener('click', () => {
         setSelectedVet(vet);
       });
@@ -175,11 +185,10 @@ const VeterinariansMap = () => {
   }, [userLocation, veterinarians, locationPermissionDenied]);
 
   const handleRequestPermission = () => {
-    // Reset states and try again
     setLocationError(null);
     setLocationPermissionDenied(false);
     setIsLoading(true);
-    getUserLocation(true); // Mostrar toast solo cuando usuario hace click explícito
+    getUserLocation(true);
   };
 
   const handleViewProfile = (vetId: string) => {
@@ -225,7 +234,6 @@ const VeterinariansMap = () => {
       <div className="bg-[#5FBFB3]/5 p-4">
         <h2 className="text-lg font-semibold mb-2">Todo para tu mascota cerca de ti</h2>
         
-        {/* Show location status */}
         {locationError && (
           <div className="mb-3 p-2 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-orange-600" />
@@ -239,7 +247,6 @@ const VeterinariansMap = () => {
             className="w-full h-64 rounded-lg border border-gray-200 overflow-hidden"
           />
           
-          {/* Location permission button */}
           {(locationError || locationPermissionDenied) && (
             <div className="absolute top-4 left-4 z-10">
               <Button
@@ -254,7 +261,6 @@ const VeterinariansMap = () => {
             </div>
           )}
           
-          {/* Veterinarian details popup */}
           {selectedVet && (
             <div className="absolute bottom-4 left-4 right-4 z-10">
               <Card className="bg-white shadow-lg">

@@ -23,6 +23,7 @@ export const useVeterinariansData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [hasFetched, setHasFetched] = useState(false);
 
   // Get user location on hook initialization
   useEffect(() => {
@@ -34,12 +35,14 @@ export const useVeterinariansData = () => {
   }, []);
 
   useEffect(() => {
+    if (hasFetched) return; // Prevent duplicate calls
+
     const fetchVeterinarians = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Consulta modificada para seguir la ruta de relación correcta
+        console.log('Fetching veterinarians from useVeterinariansData...');
         const { data: veterinarians, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
@@ -61,12 +64,12 @@ export const useVeterinariansData = () => {
           `)
           .order('average_rating', { ascending: false });
 
-        console.log('Datos obtenidos:', veterinarians);
-        console.log('Error si existe:', vetError);
-
         if (vetError) {
+          console.error('Supabase error in useVeterinariansData:', vetError);
           throw vetError;
         }
+
+        console.log('Veterinarians data fetched successfully:', veterinarians?.length || 0);
 
         // Helper function to get initials from name
         const getInitials = (displayName?: string) => {
@@ -83,10 +86,8 @@ export const useVeterinariansData = () => {
 
         // Map the database data to our frontend model
         const formattedVets: Veterinarian[] = veterinarians.map(vet => {
-          // Get display name from profiles through service_providers relation
           const displayName = vet.service_providers?.profiles?.display_name || vet.service_providers?.business_name || 'Sin nombre';
           
-          // For firstName and lastName, we'll use parts of displayName
           let firstName = '', lastName = '';
           const nameParts = displayName.split(' ');
           if (nameParts.length >= 2) {
@@ -96,20 +97,17 @@ export const useVeterinariansData = () => {
             firstName = nameParts[0];
           }
           
-          // Format display name with Dr. prefix
           const fullName = firstName 
             ? `Dr${firstName.toLowerCase().endsWith('a') ? 'a' : ''}. ${displayName}`
             : `Dr. ${vet.id.substring(0, 5)}`;
           
-          // Parse specializations - ensure it's an array
+          // Parse specializations
           let specializations: string[] = [];
           if (vet.specialization) {
             try {
-              // Handle if specialization is already an array
               if (Array.isArray(vet.specialization)) {
                 specializations = vet.specialization.map(s => String(s));
               } else {
-                // Try to parse as JSON if it's a string
                 const parsed = typeof vet.specialization === 'string' 
                   ? JSON.parse(vet.specialization) 
                   : vet.specialization;
@@ -139,7 +137,7 @@ export const useVeterinariansData = () => {
             }
           }
 
-          // Calculate distance using user location and vet coordinates
+          // Calculate distance
           const distance = userLocation 
             ? calculateDistance(
                 userLocation.latitude,
@@ -149,10 +147,8 @@ export const useVeterinariansData = () => {
               )
             : "Calculando...";
 
-          // Get image URL - we only have profile_image_url from veterinarians now
           const imageUrl = vet.profile_image_url || '';
 
-          // Return the formatted vet object
           return {
             id: vet.id,
             name: fullName,
@@ -170,16 +166,18 @@ export const useVeterinariansData = () => {
         });
 
         setVets(formattedVets);
+        setHasFetched(true);
       } catch (error) {
         console.error('Error fetching veterinarians:', error);
         setError('No se pudieron cargar los veterinarios');
+        setHasFetched(true);
       } finally {
         setLoading(false);
       }
     };
 
     fetchVeterinarians();
-  }, [userLocation]); // Re-fetch when user location changes
+  }, [userLocation, hasFetched]);
 
   return { vets, loading, error };
 };
