@@ -112,13 +112,13 @@ const GroomingReviewScreen: React.FC = () => {
         />
 
         <ReviewForm
-          initialRating={rating}
-          initialComment={comment}
-          onRatingChange={setRating}
-          onCommentChange={setComment}
+          rating={rating}
+          setRating={setRating}
+          comment={comment}
+          setComment={setComment}
           onSubmit={submitReview}
-          isSubmitting={submitting}
-          isEditing={!!existingReview}
+          submitting={submitting}
+          existingReview={!!existingReview}
         />
       </div>
     </LayoutBase>
