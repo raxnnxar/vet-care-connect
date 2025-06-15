@@ -92,7 +92,8 @@ export const useGroomingReviewForm = (groomingId: string) => {
       // Update grooming ratings
       await updateGroomingRatings();
       
-      navigate(-1);
+      // Navigate back to grooming detail instead of dashboard
+      navigate(`/owner/groomers/${groomingId}`);
     } catch (err: any) {
       console.error('Error submitting review:', err);
       toast.error('Error al enviar la reseña');
