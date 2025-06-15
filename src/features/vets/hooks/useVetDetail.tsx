@@ -106,9 +106,13 @@ export const useVetDetail = (id?: string) => {
           clinicLatitude: vetData.clinic_latitude || undefined,
           clinicLongitude: vetData.clinic_longitude || undefined,
           emergencyServices: vetData.emergency_services || false,
-          languagesSpoken: Array.isArray(vetData.languages_spoken) ? vetData.languages_spoken : [],
+          languagesSpoken: Array.isArray(vetData.languages_spoken) 
+            ? vetData.languages_spoken.filter((lang): lang is string => typeof lang === 'string')
+            : [],
           servicesOffered: Array.isArray(vetData.services_offered) ? vetData.services_offered : [],
-          animalsTreated: Array.isArray(vetData.animals_treated) ? vetData.animals_treated : [],
+          animalsTreated: Array.isArray(vetData.animals_treated) 
+            ? vetData.animals_treated.filter((animal): animal is string => typeof animal === 'string')
+            : [],
           certifications: Array.isArray(vetData.certifications) ? vetData.certifications : [],
           education: Array.isArray(vetData.education) ? vetData.education : [],
           availability: (vetData.availability && typeof vetData.availability === 'object') 
