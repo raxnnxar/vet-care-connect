@@ -37,30 +37,41 @@ export const useGroomingReviews = (groomingId: string) => {
           rating,
           comment,
           created_at,
-          updated_at,
-          pet_owner_id!inner (
-            id,
-            profiles!inner (
-              display_name
-            )
-          )
+          updated_at
         `)
         .eq('grooming_id', groomingId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Transform the data to match our expected structure
-      const transformedReviews = (data || []).map(review => ({
-        ...review,
-        pet_owner: {
-          profiles: {
-            display_name: review.pet_owner_id?.profiles?.display_name || 'Usuario anónimo'
-          }
-        }
-      }));
+      // Get pet owner profiles separately
+      const petOwnerIds = (data || []).map(review => review.pet_owner_id);
+      
+      if (petOwnerIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, display_name')
+          .in('id', petOwnerIds);
 
-      setReviews(transformedReviews);
+        if (profilesError) throw profilesError;
+
+        // Transform the data to match our expected structure
+        const transformedReviews = (data || []).map(review => {
+          const profile = profiles?.find(p => p.id === review.pet_owner_id);
+          return {
+            ...review,
+            pet_owner: {
+              profiles: {
+                display_name: profile?.display_name || 'Usuario anónimo'
+              }
+            }
+          };
+        });
+
+        setReviews(transformedReviews);
+      } else {
+        setReviews([]);
+      }
     } catch (err: any) {
       console.error('Error fetching grooming reviews:', err);
       setError(err.message);
