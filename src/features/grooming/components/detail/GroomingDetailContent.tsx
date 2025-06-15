@@ -11,7 +11,6 @@ import GroomingProfileHero from './GroomingProfileHero';
 import GroomingAnimalsSection from './GroomingAnimalsSection';
 import GroomingServicesSection from './GroomingServicesSection';
 import GroomingLocationSection from './GroomingLocationSection';
-import GroomingReviewsSection from './GroomingReviewsSection';
 import { ReviewsDialog } from '../../utils/groomingReviewUtils';
 
 export interface GroomingDetailData {
@@ -105,13 +104,6 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
               longitude={data.longitude}
             />
           )}
-
-          {/* Reviews section */}
-          <GroomingReviewsSection 
-            groomingId={data.id}
-            averageRating={data.average_rating}
-            totalReviews={data.total_reviews}
-          />
         </div>
 
         {/* Bottom spacing for fixed footer */}
