@@ -2,65 +2,124 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/state/store';
+import { toast } from 'sonner';
 
-export const useVetDetail = (id: string | undefined) => {
-  const [data, setData] = useState<any>(null);
+export interface VetDetailData {
+  id: string;
+  displayName: string;
+  specializations: string;
+  profileImageUrl?: string;
+  averageRating?: number;
+  totalReviews?: number;
+  licenseNumber?: string;
+  bio?: string;
+  yearsOfExperience?: number;
+  clinicAddress?: string;
+  clinicLatitude?: number;
+  clinicLongitude?: number;
+  emergencyServices?: boolean;
+  languagesSpoken?: string[];
+  servicesOffered?: any[];
+  animalsTreated?: string[];
+  certifications?: any[];
+  education?: any[];
+  availability?: Record<string, any>;
+}
+
+export const useVetDetail = (id?: string) => {
+  const [data, setData] = useState<VetDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    const fetchVetDetail = async () => {
-      if (!id) {
-        setError('ID de veterinario no especificado');
-        setLoading(false);
-        return;
-      }
+    if (!id) {
+      setError('ID de veterinario no válido');
+      setLoading(false);
+      return;
+    }
 
+    const fetchVetDetail = async () => {
       try {
         setLoading(true);
-        
+        setError(null);
+
         const { data: vetData, error: vetError } = await supabase
           .from('veterinarians')
           .select(`
             *,
             service_providers (
               profiles (
-                display_name,
-                email
+                display_name
               ),
-              business_name,
-              provider_type
+              business_name
             )
           `)
           .eq('id', id)
           .single();
 
-        if (vetError) {
-          console.error('Error fetching vet:', vetError);
-          setError('Error al cargar los datos del veterinario');
-          return;
-        }
+        if (vetError) throw vetError;
 
         if (!vetData) {
-          setError('Veterinario no encontrado');
-          return;
+          throw new Error('No se encontró el veterinario');
         }
 
-        // Debug: Log location data specifically
-        console.log('Vet location data:', {
-          clinic_address: vetData.clinic_address,
-          clinic_latitude: vetData.clinic_latitude,
-          clinic_longitude: vetData.clinic_longitude
-        });
+        // Format specializations
+        let specializationsText = 'Medicina General';
+        if (Array.isArray(vetData.specialization) && vetData.specialization.length > 0) {
+          const translations: Record<string, string> = {
+            'cardiology': 'Cardiología',
+            'dermatology': 'Dermatología', 
+            'orthopedics': 'Ortopedia',
+            'neurology': 'Neurología',
+            'ophthalmology': 'Oftalmología',
+            'oncology': 'Oncología',
+            'general': 'Medicina General',
+            'surgery': 'Cirugía',
+            'dentistry': 'Odontología',
+            'nutrition': 'Nutrición',
+            'internal_medicine': 'Medicina Interna',
+            'emergency': 'Emergencias',
+            'rehabilitation': 'Rehabilitación',
+            'exotics': 'Animales Exóticos',
+          };
+          
+          specializationsText = vetData.specialization
+            .map((spec: string) => translations[spec] || spec)
+            .join(', ');
+        }
 
-        setData(vetData);
+        // Format the data
+        const formattedData: VetDetailData = {
+          id: vetData.id,
+          displayName: vetData.service_providers?.profiles?.display_name || 
+                      vetData.service_providers?.business_name || 
+                      'Veterinario',
+          specializations: specializationsText,
+          profileImageUrl: vetData.profile_image_url || undefined,
+          averageRating: vetData.average_rating ? Number(vetData.average_rating) : 0,
+          totalReviews: vetData.total_reviews || 0,
+          licenseNumber: vetData.license_number || undefined,
+          bio: vetData.bio || undefined,
+          yearsOfExperience: vetData.years_of_experience || undefined,
+          clinicAddress: vetData.clinic_address || undefined,
+          clinicLatitude: vetData.clinic_latitude || undefined,
+          clinicLongitude: vetData.clinic_longitude || undefined,
+          emergencyServices: vetData.emergency_services || false,
+          languagesSpoken: Array.isArray(vetData.languages_spoken) ? vetData.languages_spoken : [],
+          servicesOffered: Array.isArray(vetData.services_offered) ? vetData.services_offered : [],
+          animalsTreated: Array.isArray(vetData.animals_treated) ? vetData.animals_treated : [],
+          certifications: Array.isArray(vetData.certifications) ? vetData.certifications : [],
+          education: Array.isArray(vetData.education) ? vetData.education : [],
+          availability: (vetData.availability && typeof vetData.availability === 'object') 
+            ? vetData.availability as Record<string, any>
+            : {}
+        };
+
+        setData(formattedData);
       } catch (err: any) {
-        console.error('Error en useVetDetail:', err);
-        setError('Error inesperado al cargar los datos');
+        console.error('Error fetching vet detail:', err);
+        setError(err.message || 'Error al cargar los detalles del veterinario');
       } finally {
         setLoading(false);
       }
@@ -70,27 +129,24 @@ export const useVetDetail = (id: string | undefined) => {
   }, [id]);
 
   const handleBookAppointment = () => {
-    if (!user?.id) {
-      navigate('/login');
-      return;
-    }
-    navigate(`/owner/appointments/book/${id}`);
+    if (!data) return;
+    
+    // Navigate to appointment booking
+    navigate(`/owner/appointments/book/${data.id}`);
   };
 
   const handleReviewClick = () => {
-    if (!user?.id) {
-      navigate('/login');
-      return;
-    }
-    navigate('/vet-review', { state: { veterinarianId: id } });
+    if (!data) return;
+    
+    // Navigate to vet review screen
+    navigate(`/owner/vets/${data.id}/review`);
   };
 
   const handleSendMessage = () => {
-    if (!user?.id) {
-      navigate('/login');
-      return;
-    }
-    console.log('Enviando mensaje al veterinario:', id);
+    if (!data) return;
+    
+    // TODO: Navigate to chat with vet
+    toast.info('Función de mensajes próximamente');
   };
 
   return {

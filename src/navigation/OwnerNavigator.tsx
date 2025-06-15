@@ -34,7 +34,6 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.FIND_VETS} element={<FindVetsScreen />} />
       <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
       <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />
-      <Route path="/vets/:id/review" element={<VetReviewScreen />} />
       <Route path={OWNER_ROUTES.SALUD} element={<SaludScreen />} />
       <Route path={OWNER_ROUTES.ESTETICA} element={<EsteticaScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />

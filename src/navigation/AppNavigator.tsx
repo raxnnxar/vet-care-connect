@@ -32,7 +32,6 @@ const AppNavigator = () => {
       console.log('Current path:', location.pathname);
       
       // Skip navigation logic if user is already on specific screens
-      // Added specific check to exclude the profile routes from this check
       if (
         location.pathname === ROUTES.PROFILE_SETUP || 
         location.pathname === '/location-setup' ||
@@ -50,13 +49,13 @@ const AppNavigator = () => {
         return;
       }
       
-      // If user is already in the owner, vet, or grooming section (except profile/chat), don't redirect
+      // If user is already in the owner, vet, or grooming section, don't redirect
       if (
-        (location.pathname.startsWith('/owner') && !location.pathname.includes('/profile')) || 
-        (location.pathname.startsWith('/vet') && !location.pathname.includes('/profile')) ||
-        (location.pathname.startsWith('/grooming') && !location.pathname.includes('/profile'))
+        location.pathname.startsWith('/owner') || 
+        location.pathname.startsWith('/vet') ||
+        location.pathname.startsWith('/grooming')
       ) {
-        console.log('User is in a section (not profile), no redirect needed');
+        console.log('User is in a section, no redirect needed');
         return;
       }
       
