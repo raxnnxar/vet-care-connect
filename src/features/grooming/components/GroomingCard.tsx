@@ -1,79 +1,108 @@
 
 import React from 'react';
-import { Star, MapPin, Scissors } from 'lucide-react';
-import { Card } from '@/ui/molecules/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
-import { GroomingBusiness } from '../hooks/useGroomingData';
+import { useNavigate } from 'react-router-dom';
+import { Star, MapPin } from 'lucide-react';
+import { Card, CardContent } from '@/ui/molecules/card';
 
 interface GroomingCardProps {
-  grooming: GroomingBusiness;
-  onClick: (groomingId: string) => void;
+  id: string;
+  businessName: string;
+  profileImageUrl?: string;
+  location?: string;
+  averageRating?: number;
+  totalReviews?: number;
+  servicesOffered?: string[];
 }
 
-const GroomingCard: React.FC<GroomingCardProps> = ({ grooming, onClick }) => {
-  // Format animals accepted
-  const formatAnimalsAccepted = () => {
-    if (!grooming.animals_accepted || grooming.animals_accepted.length === 0) {
-      return "Acepta: Animales domésticos";
-    }
-    
-    if (grooming.animals_accepted.length <= 2) {
-      return `Acepta: ${grooming.animals_accepted.join(', ')}`;
-    }
-    
-    return `Acepta: ${grooming.animals_accepted[0]}, ${grooming.animals_accepted[1]} +${grooming.animals_accepted.length - 2}`;
+const GroomingCard: React.FC<GroomingCardProps> = ({
+  id,
+  businessName,
+  profileImageUrl,
+  location,
+  averageRating = 0,
+  totalReviews = 0,
+  servicesOffered = []
+}) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/owner/estetica/${id}`);
   };
 
-  // Format services offered
-  const formatServices = () => {
-    if (!grooming.services_offered || grooming.services_offered.length === 0) {
-      return "ESTÉTICA CANINA";
-    }
-    
-    const serviceNames = grooming.services_offered.map(service => {
-      if (typeof service === 'string') return service;
-      if (service && typeof service === 'object' && service.name) return service.name;
-      return 'Servicio';
-    });
-    
-    const primary = serviceNames[0]?.toUpperCase() || 'ESTÉTICA CANINA';
-    
-    if (serviceNames.length > 1) {
-      return `${primary} +${serviceNames.length - 1}`;
-    }
-    
-    return primary;
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
-  
+
   return (
     <Card 
-      key={grooming.id}
-      className="p-4 bg-white flex items-center cursor-pointer hover:shadow-md transition-shadow rounded-xl relative overflow-hidden border border-gray-200"
-      onClick={() => onClick(grooming.id)}
+      className="cursor-pointer hover:shadow-md transition-shadow"
+      onClick={handleCardClick}
     >
-      <Avatar className="h-16 w-16 mr-3 shadow-sm">
-        {grooming.profile_image_url ? (
-          <AvatarImage src={grooming.profile_image_url} alt={grooming.business_name} className="object-cover" />
-        ) : (
-          <AvatarFallback className="bg-[#79D0B8] text-white">
-            <Scissors className="w-8 h-8" />
-          </AvatarFallback>
-        )}
-      </Avatar>
-      <div className="flex-1">
-        <h3 className="font-medium text-[#1F2937] text-base">{grooming.business_name}</h3>
-        <p className="text-sm text-gray-500 font-medium">{formatServices()}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{formatAnimalsAccepted()}</p>
-        <div className="flex items-center mt-1">
-          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-          <span className="ml-1 text-sm font-medium">{grooming.rating?.toFixed(1) || '5.0'}</span>
-          <span className="ml-1 text-xs text-gray-500">({grooming.reviewCount || 0} reseñas)</span>
-          <div className="ml-auto flex items-center text-xs text-gray-500">
-            <MapPin className="w-3 h-3 mr-1" />
-            {grooming.distance || '0.0 km'}
+      <CardContent className="p-4">
+        <div className="flex items-start space-x-3">
+          <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+            {profileImageUrl ? (
+              <img 
+                src={profileImageUrl} 
+                alt={businessName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-[#79D0B8] flex items-center justify-center text-white font-semibold">
+                {getInitials(businessName)}
+              </div>
+            )}
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 truncate">{businessName}</h3>
+            
+            {location && (
+              <div className="flex items-center text-sm text-gray-600 mt-1">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span className="truncate">{location}</span>
+              </div>
+            )}
+            
+            <div className="flex items-center mt-2">
+              <div className="flex items-center">
+                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                <span className="text-sm font-medium ml-1">
+                  {Number(averageRating).toFixed(1)}
+                </span>
+                <span className="text-sm text-gray-500 ml-1">
+                  ({totalReviews} reseñas)
+                </span>
+              </div>
+            </div>
+            
+            {servicesOffered.length > 0 && (
+              <div className="mt-2">
+                <div className="flex flex-wrap gap-1">
+                  {servicesOffered.slice(0, 2).map((service, index) => (
+                    <span 
+                      key={index}
+                      className="inline-block bg-[#e8f7f3] text-[#4DA6A8] text-xs px-2 py-1 rounded"
+                    >
+                      {service}
+                    </span>
+                  ))}
+                  {servicesOffered.length > 2 && (
+                    <span className="text-xs text-gray-500">
+                      +{servicesOffered.length - 2} más
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 };
