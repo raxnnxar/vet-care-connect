@@ -7,6 +7,7 @@ import { useGroomingDetail } from '../hooks/useGroomingDetail';
 import GroomingDetailContent from '../components/detail/GroomingDetailContent';
 import LoadingState from '../components/detail/LoadingState';
 import ErrorState from '../components/detail/ErrorState';
+import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 
 const GroomingDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,11 +17,23 @@ const GroomingDetailScreen: React.FC = () => {
   const { data, loading, error } = useGroomingDetail(id || '');
 
   if (loading) {
-    return <LoadingState />;
+    return (
+      <LayoutBase
+        footer={<NavbarInferior activeTab="home" />}
+      >
+        <LoadingState />
+      </LayoutBase>
+    );
   }
 
   if (error || !data) {
-    return <ErrorState message={error || 'No se encontró la estética'} onGoBack={() => navigate(-1)} />;
+    return (
+      <LayoutBase
+        footer={<NavbarInferior activeTab="home" />}
+      >
+        <ErrorState message={error || 'No se encontró la estética'} onGoBack={() => navigate(-1)} />
+      </LayoutBase>
+    );
   }
 
   const handleBookAppointment = () => {
@@ -47,12 +60,16 @@ const GroomingDetailScreen: React.FC = () => {
   };
 
   return (
-    <GroomingDetailContent
-      data={data}
-      onBookAppointment={handleBookAppointment}
-      onReviewClick={handleReviewClick}
-      onSendMessage={handleSendMessage}
-    />
+    <LayoutBase
+      footer={<NavbarInferior activeTab="home" />}
+    >
+      <GroomingDetailContent
+        data={data}
+        onBookAppointment={handleBookAppointment}
+        onReviewClick={handleReviewClick}
+        onSendMessage={handleSendMessage}
+      />
+    </LayoutBase>
   );
 };
 
