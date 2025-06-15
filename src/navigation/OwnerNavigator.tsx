@@ -2,18 +2,20 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { OWNER_ROUTES } from './navigationConfig';
+
+// Import screens
 import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
-import OwnerAppointmentsScreen from '@/features/appointments/screens/OwnerAppointmentsScreen';
-import AppointmentDetailScreen from '@/features/appointments/screens/AppointmentDetailScreen';
-import BookAppointmentScreen from '@/features/appointments/screens/BookAppointmentScreen';
 import OwnerProfileScreen from '@/features/owner/screens/OwnerProfileScreen';
 import PetDetailScreen from '@/features/pets/screens/PetDetailScreen';
 import PetEditScreen from '@/features/pets/screens/PetEditScreen';
+import OwnerAppointmentsScreen from '@/features/appointments/screens/OwnerAppointmentsScreen';
+import AppointmentDetailScreen from '@/features/appointments/screens/AppointmentDetailScreen';
+import BookAppointmentScreen from '@/features/appointments/screens/BookAppointmentScreen';
+import SaludScreen from '@/features/health/screens/SaludScreen';
+import EsteticaScreen from '@/features/grooming/screens/EsteticaScreen';
 import FindVetsScreen from '@/features/vets/screens/FindVetsScreen';
 import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
 import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
-import SaludScreen from '@/features/health/screens/SaludScreen';
-import EsteticaScreen from '@/features/grooming/screens/EsteticaScreen';
 import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScreen';
 import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import NotificationsScreen from '@/features/notifications/screens/NotificationsScreen';
@@ -37,7 +39,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.SALUD} element={<SaludScreen />} />
       <Route path={OWNER_ROUTES.ESTETICA} element={<EsteticaScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
-      <Route path="/owner/grooming/:id/review" element={<GroomingReviewScreen />} />
+      <Route path="/grooming/:id/review" element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.NOTIFICATIONS} element={<NotificationsScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.CHATS} element={<ChatsScreen />} />

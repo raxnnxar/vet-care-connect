@@ -98,7 +98,7 @@ const GroomingReviewScreen: React.FC = () => {
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <h1 className="text-white font-medium text-lg">
-            {existingReview ? 'Editar reseña' : 'Dejar reseña'}
+            {existingReview ? 'Editar reseña' : 'Calificar Estética'}
           </h1>
         </div>
       }

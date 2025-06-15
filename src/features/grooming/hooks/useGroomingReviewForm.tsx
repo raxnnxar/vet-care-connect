@@ -1,37 +1,39 @@
 
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { RootState } from '@/state/store';
 
 export const useGroomingReviewForm = (groomingId: string) => {
+  const [rating, setRating] = useState<number>(0);
+  const [comment, setComment] = useState<string>('');
+  const [existingReview, setExistingReview] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  
   const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
-  
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [existingReview, setExistingReview] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
 
-  // Check if user has already reviewed this grooming
   useEffect(() => {
-    const checkExistingReview = async () => {
-      if (!user?.id || !groomingId) return;
+    if (!user?.id || !groomingId) {
+      setLoading(false);
+      return;
+    }
 
+    const fetchExistingReview = async () => {
       try {
-        setLoading(true);
         const { data, error } = await supabase
           .from('reviews')
           .select('*')
           .eq('grooming_id', groomingId)
           .eq('pet_owner_id', user.id)
-          .maybeSingle();
+          .single();
 
         if (error && error.code !== 'PGRST116') {
-          throw error;
+          console.error('Error fetching existing review:', error);
+          return;
         }
 
         if (data) {
@@ -39,61 +41,94 @@ export const useGroomingReviewForm = (groomingId: string) => {
           setRating(data.rating);
           setComment(data.comment || '');
         }
-      } catch (error: any) {
-        console.error('Error checking existing review:', error);
-        toast.error('Error al verificar reseña existente');
+      } catch (err) {
+        console.error('Error checking for existing review:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    checkExistingReview();
+    fetchExistingReview();
   }, [user?.id, groomingId]);
 
   const submitReview = async () => {
-    if (!user?.id || !groomingId || rating === 0) {
-      toast.error('Por favor, selecciona una calificación');
+    if (!user?.id || rating === 0) {
+      toast.error('Por favor selecciona una calificación');
       return;
     }
 
+    setSubmitting(true);
+
     try {
-      setSubmitting(true);
-
-      const reviewData = {
-        pet_owner_id: user.id,
-        grooming_id: groomingId,
-        rating,
-        comment: comment.trim() || null,
-        veterinarian_id: '00000000-0000-0000-0000-000000000000' // Required field, using placeholder
-      };
-
-      let result;
       if (existingReview) {
         // Update existing review
-        result = await supabase
+        const { error } = await supabase
           .from('reviews')
           .update({
             rating,
-            comment: comment.trim() || null,
+            comment,
             updated_at: new Date().toISOString()
           })
           .eq('id', existingReview.id);
+
+        if (error) throw error;
+        toast.success('Reseña actualizada exitosamente');
       } else {
         // Create new review
-        result = await supabase
+        const { error } = await supabase
           .from('reviews')
-          .insert(reviewData);
+          .insert({
+            pet_owner_id: user.id,
+            grooming_id: groomingId,
+            veterinarian_id: '00000000-0000-0000-0000-000000000000', // Required field, using placeholder
+            rating,
+            comment
+          });
+
+        if (error) throw error;
+        toast.success('Reseña enviada exitosamente');
       }
 
-      if (result.error) throw result.error;
-
-      toast.success(existingReview ? 'Reseña actualizada exitosamente' : 'Reseña enviada exitosamente');
+      // Update grooming ratings
+      await updateGroomingRatings();
+      
       navigate(-1);
-    } catch (error: any) {
-      console.error('Error submitting review:', error);
-      toast.error('Error al enviar la reseña. Inténtalo de nuevo.');
+    } catch (err: any) {
+      console.error('Error submitting review:', err);
+      toast.error('Error al enviar la reseña');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const updateGroomingRatings = async () => {
+    try {
+      // Get all reviews for this grooming
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('grooming_id', groomingId);
+
+      if (error) throw error;
+
+      if (reviews && reviews.length > 0) {
+        const totalReviews = reviews.length;
+        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+
+        // Update grooming table
+        const { error: updateError } = await supabase
+          .from('pet_grooming')
+          .update({
+            average_rating: averageRating,
+            total_reviews: totalReviews,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', groomingId);
+
+        if (updateError) throw updateError;
+      }
+    } catch (err) {
+      console.error('Error updating grooming ratings:', err);
     }
   };
 
