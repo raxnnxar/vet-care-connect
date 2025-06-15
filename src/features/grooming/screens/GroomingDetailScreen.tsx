@@ -1,67 +1,58 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
-
-// Import hooks
+import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 import { useGroomingDetail } from '../hooks/useGroomingDetail';
-
-// Import components
-import GroomingDetailHeader from '../components/detail/GroomingDetailHeader';
 import GroomingDetailContent from '../components/detail/GroomingDetailContent';
 import LoadingState from '../components/detail/LoadingState';
 import ErrorState from '../components/detail/ErrorState';
 
-const GroomingDetailScreen = () => {
-  const { id } = useParams();
-  const { 
-    data, 
-    loading, 
-    error, 
-    handleBookAppointment, 
-    handleReviewClick,
-    handleSendMessage
-  } = useGroomingDetail(id);
-
-  // Create header component for all states
-  const Header = () => (
-    <GroomingDetailHeader title={loading ? "Cargando..." : error ? "Error" : "Perfil de Estética"} />
-  );
+const GroomingDetailScreen: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.auth);
+  
+  const { data, loading, error } = useGroomingDetail(id || '');
 
   if (loading) {
-    return (
-      <LayoutBase
-        header={<Header />}
-        footer={<NavbarInferior activeTab="home" />}
-      >
-        <LoadingState />
-      </LayoutBase>
-    );
+    return <LoadingState />;
   }
 
   if (error || !data) {
-    return (
-      <LayoutBase
-        header={<Header />}
-        footer={<NavbarInferior activeTab="home" />}
-      >
-        <ErrorState message={error} onGoBack={() => window.history.back()} />
-      </LayoutBase>
-    );
+    return <ErrorState error={error || 'No se encontró la estética'} />;
   }
 
+  const handleBookAppointment = () => {
+    // Navigate to booking screen with grooming ID
+    navigate(`/book-appointment?groomingId=${id}&type=grooming`);
+  };
+
+  const handleReviewClick = () => {
+    if (!user?.id) {
+      // Handle not logged in case
+      navigate('/login');
+      return;
+    }
+    navigate(`/grooming/${id}/review`);
+  };
+
+  const handleSendMessage = () => {
+    if (!user?.id) {
+      // Handle not logged in case
+      navigate('/login');
+      return;
+    }
+    navigate(`/chats?providerId=${id}&providerType=grooming`);
+  };
+
   return (
-    <LayoutBase
-      header={null}
-      footer={<NavbarInferior activeTab="home" />}
-    >
-      <GroomingDetailContent
-        data={data}
-        onBookAppointment={handleBookAppointment}
-        onReviewClick={handleReviewClick}
-        onSendMessage={handleSendMessage}
-      />
-    </LayoutBase>
+    <GroomingDetailContent
+      data={data}
+      onBookAppointment={handleBookAppointment}
+      onReviewClick={handleReviewClick}
+      onSendMessage={handleSendMessage}
+    />
   );
 };
 

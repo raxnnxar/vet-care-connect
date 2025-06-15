@@ -1,21 +1,49 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Scissors, Star } from 'lucide-react';
 import { GroomingProfile } from '@/features/auth/types/groomingTypes';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GroomingProfileHeroProps {
   userId: string;
   profileData: GroomingProfile;
-  averageRating?: number;
-  totalReviews?: number;
 }
 
 const GroomingProfileHero: React.FC<GroomingProfileHeroProps> = ({ 
   userId, 
-  profileData,
-  averageRating = 0,
-  totalReviews = 0
+  profileData
 }) => {
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [totalReviews, setTotalReviews] = useState<number>(0);
+  
+  useEffect(() => {
+    const fetchRatings = async () => {
+      if (!userId) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('pet_grooming')
+          .select('average_rating, total_reviews')
+          .eq('id', userId)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching ratings:', error);
+          return;
+        }
+        
+        if (data) {
+          setAverageRating(data.average_rating ? Number(data.average_rating) : 0);
+          setTotalReviews(data.total_reviews || 0);
+        }
+      } catch (err) {
+        console.error('Error in fetchRatings:', err);
+      }
+    };
+    
+    fetchRatings();
+  }, [userId]);
+  
   // Format rating to display with one decimal place
   const formattedRating = averageRating ? Number(averageRating).toFixed(1) : '0.0';
   
