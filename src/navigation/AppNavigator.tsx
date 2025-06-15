@@ -43,9 +43,10 @@ const AppNavigator = () => {
         location.pathname === ROUTES.POST_SIGNUP_ROLE || 
         location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE ||
         location.pathname.includes('/profile') ||
-        location.pathname.includes('/chats')
+        location.pathname.includes('/chats') ||
+        location.pathname.includes('/review')
       ) {
-        console.log('User is on a setup/profile/chat screen, allowing completion of flow');
+        console.log('User is on a setup/profile/chat/review screen, allowing completion of flow');
         return;
       }
       
