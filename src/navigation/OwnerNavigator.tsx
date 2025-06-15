@@ -26,8 +26,8 @@ const OwnerNavigator: React.FC = () => {
   return (
     <Routes>
       <Route path={OWNER_ROUTES.HOME} element={<OwnerHomeScreen />} />
-      <Route path={OWNER_ROUTES.HEALTH} element={<SaludScreen />} />
-      <Route path={OWNER_ROUTES.GROOMING} element={<EsteticaScreen />} />
+      <Route path={OWNER_ROUTES.SALUD} element={<SaludScreen />} />
+      <Route path={OWNER_ROUTES.ESTETICA} element={<EsteticaScreen />} />
       <Route path={OWNER_ROUTES.APPOINTMENTS} element={<OwnerAppointmentsScreen />} />
       <Route path={OWNER_ROUTES.APPOINTMENT_DETAIL} element={<AppointmentDetailScreen />} />
       <Route path={OWNER_ROUTES.BOOK_APPOINTMENT} element={<BookAppointmentScreen />} />
@@ -39,7 +39,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
       <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />
       <Route path={OWNER_ROUTES.PET_DETAIL} element={<PetDetailScreen />} />
-      <Route path={OWNER_ROUTES.PET_EDIT} element={<PetEditScreen />} />
+      <Route path="/owner/pets/:id/edit" element={<PetEditScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
       <Route path="/owner/groomers/:id/review" element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
