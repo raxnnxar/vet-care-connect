@@ -33,43 +33,20 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
   // Debug: Log the complete data object to see what we're receiving
   console.log('VetDetailContent - Complete data object:', data);
   console.log('VetDetailContent - Location data:', {
-    clinic_address: data.clinic_address,
-    clinic_latitude: data.clinic_latitude,
-    clinic_longitude: data.clinic_longitude
+    clinic_address: data.clinicAddress,
+    clinic_latitude: data.clinicLatitude,
+    clinic_longitude: data.clinicLongitude
   });
 
-  // Format veterinarian name using display_name from profiles
-  const displayName = data.service_providers?.profiles?.display_name || data.service_providers?.business_name || '';
+  // Use the displayName directly from the formatted data
+  const displayName = data.displayName || '';
   
   const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
   const vetName = displayName 
     ? `Dr${firstNameEndsWithA ? 'a' : ''}. ${displayName}`.trim()
     : `Dr. ${data.id.substring(0, 5)}`;
   
-  const specializations = Array.isArray(data.specialization) && data.specialization.length > 0
-    ? data.specialization.map((spec: string) => translateSpecialization(spec)).join(', ')
-    : 'Medicina General';
-    
-  function translateSpecialization(spec: string): string {
-    const translations: Record<string, string> = {
-      'cardiology': 'Cardiología',
-      'dermatology': 'Dermatología',
-      'orthopedics': 'Ortopedia',
-      'neurology': 'Neurología',
-      'ophthalmology': 'Oftalmología',
-      'oncology': 'Oncología',
-      'general': 'Medicina General',
-      'surgery': 'Cirugía',
-      'dentistry': 'Odontología',
-      'nutrition': 'Nutrición',
-      'internal_medicine': 'Medicina Interna',
-      'emergency': 'Emergencias',
-      'rehabilitation': 'Rehabilitación',
-      'exotics': 'Animales Exóticos',
-    };
-    
-    return translations[spec.toLowerCase()] || spec;
-  }
+  const specializations = data.specializations || 'Medicina General';
 
   const handleGoBack = () => {
     navigate(-1);
@@ -92,10 +69,10 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
       <VetProfileHero 
         displayName={vetName}
         specializations={specializations}
-        profileImageUrl={data.profile_image_url}
-        averageRating={data.average_rating}
-        totalReviews={data.total_reviews}
-        licenseNumber={data.license_number}
+        profileImageUrl={data.profileImageUrl}
+        averageRating={data.averageRating}
+        totalReviews={data.totalReviews}
+        licenseNumber={data.licenseNumber}
         getInitials={getInitials}
         onRatingClick={() => setReviewsDialogOpen(true)}
         vetId={data.id}
@@ -104,7 +81,7 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
       <div className="p-4 pb-28 bg-gray-50">
         {/* Animals Treated Section */}
         <div className="mb-4">
-          <VetAnimalsTreatedSection animals={data.animals_treated || []} />
+          <VetAnimalsTreatedSection animals={data.animalsTreated || []} />
         </div>
         
         {/* About Section */}
@@ -114,7 +91,7 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         
         {/* Services Section */}
         <div className="mb-4">
-          <VetServicesSection services={Array.isArray(data.services_offered) ? data.services_offered : []} />
+          <VetServicesSection services={Array.isArray(data.servicesOffered) ? data.servicesOffered : []} />
         </div>
         
         {/* Education Section */}
@@ -130,9 +107,9 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         {/* Location Section */}
         <div className="mb-6">
           <VetLocationSection 
-            address={data.clinic_address}
-            latitude={data.clinic_latitude}
-            longitude={data.clinic_longitude}
+            address={data.clinicAddress}
+            latitude={data.clinicLatitude}
+            longitude={data.clinicLongitude}
           />
         </div>
         
