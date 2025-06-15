@@ -47,7 +47,8 @@ const GroomingDetailScreen: React.FC = () => {
       navigate('/login');
       return;
     }
-    navigate(`/grooming/${id}/review`);
+    // Fix the navigation route to match the actual route structure
+    navigate(`/owner/groomers/${id}/review`);
   };
 
   const handleSendMessage = () => {
