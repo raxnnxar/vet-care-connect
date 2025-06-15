@@ -477,7 +477,7 @@ export type Database = {
           pet_owner_id: string
           rating: number
           updated_at: string | null
-          veterinarian_id: string
+          veterinarian_id: string | null
         }
         Insert: {
           comment?: string | null
@@ -487,7 +487,7 @@ export type Database = {
           pet_owner_id: string
           rating: number
           updated_at?: string | null
-          veterinarian_id: string
+          veterinarian_id?: string | null
         }
         Update: {
           comment?: string | null
@@ -497,7 +497,7 @@ export type Database = {
           pet_owner_id?: string
           rating?: number
           updated_at?: string | null
-          veterinarian_id?: string
+          veterinarian_id?: string | null
         }
         Relationships: [
           {

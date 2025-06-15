@@ -74,13 +74,13 @@ export const useGroomingReviewForm = (groomingId: string) => {
         if (error) throw error;
         toast.success('Reseña actualizada exitosamente');
       } else {
-        // Create new review
+        // Create new review - removed the placeholder veterinarian_id
         const { error } = await supabase
           .from('reviews')
           .insert({
             pet_owner_id: user.id,
             grooming_id: groomingId,
-            veterinarian_id: '00000000-0000-0000-0000-000000000000', // Required field, using placeholder
+            veterinarian_id: null, // Set to null for grooming reviews
             rating,
             comment
           });
