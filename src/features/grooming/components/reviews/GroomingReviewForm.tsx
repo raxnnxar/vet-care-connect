@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Star } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
-import { textarea } from '@/ui/atoms/textarea';
+import { Textarea } from '@/ui/atoms/textarea';
 
 interface GroomingReviewFormProps {
   initialRating: number;
@@ -59,7 +58,7 @@ const GroomingReviewForm: React.FC<GroomingReviewFormProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Comentario (opcional)
         </label>
-        <textarea
+        <Textarea
           value={initialComment}
           onChange={(e) => onCommentChange(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#79D0B8] focus:border-transparent resize-none"
