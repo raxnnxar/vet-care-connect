@@ -11,7 +11,7 @@ import GroomingProfileHero from './GroomingProfileHero';
 import GroomingAnimalsSection from './GroomingAnimalsSection';
 import GroomingServicesSection from './GroomingServicesSection';
 import GroomingLocationSection from './GroomingLocationSection';
-import GroomingReviewsSection from './GroomingReviewsSection';
+import { ReviewsDialog } from '../utils/groomingReviewUtils';
 
 export interface GroomingDetailData {
   id: string;
@@ -43,6 +43,7 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
+  const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -55,6 +56,10 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleRatingClick = () => {
+    setReviewsDialogOpen(true);
   };
 
   return (
@@ -78,7 +83,7 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
             averageRating={data.average_rating || 0}
             totalReviews={data.total_reviews || 0}
             getInitials={getInitials}
-            onRatingClick={onReviewClick}
+            onRatingClick={handleRatingClick}
             groomingId={data.id}
           />
         </div>
@@ -99,13 +104,6 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
               longitude={data.longitude}
             />
           )}
-
-          {/* Reviews section */}
-          <GroomingReviewsSection 
-            groomingId={data.id}
-            averageRating={data.average_rating}
-            totalReviews={data.total_reviews}
-          />
         </div>
 
         {/* Bottom spacing for fixed footer */}
@@ -146,6 +144,14 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Reviews Dialog */}
+      <ReviewsDialog
+        isOpen={reviewsDialogOpen}
+        setIsOpen={setReviewsDialogOpen}
+        groomingId={data.id}
+        onReviewClick={onReviewClick}
+      />
     </div>
   );
 };
