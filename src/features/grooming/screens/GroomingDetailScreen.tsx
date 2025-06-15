@@ -20,7 +20,7 @@ const GroomingDetailScreen: React.FC = () => {
   }
 
   if (error || !data) {
-    return <ErrorState error={error || 'No se encontró la estética'} />;
+    return <ErrorState message={error || 'No se encontró la estética'} onGoBack={() => navigate(-1)} />;
   }
 
   const handleBookAppointment = () => {

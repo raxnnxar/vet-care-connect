@@ -55,8 +55,6 @@ const GroomingProfilePreview: React.FC<GroomingProfilePreviewProps> = ({
       <GroomingProfileHero 
         userId={userId} 
         profileData={profileData}
-        averageRating={0} // TODO: Add rating functionality for grooming
-        totalReviews={0}  // TODO: Add reviews functionality for grooming
       />
       
       {/* Content section */}
