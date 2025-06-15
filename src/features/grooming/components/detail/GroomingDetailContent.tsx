@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
 import { Star, MessageCircle, Calendar, ArrowLeft } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
-import { useNavigate } from 'react-router-dom';
 
 // Import existing sections
 import GroomingProfileHero from './GroomingProfileHero';
@@ -33,21 +32,18 @@ interface GroomingDetailContentProps {
   onBookAppointment: () => void;
   onReviewClick: () => void;
   onSendMessage: () => void;
+  onGoBack: () => void;
 }
 
 const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
   data,
   onBookAppointment,
   onReviewClick,
-  onSendMessage
+  onSendMessage,
+  onGoBack
 }) => {
-  const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
 
   const getInitials = (name: string) => {
     return name
@@ -71,7 +67,7 @@ const GroomingDetailContent: React.FC<GroomingDetailContentProps> = ({
           {/* Back button positioned absolutely */}
           <Button
             variant="ghost"
-            onClick={handleGoBack}
+            onClick={onGoBack}
             className="absolute top-4 left-4 z-20 flex items-center gap-2 text-white hover:bg-white/20"
           >
             <ArrowLeft className="h-5 w-5" />

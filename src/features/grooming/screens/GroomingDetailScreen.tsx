@@ -31,7 +31,7 @@ const GroomingDetailScreen: React.FC = () => {
       <LayoutBase
         footer={<NavbarInferior activeTab="home" />}
       >
-        <ErrorState message={error || 'No se encontró la estética'} onGoBack={() => navigate(-1)} />
+        <ErrorState message={error || 'No se encontró la estética'} onGoBack={() => navigate('/owner/estetica')} />
       </LayoutBase>
     );
   }
@@ -59,6 +59,10 @@ const GroomingDetailScreen: React.FC = () => {
     navigate(`/chats?providerId=${id}&providerType=grooming`);
   };
 
+  const handleGoBack = () => {
+    navigate('/owner/estetica');
+  };
+
   return (
     <LayoutBase
       footer={<NavbarInferior activeTab="home" />}
@@ -68,6 +72,7 @@ const GroomingDetailScreen: React.FC = () => {
         onBookAppointment={handleBookAppointment}
         onReviewClick={handleReviewClick}
         onSendMessage={handleSendMessage}
+        onGoBack={handleGoBack}
       />
     </LayoutBase>
   );
