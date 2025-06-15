@@ -15,7 +15,6 @@ import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
 import SaludScreen from '@/features/health/screens/SaludScreen';
 import EsteticaScreen from '@/features/grooming/screens/EsteticaScreen';
 import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScreen';
-import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import NotificationsScreen from '@/features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import ChatsScreen from '@/features/chats/screens/ChatsScreen';
@@ -37,7 +36,6 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.SALUD} element={<SaludScreen />} />
       <Route path={OWNER_ROUTES.ESTETICA} element={<EsteticaScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
-      <Route path="/owner/grooming/:id/review" element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.NOTIFICATIONS} element={<NotificationsScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.CHATS} element={<ChatsScreen />} />

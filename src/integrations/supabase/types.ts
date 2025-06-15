@@ -214,7 +214,6 @@ export type Database = {
         Row: {
           animals_accepted: Json | null
           availability: Json | null
-          average_rating: number | null
           business_name: string | null
           created_at: string | null
           id: string
@@ -223,13 +222,11 @@ export type Database = {
           longitude: number | null
           profile_image_url: string | null
           services_offered: Json | null
-          total_reviews: number | null
           updated_at: string | null
         }
         Insert: {
           animals_accepted?: Json | null
           availability?: Json | null
-          average_rating?: number | null
           business_name?: string | null
           created_at?: string | null
           id?: string
@@ -238,13 +235,11 @@ export type Database = {
           longitude?: number | null
           profile_image_url?: string | null
           services_offered?: Json | null
-          total_reviews?: number | null
           updated_at?: string | null
         }
         Update: {
           animals_accepted?: Json | null
           availability?: Json | null
-          average_rating?: number | null
           business_name?: string | null
           created_at?: string | null
           id?: string
@@ -253,7 +248,6 @@ export type Database = {
           longitude?: number | null
           profile_image_url?: string | null
           services_offered?: Json | null
-          total_reviews?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -472,7 +466,6 @@ export type Database = {
         Row: {
           comment: string | null
           created_at: string | null
-          grooming_id: string | null
           id: string
           pet_owner_id: string
           rating: number
@@ -482,7 +475,6 @@ export type Database = {
         Insert: {
           comment?: string | null
           created_at?: string | null
-          grooming_id?: string | null
           id?: string
           pet_owner_id: string
           rating: number
@@ -492,7 +484,6 @@ export type Database = {
         Update: {
           comment?: string | null
           created_at?: string | null
-          grooming_id?: string | null
           id?: string
           pet_owner_id?: string
           rating?: number
@@ -500,13 +491,6 @@ export type Database = {
           veterinarian_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "reviews_grooming_id_fkey"
-            columns: ["grooming_id"]
-            isOneToOne: false
-            referencedRelation: "pet_grooming"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "reviews_veterinarian_id_fkey"
             columns: ["veterinarian_id"]

@@ -65,8 +65,9 @@ export const useGroomingDetail = (id?: string) => {
           availability: (groomingData.availability && typeof groomingData.availability === 'object') 
             ? groomingData.availability as Record<string, any>
             : {},
-          average_rating: groomingData.average_rating ? Number(groomingData.average_rating) : 0,
-          total_reviews: groomingData.total_reviews || 0
+          // TODO: Add rating functionality for grooming
+          average_rating: 0,
+          total_reviews: 0
         };
 
         setData(formattedData);
@@ -91,8 +92,8 @@ export const useGroomingDetail = (id?: string) => {
   const handleReviewClick = () => {
     if (!data) return;
     
-    // Navigate to grooming review screen
-    navigate(`/owner/grooming/${data.id}/review`);
+    // TODO: Navigate to review screen for grooming
+    toast.info('Función de reseñas próximamente');
   };
 
   const handleSendMessage = () => {
