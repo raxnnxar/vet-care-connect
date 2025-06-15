@@ -6,7 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { useGroomingDetail } from '../hooks/useGroomingDetail';
 import { useGroomingReviewForm } from '../hooks/useGroomingReviewForm';
-import ReviewForm from '@/features/vets/components/reviews/ReviewForm';
+import GroomingReviewForm from '../components/reviews/GroomingReviewForm';
 import GroomingProfileCard from '../components/reviews/GroomingProfileCard';
 
 const GroomingReviewScreen: React.FC = () => {
@@ -111,7 +111,7 @@ const GroomingReviewScreen: React.FC = () => {
           getInitials={getInitials}
         />
 
-        <ReviewForm
+        <GroomingReviewForm
           initialRating={rating}
           initialComment={comment}
           onRatingChange={setRating}

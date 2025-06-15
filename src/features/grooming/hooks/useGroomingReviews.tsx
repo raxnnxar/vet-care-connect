@@ -44,10 +44,10 @@ export const useGroomingReviews = (groomingId: string) => {
 
       if (error) throw error;
 
-      // Get pet owner profiles separately
-      const petOwnerIds = (data || []).map(review => review.pet_owner_id);
-      
-      if (petOwnerIds.length > 0) {
+      // Get pet owner profiles separately to avoid schema relationship issues
+      if (data && data.length > 0) {
+        const petOwnerIds = data.map(review => review.pet_owner_id);
+        
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, display_name')
@@ -56,7 +56,7 @@ export const useGroomingReviews = (groomingId: string) => {
         if (profilesError) throw profilesError;
 
         // Transform the data to match our expected structure
-        const transformedReviews = (data || []).map(review => {
+        const transformedReviews = data.map(review => {
           const profile = profiles?.find(p => p.id === review.pet_owner_id);
           return {
             ...review,

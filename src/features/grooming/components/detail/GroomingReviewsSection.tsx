@@ -2,7 +2,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { useGroomingReviews } from '../../hooks/useGroomingReviews';
-import ReviewItem from '@/features/vets/components/reviews/ReviewItem';
+import GroomingReviewItem from '../reviews/GroomingReviewItem';
 import ReviewsLoadingState from '@/features/vets/components/reviews/ReviewsLoadingState';
 import ReviewsStateMessage from '@/features/vets/components/reviews/ReviewsStateMessage';
 
@@ -56,7 +56,7 @@ const GroomingReviewsSection: React.FC<GroomingReviewsSectionProps> = ({
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <ReviewItem
+            <GroomingReviewItem
               key={review.id}
               id={review.id}
               reviewerName={review.pet_owner.profiles.display_name}
