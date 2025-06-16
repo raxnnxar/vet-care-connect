@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
@@ -10,11 +10,13 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
+import MedicalInfoViewer from '@/features/pets/components/medical/MedicalInfoViewer';
 
 const DetallesCitaScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [showFullMedicalHistory, setShowFullMedicalHistory] = useState(false);
   
   const { data: appointmentDetails, isLoading, error } = useQuery({
     queryKey: ['appointment-details', id],
@@ -35,7 +37,8 @@ const DetallesCitaScreen: React.FC = () => {
             weight,
             sex,
             temperament,
-            profile_picture_url
+            profile_picture_url,
+            owner_id
           ),
           pet_owners!appointments_owner_id_fkey (
             address,
@@ -144,10 +147,8 @@ const DetallesCitaScreen: React.FC = () => {
   };
 
   const handleViewMedicalHistory = () => {
-    // Navigate to a detailed medical history view
     if (appointmentDetails?.appointment?.pets?.id) {
-      toast.info('Funcionalidad de historial médico completo próximamente');
-      // Future: navigate(`/vet/pets/${appointmentDetails.appointment.pets.id}/medical-history`);
+      setShowFullMedicalHistory(true);
     } else {
       toast.error('No se pudo encontrar la información de la mascota');
     }
@@ -275,6 +276,27 @@ const DetallesCitaScreen: React.FC = () => {
       return 'Edad no disponible';
     }
   };
+  
+  // Show full medical history modal
+  if (showFullMedicalHistory && appointment.pets) {
+    return (
+      <LayoutBase
+        header={
+          <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
+            <Button variant="ghost" size="icon" className="text-white" onClick={() => setShowFullMedicalHistory(false)}>
+              <ArrowLeft />
+            </Button>
+            <h1 className="text-white font-medium text-lg ml-2">
+              Historial Médico - {appointment.pets.name}
+            </h1>
+          </div>
+        }
+        footer={<NavbarInferior activeTab="home" />}
+      >
+        <MedicalInfoViewer pet={appointment.pets} />
+      </LayoutBase>
+    );
+  }
   
   return (
     <LayoutBase
