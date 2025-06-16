@@ -12,6 +12,7 @@ import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 import MedicalInfoViewer from '@/features/pets/components/medical/MedicalInfoViewer';
+import RejectAppointmentModal from '@/features/vets/components/RejectAppointmentModal';
 import { useSelector } from 'react-redux';
 
 const DetallesCitaScreen: React.FC = () => {
@@ -19,6 +20,7 @@ const DetallesCitaScreen: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showFullMedicalHistory, setShowFullMedicalHistory] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
   
   const { data: appointmentDetails, isLoading, error } = useQuery({
@@ -111,34 +113,12 @@ const DetallesCitaScreen: React.FC = () => {
     }
   };
 
-  const handleRejectAppointment = async () => {
-    if (!id) return;
-    
-    try {
-      console.log('Rejecting appointment:', id);
-      const { data, error } = await supabase
-        .from('appointments')
-        .update({ status: APPOINTMENT_STATUS.CANCELLED })
-        .eq('id', id)
-        .select();
-      
-      if (error) {
-        throw error;
-      }
-      
-      console.log('Appointment rejected successfully:', data);
-      
-      // Invalidate and refetch queries
-      queryClient.invalidateQueries({ queryKey: ['appointment-details', id] });
-      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
-      
-      toast.success('Cita rechazada correctamente');
-    } catch (error) {
-      console.error('Error rejecting appointment:', error);
-      toast.error('Error al rechazar la cita');
-    }
+  const handleRejectSuccess = () => {
+    // Invalidate and refetch queries
+    queryClient.invalidateQueries({ queryKey: ['appointment-details', id] });
+    queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+    queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
   };
 
   const handleSendMessage = async () => {
@@ -567,7 +547,7 @@ const DetallesCitaScreen: React.FC = () => {
               </Button>
               <Button 
                 className="flex-1 bg-[#EF4444] hover:bg-red-400 text-white"
-                onClick={handleRejectAppointment}
+                onClick={() => setShowRejectModal(true)}
               >
                 <X className="mr-2" size={16} />
                 Rechazar cita
@@ -584,6 +564,19 @@ const DetallesCitaScreen: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* Reject Modal */}
+      {appointmentDetails && (
+        <RejectAppointmentModal
+          isOpen={showRejectModal}
+          onClose={() => setShowRejectModal(false)}
+          appointmentId={id!}
+          ownerId={appointmentDetails.appointment.owner_id}
+          vetId={user?.id || ''}
+          petName={appointmentDetails.appointment.pets?.name || 'la mascota'}
+          onSuccess={handleRejectSuccess}
+        />
+      )}
     </LayoutBase>
   );
 };
