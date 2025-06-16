@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowRight } from 'lucide-react';
@@ -22,7 +21,6 @@ const VetDashboard: React.FC = () => {
   
   // State for appointments
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [appointmentDates, setAppointmentDates] = useState<Date[]>([]);
 
@@ -75,13 +73,6 @@ const VetDashboard: React.FC = () => {
           }
         });
         setAppointmentDates(dates);
-        
-        // Filter pending requests (status "pendiente")
-        const pendingAppointments = allAppointments.filter(appointment => 
-          appointment.status === 'pendiente'
-        );
-        console.log('Pending appointments:', pendingAppointments);
-        setPendingRequests(pendingAppointments);
         
         // Get today's confirmed appointments by default
         const todayAppointments = await getVetAppointmentsByDate(user.id, selectedDate);
@@ -162,7 +153,7 @@ const VetDashboard: React.FC = () => {
         />
 
         {/* Pending Requests Section */}
-        <PendingRequestsList requests={pendingRequests} />
+        <PendingRequestsList requests={[]} />
 
         {/* Appointment History Section */}
         <Card 

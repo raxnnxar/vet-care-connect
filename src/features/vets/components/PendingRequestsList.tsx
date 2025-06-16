@@ -2,167 +2,320 @@
 import React from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
-import { Clock, Check, X, RefreshCw } from 'lucide-react';
+import { Cat, Check, X, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Appointment } from '../api/vetAppointmentsApi';
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
+import { useEffect } from 'react';
 
-interface PendingRequestsListProps {
-  requests: Appointment[];
+interface PendingRequest {
+  id: string;
+  petName: string;
+  time: string;
+  date: string;
+  serviceType: string;
 }
 
-const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests }) => {
+interface PendingRequestsListProps {
+  requests: PendingRequest[];
+}
+
+interface PetData {
+  id: string;
+  name: string;
+}
+
+const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: initialRequests }) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const handleAcceptRequest = (requestId: string) => {
-    console.log('Accepting request:', requestId);
-    // TODO: Implement accept logic
+  // Fetch pending appointment requests from Supabase with real-time updates
+  const { data: requests, isLoading, refetch } = useQuery({
+    queryKey: ['pending-requests'],
+    queryFn: async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('No user logged in');
+
+      console.log('Fetching pending requests for user:', user.user.id);
+
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          id,
+          appointment_date,
+          service_type,
+          pets!appointments_pet_id_fkey(id, name)
+        `)
+        .eq('provider_id', user.user.id)
+        .eq('status', APPOINTMENT_STATUS.PENDING)
+        .order('appointment_date', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching pending requests:', error);
+        throw error;
+      }
+      
+      console.log('Raw pending appointments data:', data);
+      
+      return data.map(appointment => {
+        // Default pet name
+        let petName = 'Mascota';
+        
+        // First check if pets exists and is an object
+        if (appointment.pets && typeof appointment.pets === 'object') {
+          // Use type assertion after validating object exists
+          const petsData = appointment.pets as PetData;
+          
+          // Then check if it has a name property that's a string
+          if ('name' in petsData && typeof petsData.name === 'string') {
+            petName = petsData.name;
+          }
+        }
+        
+        // Safely parse appointment date
+        let timeFormatted = 'Hora no especificada';
+        let dateFormatted = 'Fecha no especificada';
+        
+        if (appointment.appointment_date) {
+          try {
+            if (typeof appointment.appointment_date === 'string') {
+              const date = new Date(appointment.appointment_date);
+              timeFormatted = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+              dateFormatted = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+            } else if (typeof appointment.appointment_date === 'object' && appointment.appointment_date !== null) {
+              const dateObj = appointment.appointment_date as any;
+              if (dateObj.date && dateObj.time) {
+                const date = new Date(`${dateObj.date}T${dateObj.time}`);
+                timeFormatted = dateObj.time;
+                dateFormatted = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+              }
+            }
+          } catch (error) {
+            console.error('Error parsing appointment date:', error);
+          }
+        }
+
+        // Safely parse service type
+        let serviceType = 'Servicio no especificado';
+        if (appointment.service_type) {
+          try {
+            if (typeof appointment.service_type === 'string') {
+              serviceType = appointment.service_type;
+            } else if (typeof appointment.service_type === 'object' && appointment.service_type !== null) {
+              const serviceObj = appointment.service_type as any;
+              serviceType = serviceObj.name || serviceObj.type || 'Servicio no especificado';
+            }
+          } catch (error) {
+            console.error('Error parsing service type:', error);
+          }
+        }
+        
+        return {
+          id: appointment.id,
+          petName,
+          time: timeFormatted,
+          date: dateFormatted,
+          serviceType
+        };
+      });
+    },
+    initialData: initialRequests,
+    refetchInterval: 10000, // Refetch every 10 seconds
+    staleTime: 0, // Consider data stale immediately
+  });
+
+  // Set up real-time subscription for appointments table
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: user } = await supabase.auth.getUser();
+      return user.user;
+    };
+
+    const setupRealtimeSubscription = async () => {
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      console.log('Setting up real-time subscription for pending requests');
+
+      const channel = supabase
+        .channel('pending-appointments-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+            schema: 'public',
+            table: 'appointments',
+            filter: `provider_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('Real-time change detected in appointments:', payload);
+            
+            // Check if the change is related to pending status
+            const newRecord = payload.new as any;
+            const oldRecord = payload.old as any;
+            
+            if (
+              (payload.eventType === 'INSERT' && newRecord?.status === APPOINTMENT_STATUS.PENDING) ||
+              (payload.eventType === 'UPDATE' && (
+                newRecord?.status === APPOINTMENT_STATUS.PENDING || 
+                oldRecord?.status === APPOINTMENT_STATUS.PENDING
+              )) ||
+              payload.eventType === 'DELETE'
+            ) {
+              console.log('Invalidating pending requests query due to relevant change');
+              // Invalidate and refetch the pending requests
+              queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+            }
+          }
+        )
+        .subscribe((status) => {
+          console.log('Real-time subscription status:', status);
+        });
+
+      return () => {
+        console.log('Cleaning up real-time subscription');
+        supabase.removeChannel(channel);
+      };
+    };
+
+    setupRealtimeSubscription();
+  }, [queryClient]);
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    console.log('Manual refresh triggered');
+    refetch();
   };
 
-  const handleRejectRequest = (requestId: string) => {
-    console.log('Rejecting request:', requestId);
-    // TODO: Implement reject logic
-  };
-
-  const handleViewDetails = (requestId: string) => {
+  const handleViewRequest = (requestId: string) => {
     navigate(`/vet/appointments/${requestId}`);
   };
 
-  const handleRefreshRequests = () => {
-    console.log('Refreshing requests');
-    // TODO: Implement refresh logic
-  };
-
-  const formatRequestDate = (dateData: any) => {
+  const handleApproveRequest = async (requestId: string) => {
     try {
-      if (typeof dateData === 'string') {
-        const date = parseISO(dateData);
-        return format(date, "d 'de' MMMM", { locale: es });
-      } else if (typeof dateData === 'object' && dateData !== null) {
-        if (dateData.date) {
-          const date = parseISO(dateData.date);
-          return format(date, "d 'de' MMMM", { locale: es });
-        }
+      console.log('Approving request:', requestId);
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ status: APPOINTMENT_STATUS.CONFIRMED })
+        .eq('id', requestId)
+        .select();
+      
+      if (error) {
+        throw error;
       }
-      return 'Fecha no disponible';
-    } catch (err) {
-      return 'Fecha no disponible';
+      
+      console.log('Request approved successfully:', data);
+      
+      // Invalidate and refetch the pending requests
+      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+      
+      // Also invalidate any appointment-related queries
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
+      
+      toast.success('Cita aprobada correctamente');
+    } catch (error) {
+      console.error('Error approving request:', error);
+      toast.error('Error al aprobar la cita');
     }
   };
 
-  const formatRequestTime = (dateData: any) => {
+  const handleRejectRequest = async (requestId: string) => {
     try {
-      if (typeof dateData === 'string') {
-        const date = parseISO(dateData);
-        return format(date, "h:mm a", { locale: es });
-      } else if (typeof dateData === 'object' && dateData !== null) {
-        if (dateData.time) {
-          return dateData.time;
-        }
+      console.log('Rejecting request:', requestId);
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ status: APPOINTMENT_STATUS.CANCELLED })
+        .eq('id', requestId)
+        .select();
+      
+      if (error) {
+        throw error;
       }
-      return 'Hora no disponible';
-    } catch (err) {
-      return 'Hora no disponible';
+      
+      console.log('Request rejected successfully:', data);
+      
+      // Invalidate and refetch the pending requests
+      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+      
+      // Also invalidate any appointment-related queries
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
+      
+      toast.success('Cita rechazada correctamente');
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      toast.error('Error al rechazar la cita');
     }
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-3">
-        <h2 className="text-xl font-medium text-[#1F2937]">
-          Solicitudes pendientes
-        </h2>
-        <Button
-          onClick={handleRefreshRequests}
-          variant="outline"
+        <h2 className="text-xl font-medium text-[#1F2937]">Solicitudes pendientes</h2>
+        <Button 
+          variant="outline" 
           size="sm"
-          className="flex items-center space-x-2"
+          onClick={handleRefresh}
+          className="text-xs"
         >
-          <RefreshCw size={16} />
-          <span>Actualizar</span>
+          Actualizar
         </Button>
       </div>
       
-      {requests.length > 0 ? (
-        <div className="space-y-3">
-          {requests.map((request) => (
-            <Card 
-              key={request.id} 
-              className="p-4 border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => handleViewDetails(request.id)}
-            >
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-yellow-100 p-2 rounded-full">
-                    <Clock size={20} className="text-yellow-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#1F2937]">{request.petName}</p>
-                    <p className="text-sm text-gray-600">Solicitud de cita</p>
-                  </div>
-                </div>
-                <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                  Pendiente
-                </span>
-              </div>
-              
-              <div className="mb-3 space-y-1">
-                <p className="text-sm text-gray-600">
-                  <strong>Fecha:</strong> {formatRequestDate(request.appointment_date)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Hora:</strong> {formatRequestTime(request.appointment_date)}
-                </p>
-                {request.service_type && typeof request.service_type === 'object' && (
-                  <p className="text-sm text-gray-600">
-                    <strong>Servicio:</strong> {(request.service_type as any).name || 'Servicio no especificado'}
-                  </p>
-                )}
-                {request.reason && (
-                  <p className="text-sm text-gray-600">
-                    <strong>Motivo:</strong> {request.reason}
-                  </p>
-                )}
-              </div>
-              
-              <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
-                <Button
-                  onClick={() => handleAcceptRequest(request.id)}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                  size="sm"
-                >
-                  <Check size={16} className="mr-1" />
-                  Aceptar
-                </Button>
-                <Button
-                  onClick={() => handleRejectRequest(request.id)}
-                  variant="outline"
-                  className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
-                  size="sm"
-                >
-                  <X size={16} className="mr-1" />
-                  Rechazar
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card className="p-6 text-center border border-gray-200">
-          <div className="flex flex-col items-center space-y-3">
-            <div className="bg-gray-100 p-3 rounded-full">
-              <Clock size={24} className="text-gray-400" />
-            </div>
-            <div>
-              <p className="text-gray-500 font-medium">
-                No hay solicitudes pendientes
-              </p>
-              <p className="text-sm text-gray-400 mt-1">
-                Las nuevas solicitudes de citas aparecerán aquí
-              </p>
-            </div>
+      {isLoading ? (
+        <Card className="p-4 text-center">
+          <div className="animate-pulse flex flex-col space-y-3">
+            <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
+            <div className="h-24 bg-gray-200 rounded w-full"></div>
           </div>
+        </Card>
+      ) : requests && requests.length > 0 ? (
+        requests.map((request) => (
+          <Card key={request.id} className="p-3 mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <div className="bg-gray-100 p-2 rounded-full">
+                  <Cat size={24} className="text-[#4DA6A8]" />
+                </div>
+                <div>
+                  <p className="font-medium text-lg">{request.petName}</p>
+                  <p className="text-gray-500">{request.date} — {request.time}</p>
+                  <p className="text-sm text-gray-600">{request.serviceType}</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                className="bg-[#79D0B8] hover:bg-[#5FBFB3] text-white rounded-full h-10 w-10 p-0"
+                size="icon"
+                onClick={() => handleApproveRequest(request.id)}
+              >
+                <Check size={18} />
+              </Button>
+              <Button 
+                className="bg-[#EF4444] hover:bg-red-400 text-white rounded-full h-10 w-10 p-0"
+                size="icon"
+                onClick={() => handleRejectRequest(request.id)}
+              >
+                <X size={18} />
+              </Button>
+              <Button 
+                variant="outline"
+                className="border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10 rounded-full h-10 w-10 p-0"
+                size="icon"
+                onClick={() => handleViewRequest(request.id)}
+              >
+                <MessageSquare size={18} />
+              </Button>
+            </div>
+          </Card>
+        ))
+      ) : (
+        <Card className="p-4 text-center text-gray-500">
+          No hay solicitudes pendientes
         </Card>
       )}
     </div>
