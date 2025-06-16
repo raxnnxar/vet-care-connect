@@ -26,8 +26,8 @@ const GroomingWeeklyAgendaScreen: React.FC = () => {
     addDays(currentWeekStart, i)
   );
 
-  // Get dynamic time range based on grooming availability
-  const getDynamicTimeRange = () => {
+  // Get the overall time range based on grooming availability for the entire week
+  const getWeekTimeRange = () => {
     if (!groomingProfile?.availability) return { start: '09:00', end: '18:00' };
     
     let earliestStart = '23:59';
@@ -52,9 +52,9 @@ const GroomingWeeklyAgendaScreen: React.FC = () => {
     };
   };
 
-  // Generate time slots based on dynamic range
+  // Generate time slots based on the week's overall time range
   const generateTimeSlots = () => {
-    const { start, end } = getDynamicTimeRange();
+    const { start, end } = getWeekTimeRange();
     const slots = [];
     
     const [startHour, startMinute] = start.split(':').map(Number);
@@ -63,6 +63,7 @@ const GroomingWeeklyAgendaScreen: React.FC = () => {
     let currentHour = startHour;
     let currentMinute = startMinute;
     
+    // Generate slots until we reach the end time
     while (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute)) {
       const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       slots.push(timeStr);
@@ -232,6 +233,8 @@ const GroomingWeeklyAgendaScreen: React.FC = () => {
             <div className="text-xs font-medium text-gray-500 p-2">Hora</div>
             {weekDays.map((day, index) => {
               const dayAvailable = isGroomingAvailable(day);
+              const { start: dayStart, end: dayEnd } = getGroomingWorkingHours(day);
+              
               return (
                 <div 
                   key={index} 
@@ -249,6 +252,11 @@ const GroomingWeeklyAgendaScreen: React.FC = () => {
                   }`}>
                     {format(day, 'd')}
                   </div>
+                  {dayAvailable && (
+                    <div className="text-xs text-gray-400 mt-1">
+                      {dayStart} - {dayEnd}
+                    </div>
+                  )}
                 </div>
               );
             })}
