@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { VET_ROUTES } from './navigationConfig';
@@ -39,17 +40,18 @@ const UnderConstructionPage: React.FC<UnderConstructionPageProps> = ({ title }) 
 const VetNavigator: React.FC = () => {
   return (
     <Routes>
-      <Route path={VET_ROUTES.DASHBOARD} element={<VetDashboard />} />
-      <Route path={VET_ROUTES.APPOINTMENTS} element={<UnderConstructionPage title="Citas" />} />
-      <Route path={VET_ROUTES.APPOINTMENT_DETAIL} element={<VetAppointmentDetailScreen />} />
-      <Route path={VET_ROUTES.PROFILE} element={<VetProfileScreen />} />
-      <Route path={VET_ROUTES.SETTINGS} element={<SettingsScreen />} />
-      <Route path={VET_ROUTES.PATIENTS} element={<UnderConstructionPage title="Pacientes" />} />
-      <Route path={VET_ROUTES.SCHEDULE} element={<VetScheduleScreen />} />
-      <Route path={VET_ROUTES.CHATS} element={<ChatsScreen />} />
-      <Route path={VET_ROUTES.INDIVIDUAL_CHAT} element={<IndividualChatScreen />} />
-      <Route path="/agenda" element={<VetWeeklyAgendaScreen />} />
-      <Route path="/detalles-cita/:id" element={<DetallesCitaScreen />} />
+      <Route path="/" element={<VetDashboard />} />
+      <Route path={VET_ROUTES.DASHBOARD.replace('/vet', '')} element={<VetDashboard />} />
+      <Route path={VET_ROUTES.APPOINTMENTS.replace('/vet', '')} element={<UnderConstructionPage title="Citas" />} />
+      <Route path={VET_ROUTES.APPOINTMENT_DETAIL.replace('/vet', '')} element={<VetAppointmentDetailScreen />} />
+      <Route path={VET_ROUTES.PROFILE.replace('/vet', '')} element={<VetProfileScreen />} />
+      <Route path={VET_ROUTES.SETTINGS.replace('/vet', '')} element={<SettingsScreen />} />
+      <Route path={VET_ROUTES.PATIENTS.replace('/vet', '')} element={<UnderConstructionPage title="Pacientes" />} />
+      <Route path={VET_ROUTES.SCHEDULE.replace('/vet', '')} element={<VetScheduleScreen />} />
+      <Route path={VET_ROUTES.CHATS.replace('/vet', '')} element={<ChatsScreen />} />
+      <Route path={VET_ROUTES.INDIVIDUAL_CHAT.replace('/vet', '')} element={<IndividualChatScreen />} />
+      <Route path="agenda" element={<VetWeeklyAgendaScreen />} />
+      <Route path="detalles-cita/:id" element={<DetallesCitaScreen />} />
       <Route path="*" element={<VetDashboard />} />
     </Routes>
   );

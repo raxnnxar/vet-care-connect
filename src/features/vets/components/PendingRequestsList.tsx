@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
@@ -193,7 +194,8 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
   };
 
   const handleViewDetails = (requestId: string) => {
-    navigate(`/detalles-cita/${requestId}`);
+    console.log('Navigating to appointment details:', requestId);
+    navigate(`/vet/detalles-cita/${requestId}`);
   };
 
   const handleApproveRequest = async (requestId: string) => {

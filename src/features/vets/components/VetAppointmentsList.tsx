@@ -28,7 +28,8 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
   };
 
   const handleViewDetails = (appointmentId: string) => {
-    navigate(`/detalles-cita/${appointmentId}`);
+    console.log('Navigating to appointment details:', appointmentId);
+    navigate(`/vet/detalles-cita/${appointmentId}`);
   };
   
   return (
