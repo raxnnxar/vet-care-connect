@@ -4,6 +4,7 @@ import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft, Cat, Calendar, Clock, MapPin, Phone, FileText, Heart, Pill, Scissors, Check, X, MessageSquare } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
+import { ScrollArea } from '@/ui/molecules/scroll-area';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -294,7 +295,9 @@ const DetallesCitaScreen: React.FC = () => {
         }
         footer={<NavbarInferior activeTab="home" />}
       >
-        <MedicalInfoViewer pet={appointment.pets} />
+        <ScrollArea className="h-[calc(100vh-140px)]">
+          <MedicalInfoViewer pet={appointment.pets} />
+        </ScrollArea>
       </LayoutBase>
     );
   }
