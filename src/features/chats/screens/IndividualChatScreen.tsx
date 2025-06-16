@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -46,16 +45,27 @@ const IndividualChatScreen: React.FC = () => {
       try {
         console.log('Fetching conversation data for:', conversationId);
         
-        // Get conversation details and other user info
+        // Get conversation details and other user info - usar maybeSingle() en lugar de single()
         const { data: conversation, error: convError } = await supabase
           .from('conversations')
           .select('user1_id, user2_id')
           .eq('id', conversationId)
-          .single();
+          .maybeSingle();
 
         if (convError) {
           console.error('Conversation error:', convError);
           throw convError;
+        }
+
+        if (!conversation) {
+          console.error('Conversation not found');
+          toast({
+            title: "Error",
+            description: "No se encontró la conversación",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
         }
 
         console.log('Conversation data:', conversation);
@@ -86,7 +96,7 @@ const IndividualChatScreen: React.FC = () => {
           .from('veterinarians')
           .select('profile_image_url')
           .eq('id', otherUserId)
-          .single();
+          .maybeSingle();
 
         console.log('Vet data:', vetData);
 

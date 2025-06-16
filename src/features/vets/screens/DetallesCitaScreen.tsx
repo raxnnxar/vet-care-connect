@@ -12,12 +12,14 @@ import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 import MedicalInfoViewer from '@/features/pets/components/medical/MedicalInfoViewer';
+import { useSelector } from 'react-redux';
 
 const DetallesCitaScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showFullMedicalHistory, setShowFullMedicalHistory] = useState(false);
+  const { user } = useSelector((state: any) => state.auth);
   
   const { data: appointmentDetails, isLoading, error } = useQuery({
     queryKey: ['appointment-details', id],
@@ -139,12 +141,34 @@ const DetallesCitaScreen: React.FC = () => {
     }
   };
 
-  const handleSendMessage = () => {
-    // Navigate to chat with owner
-    if (appointmentDetails?.appointment?.owner_id) {
-      navigate(`/vet/chats/${appointmentDetails.appointment.owner_id}`);
-    } else {
-      toast.error('No se pudo encontrar la información del dueño');
+  const handleSendMessage = async () => {
+    if (!appointmentDetails?.appointment?.owner_id || !user?.id) {
+      toast.error('No se pudo encontrar la información del usuario');
+      return;
+    }
+
+    try {
+      // Usar la función get_or_create_conversation para crear o encontrar una conversación
+      const { data: conversationId, error } = await supabase.rpc('get_or_create_conversation', {
+        user1_uuid: user.id,
+        user2_uuid: appointmentDetails.appointment.owner_id
+      });
+
+      if (error) {
+        console.error('Error creating/getting conversation:', error);
+        toast.error('Error al crear la conversación');
+        return;
+      }
+
+      if (conversationId) {
+        // Navegar al chat individual con el ID de conversación correcto
+        navigate(`/vet/chats/${conversationId}`);
+      } else {
+        toast.error('No se pudo crear la conversación');
+      }
+    } catch (error) {
+      console.error('Error handling send message:', error);
+      toast.error('Error al enviar mensaje');
     }
   };
 
