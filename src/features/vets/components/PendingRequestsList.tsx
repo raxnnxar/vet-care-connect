@@ -4,19 +4,12 @@ import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
 import { Clock, Check, X, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-interface PendingRequest {
-  id: string;
-  petName: string;
-  ownerName: string;
-  requestedDate: string;
-  requestedTime: string;
-  service: string;
-  notes?: string;
-}
+import { Appointment } from '../api/vetAppointmentsApi';
+import { format, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface PendingRequestsListProps {
-  requests: PendingRequest[];
+  requests: Appointment[];
 }
 
 const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests }) => {
@@ -39,6 +32,39 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests }) =
   const handleRefreshRequests = () => {
     console.log('Refreshing requests');
     // TODO: Implement refresh logic
+  };
+
+  const formatRequestDate = (dateData: any) => {
+    try {
+      if (typeof dateData === 'string') {
+        const date = parseISO(dateData);
+        return format(date, "d 'de' MMMM", { locale: es });
+      } else if (typeof dateData === 'object' && dateData !== null) {
+        if (dateData.date) {
+          const date = parseISO(dateData.date);
+          return format(date, "d 'de' MMMM", { locale: es });
+        }
+      }
+      return 'Fecha no disponible';
+    } catch (err) {
+      return 'Fecha no disponible';
+    }
+  };
+
+  const formatRequestTime = (dateData: any) => {
+    try {
+      if (typeof dateData === 'string') {
+        const date = parseISO(dateData);
+        return format(date, "h:mm a", { locale: es });
+      } else if (typeof dateData === 'object' && dateData !== null) {
+        if (dateData.time) {
+          return dateData.time;
+        }
+      }
+      return 'Hora no disponible';
+    } catch (err) {
+      return 'Hora no disponible';
+    }
   };
 
   return (
@@ -73,7 +99,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests }) =
                   </div>
                   <div>
                     <p className="font-semibold text-[#1F2937]">{request.petName}</p>
-                    <p className="text-sm text-gray-600">Cliente: {request.ownerName}</p>
+                    <p className="text-sm text-gray-600">Solicitud de cita</p>
                   </div>
                 </div>
                 <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
@@ -83,17 +109,19 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests }) =
               
               <div className="mb-3 space-y-1">
                 <p className="text-sm text-gray-600">
-                  <strong>Fecha:</strong> {request.requestedDate}
+                  <strong>Fecha:</strong> {formatRequestDate(request.appointment_date)}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Hora:</strong> {request.requestedTime}
+                  <strong>Hora:</strong> {formatRequestTime(request.appointment_date)}
                 </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Servicio:</strong> {request.service}
-                </p>
-                {request.notes && (
+                {request.service_type && typeof request.service_type === 'object' && (
                   <p className="text-sm text-gray-600">
-                    <strong>Notas:</strong> {request.notes}
+                    <strong>Servicio:</strong> {(request.service_type as any).name || 'Servicio no especificado'}
+                  </p>
+                )}
+                {request.reason && (
+                  <p className="text-sm text-gray-600">
+                    <strong>Motivo:</strong> {request.reason}
                   </p>
                 )}
               </div>
