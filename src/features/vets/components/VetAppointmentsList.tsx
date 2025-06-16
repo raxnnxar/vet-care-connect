@@ -26,6 +26,10 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
   const handleViewAppointment = (appointmentId: string) => {
     navigate(`/vet/appointments/${appointmentId}`);
   };
+
+  const handleViewDetails = (appointmentId: string) => {
+    navigate(`/detalles-cita/${appointmentId}`);
+  };
   
   return (
     <div>
@@ -47,7 +51,11 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
         <div className="overflow-x-auto">
           <div className="flex gap-3 pb-2" style={{ minWidth: 'fit-content' }}>
             {appointments.map((appointment) => (
-              <Card key={appointment.id} className="flex-shrink-0 w-72 p-4 border border-gray-200 hover:shadow-md transition-shadow">
+              <Card 
+                key={appointment.id} 
+                className="flex-shrink-0 w-72 p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => handleViewDetails(appointment.id)}
+              >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     <div className="bg-[#79D0B8]/10 p-2 rounded-full">
@@ -79,7 +87,10 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
                   </div>
                   <Button 
                     className="bg-[#79D0B8] hover:bg-[#5FBFB3] text-white text-sm px-4 py-2 h-9"
-                    onClick={() => handleViewAppointment(appointment.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewAppointment(appointment.id);
+                    }}
                   >
                     Ver detalles
                   </Button>

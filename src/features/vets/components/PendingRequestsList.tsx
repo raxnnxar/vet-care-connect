@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
@@ -193,6 +192,10 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     navigate(`/vet/appointments/${requestId}`);
   };
 
+  const handleViewDetails = (requestId: string) => {
+    navigate(`/detalles-cita/${requestId}`);
+  };
+
   const handleApproveRequest = async (requestId: string) => {
     try {
       console.log('Approving request:', requestId);
@@ -275,7 +278,10 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       ) : requests && requests.length > 0 ? (
         requests.map((request) => (
           <Card key={request.id} className="p-3 mb-3">
-            <div className="flex items-center justify-between mb-3">
+            <div 
+              className="flex items-center justify-between mb-3 cursor-pointer"
+              onClick={() => handleViewDetails(request.id)}
+            >
               <div className="flex items-center space-x-3">
                 <div className="bg-gray-100 p-2 rounded-full">
                   <Cat size={24} className="text-[#4DA6A8]" />
@@ -291,14 +297,20 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
               <Button 
                 className="bg-[#79D0B8] hover:bg-[#5FBFB3] text-white rounded-full h-10 w-10 p-0"
                 size="icon"
-                onClick={() => handleApproveRequest(request.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleApproveRequest(request.id);
+                }}
               >
                 <Check size={18} />
               </Button>
               <Button 
                 className="bg-[#EF4444] hover:bg-red-400 text-white rounded-full h-10 w-10 p-0"
                 size="icon"
-                onClick={() => handleRejectRequest(request.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRejectRequest(request.id);
+                }}
               >
                 <X size={18} />
               </Button>
@@ -306,7 +318,10 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
                 variant="outline"
                 className="border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10 rounded-full h-10 w-10 p-0"
                 size="icon"
-                onClick={() => handleViewRequest(request.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewRequest(request.id);
+                }}
               >
                 <MessageSquare size={18} />
               </Button>
