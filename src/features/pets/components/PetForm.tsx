@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ScrollArea } from '@/ui/molecules/scroll-area';
@@ -32,6 +33,7 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
       return {
         name: '',
         species: '',
+        breed: '',
         customSpecies: '',
         age: undefined,
         weight: undefined,
@@ -78,6 +80,7 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
     return {
       name: pet.name || '',
       species: species,
+      breed: pet.breed || '',
       customSpecies: customSpecies,
       age: age,
       weight: pet.weight ? Number(pet.weight) : undefined,
@@ -119,7 +122,7 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
       const transformedData: any = {
         name: data.name,
         species: data.species === 'Otro' ? PET_CATEGORIES.OTHER : speciesMapping[data.species],
-        breed: data.species === 'Otro' ? data.customSpecies : '',
+        breed: data.breed || '',
         additional_notes: data.additionalNotes || '',
         weight: data.weight || null,
         sex: data.sex ? genderMapping[data.sex] : null,

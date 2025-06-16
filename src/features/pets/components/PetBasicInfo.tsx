@@ -3,6 +3,7 @@ import React from 'react';
 import { PetBasicInfoProps } from '@/features/pets/types/formTypes';
 import PetNameField from './form/fields/PetNameField';
 import PetSpeciesField, { speciesMapping } from './form/fields/PetSpeciesField';
+import PetBreedField from './form/fields/PetBreedField';
 import CustomSpeciesField from './form/fields/CustomSpeciesField';
 import PetMeasurementsFields from './form/fields/PetMeasurementsFields';
 import PetSexField from './form/fields/PetSexField';
@@ -18,6 +19,7 @@ const PetBasicInfo: React.FC<PetBasicInfoProps> = ({
     <>
       <PetNameField register={register} errors={errors} />
       <PetSpeciesField control={control} errors={errors} />
+      <PetBreedField register={register} errors={errors} />
       <CustomSpeciesField 
         register={register} 
         errors={errors} 
