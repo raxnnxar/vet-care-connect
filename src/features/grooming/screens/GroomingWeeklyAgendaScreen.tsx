@@ -63,7 +63,7 @@ const GroomingWeeklyAgendaScreen: React.FC = () => {
     let currentMinute = startMinute;
     
     // Generate slots until we reach the end time (INCLUSIVE of the end time)
-    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
+    while (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute)) {
       const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       slots.push(timeStr);
       
@@ -257,7 +257,7 @@ const GroomingWeeklyAgendaScreen: React.FC = () => {
         </div>
 
         {/* Scrollable Time slots grid */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-20">
           <div className="space-y-0">
             {timeSlots.map((timeSlot, timeIndex) => (
               <div key={timeIndex} className="grid grid-cols-8 gap-1 border-b border-gray-100 px-4">
