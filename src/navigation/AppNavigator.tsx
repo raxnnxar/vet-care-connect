@@ -31,7 +31,7 @@ const AppNavigator = () => {
       console.log('Current role info:', { userRole, providerType });
       console.log('Current path:', location.pathname);
       
-      // Skip navigation logic if user is already on specific screens
+      // Skip navigation logic if user is already on specific screens or vet routes
       if (
         location.pathname === ROUTES.PROFILE_SETUP || 
         location.pathname === '/location-setup' ||
@@ -43,9 +43,12 @@ const AppNavigator = () => {
         location.pathname === ROUTES.POST_SIGNUP_SERVICE_TYPE ||
         location.pathname.includes('/profile') ||
         location.pathname.includes('/chats') ||
-        location.pathname.includes('/review')
+        location.pathname.includes('/review') ||
+        location.pathname.includes('/detalles-cita') ||
+        location.pathname.includes('/appointments') ||
+        location.pathname.includes('/agenda')
       ) {
-        console.log('User is on a setup/profile/chat/review screen, allowing completion of flow');
+        console.log('User is on a setup/profile/chat/review/vet screen, allowing completion of flow');
         return;
       }
       
@@ -73,7 +76,7 @@ const AppNavigator = () => {
         return;
       }
       
-      // Mejorado: Redirigir según el rol y tipo de usuario
+      // Mejorado: Redirigir según el rol y tipo de usuario SOLO si está en la raíz
       if (location.pathname === '/') {
         if (userRole === 'pet_owner') {
           console.log('Redirecting pet owner to owner home');
