@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowLeft, Cat } from 'lucide-react';
@@ -63,8 +62,8 @@ const VetWeeklyAgendaScreen: React.FC = () => {
     let currentHour = startHour;
     let currentMinute = startMinute;
     
-    // Generate slots until we reach the end time
-    while (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute)) {
+    // Generate slots until we reach the end time (INCLUSIVE of the end time)
+    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       slots.push(timeStr);
       
@@ -130,7 +129,7 @@ const VetWeeklyAgendaScreen: React.FC = () => {
     if (!isVetAvailable(date)) return false;
     
     const { start, end } = getVetWorkingHours(date);
-    return timeSlot >= start && timeSlot <= end;
+    return timeSlot >= start && timeSlot < end;
   };
 
   // Get appointment for specific date and time
@@ -227,13 +226,12 @@ const VetWeeklyAgendaScreen: React.FC = () => {
       footer={<NavbarInferior activeTab="home" />}
     >
       <div className="flex flex-col h-full">
-        {/* Fixed Week header with rounded design */}
+        {/* Fixed Week header */}
         <div className="bg-white shadow-sm border-b border-gray-100">
           <div className="grid grid-cols-8 gap-1 p-4">
             <div className="text-xs font-medium text-gray-500 p-2">Hora</div>
             {weekDays.map((day, index) => {
               const dayAvailable = isVetAvailable(day);
-              const { start: dayStart, end: dayEnd } = getVetWorkingHours(day);
               
               return (
                 <div 
@@ -252,11 +250,6 @@ const VetWeeklyAgendaScreen: React.FC = () => {
                   }`}>
                     {format(day, 'd')}
                   </div>
-                  {dayAvailable && (
-                    <div className="text-xs text-gray-400 mt-1">
-                      {dayStart} - {dayEnd}
-                    </div>
-                  )}
                 </div>
               );
             })}
