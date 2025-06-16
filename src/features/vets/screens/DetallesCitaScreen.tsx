@@ -249,10 +249,10 @@ const DetallesCitaScreen: React.FC = () => {
   
   const getStatusBadge = (status: string) => {
     const statusMap: { [key: string]: { label: string; color: string } } = {
-      pending: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
-      confirmed: { label: 'Confirmada', color: 'bg-green-100 text-green-800' },
-      completed: { label: 'Completada', color: 'bg-blue-100 text-blue-800' },
-      cancelled: { label: 'Cancelada', color: 'bg-red-100 text-red-800' }
+      pendiente: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
+      programada: { label: 'Confirmada', color: 'bg-green-100 text-green-800' },
+      completada: { label: 'Completada', color: 'bg-blue-100 text-blue-800' },
+      cancelada: { label: 'Cancelada', color: 'bg-red-100 text-red-800' }
     };
     
     const statusInfo = statusMap[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
@@ -506,7 +506,7 @@ const DetallesCitaScreen: React.FC = () => {
         
         {/* Action Buttons */}
         <div className="flex flex-col gap-3">
-          {appointment.status === 'pending' && (
+          {appointment.status === APPOINTMENT_STATUS.PENDING && (
             <div className="flex gap-3">
               <Button 
                 className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3] text-white"
