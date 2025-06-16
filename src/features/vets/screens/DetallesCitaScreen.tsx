@@ -38,7 +38,8 @@ const DetallesCitaScreen: React.FC = () => {
             sex,
             temperament,
             profile_picture_url,
-            owner_id
+            owner_id,
+            created_at
           ),
           pet_owners!appointments_owner_id_fkey (
             address,
