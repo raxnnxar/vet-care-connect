@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card } from '@/ui/molecules/card';
-import { Button } from '@/ui/atoms/button';
 import { Cat, Clock, Calendar } from 'lucide-react';
 import { Appointment } from '../api/vetAppointmentsApi';
 import { format, isSameDay } from 'date-fns';
@@ -22,10 +21,6 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
   const navigate = useNavigate();
   const formattedSelectedDate = format(selectedDate, 'd MMMM', { locale: es });
   const isToday = isSameDay(selectedDate, new Date());
-  
-  const handleViewAppointment = (appointmentId: string) => {
-    navigate(`/vet/appointments/${appointmentId}`);
-  };
 
   const handleViewDetails = (appointmentId: string) => {
     console.log('Navigating to appointment details:', appointmentId);
@@ -79,22 +74,13 @@ const VetAppointmentsList: React.FC<VetAppointmentsListProps> = ({
                   </div>
                 )}
                 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-center items-center">
                   <div className="flex items-center space-x-1 text-xs text-gray-500">
                     <Calendar size={12} />
                     <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
                       Confirmada
                     </span>
                   </div>
-                  <Button 
-                    className="bg-[#79D0B8] hover:bg-[#5FBFB3] text-white text-sm px-4 py-2 h-9"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewAppointment(appointment.id);
-                    }}
-                  >
-                    Ver detalles
-                  </Button>
                 </div>
               </Card>
             ))}

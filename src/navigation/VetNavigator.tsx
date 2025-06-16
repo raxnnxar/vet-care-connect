@@ -4,7 +4,6 @@ import { Routes, Route } from 'react-router-dom';
 import { VET_ROUTES } from './navigationConfig';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import VetDashboard from '@/features/vets/screens/VetDashboard';
-import VetAppointmentDetailScreen from '@/features/vets/screens/VetAppointmentDetailScreen';
 import VetProfileScreen from '@/features/vets/screens/VetProfileScreen';
 import VetScheduleScreen from '@/features/vets/screens/VetScheduleScreen';
 import VetWeeklyAgendaScreen from '@/features/vets/screens/VetWeeklyAgendaScreen';
@@ -43,7 +42,6 @@ const VetNavigator: React.FC = () => {
       <Route path="/" element={<VetDashboard />} />
       <Route path={VET_ROUTES.DASHBOARD.replace('/vet', '')} element={<VetDashboard />} />
       <Route path={VET_ROUTES.APPOINTMENTS.replace('/vet', '')} element={<UnderConstructionPage title="Citas" />} />
-      <Route path={VET_ROUTES.APPOINTMENT_DETAIL.replace('/vet', '')} element={<VetAppointmentDetailScreen />} />
       <Route path={VET_ROUTES.PROFILE.replace('/vet', '')} element={<VetProfileScreen />} />
       <Route path={VET_ROUTES.SETTINGS.replace('/vet', '')} element={<SettingsScreen />} />
       <Route path={VET_ROUTES.PATIENTS.replace('/vet', '')} element={<UnderConstructionPage title="Pacientes" />} />
