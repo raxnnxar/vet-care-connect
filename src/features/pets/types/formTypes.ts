@@ -19,3 +19,23 @@ export interface PetBasicInfoProps {
   errors: FieldErrors<PetFormValues>;
   selectedSpecies: string;
 }
+
+export interface PetPhotoUploadProps {
+  photoPreview: string | null;
+  onPhotoSelect: (file: File) => void;
+}
+
+export interface MedicalFormValues {
+  vaccineDocument?: FileList;
+  medications: Array<{
+    name: string;
+    dosage: string;
+    frequency: string;
+  }>;
+  surgeries: Array<{
+    type: string;
+    date: string;
+  }>;
+  allergies: string;
+  chronicConditions: string;
+}
