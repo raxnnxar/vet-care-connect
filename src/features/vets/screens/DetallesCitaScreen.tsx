@@ -1,19 +1,20 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
-import { ArrowLeft, Cat, Calendar, Clock, MapPin, Phone, FileText, Heart, Pill, Scissors } from 'lucide-react';
+import { ArrowLeft, Cat, Calendar, Clock, MapPin, Phone, FileText, Heart, Pill, Scissors, Check, X, MessageSquare } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 
 const DetallesCitaScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const { data: appointmentDetails, isLoading, error } = useQuery({
     queryKey: ['appointment-details', id],
@@ -72,6 +73,85 @@ const DetallesCitaScreen: React.FC = () => {
   });
   
   const goBack = () => navigate(-1);
+  
+  const handleApproveAppointment = async () => {
+    if (!id) return;
+    
+    try {
+      console.log('Approving appointment:', id);
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ status: APPOINTMENT_STATUS.CONFIRMED })
+        .eq('id', id)
+        .select();
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log('Appointment approved successfully:', data);
+      
+      // Invalidate and refetch queries
+      queryClient.invalidateQueries({ queryKey: ['appointment-details', id] });
+      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
+      
+      toast.success('Cita confirmada correctamente');
+    } catch (error) {
+      console.error('Error approving appointment:', error);
+      toast.error('Error al confirmar la cita');
+    }
+  };
+
+  const handleRejectAppointment = async () => {
+    if (!id) return;
+    
+    try {
+      console.log('Rejecting appointment:', id);
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ status: APPOINTMENT_STATUS.CANCELLED })
+        .eq('id', id)
+        .select();
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log('Appointment rejected successfully:', data);
+      
+      // Invalidate and refetch queries
+      queryClient.invalidateQueries({ queryKey: ['appointment-details', id] });
+      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
+      
+      toast.success('Cita rechazada correctamente');
+    } catch (error) {
+      console.error('Error rejecting appointment:', error);
+      toast.error('Error al rechazar la cita');
+    }
+  };
+
+  const handleSendMessage = () => {
+    // Navigate to chat with owner
+    if (appointmentDetails?.appointment?.owner_id) {
+      navigate(`/vet/chats/${appointmentDetails.appointment.owner_id}`);
+    } else {
+      toast.error('No se pudo encontrar la información del dueño');
+    }
+  };
+
+  const handleViewMedicalHistory = () => {
+    // Navigate to a detailed medical history view
+    if (appointmentDetails?.appointment?.pets?.id) {
+      toast.info('Funcionalidad de historial médico completo próximamente');
+      // Future: navigate(`/vet/pets/${appointmentDetails.appointment.pets.id}/medical-history`);
+    } else {
+      toast.error('No se pudo encontrar la información de la mascota');
+    }
+  };
   
   if (isLoading) {
     return (
@@ -311,10 +391,20 @@ const DetallesCitaScreen: React.FC = () => {
         {/* Historial Médico */}
         {medicalHistory && (
           <Card className="p-4">
-            <h2 className="text-xl font-medium text-[#1F2937] mb-4 flex items-center">
-              <Heart className="mr-2 text-[#79D0B8]" size={20} />
-              Historial Médico
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-[#1F2937] flex items-center">
+                <Heart className="mr-2 text-[#79D0B8]" size={20} />
+                Historial Médico
+              </h2>
+              <Button 
+                variant="outline"
+                size="sm"
+                className="border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10"
+                onClick={handleViewMedicalHistory}
+              >
+                Ver completo
+              </Button>
+            </div>
             
             <div className="space-y-4">
               {medicalHistory.allergies && (
@@ -414,13 +504,33 @@ const DetallesCitaScreen: React.FC = () => {
           </Card>
         )}
         
-        {/* Botón para volver */}
-        <div className="flex gap-3">
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-3">
+          {appointment.status === 'pending' && (
+            <div className="flex gap-3">
+              <Button 
+                className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3] text-white"
+                onClick={handleApproveAppointment}
+              >
+                <Check className="mr-2" size={16} />
+                Confirmar cita
+              </Button>
+              <Button 
+                className="flex-1 bg-[#EF4444] hover:bg-red-400 text-white"
+                onClick={handleRejectAppointment}
+              >
+                <X className="mr-2" size={16} />
+                Rechazar cita
+              </Button>
+            </div>
+          )}
           <Button 
-            className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
-            onClick={goBack}
+            variant="outline"
+            className="w-full border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10"
+            onClick={handleSendMessage}
           >
-            Volver al Dashboard
+            <MessageSquare className="mr-2" size={16} />
+            Enviar mensaje
           </Button>
         </div>
       </div>
