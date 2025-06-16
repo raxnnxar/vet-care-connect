@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 export const getStatusBadge = (status: string) => {
   const statusMap: { [key: string]: { label: string; color: string } } = {
     pendiente: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
