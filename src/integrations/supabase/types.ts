@@ -317,6 +317,7 @@ export type Database = {
           primary_grooming_id: string | null
           primary_vet_id: string | null
           profile_picture_url: string | null
+          reminders_enabled: boolean | null
           share_location: boolean | null
         }
         Insert: {
@@ -328,6 +329,7 @@ export type Database = {
           primary_grooming_id?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
+          reminders_enabled?: boolean | null
           share_location?: boolean | null
         }
         Update: {
@@ -339,6 +341,7 @@ export type Database = {
           primary_grooming_id?: string | null
           primary_vet_id?: string | null
           profile_picture_url?: string | null
+          reminders_enabled?: boolean | null
           share_location?: boolean | null
         }
         Relationships: [
@@ -562,7 +565,6 @@ export type Database = {
           id: string
           instructions_for_owner: string | null
           pet_id: string
-          reminders_enabled: boolean | null
           start_date: string
           veterinarian_id: string
         }
@@ -573,7 +575,6 @@ export type Database = {
           id?: string
           instructions_for_owner?: string | null
           pet_id: string
-          reminders_enabled?: boolean | null
           start_date?: string
           veterinarian_id: string
         }
@@ -584,7 +585,6 @@ export type Database = {
           id?: string
           instructions_for_owner?: string | null
           pet_id?: string
-          reminders_enabled?: boolean | null
           start_date?: string
           veterinarian_id?: string
         }
