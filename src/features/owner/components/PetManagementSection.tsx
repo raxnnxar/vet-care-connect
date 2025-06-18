@@ -98,8 +98,8 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     if (handlePetClick) {
       handlePetClick(pet);
     } else {
-      // Navigate to pet detail screen
-      navigate(`/owner/pets/${pet.id}`);
+      // Navigate to pet detail screen using the correct route
+      navigate(`/pets/${pet.id}`);
     }
   };
 
