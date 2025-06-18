@@ -5,7 +5,6 @@ import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
 import { Textarea } from '@/ui/atoms/textarea';
 import { Label } from '@/ui/atoms/label';
-import { FormItem, FormLabel, FormControl } from '@/ui/molecules/form';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import TreatmentMedicationsSection from './TreatmentMedicationsSection';
@@ -72,28 +71,26 @@ const TreatmentPlanCard: React.FC<TreatmentPlanCardProps> = ({
 
       {!treatmentCaseId ? (
         <div className="space-y-4">
-          <FormItem>
-            <FormLabel>Diagnóstico general</FormLabel>
-            <FormControl>
-              <Input
-                value={diagnosis}
-                onChange={(e) => setDiagnosis(e.target.value)}
-                placeholder="Ingrese el diagnóstico"
-              />
-            </FormControl>
-          </FormItem>
+          <div className="space-y-2">
+            <Label htmlFor="diagnosis">Diagnóstico general</Label>
+            <Input
+              id="diagnosis"
+              value={diagnosis}
+              onChange={(e) => setDiagnosis(e.target.value)}
+              placeholder="Ingrese el diagnóstico"
+            />
+          </div>
 
-          <FormItem>
-            <FormLabel>Instrucciones generales para el dueño</FormLabel>
-            <FormControl>
-              <Textarea
-                value={instructions}
-                onChange={(e) => setInstructions(e.target.value)}
-                placeholder="Instrucciones para el cuidado en casa..."
-                rows={3}
-              />
-            </FormControl>
-          </FormItem>
+          <div className="space-y-2">
+            <Label htmlFor="instructions">Instrucciones generales para el dueño</Label>
+            <Textarea
+              id="instructions"
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              placeholder="Instrucciones para el cuidado en casa..."
+              rows={3}
+            />
+          </div>
 
           <Button 
             onClick={handleSaveTreatmentCase}

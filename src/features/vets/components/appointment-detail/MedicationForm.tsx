@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
 import { Textarea } from '@/ui/atoms/textarea';
-import { FormItem, FormLabel, FormControl } from '@/ui/molecules/form';
+import { Label } from '@/ui/atoms/label';
 
 interface MedicationFormProps {
   onSave: (medication: {
@@ -57,81 +57,75 @@ const MedicationForm: React.FC<MedicationFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormItem>
-          <FormLabel>Medicamento *</FormLabel>
-          <FormControl>
-            <Input
-              value={formData.medication}
-              onChange={(e) => handleChange('medication', e.target.value)}
-              placeholder="Nombre del medicamento"
-              required
-            />
-          </FormControl>
-        </FormItem>
+        <div className="space-y-2">
+          <Label htmlFor="medication">Medicamento *</Label>
+          <Input
+            id="medication"
+            value={formData.medication}
+            onChange={(e) => handleChange('medication', e.target.value)}
+            placeholder="Nombre del medicamento"
+            required
+          />
+        </div>
 
-        <FormItem>
-          <FormLabel>Dosis *</FormLabel>
-          <FormControl>
-            <Input
-              value={formData.dosage}
-              onChange={(e) => handleChange('dosage', e.target.value)}
-              placeholder="ej. 1 cápsula, 5ml"
-              required
-            />
-          </FormControl>
-        </FormItem>
+        <div className="space-y-2">
+          <Label htmlFor="dosage">Dosis *</Label>
+          <Input
+            id="dosage"
+            value={formData.dosage}
+            onChange={(e) => handleChange('dosage', e.target.value)}
+            placeholder="ej. 1 cápsula, 5ml"
+            required
+          />
+        </div>
 
-        <FormItem>
-          <FormLabel>Frecuencia (horas) *</FormLabel>
-          <FormControl>
-            <Input
-              type="number"
-              value={formData.frequency_hours}
-              onChange={(e) => handleChange('frequency_hours', e.target.value)}
-              placeholder="ej. 8, 12, 24"
-              min="1"
-              required
-            />
-          </FormControl>
-        </FormItem>
+        <div className="space-y-2">
+          <Label htmlFor="frequency_hours">Frecuencia (horas) *</Label>
+          <Input
+            id="frequency_hours"
+            type="number"
+            value={formData.frequency_hours}
+            onChange={(e) => handleChange('frequency_hours', e.target.value)}
+            placeholder="ej. 8, 12, 24"
+            min="1"
+            required
+          />
+        </div>
 
-        <FormItem>
-          <FormLabel>Duración (días) *</FormLabel>
-          <FormControl>
-            <Input
-              type="number"
-              value={formData.duration_days}
-              onChange={(e) => handleChange('duration_days', e.target.value)}
-              placeholder="ej. 7, 14"
-              min="1"
-              required
-            />
-          </FormControl>
-        </FormItem>
+        <div className="space-y-2">
+          <Label htmlFor="duration_days">Duración (días) *</Label>
+          <Input
+            id="duration_days"
+            type="number"
+            value={formData.duration_days}
+            onChange={(e) => handleChange('duration_days', e.target.value)}
+            placeholder="ej. 7, 14"
+            min="1"
+            required
+          />
+        </div>
 
-        <FormItem>
-          <FormLabel>Fecha de inicio</FormLabel>
-          <FormControl>
-            <Input
-              type="date"
-              value={formData.start_date}
-              onChange={(e) => handleChange('start_date', e.target.value)}
-            />
-          </FormControl>
-        </FormItem>
+        <div className="space-y-2">
+          <Label htmlFor="start_date">Fecha de inicio</Label>
+          <Input
+            id="start_date"
+            type="date"
+            value={formData.start_date}
+            onChange={(e) => handleChange('start_date', e.target.value)}
+          />
+        </div>
       </div>
 
-      <FormItem>
-        <FormLabel>Instrucciones adicionales</FormLabel>
-        <FormControl>
-          <Textarea
-            value={formData.instructions}
-            onChange={(e) => handleChange('instructions', e.target.value)}
-            placeholder="ej. dar con comida, no administrar con el estómago vacío..."
-            rows={2}
-          />
-        </FormControl>
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="instructions">Instrucciones adicionales</Label>
+        <Textarea
+          id="instructions"
+          value={formData.instructions}
+          onChange={(e) => handleChange('instructions', e.target.value)}
+          placeholder="ej. dar con comida, no administrar con el estómago vacío..."
+          rows={2}
+        />
+      </div>
 
       <div className="flex gap-2 justify-end">
         <Button
