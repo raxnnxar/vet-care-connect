@@ -554,6 +554,108 @@ export type Database = {
           },
         ]
       }
+      treatment_cases: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          diagnosis: string
+          id: string
+          instructions_for_owner: string | null
+          pet_id: string
+          reminders_enabled: boolean | null
+          start_date: string
+          veterinarian_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          diagnosis: string
+          id?: string
+          instructions_for_owner?: string | null
+          pet_id: string
+          reminders_enabled?: boolean | null
+          start_date?: string
+          veterinarian_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          diagnosis?: string
+          id?: string
+          instructions_for_owner?: string | null
+          pet_id?: string
+          reminders_enabled?: boolean | null
+          start_date?: string
+          veterinarian_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_cases_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_cases_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_cases_veterinarian_id_fkey"
+            columns: ["veterinarian_id"]
+            isOneToOne: false
+            referencedRelation: "veterinarians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treatment_medications: {
+        Row: {
+          created_at: string | null
+          dosage: string
+          duration_days: number
+          frequency_hours: number
+          id: string
+          instructions: string | null
+          medication: string
+          start_date: string
+          treatment_case_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          dosage: string
+          duration_days: number
+          frequency_hours: number
+          id?: string
+          instructions?: string | null
+          medication: string
+          start_date?: string
+          treatment_case_id: string
+        }
+        Update: {
+          created_at?: string | null
+          dosage?: string
+          duration_days?: number
+          frequency_hours?: number
+          id?: string
+          instructions?: string | null
+          medication?: string
+          start_date?: string
+          treatment_case_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_medications_treatment_case_id_fkey"
+            columns: ["treatment_case_id"]
+            isOneToOne: false
+            referencedRelation: "treatment_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vaccine_documents: {
         Row: {
           document_url: string
@@ -592,6 +694,141 @@ export type Database = {
             columns: ["uploaded_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vet_medical_records: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          date: string
+          description: string
+          id: string
+          pet_id: string
+          title: string
+          veterinarian_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          date?: string
+          description: string
+          id?: string
+          pet_id: string
+          title: string
+          veterinarian_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          date?: string
+          description?: string
+          id?: string
+          pet_id?: string
+          title?: string
+          veterinarian_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vet_medical_records_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vet_medical_records_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vet_medical_records_veterinarian_id_fkey"
+            columns: ["veterinarian_id"]
+            isOneToOne: false
+            referencedRelation: "veterinarians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vet_personal_notes: {
+        Row: {
+          content: string
+          created_at: string | null
+          date: string | null
+          id: string
+          title: string | null
+          updated_at: string | null
+          veterinarian_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+          veterinarian_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+          veterinarian_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vet_personal_notes_veterinarian_id_fkey"
+            columns: ["veterinarian_id"]
+            isOneToOne: false
+            referencedRelation: "veterinarians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vet_pet_notes: {
+        Row: {
+          created_at: string | null
+          id: string
+          note: string
+          pet_id: string
+          updated_at: string | null
+          veterinarian_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          note: string
+          pet_id: string
+          updated_at?: string | null
+          veterinarian_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          note?: string
+          pet_id?: string
+          updated_at?: string | null
+          veterinarian_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vet_pet_notes_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vet_pet_notes_veterinarian_id_fkey"
+            columns: ["veterinarian_id"]
+            isOneToOne: false
+            referencedRelation: "veterinarians"
             referencedColumns: ["id"]
           },
         ]

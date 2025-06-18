@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -17,6 +16,7 @@ import PetInfoCard from '@/features/vets/components/appointment-detail/PetInfoCa
 import MedicalHistoryCard from '@/features/vets/components/appointment-detail/MedicalHistoryCard';
 import OwnerInfoCard from '@/features/vets/components/appointment-detail/OwnerInfoCard';
 import AppointmentActionButtons from '@/features/vets/components/appointment-detail/AppointmentActionButtons';
+import ClinicalNoteCard from '@/features/vets/components/appointment-detail/ClinicalNoteCard';
 
 const DetallesCitaScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -202,6 +202,16 @@ const DetallesCitaScreen: React.FC = () => {
         />
         
         <OwnerInfoCard ownerInfo={appointment.pet_owners} />
+        
+        {/* New Clinical Note Section */}
+        {appointment.pets?.id && user?.id && (
+          <ClinicalNoteCard
+            appointmentId={appointment.id}
+            petId={appointment.pets.id}
+            veterinarianId={user.id}
+            appointmentDate={appointment.appointment_date}
+          />
+        )}
         
         <AppointmentActionButtons
           appointmentStatus={appointment.status}
