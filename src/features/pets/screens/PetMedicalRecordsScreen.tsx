@@ -54,7 +54,24 @@ const PetMedicalRecordsScreen: React.FC = () => {
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching medical history:', error);
         } else if (medicalData) {
-          setMedicalHistory(medicalData);
+          // Convert Json types to proper arrays
+          const convertedMedicalData: MedicalHistory = {
+            id: medicalData.id,
+            allergies: medicalData.allergies,
+            chronic_conditions: medicalData.chronic_conditions,
+            vaccines_document_url: medicalData.vaccines_document_url,
+            current_medications: Array.isArray(medicalData.current_medications) 
+              ? medicalData.current_medications 
+              : medicalData.current_medications 
+                ? JSON.parse(medicalData.current_medications as string)
+                : [],
+            previous_surgeries: Array.isArray(medicalData.previous_surgeries)
+              ? medicalData.previous_surgeries
+              : medicalData.previous_surgeries
+                ? JSON.parse(medicalData.previous_surgeries as string)
+                : []
+          };
+          setMedicalHistory(convertedMedicalData);
         }
       } catch (error) {
         console.error('Error fetching pet data:', error);
