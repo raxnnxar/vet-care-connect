@@ -33,7 +33,8 @@ export const OWNER_ROUTES = {
   NOTIFICATIONS: '/notifications',
   SETTINGS: '/settings',
   CHATS: '/chats',
-  INDIVIDUAL_CHAT: '/chats/:conversationId'
+  INDIVIDUAL_CHAT: '/chats/:conversationId',
+  TREATMENTS: '/treatments'
 };
 
 // GroomingNavigator routes

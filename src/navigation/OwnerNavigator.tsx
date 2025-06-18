@@ -21,6 +21,7 @@ import PetEditScreen from '@/features/pets/screens/PetEditScreen';
 import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScreen';
 import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
+import TreatmentsScreen from '@/features/treatments/screens/TreatmentsScreen';
 
 const OwnerNavigator: React.FC = () => {
   return (
@@ -43,6 +44,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
+      <Route path="/owner/treatments" element={<TreatmentsScreen />} />
       
       {/* Redirect legacy grooming routes to new estetica routes */}
       <Route path="/groomers/:id" element={<GroomingDetailScreen />} />

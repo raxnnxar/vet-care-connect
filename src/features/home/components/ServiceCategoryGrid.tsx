@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stethoscope, Calendar, Scissors, MapPin } from 'lucide-react';
+import { Stethoscope, Pill, Scissors, MapPin } from 'lucide-react';
 
 const ServiceCategoryGrid = () => {
   const navigate = useNavigate();
@@ -24,12 +24,12 @@ const ServiceCategoryGrid = () => {
       route: '/owner/estetica'
     },
     {
-      id: 'appointments',
-      title: 'Citas',
-      icon: Calendar,
+      id: 'treatments',
+      title: 'Tratamientos',
+      icon: Pill,
       color: 'bg-green-500',
-      description: 'Gestiona tus citas',
-      route: '/owner/appointments'
+      description: 'Gestiona tratamientos',
+      route: '/owner/treatments'
     },
     {
       id: 'nearby',
