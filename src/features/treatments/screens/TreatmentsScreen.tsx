@@ -18,10 +18,10 @@ interface Treatment {
   instructions_for_owner: string | null;
   start_date: string;
   pet_name: string;
-  medications: Medication[];
+  medications: TreatmentMedication[];
 }
 
-interface Medication {
+interface TreatmentMedication {
   id: string;
   medication: string;
   dosage: string;
@@ -29,6 +29,8 @@ interface Medication {
   duration_days: number;
   start_date: string;
   instructions: string | null;
+  created_at: string | null;
+  treatment_case_id: string;
 }
 
 const TreatmentsScreen = () => {
@@ -121,7 +123,7 @@ const TreatmentsScreen = () => {
     }
   };
 
-  const calculateNextDose = (medication: Medication) => {
+  const calculateNextDose = (medication: TreatmentMedication) => {
     const startDate = new Date(medication.start_date);
     const now = new Date();
     const frequencyMs = medication.frequency_hours * 60 * 60 * 1000;
