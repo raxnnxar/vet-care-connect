@@ -5,6 +5,7 @@ import PetInfoCard from './PetInfoCard';
 import MedicalHistoryCard from './MedicalHistoryCard';
 import OwnerInfoCard from './OwnerInfoCard';
 import ClinicalNoteCard from './ClinicalNoteCard';
+import TreatmentPlanCard from './TreatmentPlanCard';
 import AppointmentActionButtons from './AppointmentActionButtons';
 import { getStatusBadge } from '@/features/vets/utils/appointmentUtils';
 
@@ -51,6 +52,14 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
           petId={appointment.pets.id}
           veterinarianId={user.id}
           appointmentDate={getAppointmentDateString(appointment.appointment_date)}
+        />
+      )}
+      
+      {appointment.pets?.id && user?.id && (
+        <TreatmentPlanCard
+          appointmentId={appointment.id}
+          petId={appointment.pets.id}
+          veterinarianId={user.id}
         />
       )}
       
