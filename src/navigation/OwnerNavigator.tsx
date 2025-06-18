@@ -17,6 +17,7 @@ import FindVetsScreen from '@/features/vets/screens/FindVetsScreen';
 import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
 import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
 import PetDetailScreen from '@/features/pets/screens/PetDetailScreen';
+import PetMedicalRecordsScreen from '@/features/pets/screens/PetMedicalRecordsScreen';
 import PetEditScreen from '@/features/pets/screens/PetEditScreen';
 import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScreen';
 import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
@@ -40,6 +41,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
       <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />
       <Route path={OWNER_ROUTES.PET_DETAIL} element={<PetDetailScreen />} />
+      <Route path={OWNER_ROUTES.PET_MEDICAL_RECORDS} element={<PetMedicalRecordsScreen />} />
       <Route path="/owner/pets/:id/edit" element={<PetEditScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />

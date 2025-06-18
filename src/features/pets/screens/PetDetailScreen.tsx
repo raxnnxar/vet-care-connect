@@ -9,7 +9,6 @@ import { usePets } from '@/features/pets/hooks/usePets';
 import { Pet } from '@/features/pets/types';
 import { useToast } from "@/hooks/use-toast";
 import { toast } from 'sonner';
-import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
 
 const PetDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +17,6 @@ const PetDetailScreen: React.FC = () => {
   const { getPetById, deletePet } = usePets();
   const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [showMedicalDialog, setShowMedicalDialog] = useState(false);
 
   useEffect(() => {
     const fetchPet = async () => {
@@ -58,7 +56,7 @@ const PetDetailScreen: React.FC = () => {
         title: "Éxito",
         description: "Mascota eliminada exitosamente",
       });
-      navigate('/owner/pets');
+      navigate('/owner/profile');
     } catch (error) {
       console.error('Error deleting pet:', error);
       uiToast({
@@ -77,15 +75,12 @@ const PetDetailScreen: React.FC = () => {
     navigate('/owner/find-vets');
   };
 
-  const goBack = () => {
-    navigate(-1);
+  const handleViewMedicalInfo = () => {
+    navigate(`/owner/pets/${id}/medical-records`);
   };
 
-  const handlePetCreated = (pet: Pet | null) => {
-    if (pet) {
-      toast.success('Mascota creada exitosamente');
-      navigate('/owner/pets');
-    }
+  const goBack = () => {
+    navigate('/owner/profile');
   };
 
   if (isLoading) {
@@ -99,7 +94,7 @@ const PetDetailScreen: React.FC = () => {
             <h1 className="text-white font-medium text-lg ml-2">Cargando...</h1>
           </div>
         }
-        footer={<NavbarInferior activeTab="home" />}
+        footer={<NavbarInferior activeTab="profile" />}
       >
         <div className="p-4 flex justify-center items-center h-full">
           <div className="animate-pulse flex flex-col w-full gap-4">
@@ -124,13 +119,13 @@ const PetDetailScreen: React.FC = () => {
             <h1 className="text-white font-medium text-lg ml-2">Mascota no encontrada</h1>
           </div>
         }
-        footer={<NavbarInferior activeTab="home" />}
+        footer={<NavbarInferior activeTab="profile" />}
       >
         <div className="p-4">
           <Card className="p-4 text-center">
             <p>No se pudo encontrar la información de esta mascota.</p>
-            <Button className="mt-4 bg-[#79D0B8]" onClick={() => navigate('/owner/pets')}>
-              Ver todas las mascotas
+            <Button className="mt-4 bg-[#79D0B8]" onClick={() => navigate('/owner/profile')}>
+              Volver al perfil
             </Button>
           </Card>
         </div>
@@ -150,10 +145,10 @@ const PetDetailScreen: React.FC = () => {
           <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
             <ArrowLeft />
           </Button>
-          <h1 className="text-white font-medium text-lg ml-2">{pet.name}</h1>
+          <h1 className="text-white font-medium text-lg ml-2">Detalles de la Mascota</h1>
         </div>
       }
-      footer={<NavbarInferior activeTab="home" />}
+      footer={<NavbarInferior activeTab="profile" />}
     >
       <div className="p-4 pb-20">
         {/* Pet image */}
@@ -168,7 +163,11 @@ const PetDetailScreen: React.FC = () => {
             </div>
           ) : (
             <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-              <p className="text-gray-500">Sin foto</p>
+              <div className="w-24 h-24 bg-[#79D0B8] rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-2xl">
+                  {pet.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
             </div>
           )}
         </div>
@@ -176,32 +175,48 @@ const PetDetailScreen: React.FC = () => {
         {/* Pet information */}
         <Card className="mb-4">
           <div className="p-4">
-            <h2 className="text-2xl font-semibold mb-4">{pet.name}</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-center">{pet.name}</h2>
             
-            <div className="grid grid-cols-2 gap-y-3">
-              <div>
-                <p className="text-sm text-gray-500">Especie</p>
-                <p>{pet.species}</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Especie</p>
+                  <p className="text-gray-800">{pet.species}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Raza</p>
+                  <p className="text-gray-800">{pet.breed || 'No especificada'}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Edad</p>
+                  <p className="text-gray-800">{petAge}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Peso</p>
+                  <p className="text-gray-800">{pet.weight ? `${pet.weight} kg` : 'No especificado'}</p>
+                </div>
               </div>
+
+              {pet.sex && (
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Sexo</p>
+                  <p className="text-gray-800">{pet.sex}</p>
+                </div>
+              )}
+
+              {pet.temperament && (
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Temperamento</p>
+                  <p className="text-gray-800">{pet.temperament}</p>
+                </div>
+              )}
               
               <div>
-                <p className="text-sm text-gray-500">Raza</p>
-                <p>{pet.breed || 'No especificada'}</p>
-              </div>
-              
-              <div>
-                <p className="text-sm text-gray-500">Edad</p>
-                <p>{petAge}</p>
-              </div>
-              
-              <div>
-                <p className="text-sm text-gray-500">Peso</p>
-                <p>{pet.weight ? `${pet.weight} kg` : 'No especificado'}</p>
-              </div>
-              
-              <div className="col-span-2">
-                <p className="text-sm text-gray-500">Descripción</p>
-                <p>{petDescription}</p>
+                <p className="text-sm text-gray-500 font-medium">Descripción</p>
+                <p className="text-gray-800">{petDescription}</p>
               </div>
             </div>
           </div>
@@ -213,7 +228,7 @@ const PetDetailScreen: React.FC = () => {
             <Button 
               variant="outline" 
               className="w-full border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10"
-              onClick={() => setShowMedicalDialog(true)}
+              onClick={handleViewMedicalInfo}
             >
               <Heart className="w-4 h-4 mr-2" />
               Ver información médica
@@ -251,16 +266,6 @@ const PetDetailScreen: React.FC = () => {
             </Button>
           </div>
         </div>
-
-        {/* Medical Dialog */}
-        {showMedicalDialog && (
-          <MedicalDialog
-            pet={pet}
-            open={showMedicalDialog}
-            onClose={() => setShowMedicalDialog(false)}
-            mode="view"
-          />
-        )}
       </div>
     </LayoutBase>
   );

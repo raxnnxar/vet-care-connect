@@ -23,6 +23,7 @@ export const OWNER_ROUTES = {
   BOOK_APPOINTMENT: '/appointments/book/:vetId',
   PROFILE: '/profile',
   PET_DETAIL: '/pets/:id',
+  PET_MEDICAL_RECORDS: '/pets/:id/medical-records',
   FIND_VETS: '/find-vets',
   VET_DETAIL: '/vets/:id',
   VET_REVIEW: '/vets/:id/review',

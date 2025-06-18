@@ -5,7 +5,6 @@ import { Button } from '@/ui/atoms/button';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
 import PetForm from '@/features/pets/components/PetForm';
-import PetDetailModal from '@/features/pets/components/PetDetailModal';
 import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
 import { usePets } from '@/features/pets/hooks';
 
@@ -47,7 +46,6 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   // Use local state if the props are not provided
   const [localShowPetForm, setLocalShowPetForm] = useState(false);
   const [localShowMedicalDialog, setLocalShowMedicalDialog] = useState(false);
-  const [localSelectedPet, setLocalSelectedPet] = useState<Pet | null>(null);
   const [lastCreatedPet, setLastCreatedPet] = useState<Pet | null>(null);
   const [localEditingPet, setLocalEditingPet] = useState<Pet | null>(null);
   const { createPet, updatePet } = usePets();
@@ -55,8 +53,6 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   // Use the prop handlers if provided, otherwise use local handlers
   const actualShowPetForm = showPetForm !== undefined ? showPetForm : localShowPetForm;
   const actualSetShowPetForm = setShowPetForm || setLocalShowPetForm;
-  const actualSelectedPet = selectedPet !== undefined ? selectedPet : localSelectedPet;
-  const actualSetSelectedPet = setSelectedPet || setLocalSelectedPet;
   const actualEditingPet = editingPet !== undefined ? editingPet : localEditingPet;
   const actualSetEditingPet = setEditingPet || setLocalEditingPet;
   const actualPets = userPets || pets;
@@ -98,39 +94,12 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     }
   };
 
-  const handleLocalPetUpdate = async (petData: any): Promise<Pet | null> => {
-    try {
-      if (handlePetUpdate) {
-        return await handlePetUpdate(petData);
-      }
-      
-      if (!petData || !petData.id) {
-        toast.error('Datos de mascota inválidos');
-        return null;
-      }
-      
-      const updatedPet = await updatePet(petData.id, petData);
-      
-      if (!updatedPet) {
-        toast.error('Error al actualizar la mascota');
-        return null;
-      }
-      
-      toast.success('Mascota actualizada con éxito');
-      return updatedPet as Pet;
-    } catch (error) {
-      console.error('Error al actualizar la mascota:', error);
-      toast.error('Error al actualizar la mascota');
-      return null;
-    }
-  };
-
   const handleLocalPetClick = (pet: Pet) => {
     if (handlePetClick) {
       handlePetClick(pet);
     } else {
-      // Navigate to pet edit screen
-      navigate(`/owner/pets/${pet.id}/edit`);
+      // Navigate to pet detail screen
+      navigate(`/owner/pets/${pet.id}`);
     }
   };
 
@@ -230,15 +199,6 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
             setLocalShowMedicalDialog(false);
             setLastCreatedPet(null);
           }}
-        />
-      )}
-
-      {actualSelectedPet && (
-        <PetDetailModal
-          pet={actualSelectedPet}
-          isOpen={!!actualSelectedPet}
-          onClose={() => actualSetSelectedPet(null)}
-          onPetUpdate={handleLocalPetUpdate}
         />
       )}
     </div>
