@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
@@ -100,9 +99,9 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
     if (handlePetClick) {
       handlePetClick(pet);
     } else {
-      // Navigate to pet detail screen using the correct route
-      console.log('Navigating to:', `/pets/${pet.id}`);
-      navigate(`/pets/${pet.id}`);
+      // Navigate to pet detail screen using the correct owner route
+      console.log('Navigating to:', `/owner/pets/${pet.id}`);
+      navigate(`/owner/pets/${pet.id}`);
     }
   };
 
