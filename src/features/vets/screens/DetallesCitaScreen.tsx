@@ -151,6 +151,26 @@ const DetallesCitaScreen: React.FC = () => {
   
   const { appointment, medicalHistory } = appointmentDetails;
   
+  // Convert appointment_date from Json to string
+  const getAppointmentDateString = (appointmentDate: any): string => {
+    if (!appointmentDate) return new Date().toISOString();
+    
+    if (typeof appointmentDate === 'string') {
+      return appointmentDate;
+    }
+    
+    if (typeof appointmentDate === 'object' && appointmentDate !== null) {
+      if (appointmentDate.date) {
+        return appointmentDate.date;
+      }
+      if (appointmentDate.datetime) {
+        return appointmentDate.datetime;
+      }
+    }
+    
+    return new Date().toISOString();
+  };
+  
   // Show full medical history modal
   if (showFullMedicalHistory && appointment.pets) {
     return (
@@ -209,7 +229,7 @@ const DetallesCitaScreen: React.FC = () => {
             appointmentId={appointment.id}
             petId={appointment.pets.id}
             veterinarianId={user.id}
-            appointmentDate={appointment.appointment_date}
+            appointmentDate={getAppointmentDateString(appointment.appointment_date)}
           />
         )}
         
