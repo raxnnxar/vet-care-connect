@@ -44,7 +44,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
-      <Route path="/owner/treatments" element={<TreatmentsScreen />} />
+      <Route path={OWNER_ROUTES.TREATMENTS} element={<TreatmentsScreen />} />
       
       {/* Redirect legacy grooming routes to new estetica routes */}
       <Route path="/groomers/:id" element={<GroomingDetailScreen />} />
