@@ -7,6 +7,7 @@ import { Pet } from '@/features/pets/types';
 import PetForm from '@/features/pets/components/PetForm';
 import MedicalDialog from '@/features/pets/components/medical/MedicalDialog';
 import { usePets } from '@/features/pets/hooks';
+import PetListItem from '@/features/pets/components/PetListItem';
 
 interface PetManagementSectionProps {
   // These are now optional because they can be provided as direct props or through userPets
@@ -95,10 +96,12 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
   };
 
   const handleLocalPetClick = (pet: Pet) => {
+    console.log('Pet clicked:', pet);
     if (handlePetClick) {
       handlePetClick(pet);
     } else {
       // Navigate to pet detail screen using the correct route
+      console.log('Navigating to:', `/pets/${pet.id}`);
       navigate(`/pets/${pet.id}`);
     }
   };
@@ -130,29 +133,11 @@ const PetManagementSection: React.FC<PetManagementSectionProps> = ({
         ) : (
           <div className="space-y-3">
             {actualPets.map((pet) => (
-              <div
+              <PetListItem
                 key={pet.id}
-                className="bg-white/90 p-4 rounded-lg shadow-sm flex items-center gap-3 cursor-pointer hover:bg-white transition-colors"
-                onClick={() => handleLocalPetClick(pet)}
-              >
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary font-semibold overflow-hidden">
-                  {pet.profile_picture_url ? (
-                    <img 
-                      src={pet.profile_picture_url} 
-                      alt={pet.name}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    pet.name ? pet.name.substring(0, 2).toUpperCase() : 'P'
-                  )}
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-800">{pet.name}</h4>
-                  <p className="text-sm text-gray-500">
-                    {pet.species}
-                  </p>
-                </div>
-              </div>
+                pet={pet}
+                onClick={handleLocalPetClick}
+              />
             ))}
           </div>
         )}
