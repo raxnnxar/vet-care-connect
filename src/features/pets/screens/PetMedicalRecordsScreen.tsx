@@ -5,7 +5,6 @@ import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
 import { ArrowLeft, Heart, FileText, AlertTriangle, Pill } from 'lucide-react';
-import { usePets } from '@/features/pets/hooks/usePets';
 import { useVaccineDocuments } from '@/features/pets/hooks/useVaccineDocuments';
 import { Pet } from '@/features/pets/types';
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +24,6 @@ const PetMedicalRecordsScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { getPetById } = usePets();
   const { documents, isLoading: documentsLoading } = useVaccineDocuments(id || '');
   
   const [pet, setPet] = useState<Pet | null>(null);
@@ -38,10 +36,17 @@ const PetMedicalRecordsScreen: React.FC = () => {
       
       setIsLoading(true);
       try {
-        // Fetch pet data
-        const petData = await getPetById(id);
-        if (petData) {
-          setPet(petData as unknown as Pet);
+        // Fetch pet data directly from Supabase
+        const { data: petData, error: petError } = await supabase
+          .from('pets')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (petError && petError.code !== 'PGRST116') {
+          console.error('Error fetching pet:', petError);
+        } else if (petData) {
+          setPet(petData as Pet);
         }
 
         // Fetch medical history
@@ -86,7 +91,7 @@ const PetMedicalRecordsScreen: React.FC = () => {
     };
 
     fetchData();
-  }, [id, getPetById, toast]);
+  }, [id]); // Solo dependemos del ID, no de funciones que cambien
 
   const handleBack = () => {
     navigate(`/owner/pets/${id}`);
