@@ -5,16 +5,14 @@ import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
 import { ArrowLeft, Edit, Trash2, Calendar, Heart } from 'lucide-react';
-import { usePets } from '@/features/pets/hooks/usePets';
 import { Pet } from '@/features/pets/types';
 import { useToast } from "@/hooks/use-toast";
-import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const PetDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast: uiToast } = useToast();
-  const { getPetById, deletePet } = usePets();
   const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,13 +28,19 @@ const PetDetailScreen: React.FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        console.log('Fetching pet with ID:', id);
         
-        const petData = await getPetById(id);
-        console.log('Pet data received:', petData);
+        const { data, error: fetchError } = await supabase
+          .from('pets')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (fetchError) {
+          throw fetchError;
+        }
         
-        if (petData) {
-          setPet(petData as Pet);
+        if (data) {
+          setPet(data as Pet);
         } else {
           setError('No se pudo encontrar la mascota');
         }
@@ -49,7 +53,7 @@ const PetDetailScreen: React.FC = () => {
     };
 
     fetchPet();
-  }, [id, getPetById]);
+  }, [id]); // Solo dependemos del ID, no de funciones que cambien
 
   const handleDeletePet = async () => {
     if (!id || !pet) return;
@@ -59,7 +63,15 @@ const PetDetailScreen: React.FC = () => {
     }
     
     try {
-      await deletePet(id);
+      const { error } = await supabase
+        .from('pets')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
       uiToast({
         title: "Éxito",
         description: "Mascota eliminada exitosamente",
