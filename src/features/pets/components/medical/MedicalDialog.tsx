@@ -12,7 +12,6 @@ import { Syringe } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import VaccineDocumentUpload from './VaccineDocumentUpload';
-import MedicationsSection from './MedicationsSection';
 import SurgeriesSection from './SurgeriesSection';
 import MedicalConditionsSection from './MedicalConditionsSection';
 import MedicalDialogHeader from './MedicalDialogHeader';
@@ -31,16 +30,12 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
 
   const { register, handleSubmit, control } = useForm<MedicalFormValues>({
     defaultValues: {
-      medications: [{ name: '', dosage: '', frequency: '' }],
       surgeries: [{ type: '', date: '' }],
       allergies: '',
       chronicConditions: ''
     }
   });
 
-  const { fields: medicationFields, append: appendMedication, remove: removeMedication } = 
-    useFieldArray({ control, name: "medications" });
-    
   const { fields: surgeryFields, append: appendSurgery, remove: removeSurgery } = 
     useFieldArray({ control, name: "surgeries" });
 
@@ -49,10 +44,9 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
       setIsSubmitting(true);
       console.log('Submitting medical data for pet:', pet.id);
       
-      // Prepare medical history data
+      // Prepare medical history data without current_medications
       const medicalHistoryData = {
         pet_id: pet.id,
-        current_medications: data.medications.filter(m => m.name.trim() !== ''),
         previous_surgeries: data.surgeries.filter(s => s.type.trim() !== ''),
         allergies: data.allergies || null,
         chronic_conditions: data.chronicConditions || null
@@ -130,14 +124,6 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
             <VaccineDocumentUpload 
               petId={pet.id} 
               petOwnerId={pet.owner_id}
-            />
-          
-            {/* Medications Section */}
-            <MedicationsSection 
-              medicationFields={medicationFields}
-              appendMedication={appendMedication}
-              removeMedication={removeMedication}
-              register={register}
             />
             
             {/* Medical Conditions Section */}
