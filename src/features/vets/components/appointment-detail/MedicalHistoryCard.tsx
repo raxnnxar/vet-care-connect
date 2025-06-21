@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
-import { Heart, FileText, Pill, Scissors } from 'lucide-react';
+import { Heart, FileText, Scissors } from 'lucide-react';
 
 interface MedicalHistoryCardProps {
   medicalHistory: any;
@@ -53,25 +53,6 @@ const MedicalHistoryCard: React.FC<MedicalHistoryCardProps> = ({
             <div>
               <p className="text-sm text-gray-500">Condiciones crónicas</p>
               <p className="font-medium">{medicalHistory.chronic_conditions}</p>
-            </div>
-          </div>
-        )}
-        
-        {medicalHistory.current_medications && (
-          <div className="flex items-start">
-            <div className="bg-blue-100 p-2 rounded-full mr-3">
-              <Pill size={16} className="text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Medicación actual</p>
-              <div className="font-medium">
-                {Array.isArray(medicalHistory.current_medications) 
-                  ? medicalHistory.current_medications.map((med: any, index: number) => (
-                      <p key={index}>{med.name} - {med.dosage} ({med.frequency})</p>
-                    ))
-                  : <p>{JSON.stringify(medicalHistory.current_medications)}</p>
-                }
-              </div>
             </div>
           </div>
         )}

@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import { PetMedicalHistory } from '../../types';
 import { Button } from '@/ui/atoms/button';
 import { Label } from '@/ui/atoms/label';
-import { Input } from '@/ui/atoms/input';
 import { Textarea } from '@/ui/atoms/textarea';
-import { Stethoscope, Upload, AlertTriangle, Check } from 'lucide-react';
+import { Stethoscope, Upload, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PetMedicalInfoFormProps {
@@ -17,7 +16,6 @@ interface PetMedicalInfoFormProps {
 const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({ petId, onSave, onCancel }) => {
   const [allergies, setAllergies] = useState<string>('');
   const [chronicConditions, setChronicConditions] = useState<string>('');
-  const [medications, setMedications] = useState<string>('');
   const [surgeries, setSurgeries] = useState<string>('');
   const [vaccineFile, setVaccineFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -51,11 +49,10 @@ const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({ petId, onSave, 
     setIsSubmitting(true);
 
     try {
-      // Prepare medical history data
+      // Prepare medical history data without current_medications
       const medicalInfo: PetMedicalHistory = {
         allergies: allergies || null,
         chronic_conditions: chronicConditions || null,
-        current_medications: medications ? parseJsonArray(medications) : [],
         previous_surgeries: surgeries ? parseJsonArray(surgeries) : [],
         vaccines_document_url: vaccineDocUrl
       };
@@ -129,20 +126,6 @@ const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({ petId, onSave, 
           onChange={(e) => setChronicConditions(e.target.value)}
           placeholder="Ingrese cualquier condición crónica"
         />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="medications">Medicamentos actuales</Label>
-        <Textarea
-          id="medications"
-          value={medications}
-          onChange={(e) => setMedications(e.target.value)}
-          placeholder="Ingrese un medicamento por línea"
-          className="min-h-[80px]"
-        />
-        <p className="text-xs text-muted-foreground">
-          Ingrese cada medicamento en una línea separada
-        </p>
       </div>
 
       <div className="space-y-2">

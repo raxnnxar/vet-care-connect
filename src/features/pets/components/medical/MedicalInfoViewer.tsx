@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pet } from '../../types';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, Pill, Heart, AlertTriangle } from 'lucide-react';
+import { FileText, Heart, AlertTriangle } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
 import { useVaccineDocuments } from '../../hooks/useVaccineDocuments';
 import VaccineDocumentsList from './VaccineDocumentsList';
@@ -10,7 +10,6 @@ import VaccineDocumentsList from './VaccineDocumentsList';
 interface MedicalHistory {
   id: string;
   pet_id: string;
-  current_medications: { name: string; dosage: string; frequency: string; }[];
   previous_surgeries: { type: string; date: string; }[];
   allergies: string;
   chronic_conditions: string;
@@ -42,12 +41,9 @@ const MedicalInfoViewer: React.FC<MedicalInfoViewerProps> = ({ pet }) => {
         }
 
         if (data) {
-          // Safely parse JSON fields
+          // Safely parse JSON fields, excluding current_medications
           const parsedData: MedicalHistory = {
             ...data,
-            current_medications: Array.isArray(data.current_medications) 
-              ? data.current_medications as { name: string; dosage: string; frequency: string; }[]
-              : [],
             previous_surgeries: Array.isArray(data.previous_surgeries)
               ? data.previous_surgeries as { type: string; date: string; }[]
               : []
@@ -115,26 +111,6 @@ const MedicalInfoViewer: React.FC<MedicalInfoViewerProps> = ({ pet }) => {
 
       {medicalHistory && (
         <>
-          {/* Current Medications Section */}
-          {medicalHistory.current_medications.length > 0 && (
-            <Card className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Pill className="h-5 w-5 text-[#79D0B8]" />
-                <h4 className="font-medium text-gray-800">Medicamentos Actuales</h4>
-              </div>
-              <div className="space-y-3">
-                {medicalHistory.current_medications.map((medication, index) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                    <div className="font-medium text-gray-800">{medication.name}</div>
-                    <div className="text-sm text-gray-600">
-                      Dosis: {medication.dosage} | Frecuencia: {medication.frequency}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-
           {/* Previous Surgeries Section */}
           {medicalHistory.previous_surgeries.length > 0 && (
             <Card className="p-4">

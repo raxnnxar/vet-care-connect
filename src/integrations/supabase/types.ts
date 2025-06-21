@@ -210,6 +210,50 @@ export type Database = {
           },
         ]
       }
+      owner_medications: {
+        Row: {
+          chronic: boolean | null
+          created_at: string | null
+          dosage: string | null
+          frequency_hours: number | null
+          id: string
+          instructions: string | null
+          medication: string | null
+          pet_id: string | null
+          start_date: string | null
+        }
+        Insert: {
+          chronic?: boolean | null
+          created_at?: string | null
+          dosage?: string | null
+          frequency_hours?: number | null
+          id?: string
+          instructions?: string | null
+          medication?: string | null
+          pet_id?: string | null
+          start_date?: string | null
+        }
+        Update: {
+          chronic?: boolean | null
+          created_at?: string | null
+          dosage?: string | null
+          frequency_hours?: number | null
+          id?: string
+          instructions?: string | null
+          medication?: string | null
+          pet_id?: string | null
+          start_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_medications_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pet_grooming: {
         Row: {
           animals_accepted: Json | null

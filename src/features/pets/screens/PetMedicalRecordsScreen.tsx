@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
-import { ArrowLeft, Heart, FileText, AlertTriangle, Pill } from 'lucide-react';
+import { ArrowLeft, Heart, FileText, AlertTriangle } from 'lucide-react';
 import { useVaccineDocuments } from '@/features/pets/hooks/useVaccineDocuments';
 import { Pet } from '@/features/pets/types';
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +14,6 @@ interface MedicalHistory {
   id: string;
   allergies?: string;
   chronic_conditions?: string;
-  current_medications?: any[];
   previous_surgeries?: any[];
   vaccines_document_url?: string;
 }
@@ -59,17 +57,12 @@ const PetMedicalRecordsScreen: React.FC = () => {
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching medical history:', error);
         } else if (medicalData) {
-          // Convert Json types to proper arrays
+          // Convert Json types to proper arrays, excluding current_medications
           const convertedMedicalData: MedicalHistory = {
             id: medicalData.id,
             allergies: medicalData.allergies,
             chronic_conditions: medicalData.chronic_conditions,
             vaccines_document_url: medicalData.vaccines_document_url,
-            current_medications: Array.isArray(medicalData.current_medications) 
-              ? medicalData.current_medications 
-              : medicalData.current_medications 
-                ? JSON.parse(medicalData.current_medications as string)
-                : [],
             previous_surgeries: Array.isArray(medicalData.previous_surgeries)
               ? medicalData.previous_surgeries
               : medicalData.previous_surgeries
@@ -200,29 +193,6 @@ const PetMedicalRecordsScreen: React.FC = () => {
           <p className="text-gray-600">
             {medicalHistory?.chronic_conditions || 'Sin enfermedades crónicas registradas'}
           </p>
-        </Card>
-
-        {/* Current Medications */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Pill className="w-5 h-5 text-blue-500" />
-            <h3 className="font-semibold text-gray-800">Medicamentos actuales</h3>
-          </div>
-          {medicalHistory?.current_medications && medicalHistory.current_medications.length > 0 ? (
-            <div className="space-y-2">
-              {medicalHistory.current_medications.map((medication: any, index: number) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                  <div className="font-medium text-gray-800">{medication.name}</div>
-                  <div className="text-sm text-gray-600">{medication.dosage}</div>
-                  {medication.frequency && (
-                    <div className="text-sm text-gray-500">Frecuencia: {medication.frequency}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600">Sin medicamentos actuales registrados</p>
-          )}
         </Card>
 
         {/* Previous Surgeries */}
