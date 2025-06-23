@@ -1,3 +1,4 @@
+
 export interface MedicalFormValues {
   surgeries: { type: string; date: string; }[];
   allergies: string;

@@ -102,7 +102,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
         result = insertData;
       }
 
-      // Save medications to owner_medications table (without prescribed_by_owner and chronic)
+      // Save medications to owner_medications table (only the fields that exist)
       const validMedications = data.medications.filter(med => med.name.trim() !== '');
       
       if (validMedications.length > 0) {
