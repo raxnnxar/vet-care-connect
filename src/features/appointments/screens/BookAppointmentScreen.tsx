@@ -174,6 +174,7 @@ const BookAppointmentScreen: React.FC = () => {
           <PetSelectionStep 
             selectedPet={selectedPet} 
             onPetSelect={setSelectedPet}
+            onContinue={handleContinue}
           />
         );
       case 2:
@@ -259,7 +260,8 @@ const BookAppointmentScreen: React.FC = () => {
           {renderStepContent()}
         </VeterinarianCard>
         
-        {shouldShowNavigationButtons() && (
+        {/* Solo mostrar NavigationButtons para los pasos que no tienen su propio botón */}
+        {shouldShowNavigationButtons() && currentStep !== 1 && (
           <NavigationButtons
             currentStep={currentStep}
             selectedPet={selectedPet}

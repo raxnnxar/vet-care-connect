@@ -11,11 +11,13 @@ import { PlusCircle } from 'lucide-react';
 interface PetSelectionStepProps {
   selectedPet: Pet | null;
   onPetSelect: (pet: Pet) => void;
+  onContinue?: () => void;
 }
 
 const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
   selectedPet,
-  onPetSelect
+  onPetSelect,
+  onContinue
 }) => {
   const { pets, isLoading } = usePets();
   const navigate = useNavigate();
@@ -58,12 +60,12 @@ const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
   return (
     <div className="space-y-4">
       <h3 className="font-medium text-gray-700 mb-4">Selecciona una mascota</h3>
-      <div className="space-y-3">
+      <div className="space-y-3 max-h-96 overflow-y-auto">
         {pets.map((pet) => (
           <div 
             key={pet.id}
             onClick={() => onPetSelect(pet)}
-            className={`border rounded-lg overflow-hidden transition-all ${
+            className={`border rounded-lg overflow-hidden transition-all cursor-pointer ${
               selectedPet?.id === pet.id 
                 ? 'border-[#79D0B8] bg-[#e8f7f3]' 
                 : 'border-gray-200'
@@ -73,6 +75,18 @@ const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
           </div>
         ))}
       </div>
+      
+      {/* Botón de continuar */}
+      {selectedPet && onContinue && (
+        <div className="pt-4">
+          <Button 
+            className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
+            onClick={onContinue}
+          >
+            Continuar
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
