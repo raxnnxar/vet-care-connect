@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
-import { ArrowLeft, Cat } from 'lucide-react';
+import { ArrowLeft, Cat, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay, parseISO } from 'date-fns';
@@ -8,6 +8,7 @@ import { es } from 'date-fns/locale';
 import { getVetAppointments, Appointment } from '../api/vetAppointmentsApi';
 import { useVetProfileData } from '@/features/auth/hooks/useVetProfileData';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
+import VetNotesDrawer from '../components/VetNotesDrawer';
 
 const VetWeeklyAgendaScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const VetWeeklyAgendaScreen: React.FC = () => {
   );
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
 
   // Generate week days
   const weekDays = Array.from({ length: 7 }, (_, i) => 
@@ -192,125 +194,139 @@ const VetWeeklyAgendaScreen: React.FC = () => {
   };
 
   return (
-    <LayoutBase
-      header={
-        <div className="flex items-center justify-between px-4 py-3 bg-[#79D0B8]">
-          <button
-            onClick={() => navigate('/vet')}
-            className="p-1 rounded-full hover:bg-white/20 transition-colors"
-          >
-            <ArrowLeft size={24} className="text-white" />
-          </button>
-          
-          <div className="flex items-center space-x-4">
+    <>
+      <LayoutBase
+        header={
+          <div className="flex items-center justify-between px-4 py-3 bg-[#79D0B8]">
             <button
-              onClick={goToPreviousWeek}
+              onClick={() => navigate('/vet')}
+              className="p-1 rounded-full hover:bg-white/20 transition-colors"
+            >
+              <ArrowLeft size={24} className="text-white" />
+            </button>
+            
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={goToPreviousWeek}
+                className="p-2 rounded-full hover:bg-white/20 text-white transition-colors"
+              >
+                <span className="text-lg">‹</span>
+              </button>
+              <span className="text-white font-medium text-lg">
+                {format(currentWeekStart, 'd MMM', { locale: es })} - {format(addDays(currentWeekStart, 6), 'd MMM yyyy', { locale: es })}
+              </span>
+              <button
+                onClick={goToNextWeek}
+                className="p-2 rounded-full hover:bg-white/20 text-white transition-colors"
+              >
+                <span className="text-lg">›</span>
+              </button>
+            </div>
+            
+            <button
+              onClick={() => setNotesDrawerOpen(true)}
               className="p-2 rounded-full hover:bg-white/20 text-white transition-colors"
             >
-              <span className="text-lg">‹</span>
-            </button>
-            <span className="text-white font-medium text-lg">
-              {format(currentWeekStart, 'd MMM', { locale: es })} - {format(addDays(currentWeekStart, 6), 'd MMM yyyy', { locale: es })}
-            </span>
-            <button
-              onClick={goToNextWeek}
-              className="p-2 rounded-full hover:bg-white/20 text-white transition-colors"
-            >
-              <span className="text-lg">›</span>
+              <BookOpen size={20} />
             </button>
           </div>
-          
-          <div className="w-10"></div>
-        </div>
-      }
-      footer={<NavbarInferior activeTab="home" />}
-    >
-      <div className="flex flex-col h-full">
-        {/* Fixed Week header */}
-        <div className="bg-white shadow-sm border-b border-gray-100">
-          <div className="grid grid-cols-8 gap-1 p-4">
-            <div className="text-xs font-medium text-gray-500 p-2">Hora</div>
-            {weekDays.map((day, index) => {
-              const dayAvailable = isVetAvailable(day);
-              
-              return (
-                <div 
-                  key={index} 
-                  className={`text-center p-3 rounded-xl ${
-                    dayAvailable 
-                      ? 'bg-gray-50' 
-                      : 'bg-red-100'
-                  }`}
-                >
-                  <div className="text-xs font-medium text-gray-500 uppercase">
-                    {format(day, 'EEE', { locale: es })}
-                  </div>
-                  <div className={`text-lg font-semibold mt-1 ${
-                    dayAvailable ? 'text-[#1F2937]' : 'text-red-500'
-                  }`}>
-                    {format(day, 'd')}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Scrollable Time slots grid */}
-        <div className="flex-1 overflow-y-auto pb-20">
-          <div className="space-y-0">
-            {timeSlots.map((timeSlot, timeIndex) => (
-              <div key={timeIndex} className="grid grid-cols-8 gap-1 border-b border-gray-100 px-4">
-                {/* Time label */}
-                <div className="text-xs text-gray-500 p-2 text-right pr-4">
-                  {timeSlot}
-                </div>
+        }
+        footer={<NavbarInferior activeTab="home" />}
+      >
+        <div className="flex flex-col h-full">
+          {/* Fixed Week header */}
+          <div className="bg-white shadow-sm border-b border-gray-100">
+            <div className="grid grid-cols-8 gap-1 p-4">
+              <div className="text-xs font-medium text-gray-500 p-2">Hora</div>
+              {weekDays.map((day, index) => {
+                const dayAvailable = isVetAvailable(day);
                 
-                {/* Day columns */}
-                {weekDays.map((day, dayIndex) => {
-                  const isDayAvailable = isVetAvailable(day);
-                  const isSlotAvailable = isTimeSlotAvailable(day, timeSlot);
-                  const appointment = getAppointmentForSlot(day, timeSlot);
-                  
-                  // If day is not available, show closed column
-                  if (!isDayAvailable) {
-                    return (
-                      <div 
-                        key={dayIndex} 
-                        className="h-8 bg-red-100 border-r border-gray-200 rounded-sm"
-                      />
-                    );
-                  }
-                  
-                  // If slot is not within working hours, show empty
-                  if (!isSlotAvailable) {
-                    return (
-                      <div 
-                        key={dayIndex} 
-                        className="h-8 bg-gray-50 border-r border-gray-100 rounded-sm"
-                      />
-                    );
-                  }
-                  
-                  return (
-                    <div 
-                      key={dayIndex} 
-                      className="h-8 bg-[#79D0B8]/10 border-r border-gray-100 relative rounded-sm"
-                    >
-                      {appointment && (
-                        <div className="h-full bg-[#79D0B8] text-white text-xs p-1 rounded-sm flex items-center justify-center overflow-hidden">
-                          {getPetIcon(appointment.petName || '')}
-                        </div>
-                      )}
+                return (
+                  <div 
+                    key={index} 
+                    className={`text-center p-3 rounded-xl ${
+                      dayAvailable 
+                        ? 'bg-gray-50' 
+                        : 'bg-red-100'
+                    }`}
+                  >
+                    <div className="text-xs font-medium text-gray-500 uppercase">
+                      {format(day, 'EEE', { locale: es })}
                     </div>
-                  );
-                })}
-              </div>
-            ))}
+                    <div className={`text-lg font-semibold mt-1 ${
+                      dayAvailable ? 'text-[#1F2937]' : 'text-red-500'
+                    }`}>
+                      {format(day, 'd')}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Scrollable Time slots grid */}
+          <div className="flex-1 overflow-y-auto pb-20">
+            <div className="space-y-0">
+              {timeSlots.map((timeSlot, timeIndex) => (
+                <div key={timeIndex} className="grid grid-cols-8 gap-1 border-b border-gray-100 px-4">
+                  {/* Time label */}
+                  <div className="text-xs text-gray-500 p-2 text-right pr-4">
+                    {timeSlot}
+                  </div>
+                  
+                  {/* Day columns */}
+                  {weekDays.map((day, dayIndex) => {
+                    const isDayAvailable = isVetAvailable(day);
+                    const isSlotAvailable = isTimeSlotAvailable(day, timeSlot);
+                    const appointment = getAppointmentForSlot(day, timeSlot);
+                    
+                    // If day is not available, show closed column
+                    if (!isDayAvailable) {
+                      return (
+                        <div 
+                          key={dayIndex} 
+                          className="h-8 bg-red-100 border-r border-gray-200 rounded-sm"
+                        />
+                      );
+                    }
+                    
+                    // If slot is not within working hours, show empty
+                    if (!isSlotAvailable) {
+                      return (
+                        <div 
+                          key={dayIndex} 
+                          className="h-8 bg-gray-50 border-r border-gray-100 rounded-sm"
+                        />
+                      );
+                    }
+                    
+                    return (
+                      <div 
+                        key={dayIndex} 
+                        className="h-8 bg-[#79D0B8]/10 border-r border-gray-100 relative rounded-sm"
+                      >
+                        {appointment && (
+                          <div className="h-full bg-[#79D0B8] text-white text-xs p-1 rounded-sm flex items-center justify-center overflow-hidden">
+                            {getPetIcon(appointment.petName || '')}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </LayoutBase>
+      </LayoutBase>
+
+      <VetNotesDrawer
+        isOpen={notesDrawerOpen}
+        onClose={() => setNotesDrawerOpen(false)}
+        vetId={user?.id}
+        currentWeekStart={currentWeekStart}
+      />
+    </>
   );
 };
 
