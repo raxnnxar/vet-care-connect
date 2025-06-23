@@ -34,7 +34,10 @@ export const useVetNotes = (vetId: string | undefined, currentWeekStart: Date) =
         .lte('date', weekEnd)
         .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching notes:', error);
+        throw error;
+      }
       
       setNotes(data || []);
     } catch (error) {
@@ -50,9 +53,14 @@ export const useVetNotes = (vetId: string | undefined, currentWeekStart: Date) =
   };
 
   const createNote = async (noteDate: string, title: string, content: string) => {
-    if (!vetId) return;
+    if (!vetId) {
+      console.error('No vet ID available');
+      return;
+    }
 
     try {
+      console.log('Creating note with:', { veterinarian_id: vetId, date: noteDate, title, content });
+      
       const { data, error } = await supabase
         .from('vet_personal_notes')
         .insert({
@@ -64,8 +72,12 @@ export const useVetNotes = (vetId: string | undefined, currentWeekStart: Date) =
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating note:', error);
+        throw error;
+      }
 
+      console.log('Note created successfully:', data);
       setNotes(prev => [data, ...prev]);
       toast({
         title: "Nota guardada",
