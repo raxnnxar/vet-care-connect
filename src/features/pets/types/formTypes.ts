@@ -1,4 +1,3 @@
-
 export interface MedicalFormValues {
   surgeries: { type: string; date: string; }[];
   allergies: string;
@@ -22,7 +21,6 @@ export interface OwnerMedication {
   start_date: string;
   end_date: string | null;
   is_permanent: boolean;
-  prescribed_by_owner: boolean;
   created_at?: string;
 }
 

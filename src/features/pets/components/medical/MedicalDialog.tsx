@@ -102,7 +102,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
         result = insertData;
       }
 
-      // Save medications to owner_medications table
+      // Save medications to owner_medications table (without prescribed_by_owner and chronic)
       const validMedications = data.medications.filter(med => med.name.trim() !== '');
       
       if (validMedications.length > 0) {
@@ -113,8 +113,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
           frequency_hours: med.frequency_hours,
           start_date: med.start_date,
           end_date: med.is_permanent ? null : (med.end_date || null),
-          is_permanent: med.is_permanent,
-          prescribed_by_owner: true
+          is_permanent: med.is_permanent
         }));
 
         console.log('Medications to save:', medicationsToInsert);

@@ -716,6 +716,7 @@ export type Database = {
           lot_expiry_date: string | null
           lot_number: string | null
           manufacturer: string | null
+          needs_booster: boolean | null
           next_due_date: string | null
           notes: string | null
           pet_id: string
@@ -731,6 +732,7 @@ export type Database = {
           lot_expiry_date?: string | null
           lot_number?: string | null
           manufacturer?: string | null
+          needs_booster?: boolean | null
           next_due_date?: string | null
           notes?: string | null
           pet_id: string
@@ -746,6 +748,7 @@ export type Database = {
           lot_expiry_date?: string | null
           lot_number?: string | null
           manufacturer?: string | null
+          needs_booster?: boolean | null
           next_due_date?: string | null
           notes?: string | null
           pet_id?: string
