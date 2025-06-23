@@ -46,9 +46,10 @@ const AppNavigator = () => {
         location.pathname.includes('/review') ||
         location.pathname.includes('/detalles-cita') ||
         location.pathname.includes('/appointments') ||
-        location.pathname.includes('/agenda')
+        location.pathname.includes('/agenda') ||
+        location.pathname.includes('/pets') // Add pets routes to avoid redirects during pet management
       ) {
-        console.log('User is on a setup/profile/chat/review/vet screen, allowing completion of flow');
+        console.log('User is on a setup/profile/chat/review/vet/pets screen, allowing completion of flow');
         return;
       }
       
@@ -98,14 +99,18 @@ const AppNavigator = () => {
       console.log('No user found in AppNavigator');
       
       // If no user and not on auth routes, redirect to login
+      // BUT don't redirect if we're in the middle of pet creation flow
       if (
         !location.pathname.startsWith('/login') && 
         !location.pathname.startsWith('/signup') &&
         !location.pathname.startsWith('/forgot-password') &&
         !location.pathname.startsWith('/reset-password') &&
+        !location.pathname.startsWith('/owner') && // Don't redirect if already in owner section
+        !location.pathname.startsWith('/vet') && // Don't redirect if already in vet section
+        !location.pathname.startsWith('/grooming') && // Don't redirect if already in grooming section
         location.pathname !== '/'
       ) {
-        console.log('No user and not on auth route, redirecting to login');
+        console.log('No user and not on auth route or app sections, redirecting to login');
         navigate(ROUTES.LOGIN);
       }
     }

@@ -184,9 +184,17 @@ const PetForm: React.FC<PetFormProps> = ({ mode, pet, onSubmit, isSubmitting, on
     }
   };
 
+  // Handle completion of medical step - don't redirect, just close the form
+  const handleMedicalStepComplete = () => {
+    console.log('Medical step completed, closing form');
+    if (onCancel) {
+      onCancel();
+    }
+  };
+
   // If we're on the medical step, render the medical form
   if (step === 'medical' && createdPet) {
-    return <FormSteps step={step} createdPet={createdPet} onComplete={onCancel || (() => {})} />;
+    return <FormSteps step={step} createdPet={createdPet} onComplete={handleMedicalStepComplete} />;
   }
 
   const isFormSubmitting = isSubmitting || isUploadingPhoto;
