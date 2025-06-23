@@ -7,6 +7,7 @@ import { Button } from '@/ui/atoms/button';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/ui/atoms/skeleton';
 import { PlusCircle } from 'lucide-react';
+import { ScrollArea } from '@/ui/molecules/scroll-area';
 
 interface PetSelectionStepProps {
   selectedPet: Pet | null;
@@ -56,22 +57,26 @@ const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full flex flex-col">
       <h3 className="font-medium text-gray-700 mb-4">Selecciona una mascota</h3>
-      <div className="space-y-3">
-        {pets.map((pet) => (
-          <div 
-            key={pet.id}
-            onClick={() => onPetSelect(pet)}
-            className={`border rounded-lg overflow-hidden transition-all ${
-              selectedPet?.id === pet.id 
-                ? 'border-[#79D0B8] bg-[#e8f7f3]' 
-                : 'border-gray-200'
-            }`}
-          >
-            <PetListItem pet={pet} onClick={() => onPetSelect(pet)} />
+      <div className="flex-1 min-h-0">
+        <ScrollArea className="h-full max-h-[60vh]">
+          <div className="space-y-3 pr-4">
+            {pets.map((pet) => (
+              <div 
+                key={pet.id}
+                onClick={() => onPetSelect(pet)}
+                className={`border rounded-lg overflow-hidden transition-all ${
+                  selectedPet?.id === pet.id 
+                    ? 'border-[#79D0B8] bg-[#e8f7f3]' 
+                    : 'border-gray-200'
+                }`}
+              >
+                <PetListItem pet={pet} onClick={() => onPetSelect(pet)} />
+              </div>
+            ))}
           </div>
-        ))}
+        </ScrollArea>
       </div>
     </div>
   );

@@ -247,30 +247,38 @@ const BookAppointmentScreen: React.FC = () => {
       }
       footer={<NavbarInferior activeTab="appointments" />}
     >
-      <div className="p-4 bg-gray-50 min-h-screen">
-        <StepsIndicator currentStep={currentStep} totalSteps={4} />
+      <div className="flex flex-col h-full bg-gray-50">
+        <div className="p-4">
+          <StepsIndicator currentStep={currentStep} totalSteps={4} />
+        </div>
         
-        <VeterinarianCard 
-          veterinarian={provider}
-          isLoading={isLoading}
-          currentStep={currentStep}
-          providerType={providerType}
-        >
-          {renderStepContent()}
-        </VeterinarianCard>
+        <div className="flex-1 flex flex-col min-h-0 px-4">
+          <VeterinarianCard 
+            veterinarian={provider}
+            isLoading={isLoading}
+            currentStep={currentStep}
+            providerType={providerType}
+          >
+            <div className="flex-1 min-h-0">
+              {renderStepContent()}
+            </div>
+          </VeterinarianCard>
+        </div>
         
         {shouldShowNavigationButtons() && (
-          <NavigationButtons
-            currentStep={currentStep}
-            selectedPet={selectedPet}
-            selectedService={selectedService}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            onGoBack={handleGoBack}
-            onContinue={handleContinue}
-            isLoading={isCreatingAppointment}
-            canContinue={canContinue()}
-          />
+          <div className="p-4 border-t bg-white">
+            <NavigationButtons
+              currentStep={currentStep}
+              selectedPet={selectedPet}
+              selectedService={selectedService}
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              onGoBack={handleGoBack}
+              onContinue={handleContinue}
+              isLoading={isCreatingAppointment}
+              canContinue={canContinue()}
+            />
+          </div>
         )}
       </div>
     </LayoutBase>
