@@ -11,13 +11,11 @@ import { PlusCircle } from 'lucide-react';
 interface PetSelectionStepProps {
   selectedPet: Pet | null;
   onPetSelect: (pet: Pet) => void;
-  onContinue?: () => void;
 }
 
 const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
   selectedPet,
-  onPetSelect,
-  onContinue
+  onPetSelect
 }) => {
   const { pets, isLoading } = usePets();
   const navigate = useNavigate();
@@ -60,7 +58,7 @@ const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
   return (
     <div className="space-y-4">
       <h3 className="font-medium text-gray-700 mb-4">Selecciona una mascota</h3>
-      <div className="space-y-3 max-h-96 overflow-y-auto">
+      <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
         {pets.map((pet) => (
           <div 
             key={pet.id}
@@ -75,18 +73,6 @@ const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
           </div>
         ))}
       </div>
-      
-      {/* Botón de continuar */}
-      {selectedPet && onContinue && (
-        <div className="pt-4">
-          <Button 
-            className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3]"
-            onClick={onContinue}
-          >
-            Continuar
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

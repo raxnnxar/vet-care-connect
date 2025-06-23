@@ -174,7 +174,6 @@ const BookAppointmentScreen: React.FC = () => {
           <PetSelectionStep 
             selectedPet={selectedPet} 
             onPetSelect={setSelectedPet}
-            onContinue={handleContinue}
           />
         );
       case 2:
@@ -248,32 +247,41 @@ const BookAppointmentScreen: React.FC = () => {
       }
       footer={<NavbarInferior activeTab="appointments" />}
     >
-      <div className="p-4 bg-gray-50 min-h-screen">
-        <StepsIndicator currentStep={currentStep} totalSteps={4} />
+      <div className="flex flex-col h-full">
+        <div className="p-4 bg-gray-50">
+          <StepsIndicator currentStep={currentStep} totalSteps={4} />
+        </div>
         
-        <VeterinarianCard 
-          veterinarian={provider}
-          isLoading={isLoading}
-          currentStep={currentStep}
-          providerType={providerType}
-        >
-          {renderStepContent()}
-        </VeterinarianCard>
-        
-        {/* Solo mostrar NavigationButtons para los pasos que no tienen su propio botón */}
-        {shouldShowNavigationButtons() && currentStep !== 1 && (
-          <NavigationButtons
-            currentStep={currentStep}
-            selectedPet={selectedPet}
-            selectedService={selectedService}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            onGoBack={handleGoBack}
-            onContinue={handleContinue}
-            isLoading={isCreatingAppointment}
-            canContinue={canContinue()}
-          />
-        )}
+        <div className="flex-1 overflow-hidden bg-gray-50">
+          <div className="h-full flex flex-col px-4">
+            <div className="flex-1 overflow-hidden">
+              <VeterinarianCard 
+                veterinarian={provider}
+                isLoading={isLoading}
+                currentStep={currentStep}
+                providerType={providerType}
+              >
+                {renderStepContent()}
+              </VeterinarianCard>
+            </div>
+            
+            {shouldShowNavigationButtons() && (
+              <div className="py-4 border-t bg-white">
+                <NavigationButtons
+                  currentStep={currentStep}
+                  selectedPet={selectedPet}
+                  selectedService={selectedService}
+                  selectedDate={selectedDate}
+                  selectedTime={selectedTime}
+                  onGoBack={handleGoBack}
+                  onContinue={handleContinue}
+                  isLoading={isCreatingAppointment}
+                  canContinue={canContinue()}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </LayoutBase>
   );
