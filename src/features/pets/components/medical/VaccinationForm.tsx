@@ -6,7 +6,7 @@ import { Label } from '@/ui/atoms/label';
 import { Textarea } from '@/ui/atoms/textarea';
 import { Checkbox } from '@/ui/atoms/checkbox';
 import { Card } from '@/ui/molecules/card';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { CreateVaccinationRecord } from '../../types/vaccinationTypes';
 
 interface VaccinationFormProps {
@@ -29,6 +29,7 @@ const VaccinationForm: React.FC<VaccinationFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     if (!vaccineName.trim() || !applicationDate) {
       return;
@@ -61,7 +62,7 @@ const VaccinationForm: React.FC<VaccinationFormProps> = ({
         </Button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="vaccine-name">Nombre de la vacuna *</Label>
           <Input
@@ -112,7 +113,8 @@ const VaccinationForm: React.FC<VaccinationFormProps> = ({
 
         <div className="flex gap-3 pt-2">
           <Button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
             disabled={isSubmitting || !vaccineName.trim() || !applicationDate}
           >
@@ -122,7 +124,7 @@ const VaccinationForm: React.FC<VaccinationFormProps> = ({
             Cancelar
           </Button>
         </div>
-      </form>
+      </div>
     </Card>
   );
 };

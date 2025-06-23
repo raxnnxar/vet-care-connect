@@ -39,6 +39,7 @@ const DigitalVaccinationSection: React.FC<DigitalVaccinationSectionProps> = ({ p
         
         {!showForm && (
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => setShowForm(true)}
