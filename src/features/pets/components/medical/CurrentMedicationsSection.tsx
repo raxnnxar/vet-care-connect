@@ -70,7 +70,7 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
           treatment_cases!inner(
             veterinarian_id,
             start_date,
-            profiles!inner(display_name)
+            pet_id
           )
         `)
         .eq('treatment_cases.pet_id', petId)
@@ -78,6 +78,22 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
         .gte('start_date', new Date().toISOString().split('T')[0]);
 
       if (vetError) throw vetError;
+
+      // Get veterinarian names for vet medications
+      let vetProfiles: any[] = [];
+      if (vetMeds && vetMeds.length > 0) {
+        const vetIds = [...new Set(vetMeds.map(med => med.treatment_cases?.veterinarian_id).filter(Boolean))];
+        if (vetIds.length > 0) {
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, display_name')
+            .in('id', vetIds);
+
+          if (!profilesError && profiles) {
+            vetProfiles = profiles;
+          }
+        }
+      }
 
       // Transform owner medications
       const transformedOwnerMeds: Medication[] = (ownerMeds || []).map(med => ({
@@ -97,6 +113,8 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
         endDate.setDate(endDate.getDate() + med.duration_days);
         const isActive = endDate > new Date();
         
+        const vetProfile = vetProfiles.find(p => p.id === med.treatment_cases?.veterinarian_id);
+        
         return {
           id: med.id,
           medication: med.medication,
@@ -106,7 +124,7 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
           end_date: isActive ? endDate.toISOString().split('T')[0] : null,
           is_permanent: false,
           source: 'vet' as const,
-          prescribed_by: med.treatment_cases?.profiles?.display_name || 'Veterinario',
+          prescribed_by: vetProfile?.display_name || 'Veterinario',
           treatment_case_id: med.treatment_case_id
         };
       }).filter(med => med.end_date === null || new Date(med.end_date) > new Date());

@@ -123,7 +123,7 @@ const AddMedicationDialog: React.FC<AddMedicationDialogProps> = ({
             <Checkbox
               id="permanent"
               checked={isPermanent}
-              onCheckedChange={setIsPermanent}
+              onCheckedChange={(checked) => setIsPermanent(checked === true)}
             />
             <Label htmlFor="permanent">Medicamento permanente</Label>
           </div>
