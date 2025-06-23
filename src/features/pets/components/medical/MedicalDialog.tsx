@@ -49,7 +49,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
       setIsSubmitting(true);
       console.log('Submitting medical data for pet:', pet.id);
       
-      // Prepare medical history data without current_medications
+      // Prepare medical history data
       const medicalHistoryData = {
         pet_id: pet.id,
         previous_surgeries: data.surgeries.filter(s => s.type.trim() !== ''),

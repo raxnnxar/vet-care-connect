@@ -4,7 +4,7 @@ import { PetMedicalHistory } from '../../types';
 import { Button } from '@/ui/atoms/button';
 import { Label } from '@/ui/atoms/label';
 import { Textarea } from '@/ui/atoms/textarea';
-import { Stethoscope, Upload, Check } from 'lucide-react';
+import { Stethoscope } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PetMedicalInfoFormProps {
@@ -17,17 +17,7 @@ const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({ petId, onSave, 
   const [allergies, setAllergies] = useState<string>('');
   const [chronicConditions, setChronicConditions] = useState<string>('');
   const [surgeries, setSurgeries] = useState<string>('');
-  const [vaccineFile, setVaccineFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [vaccineDocUrl, setVaccineDocUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setVaccineFile(files[0]);
-    }
-  };
 
   const parseJsonArray = (text: string) => {
     if (!text.trim()) return [];
@@ -49,12 +39,11 @@ const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({ petId, onSave, 
     setIsSubmitting(true);
 
     try {
-      // Prepare medical history data without current_medications
+      // Prepare medical history data
       const medicalInfo: PetMedicalHistory = {
         allergies: allergies || null,
         chronic_conditions: chronicConditions || null,
-        previous_surgeries: surgeries ? parseJsonArray(surgeries) : [],
-        vaccines_document_url: vaccineDocUrl
+        previous_surgeries: surgeries ? parseJsonArray(surgeries) : []
       };
 
       await onSave(medicalInfo);
@@ -68,46 +57,6 @@ const PetMedicalInfoForm: React.FC<PetMedicalInfoFormProps> = ({ petId, onSave, 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="vaccineDoc">Documento de vacunas</Label>
-        <div className="flex flex-col space-y-2">
-          <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-primary transition-colors">
-            <input
-              id="vaccineDoc"
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg"
-              onChange={handleFileChange}
-              className="hidden"
-              disabled={uploading}
-            />
-            <Label 
-              htmlFor="vaccineDoc" 
-              className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground"
-            >
-              <Upload className="h-8 w-8" />
-              <span>
-                {uploading ? 'Subiendo...' : 'Subir documento de vacunas (PDF/Imagen)'}
-              </span>
-              <span className="text-xs text-muted-foreground">Máximo 5MB</span>
-            </Label>
-          </div>
-          
-          {vaccineDocUrl && (
-            <div className="bg-green-50 text-green-700 p-2 rounded-md flex items-center gap-2">
-              <Check className="h-4 w-4" />
-              <a 
-                href={vaccineDocUrl}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm underline hover:text-green-800"
-              >
-                Documento subido exitosamente - Ver documento
-              </a>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="allergies">Alergias</Label>
         <Textarea

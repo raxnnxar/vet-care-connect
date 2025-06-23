@@ -275,46 +275,6 @@ export const petsApi: IPetsApi = {
 
       console.log('API: Public URL for vaccine document:', publicUrlData.publicUrl);
 
-      // Check if a medical history record exists for this pet
-      const { data: existingRecord, error: fetchError } = await supabase
-        .from('pet_medical_history')
-        .select('id')
-        .eq('pet_id', petId)
-        .maybeSingle();
-        
-      if (fetchError) {
-        console.error('API: Error checking for existing medical history:', fetchError);
-      }
-      
-      let updateError = null;
-      
-      if (existingRecord) {
-        // Update existing record
-        console.log('API: Updating existing medical history record');
-        const { error } = await supabase
-          .from('pet_medical_history')
-          .update({ vaccines_document_url: publicUrlData.publicUrl })
-          .eq('pet_id', petId);
-          
-        updateError = error;
-      } else {
-        // Create new record
-        console.log('API: Creating new medical history record');
-        const { error } = await supabase
-          .from('pet_medical_history')
-          .insert({ 
-            pet_id: petId, 
-            vaccines_document_url: publicUrlData.publicUrl 
-          });
-          
-        updateError = error;
-      }
-
-      if (updateError) {
-        console.error('API: Error updating pet medical history with vaccine document URL:', updateError);
-        throw updateError;
-      }
-
       return { data: { publicUrl: publicUrlData.publicUrl }, error: null };
     } catch (error) {
       console.error('API: Error in uploadVaccineDocument:', error);
@@ -332,7 +292,6 @@ export const petsApi: IPetsApi = {
         pet_id: petId,
         allergies: medicalHistoryData.allergies || null,
         chronic_conditions: medicalHistoryData.chronic_conditions || null,
-        vaccines_document_url: medicalHistoryData.vaccines_document_url || null,
         previous_surgeries: 
           medicalHistoryData.previous_surgeries ? 
             JSON.stringify(medicalHistoryData.previous_surgeries) : null

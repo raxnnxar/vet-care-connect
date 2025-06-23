@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
@@ -15,7 +16,6 @@ interface MedicalHistory {
   allergies?: string;
   chronic_conditions?: string;
   previous_surgeries?: any[];
-  vaccines_document_url?: string;
 }
 
 const PetMedicalRecordsScreen: React.FC = () => {
@@ -57,12 +57,11 @@ const PetMedicalRecordsScreen: React.FC = () => {
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching medical history:', error);
         } else if (medicalData) {
-          // Convert Json types to proper arrays, excluding current_medications
+          // Convert Json types to proper arrays
           const convertedMedicalData: MedicalHistory = {
             id: medicalData.id,
             allergies: medicalData.allergies,
             chronic_conditions: medicalData.chronic_conditions,
-            vaccines_document_url: medicalData.vaccines_document_url,
             previous_surgeries: Array.isArray(medicalData.previous_surgeries)
               ? medicalData.previous_surgeries
               : medicalData.previous_surgeries
@@ -84,7 +83,7 @@ const PetMedicalRecordsScreen: React.FC = () => {
     };
 
     fetchData();
-  }, [id]); // Solo dependemos del ID, no de funciones que cambien
+  }, [id]);
 
   const handleBack = () => {
     navigate(`/owner/pets/${id}`);

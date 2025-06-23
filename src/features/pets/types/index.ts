@@ -1,3 +1,4 @@
+
 /**
  * Core pet entity type
  */
@@ -27,7 +28,6 @@ export interface PetMedicalHistory {
   allergies?: string | null;
   chronic_conditions?: string | null;
   previous_surgeries?: any[] | null;
-  vaccines_document_url?: string | null;
   created_at?: string;
 }
 
