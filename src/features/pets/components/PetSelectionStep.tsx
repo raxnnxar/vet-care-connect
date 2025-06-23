@@ -58,12 +58,12 @@ const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
   return (
     <div className="space-y-4">
       <h3 className="font-medium text-gray-700 mb-4">Selecciona una mascota</h3>
-      <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+      <div className="space-y-3">
         {pets.map((pet) => (
           <div 
             key={pet.id}
             onClick={() => onPetSelect(pet)}
-            className={`border rounded-lg overflow-hidden transition-all cursor-pointer ${
+            className={`border rounded-lg overflow-hidden transition-all ${
               selectedPet?.id === pet.id 
                 ? 'border-[#79D0B8] bg-[#e8f7f3]' 
                 : 'border-gray-200'

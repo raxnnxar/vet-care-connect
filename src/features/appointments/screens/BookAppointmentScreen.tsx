@@ -247,41 +247,31 @@ const BookAppointmentScreen: React.FC = () => {
       }
       footer={<NavbarInferior activeTab="appointments" />}
     >
-      <div className="flex flex-col h-full">
-        <div className="p-4 bg-gray-50">
-          <StepsIndicator currentStep={currentStep} totalSteps={4} />
-        </div>
+      <div className="p-4 bg-gray-50 min-h-screen">
+        <StepsIndicator currentStep={currentStep} totalSteps={4} />
         
-        <div className="flex-1 overflow-hidden bg-gray-50">
-          <div className="h-full flex flex-col px-4">
-            <div className="flex-1 overflow-hidden">
-              <VeterinarianCard 
-                veterinarian={provider}
-                isLoading={isLoading}
-                currentStep={currentStep}
-                providerType={providerType}
-              >
-                {renderStepContent()}
-              </VeterinarianCard>
-            </div>
-            
-            {shouldShowNavigationButtons() && (
-              <div className="py-4 border-t bg-white">
-                <NavigationButtons
-                  currentStep={currentStep}
-                  selectedPet={selectedPet}
-                  selectedService={selectedService}
-                  selectedDate={selectedDate}
-                  selectedTime={selectedTime}
-                  onGoBack={handleGoBack}
-                  onContinue={handleContinue}
-                  isLoading={isCreatingAppointment}
-                  canContinue={canContinue()}
-                />
-              </div>
-            )}
-          </div>
-        </div>
+        <VeterinarianCard 
+          veterinarian={provider}
+          isLoading={isLoading}
+          currentStep={currentStep}
+          providerType={providerType}
+        >
+          {renderStepContent()}
+        </VeterinarianCard>
+        
+        {shouldShowNavigationButtons() && (
+          <NavigationButtons
+            currentStep={currentStep}
+            selectedPet={selectedPet}
+            selectedService={selectedService}
+            selectedDate={selectedDate}
+            selectedTime={selectedTime}
+            onGoBack={handleGoBack}
+            onContinue={handleContinue}
+            isLoading={isCreatingAppointment}
+            canContinue={canContinue()}
+          />
+        )}
       </div>
     </LayoutBase>
   );
