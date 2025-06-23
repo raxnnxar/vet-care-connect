@@ -1,3 +1,4 @@
+
 import { Pet, CreatePetData, UpdatePetData, PetFilters, PetMedicalHistory } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryOptions } from '../../../core/api/apiClient';
@@ -332,9 +333,6 @@ export const petsApi: IPetsApi = {
         allergies: medicalHistoryData.allergies || null,
         chronic_conditions: medicalHistoryData.chronic_conditions || null,
         vaccines_document_url: medicalHistoryData.vaccines_document_url || null,
-        current_medications: 
-          medicalHistoryData.current_medications ? 
-            JSON.stringify(medicalHistoryData.current_medications) : null,
         previous_surgeries: 
           medicalHistoryData.previous_surgeries ? 
             JSON.stringify(medicalHistoryData.previous_surgeries) : null

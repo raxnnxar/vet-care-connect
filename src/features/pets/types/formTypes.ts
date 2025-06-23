@@ -25,3 +25,22 @@ export interface OwnerMedication {
   prescribed_by_owner: boolean;
   created_at?: string;
 }
+
+export interface PetFormValues {
+  name: string;
+  species: string;
+  breed: string;
+  customSpecies: string;
+  age?: number;
+  weight?: number;
+  sex: string;
+  temperament: string;
+  additionalNotes: string;
+}
+
+export interface PetBasicInfoProps {
+  control: any;
+  register: any;
+  errors: any;
+  selectedSpecies: string;
+}
