@@ -706,6 +706,62 @@ export type Database = {
           },
         ]
       }
+      vaccination_records: {
+        Row: {
+          administered_by: string | null
+          anatomical_site: string | null
+          application_date: string
+          created_at: string | null
+          id: string
+          lot_expiry_date: string | null
+          lot_number: string | null
+          manufacturer: string | null
+          next_due_date: string | null
+          notes: string | null
+          pet_id: string
+          route: string | null
+          vaccine_name: string
+        }
+        Insert: {
+          administered_by?: string | null
+          anatomical_site?: string | null
+          application_date: string
+          created_at?: string | null
+          id?: string
+          lot_expiry_date?: string | null
+          lot_number?: string | null
+          manufacturer?: string | null
+          next_due_date?: string | null
+          notes?: string | null
+          pet_id: string
+          route?: string | null
+          vaccine_name: string
+        }
+        Update: {
+          administered_by?: string | null
+          anatomical_site?: string | null
+          application_date?: string
+          created_at?: string | null
+          id?: string
+          lot_expiry_date?: string | null
+          lot_number?: string | null
+          manufacturer?: string | null
+          next_due_date?: string | null
+          notes?: string | null
+          pet_id?: string
+          route?: string | null
+          vaccine_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccination_records_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vaccine_documents: {
         Row: {
           document_url: string

@@ -17,6 +17,7 @@ import MedicalConditionsSection from './MedicalConditionsSection';
 import OwnerMedicationsSection from './OwnerMedicationsSection';
 import MedicalDialogHeader from './MedicalDialogHeader';
 import MedicalInfoViewer from './MedicalInfoViewer';
+import DigitalVaccinationSection from './DigitalVaccinationSection';
 import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface MedicalDialogProps {
@@ -153,10 +154,18 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Vaccine Document Upload Section */}
-            <VaccineDocumentUpload 
-              petId={pet.id} 
-              petOwnerId={pet.owner_id}
-            />
+            <div className="space-y-3">
+              <VaccineDocumentUpload 
+                petId={pet.id} 
+                petOwnerId={pet.owner_id}
+              />
+              <p className="text-sm text-gray-600">
+                Si tienes una foto o PDF de tu cartilla física, súbelo aquí como respaldo. No es obligatorio.
+              </p>
+            </div>
+            
+            {/* Digital Vaccination Section */}
+            <DigitalVaccinationSection petId={pet.id} />
             
             {/* Medical Conditions Section */}
             <MedicalConditionsSection register={register} />
