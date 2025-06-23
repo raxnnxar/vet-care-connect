@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import VaccineDocumentUpload from './VaccineDocumentUpload';
 import SurgeriesSection from './SurgeriesSection';
 import MedicalConditionsSection from './MedicalConditionsSection';
+import OwnerMedicationsSection from './OwnerMedicationsSection';
 import MedicalDialogHeader from './MedicalDialogHeader';
 import MedicalInfoViewer from './MedicalInfoViewer';
 import { MedicalFormValues } from '@/features/pets/types/formTypes';
@@ -28,16 +29,20 @@ interface MedicalDialogProps {
 const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode = 'edit' }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, control } = useForm<MedicalFormValues>({
+  const { register, handleSubmit, control, watch } = useForm<MedicalFormValues>({
     defaultValues: {
       surgeries: [{ type: '', date: '' }],
       allergies: '',
-      chronicConditions: ''
+      chronicConditions: '',
+      medications: []
     }
   });
 
   const { fields: surgeryFields, append: appendSurgery, remove: removeSurgery } = 
     useFieldArray({ control, name: "surgeries" });
+
+  const { fields: medicationFields, append: appendMedication, remove: removeMedication } = 
+    useFieldArray({ control, name: "medications" });
 
   const onSubmit = async (data: MedicalFormValues) => {
     try {
@@ -96,6 +101,33 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
         result = insertData;
       }
 
+      // Save medications to owner_medications table
+      const validMedications = data.medications.filter(med => med.name.trim() !== '');
+      
+      if (validMedications.length > 0) {
+        const medicationsToInsert = validMedications.map(med => ({
+          pet_id: pet.id,
+          medication: med.name,
+          dosage: med.dosage,
+          frequency_hours: med.frequency_hours,
+          start_date: med.start_date,
+          end_date: med.is_permanent ? null : (med.end_date || null),
+          is_permanent: med.is_permanent,
+          prescribed_by_owner: true
+        }));
+
+        console.log('Medications to save:', medicationsToInsert);
+
+        const { error: medicationsError } = await supabase
+          .from('owner_medications')
+          .insert(medicationsToInsert);
+
+        if (medicationsError) {
+          console.error('Error saving medications:', medicationsError);
+          throw medicationsError;
+        }
+      }
+
       console.log('Medical history saved successfully:', result);
       toast.success('Información médica guardada exitosamente');
       onClose();
@@ -135,6 +167,15 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
               appendSurgery={appendSurgery}
               removeSurgery={removeSurgery}
               register={register}
+            />
+
+            {/* Owner Medications Section */}
+            <OwnerMedicationsSection
+              medicationFields={medicationFields}
+              appendMedication={appendMedication}
+              removeMedication={removeMedication}
+              register={register}
+              watch={watch}
             />
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">

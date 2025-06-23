@@ -215,9 +215,11 @@ export type Database = {
           chronic: boolean | null
           created_at: string | null
           dosage: string | null
+          end_date: string | null
           frequency_hours: number | null
           id: string
           instructions: string | null
+          is_permanent: boolean | null
           medication: string | null
           pet_id: string | null
           start_date: string | null
@@ -226,9 +228,11 @@ export type Database = {
           chronic?: boolean | null
           created_at?: string | null
           dosage?: string | null
+          end_date?: string | null
           frequency_hours?: number | null
           id?: string
           instructions?: string | null
+          is_permanent?: boolean | null
           medication?: string | null
           pet_id?: string | null
           start_date?: string | null
@@ -237,9 +241,11 @@ export type Database = {
           chronic?: boolean | null
           created_at?: string | null
           dosage?: string | null
+          end_date?: string | null
           frequency_hours?: number | null
           id?: string
           instructions?: string | null
+          is_permanent?: boolean | null
           medication?: string | null
           pet_id?: string | null
           start_date?: string | null

@@ -1,41 +1,27 @@
 
-import { Control, UseFormRegister, FieldErrors } from 'react-hook-form';
-
-export interface PetFormValues {
-  name: string;
-  species: string;
-  breed?: string;
-  customSpecies?: string;
-  age?: number;
-  weight?: number;
-  sex: string;
-  temperament?: string;
-  additionalNotes?: string;
-}
-
-export interface PetBasicInfoProps {
-  control: Control<PetFormValues>;
-  register: UseFormRegister<PetFormValues>;
-  errors: FieldErrors<PetFormValues>;
-  selectedSpecies: string;
-}
-
-export interface PetPhotoUploadProps {
-  photoPreview: string | null;
-  onPhotoSelect: (file: File) => void;
-}
-
 export interface MedicalFormValues {
-  vaccineDocument?: FileList;
-  medications: Array<{
-    name: string;
-    dosage: string;
-    frequency: string;
-  }>;
-  surgeries: Array<{
-    type: string;
-    date: string;
-  }>;
+  surgeries: { type: string; date: string; }[];
   allergies: string;
   chronicConditions: string;
+  medications: {
+    name: string;
+    dosage: string;
+    frequency_hours: number;
+    start_date: string;
+    is_permanent: boolean;
+    end_date: string;
+  }[];
+}
+
+export interface OwnerMedication {
+  id?: string;
+  pet_id: string;
+  medication: string;
+  dosage: string;
+  frequency_hours: number;
+  start_date: string;
+  end_date: string | null;
+  is_permanent: boolean;
+  prescribed_by_owner: boolean;
+  created_at?: string;
 }

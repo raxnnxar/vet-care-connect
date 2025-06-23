@@ -1,4 +1,3 @@
-
 /**
  * Core pet entity type
  */
@@ -25,11 +24,11 @@ export interface Pet {
 export interface PetMedicalHistory {
   id?: string;
   pet_id?: string;
-  allergies?: string;
-  chronic_conditions?: string;
-  vaccines_document_url?: string;
-  current_medications?: Medication[] | JSON | any;
-  previous_surgeries?: Surgery[] | JSON | any;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
+  previous_surgeries?: any[] | null;
+  vaccines_document_url?: string | null;
+  created_at?: string;
 }
 
 /**
