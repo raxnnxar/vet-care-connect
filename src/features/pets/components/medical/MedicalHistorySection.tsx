@@ -2,23 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/ui/molecules/card';
 import { supabase } from '@/integrations/supabase/client';
-import { Badge } from '@/ui/atoms/badge';
 import { formatDate } from '@/frontend/shared/utils/date';
-import { Stethoscope, FileText, ChevronRight } from 'lucide-react';
+import { Stethoscope, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface MedicalHistoryEvent {
   event_id: string;
   event_date: string;
-  event_type: 'tratamiento' | 'nota';
   diagnosis: string;
   vet_name: string;
+  note_text?: string;
+  meds_summary?: string;
   pet_id: string;
-  veterinarian_id: string;
-  instructions_for_owner?: string;
-  appointment_id?: string;
-  description?: string;
-  title?: string;
+  vet_id: string;
 }
 
 interface MedicalHistorySectionProps {
@@ -46,26 +42,22 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('v_medical_history')
+        .from('v_medical_history_compact')
         .select('*')
         .eq('pet_id', petId)
         .order('event_date', { ascending: false });
 
       if (error) throw error;
       
-      // Type the data properly to ensure event_type is correctly typed
       const typedEvents: MedicalHistoryEvent[] = (data || []).map(item => ({
         event_id: item.event_id,
         event_date: item.event_date,
-        event_type: item.event_type as 'tratamiento' | 'nota',
         diagnosis: item.diagnosis,
         vet_name: item.vet_name,
+        note_text: item.note_text,
+        meds_summary: item.meds_summary,
         pet_id: item.pet_id,
-        veterinarian_id: item.veterinarian_id,
-        instructions_for_owner: item.instructions_for_owner,
-        appointment_id: item.appointment_id,
-        description: item.description,
-        title: item.title
+        vet_id: item.vet_id
       }));
       
       setEvents(typedEvents);
@@ -77,8 +69,9 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
   };
 
   const handleEventClick = (event: MedicalHistoryEvent) => {
-    // Navigate to a detailed view - we'll create this later
+    // Navigate to detailed view
     console.log('Navigate to event detail:', event);
+    // TODO: Implementar navegación a detalle
   };
 
   if (isLoading) {
@@ -122,38 +115,37 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    {event.event_type === 'tratamiento' ? (
-                      <Stethoscope className="w-4 h-4 text-[#79D0B8]" />
-                    ) : (
-                      <FileText className="w-4 h-4 text-gray-600" />
-                    )}
                     <span className="text-sm text-gray-500">
                       {formatDate(event.event_date)}
                     </span>
                     <span className="text-gray-400">·</span>
-                    <Badge variant="outline" className="text-xs">
-                      {event.event_type === 'tratamiento' ? 'Tratamiento' : 'Nota'}
-                    </Badge>
+                    <span className="text-sm text-gray-600">
+                      Vet: {event.vet_name}
+                    </span>
                   </div>
                   
-                  <h4 className="font-semibold text-gray-800 mb-1">
-                    {event.diagnosis}
-                  </h4>
-                  
-                  <p className="text-sm text-gray-600 mb-2">
-                    Vet: {event.vet_name}
-                  </p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Stethoscope className="w-4 h-4 text-[#79D0B8]" />
+                    <h4 className="font-semibold text-gray-800">
+                      {event.diagnosis}
+                    </h4>
+                  </div>
 
-                  {event.event_type === 'nota' && event.description && (
-                    <p className="text-sm text-gray-700 line-clamp-2">
-                      "{event.description}"
+                  {event.note_text && (
+                    <p className="text-sm text-gray-700 mb-2 line-clamp-2">
+                      {event.note_text}
                     </p>
                   )}
 
-                  {event.event_type === 'tratamiento' && event.instructions_for_owner && (
-                    <p className="text-sm text-gray-700 line-clamp-2">
-                      {event.instructions_for_owner}
-                    </p>
+                  {event.meds_summary && (
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">💊 </span>
+                      {event.meds_summary.split('\n').map((med, index) => (
+                        <div key={index} className="ml-4">
+                          {med}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
                 

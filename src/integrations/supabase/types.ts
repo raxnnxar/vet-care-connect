@@ -1025,6 +1025,19 @@ export type Database = {
         }
         Relationships: []
       }
+      v_medical_history_compact: {
+        Row: {
+          diagnosis: string | null
+          event_date: string | null
+          event_id: string | null
+          meds_summary: string | null
+          note_text: string | null
+          pet_id: string | null
+          vet_id: string | null
+          vet_name: string | null
+        }
+        Relationships: []
+      }
       v_treatment_medications: {
         Row: {
           created_at: string | null
