@@ -1,11 +1,10 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/ui/atoms/button';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/molecules/dialog';
+import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
 import { Label } from '@/ui/atoms/label';
-import { Checkbox } from '@/ui/atoms/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/molecules/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/atoms/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -15,9 +14,10 @@ interface Medication {
   dosage: string;
   frequency_hours: number;
   start_date: string;
-  end_date: string | null;
-  is_permanent: boolean;
+  category: 'cronico' | 'suplemento';
   source: 'owner' | 'vet';
+  prescribed_by?: string;
+  treatment_case_id?: string;
 }
 
 interface EditMedicationDialogProps {
@@ -31,33 +31,46 @@ const EditMedicationDialog: React.FC<EditMedicationDialogProps> = ({
   onClose,
   onMedicationUpdated
 }) => {
-  const [medicationName, setMedicationName] = useState(medication.medication);
-  const [dosage, setDosage] = useState(medication.dosage);
-  const [frequencyHours, setFrequencyHours] = useState(medication.frequency_hours.toString());
-  const [startDate, setStartDate] = useState(medication.start_date);
-  const [endDate, setEndDate] = useState(medication.end_date || '');
-  const [isPermanent, setIsPermanent] = useState(medication.is_permanent);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    medication: medication.medication,
+    dosage: medication.dosage,
+    frequency_hours: medication.frequency_hours,
+    start_date: medication.start_date,
+    category: medication.category,
+    instructions: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setFormData({
+      medication: medication.medication,
+      dosage: medication.dosage,
+      frequency_hours: medication.frequency_hours,
+      start_date: medication.start_date,
+      category: medication.category,
+      instructions: ''
+    });
+  }, [medication]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!medicationName.trim() || !dosage.trim()) {
-      toast.error('Por favor completa todos los campos obligatorios');
+    if (medication.source !== 'owner') {
+      toast.error('Solo puedes editar medicamentos agregados por ti');
       return;
     }
 
-    setIsSubmitting(true);
+    setIsLoading(true);
     try {
       const { error } = await supabase
         .from('owner_medications')
         .update({
-          medication: medicationName.trim(),
-          dosage: dosage.trim(),
-          frequency_hours: parseInt(frequencyHours),
-          start_date: startDate,
-          end_date: isPermanent ? null : (endDate || null),
-          is_permanent: isPermanent
+          medication: formData.medication,
+          dosage: formData.dosage,
+          frequency_hours: formData.frequency_hours,
+          start_date: formData.start_date,
+          category: formData.category,
+          instructions: formData.instructions
         })
         .eq('id', medication.id);
 
@@ -69,99 +82,115 @@ const EditMedicationDialog: React.FC<EditMedicationDialogProps> = ({
       console.error('Error updating medication:', error);
       toast.error('Error al actualizar el medicamento');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
+  const frequencyOptions = [
+    { value: 6, label: 'Cada 6 horas' },
+    { value: 8, label: 'Cada 8 horas' },
+    { value: 12, label: 'Cada 12 horas' },
+    { value: 24, label: 'Una vez al día' },
+    { value: 48, label: 'Cada 2 días' },
+    { value: 168, label: 'Una vez a la semana' }
+  ];
+
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Editar Medicamento</DialogTitle>
         </DialogHeader>
-
+        
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="medication">Nombre del medicamento *</Label>
+          <div>
+            <Label htmlFor="medication">Nombre del medicamento</Label>
             <Input
               id="medication"
-              value={medicationName}
-              onChange={(e) => setMedicationName(e.target.value)}
-              placeholder="Ej: Amoxicilina"
+              value={formData.medication}
+              onChange={(e) => setFormData(prev => ({ ...prev, medication: e.target.value }))}
+              placeholder="Ej: Paracetamol"
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="dosage">Dosis *</Label>
+          <div>
+            <Label htmlFor="dosage">Dosis</Label>
             <Input
               id="dosage"
-              value={dosage}
-              onChange={(e) => setDosage(e.target.value)}
-              placeholder="Ej: 1 cápsula, 5ml, 250mg"
+              value={formData.dosage}
+              onChange={(e) => setFormData(prev => ({ ...prev, dosage: e.target.value }))}
+              placeholder="Ej: 500mg, 1 tableta"
               required
             />
           </div>
 
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="frequency">Frecuencia</Label>
-            <Select value={frequencyHours} onValueChange={setFrequencyHours}>
+            <Select 
+              value={formData.frequency_hours.toString()} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, frequency_hours: parseInt(value) }))}
+            >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Selecciona la frecuencia" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="6">Cada 6 horas</SelectItem>
-                <SelectItem value="8">Cada 8 horas</SelectItem>
-                <SelectItem value="12">Cada 12 horas</SelectItem>
-                <SelectItem value="24">Una vez al día</SelectItem>
-                <SelectItem value="48">Cada 2 días</SelectItem>
-                <SelectItem value="72">Cada 3 días</SelectItem>
+                {frequencyOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value.toString()}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="startDate">Fecha de inicio</Label>
+          <div>
+            <Label htmlFor="category">Categoría</Label>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value: 'cronico' | 'suplemento') => setFormData(prev => ({ ...prev, category: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona la categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cronico">Crónico</SelectItem>
+                <SelectItem value="suplemento">Suplemento</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="start_date">Fecha de inicio</Label>
             <Input
-              id="startDate"
+              id="start_date"
               type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              value={formData.start_date}
+              onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
+              required
             />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="permanent"
-              checked={isPermanent}
-              onCheckedChange={(checked) => setIsPermanent(checked === true)}
+          <div>
+            <Label htmlFor="instructions">Instrucciones (opcional)</Label>
+            <Input
+              id="instructions"
+              value={formData.instructions}
+              onChange={(e) => setFormData(prev => ({ ...prev, instructions: e.target.value }))}
+              placeholder="Instrucciones adicionales"
             />
-            <Label htmlFor="permanent">Medicamento permanente</Label>
           </div>
 
-          {!isPermanent && (
-            <div className="space-y-2">
-              <Label htmlFor="endDate">Fecha de fin (opcional)</Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate}
-              />
-            </div>
-          )}
-
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
             <Button 
               type="submit" 
+              disabled={isLoading}
               className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
-              disabled={isSubmitting}
             >
-              {isSubmitting ? 'Actualizando...' : 'Actualizar medicamento'}
+              {isLoading ? 'Guardando...' : 'Guardar cambios'}
             </Button>
           </div>
         </form>
