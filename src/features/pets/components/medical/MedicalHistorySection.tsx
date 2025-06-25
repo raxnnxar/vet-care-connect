@@ -52,7 +52,23 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
         .order('event_date', { ascending: false });
 
       if (error) throw error;
-      setEvents(data || []);
+      
+      // Type the data properly to ensure event_type is correctly typed
+      const typedEvents: MedicalHistoryEvent[] = (data || []).map(item => ({
+        event_id: item.event_id,
+        event_date: item.event_date,
+        event_type: item.event_type as 'tratamiento' | 'nota',
+        diagnosis: item.diagnosis,
+        vet_name: item.vet_name,
+        pet_id: item.pet_id,
+        veterinarian_id: item.veterinarian_id,
+        instructions_for_owner: item.instructions_for_owner,
+        appointment_id: item.appointment_id,
+        description: item.description,
+        title: item.title
+      }));
+      
+      setEvents(typedEvents);
     } catch (error) {
       console.error('Error fetching medical history:', error);
     } finally {

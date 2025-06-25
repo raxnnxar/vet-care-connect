@@ -15,12 +15,9 @@ const DigitalVaccinationSection: React.FC<DigitalVaccinationSectionProps> = ({ p
   const [showForm, setShowForm] = useState(false);
   const { records, isLoading, isCreating, createRecord, deleteRecord } = useVaccinationRecords(petId);
 
-  const handleCreateRecord = async (record: any) => {
-    const success = await createRecord(record);
-    if (success) {
-      setShowForm(false);
-    }
-    return success;
+  const handleVaccinationAdded = () => {
+    setShowForm(false);
+    // Refresh will happen automatically through the hook
   };
 
   const handleDeleteRecord = async (recordId: string) => {
@@ -54,9 +51,8 @@ const DigitalVaccinationSection: React.FC<DigitalVaccinationSectionProps> = ({ p
       {showForm && (
         <VaccinationForm
           petId={petId}
-          onSubmit={handleCreateRecord}
-          onCancel={() => setShowForm(false)}
-          isSubmitting={isCreating}
+          onClose={() => setShowForm(false)}
+          onVaccinationAdded={handleVaccinationAdded}
         />
       )}
 
