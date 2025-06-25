@@ -215,11 +215,9 @@ export type Database = {
           category: Database["public"]["Enums"]["owner_med_category"] | null
           created_at: string | null
           dosage: string | null
-          end_date: string | null
           frequency_hours: number | null
           id: string
           instructions: string | null
-          is_permanent: boolean | null
           medication: string | null
           pet_id: string | null
           start_date: string | null
@@ -228,11 +226,9 @@ export type Database = {
           category?: Database["public"]["Enums"]["owner_med_category"] | null
           created_at?: string | null
           dosage?: string | null
-          end_date?: string | null
           frequency_hours?: number | null
           id?: string
           instructions?: string | null
-          is_permanent?: boolean | null
           medication?: string | null
           pet_id?: string | null
           start_date?: string | null
@@ -241,11 +237,9 @@ export type Database = {
           category?: Database["public"]["Enums"]["owner_med_category"] | null
           created_at?: string | null
           dosage?: string | null
-          end_date?: string | null
           frequency_hours?: number | null
           id?: string
           instructions?: string | null
-          is_permanent?: boolean | null
           medication?: string | null
           pet_id?: string | null
           start_date?: string | null
@@ -665,7 +659,6 @@ export type Database = {
           frequency_hours: number
           id: string
           instructions: string | null
-          is_active: boolean | null
           medication: string
           start_date: string
           treatment_case_id: string
@@ -678,7 +671,6 @@ export type Database = {
           frequency_hours: number
           id?: string
           instructions?: string | null
-          is_active?: boolean | null
           medication: string
           start_date?: string
           treatment_case_id: string
@@ -691,7 +683,6 @@ export type Database = {
           frequency_hours?: number
           id?: string
           instructions?: string | null
-          is_active?: boolean | null
           medication?: string
           start_date?: string
           treatment_case_id?: string
@@ -1018,7 +1009,62 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_treatment_medications: {
+        Row: {
+          created_at: string | null
+          days_left: number | null
+          dosage: string | null
+          duration_days: number | null
+          first_dose_at: string | null
+          frequency_hours: number | null
+          id: string | null
+          instructions: string | null
+          is_active: boolean | null
+          medication: string | null
+          next_dose_at: string | null
+          start_date: string | null
+          treatment_case_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          days_left?: never
+          dosage?: string | null
+          duration_days?: number | null
+          first_dose_at?: string | null
+          frequency_hours?: number | null
+          id?: string | null
+          instructions?: string | null
+          is_active?: never
+          medication?: string | null
+          next_dose_at?: never
+          start_date?: string | null
+          treatment_case_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          days_left?: never
+          dosage?: string | null
+          duration_days?: number | null
+          first_dose_at?: string | null
+          frequency_hours?: number | null
+          id?: string | null
+          instructions?: string | null
+          is_active?: never
+          medication?: string | null
+          next_dose_at?: never
+          start_date?: string | null
+          treatment_case_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_medications_treatment_case_id_fkey"
+            columns: ["treatment_case_id"]
+            isOneToOne: false
+            referencedRelation: "treatment_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       create_pet_grooming: {

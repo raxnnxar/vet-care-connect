@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, AlertTriangle, Play } from 'lucide-react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
@@ -9,16 +10,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
-
-interface Treatment {
-  id: string;
-  pet_id: string;
-  diagnosis: string;
-  instructions_for_owner: string | null;
-  start_date: string;
-  pet_name: string;
-  medications: TreatmentMedication[];
-}
+import { Input } from '@/ui/atoms/input';
+import { Label } from '@/ui/atoms/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/molecules/dialog';
 
 interface TreatmentMedication {
   id: string;
@@ -32,6 +26,18 @@ interface TreatmentMedication {
   treatment_case_id: string;
   first_dose_at: string | null;
   is_active: boolean | null;
+  next_dose_at: string | null;
+  days_left: number | null;
+}
+
+interface Treatment {
+  id: string;
+  pet_id: string;
+  diagnosis: string;
+  instructions_for_owner: string | null;
+  start_date: string;
+  pet_name: string;
+  medications: TreatmentMedication[];
 }
 
 const TreatmentsScreen = () => {
@@ -39,6 +45,10 @@ const TreatmentsScreen = () => {
   const { user } = useSelector((state: any) => state.auth);
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isStartingDose, setIsStartingDose] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState('');
+  const [isTimeDialogOpen, setIsTimeDialogOpen] = useState(false);
+  const [selectedMedicationId, setSelectedMedicationId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchActiveTreatments();
@@ -76,46 +86,40 @@ const TreatmentsScreen = () => {
         return;
       }
 
-      // Fetch medications for each treatment case
-      const treatmentsWithMedications = await Promise.all(
-        treatmentCases.map(async (treatment) => {
-          const { data: medications, error: medicationError } = await supabase
-            .from('treatment_medications')
-            .select('*')
-            .eq('treatment_case_id', treatment.id);
+      // Get treatment case IDs
+      const treatmentCaseIds = treatmentCases.map(tc => tc.id);
 
-          if (medicationError) {
-            console.error('Error fetching medications:', medicationError);
-            return null;
-          }
+      // Fetch medications from the view, excluding inactive ones
+      const { data: medications, error: medicationError } = await supabase
+        .from('v_treatment_medications')
+        .select('*')
+        .in('treatment_case_id', treatmentCaseIds)
+        .or('first_dose_at.is.null,is_active.eq.true'); // Only pending or active
 
-          // Filter active medications (within duration period)
-          const activeMedications = medications?.filter(med => {
-            const startDate = new Date(med.start_date);
-            const endDate = new Date(startDate);
-            endDate.setDate(endDate.getDate() + med.duration_days);
-            return new Date() <= endDate;
-          }) || [];
+      if (medicationError) {
+        console.error('Error fetching medications:', medicationError);
+        toast.error('Error al cargar los medicamentos');
+        return;
+      }
 
-          return {
-            id: treatment.id,
-            pet_id: treatment.pet_id,
-            diagnosis: treatment.diagnosis,
-            instructions_for_owner: treatment.instructions_for_owner,
-            start_date: treatment.start_date,
-            pet_name: (treatment.pets as any).name,
-            medications: activeMedications as TreatmentMedication[]
-          };
-        })
-      );
+      // Group medications by treatment case
+      const treatmentsWithMedications = treatmentCases.map(treatment => {
+        const treatmentMedications = medications?.filter(med => 
+          med.treatment_case_id === treatment.id
+        ) || [];
 
-      // Filter out null results and treatments without active medications
-      const validTreatments = treatmentsWithMedications
-        .filter((treatment): treatment is Treatment => 
-          treatment !== null && treatment.medications.length > 0
-        );
+        return {
+          id: treatment.id,
+          pet_id: treatment.pet_id,
+          diagnosis: treatment.diagnosis,
+          instructions_for_owner: treatment.instructions_for_owner,
+          start_date: treatment.start_date,
+          pet_name: (treatment.pets as any).name,
+          medications: treatmentMedications as TreatmentMedication[]
+        };
+      }).filter(treatment => treatment.medications.length > 0); // Only treatments with medications
 
-      setTreatments(validTreatments);
+      setTreatments(treatmentsWithMedications);
     } catch (error) {
       console.error('Error:', error);
       toast.error('Error al cargar los tratamientos');
@@ -124,32 +128,71 @@ const TreatmentsScreen = () => {
     }
   };
 
-  const calculateNextDose = (medication: TreatmentMedication) => {
-    const startDate = new Date(medication.start_date);
-    const now = new Date();
-    const frequencyMs = medication.frequency_hours * 60 * 60 * 1000;
-    
-    // Find the next dose time
-    let nextDose = new Date(startDate);
-    while (nextDose <= now) {
-      nextDose = new Date(nextDose.getTime() + frequencyMs);
+  const startDoseNow = async (medicationId: string) => {
+    setIsStartingDose(medicationId);
+    try {
+      const { error } = await supabase
+        .from('treatment_medications')
+        .update({ first_dose_at: new Date().toISOString() })
+        .eq('id', medicationId);
+
+      if (error) {
+        console.error('Error starting dose:', error);
+        toast.error('Error al iniciar la dosis');
+        return;
+      }
+
+      toast.success('Primera dosis iniciada');
+      await fetchActiveTreatments(); // Refresh data
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Error al iniciar la dosis');
+    } finally {
+      setIsStartingDose(null);
     }
-    
-    // Check if it's today
-    const today = new Date();
-    const isToday = nextDose.toDateString() === today.toDateString();
-    
-    const timeString = nextDose.toLocaleTimeString('es-ES', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-    
-    if (isToday) {
-      return `Siguiente dosis de ${medication.medication} a las ${timeString} de hoy`;
-    } else {
-      const dateString = nextDose.toLocaleDateString('es-ES');
-      return `Siguiente dosis de ${medication.medication} el ${dateString} a las ${timeString}`;
+  };
+
+  const startDoseAtTime = async () => {
+    if (!selectedMedicationId || !selectedTime) return;
+
+    try {
+      // Create a date with today's date and selected time
+      const today = new Date();
+      const [hours, minutes] = selectedTime.split(':');
+      const selectedDateTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(hours), parseInt(minutes));
+
+      const { error } = await supabase
+        .from('treatment_medications')
+        .update({ first_dose_at: selectedDateTime.toISOString() })
+        .eq('id', selectedMedicationId);
+
+      if (error) {
+        console.error('Error starting dose at time:', error);
+        toast.error('Error al programar la dosis');
+        return;
+      }
+
+      toast.success('Primera dosis programada');
+      setIsTimeDialogOpen(false);
+      setSelectedTime('');
+      setSelectedMedicationId(null);
+      await fetchActiveTreatments(); // Refresh data
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Error al programar la dosis');
     }
+  };
+
+  const openTimeDialog = (medicationId: string) => {
+    setSelectedMedicationId(medicationId);
+    setSelectedTime(new Date().toTimeString().slice(0, 5)); // Default to current time
+    setIsTimeDialogOpen(true);
+  };
+
+  const getMedicationStatus = (medication: TreatmentMedication) => {
+    if (!medication.first_dose_at) return 'pending';
+    if (medication.is_active) return 'active';
+    return 'finished';
   };
 
   const formatFrequency = (hours: number) => {
@@ -160,12 +203,31 @@ const TreatmentsScreen = () => {
     return `Cada ${hours} horas`;
   };
 
+  const formatNextDose = (nextDoseAt: string | null) => {
+    if (!nextDoseAt) return null;
+    
+    const nextDose = new Date(nextDoseAt);
+    const today = new Date();
+    const isToday = nextDose.toDateString() === today.toDateString();
+    
+    const timeString = nextDose.toLocaleTimeString('es-ES', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+    
+    if (isToday) {
+      return `Hoy a las ${timeString}`;
+    } else {
+      const dateString = nextDose.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+      return `${dateString} a las ${timeString}`;
+    }
+  };
+
   const handleBackClick = () => {
     navigate('/owner');
   };
 
   const handleViewHistory = () => {
-    // Por ahora no hace nada, como solicitaste
     toast.info('Funcionalidad disponible próximamente');
   };
 
@@ -209,7 +271,7 @@ const TreatmentsScreen = () => {
                 <Clock className="w-8 h-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-medium text-gray-800 mb-2">
-                Sin tratamientos activos
+                No tienes tratamientos activos
               </h3>
               <p className="text-gray-600 mb-6">
                 Tu mascota no tiene tratamientos activos en este momento.
@@ -233,9 +295,6 @@ const TreatmentsScreen = () => {
                     <h3 className="text-lg font-semibold text-gray-800">
                       {treatment.pet_name}
                     </h3>
-                    <Badge variant="outline" className="text-[#79D0B8] border-[#79D0B8]">
-                      Activo
-                    </Badge>
                   </div>
                   <p className="text-sm text-gray-600 mb-1">
                     <span className="font-medium">Diagnóstico:</span> {treatment.diagnosis}
@@ -251,36 +310,90 @@ const TreatmentsScreen = () => {
                   <h4 className="font-medium text-gray-800 flex items-center gap-2">
                     💊 Medicamentos
                   </h4>
-                  {treatment.medications.map((medication) => (
-                    <div key={medication.id} className="bg-gray-50 p-3 rounded-lg">
-                      <div className="flex items-start justify-between mb-2">
-                        <h5 className="font-medium text-gray-800">{medication.medication}</h5>
-                        <Badge variant="secondary" className="text-xs">
-                          {medication.duration_days} días
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-2">
-                        <div>
-                          <span className="font-medium">Dosis:</span> {medication.dosage}
+                  {treatment.medications.map((medication) => {
+                    const status = getMedicationStatus(medication);
+                    
+                    return (
+                      <div key={medication.id} className={`p-3 rounded-lg ${
+                        status === 'pending' ? 'bg-gray-50 border border-orange-200' : 'bg-gray-50'
+                      }`}>
+                        <div className="flex items-start justify-between mb-2">
+                          <h5 className="font-medium text-gray-800">{medication.medication}</h5>
+                          {status === 'active' && (
+                            <Badge variant="outline" className="text-[#79D0B8] border-[#79D0B8]">
+                              Activo
+                            </Badge>
+                          )}
                         </div>
-                        <div>
-                          <span className="font-medium">Frecuencia:</span> {formatFrequency(medication.frequency_hours)}
+                        
+                        <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-2">
+                          <div>
+                            <span className="font-medium">Dosis:</span> {medication.dosage}
+                          </div>
+                          <div>
+                            <span className="font-medium">Frecuencia:</span> {formatFrequency(medication.frequency_hours)}
+                          </div>
                         </div>
+                        
+                        {medication.instructions && (
+                          <p className="text-sm text-gray-600 mb-2">
+                            <span className="font-medium">Instrucciones:</span> {medication.instructions}
+                          </p>
+                        )}
+
+                        {status === 'pending' && (
+                          <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertTriangle className="w-4 h-4 text-orange-500" />
+                              <span className="text-sm font-medium text-orange-700">
+                                Aún no has iniciado la primera dosis
+                              </span>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-orange-600 border-orange-600 hover:bg-orange-50"
+                                onClick={() => startDoseNow(medication.id)}
+                                disabled={isStartingDose === medication.id}
+                              >
+                                <Play className="w-3 h-3 mr-1" />
+                                {isStartingDose === medication.id ? 'Iniciando...' : 'Iniciar ahora'}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-orange-600 border-orange-600 hover:bg-orange-50"
+                                onClick={() => openTimeDialog(medication.id)}
+                              >
+                                <Clock className="w-3 h-3 mr-1" />
+                                Elegir hora
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {status === 'active' && (
+                          <div className="mt-2 space-y-1">
+                            {medication.next_dose_at && (
+                              <div className="flex items-center gap-1 text-sm text-[#79D0B8] font-medium">
+                                <Clock className="w-4 h-4" />
+                                <span>Próxima dosis: {formatNextDose(medication.next_dose_at)}</span>
+                              </div>
+                            )}
+                            {medication.days_left !== null && (
+                              <p className="text-sm text-gray-600">
+                                {medication.days_left > 0 
+                                  ? `Quedan: ${medication.days_left} días`
+                                  : 'Uso indefinido'
+                                }
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      
-                      {medication.instructions && (
-                        <p className="text-sm text-gray-600 mb-2">
-                          <span className="font-medium">Instrucciones:</span> {medication.instructions}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center gap-1 text-sm text-[#79D0B8] font-medium">
-                        <Clock className="w-4 h-4" />
-                        <span>{calculateNextDose(medication)}</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-gray-100">
@@ -297,6 +410,41 @@ const TreatmentsScreen = () => {
             ))}
           </div>
         )}
+
+        {/* Time Picker Dialog */}
+        <Dialog open={isTimeDialogOpen} onOpenChange={setIsTimeDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Elegir hora para la primera dosis</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="time">Hora</Label>
+                <Input
+                  id="time"
+                  type="time"
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsTimeDialogOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={startDoseAtTime}
+                  disabled={!selectedTime}
+                >
+                  Programar dosis
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </LayoutBase>
   );
