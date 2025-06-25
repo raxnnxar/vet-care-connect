@@ -1011,25 +1011,10 @@ export type Database = {
     Views: {
       v_medical_history: {
         Row: {
-          appointment_id: string | null
-          description: string | null
           diagnosis: string | null
           event_date: string | null
           event_id: string | null
-          event_type: string | null
           instructions_for_owner: string | null
-          pet_id: string | null
-          title: string | null
-          vet_name: string | null
-          veterinarian_id: string | null
-        }
-        Relationships: []
-      }
-      v_medical_history_compact: {
-        Row: {
-          diagnosis: string | null
-          event_date: string | null
-          event_id: string | null
           meds_summary: string | null
           note_text: string | null
           pet_id: string | null

@@ -12,6 +12,7 @@ interface MedicalHistoryEvent {
   diagnosis: string;
   vet_name: string;
   note_text?: string;
+  instructions_for_owner?: string;
   meds_summary?: string;
   pet_id: string;
   vet_id: string;
@@ -42,7 +43,7 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('v_medical_history_compact')
+        .from('v_medical_history')
         .select('*')
         .eq('pet_id', petId)
         .order('event_date', { ascending: false });
@@ -55,6 +56,7 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
         diagnosis: item.diagnosis,
         vet_name: item.vet_name,
         note_text: item.note_text,
+        instructions_for_owner: item.instructions_for_owner,
         meds_summary: item.meds_summary,
         pet_id: item.pet_id,
         vet_id: item.vet_id
@@ -122,16 +124,13 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
                     </span>
                   </div>
                   
-                  <div className="flex items-center gap-2 mb-2">
-                    <Stethoscope className="w-4 h-4 text-[#79D0B8]" />
-                    <h4 className="font-semibold text-gray-800">
-                      {event.diagnosis}
-                    </h4>
-                  </div>
+                  <h4 className="font-semibold text-gray-800 mb-2">
+                    {event.diagnosis}
+                  </h4>
 
                   {event.note_text && (
                     <p className="text-sm text-gray-700 line-clamp-2">
-                      {event.note_text}
+                      "{event.note_text}"
                     </p>
                   )}
                 </div>

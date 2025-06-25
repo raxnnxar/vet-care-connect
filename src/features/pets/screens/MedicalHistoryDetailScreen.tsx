@@ -4,10 +4,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { Card } from '@/ui/molecules/card';
-import { ArrowLeft, Stethoscope, Pill } from 'lucide-react';
+import { ArrowLeft, Stethoscope, Pill, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
-import { Badge } from '@/ui/atoms/badge';
 
 interface MedicalHistoryDetail {
   event_id: string;
@@ -15,19 +14,10 @@ interface MedicalHistoryDetail {
   diagnosis: string;
   vet_name: string;
   note_text?: string;
+  instructions_for_owner?: string;
   meds_summary?: string;
   pet_id: string;
   vet_id: string;
-}
-
-interface TreatmentMedication {
-  id: string;
-  medication: string;
-  dosage: string;
-  frequency_hours: number;
-  duration_days: number;
-  instructions?: string;
-  is_active: boolean;
 }
 
 const MedicalHistoryDetailScreen: React.FC = () => {
@@ -35,7 +25,6 @@ const MedicalHistoryDetailScreen: React.FC = () => {
   const navigate = useNavigate();
   
   const [historyDetail, setHistoryDetail] = useState<MedicalHistoryDetail | null>(null);
-  const [medications, setMedications] = useState<TreatmentMedication[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -44,9 +33,9 @@ const MedicalHistoryDetailScreen: React.FC = () => {
       
       setIsLoading(true);
       try {
-        // Fetch medical history detail
+        // Fetch medical history detail from v_medical_history
         const { data: historyData, error: historyError } = await supabase
-          .from('v_medical_history_compact')
+          .from('v_medical_history')
           .select('*')
           .eq('event_id', eventId)
           .maybeSingle();
@@ -55,50 +44,6 @@ const MedicalHistoryDetailScreen: React.FC = () => {
           console.error('Error fetching history detail:', historyError);
         } else if (historyData) {
           setHistoryDetail(historyData as MedicalHistoryDetail);
-        }
-
-        // Fetch treatment medications
-        const { data: medicationsData, error: medicationsError } = await supabase
-          .from('treatment_medications')
-          .select(`
-            id,
-            medication,
-            dosage,
-            frequency_hours,
-            duration_days,
-            instructions,
-            treatment_cases!inner (
-              id,
-              appointment_id
-            )
-          `)
-          .or(`treatment_cases.appointment_id.eq.${eventId},treatment_cases.id.eq.${eventId}`);
-
-        if (medicationsError) {
-          console.error('Error fetching medications:', medicationsError);
-        } else if (medicationsData) {
-          // Check active status for each medication
-          const medicationsWithStatus = await Promise.all(
-            medicationsData.map(async (med) => {
-              const { data: activeData } = await supabase
-                .from('v_treatment_medications')
-                .select('is_active')
-                .eq('id', med.id)
-                .single();
-
-              return {
-                id: med.id,
-                medication: med.medication,
-                dosage: med.dosage,
-                frequency_hours: med.frequency_hours,
-                duration_days: med.duration_days,
-                instructions: med.instructions,
-                is_active: activeData?.is_active || false
-              };
-            })
-          );
-          
-          setMedications(medicationsWithStatus);
         }
       } catch (error) {
         console.error('Error fetching detail data:', error);
@@ -112,14 +57,6 @@ const MedicalHistoryDetailScreen: React.FC = () => {
 
   const handleBack = () => {
     navigate(-1);
-  };
-
-  const formatFrequency = (hours: number) => {
-    if (hours === 24) return 'c/24h';
-    if (hours === 12) return 'c/12h';
-    if (hours === 8) return 'c/8h';
-    if (hours === 6) return 'c/6h';
-    return `c/${hours}h`;
   };
 
   const formatDate = (dateString: string) => {
@@ -216,33 +153,25 @@ const MedicalHistoryDetailScreen: React.FC = () => {
           </Card>
         )}
 
-        {/* Medications */}
-        {medications.length > 0 && (
+        {/* Instructions for Owner */}
+        {historyDetail.instructions_for_owner && (
           <Card className="p-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <FileText className="w-5 h-5 text-[#79D0B8]" />
+              <h3 className="font-semibold text-gray-800">Instrucciones para el dueño</h3>
+            </div>
+            <p className="text-gray-700">{historyDetail.instructions_for_owner}</p>
+          </Card>
+        )}
+
+        {/* Medications Summary */}
+        {historyDetail.meds_summary && (
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-2">
               <Pill className="w-5 h-5 text-[#79D0B8]" />
               <h3 className="font-semibold text-gray-800">Medicamentos prescritos</h3>
             </div>
-            <div className="space-y-3">
-              {medications.map((med) => (
-                <div key={med.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-gray-800">{med.medication}</span>
-                      <Badge variant={med.is_active ? "default" : "secondary"}>
-                        {med.is_active ? "Activo" : "Finalizado"}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      {med.dosage} {formatFrequency(med.frequency_hours)} ({med.duration_days} días)
-                    </p>
-                    {med.instructions && (
-                      <p className="text-sm text-gray-500 mt-1">{med.instructions}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="text-gray-700">{historyDetail.meds_summary}</p>
           </Card>
         )}
 
