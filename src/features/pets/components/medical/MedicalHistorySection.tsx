@@ -74,6 +74,15 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
     navigate(`/owner/history/${event.event_id}`);
   };
 
+  const truncateText = (text: string, maxLines: number = 2) => {
+    const words = text.split(' ');
+    const wordsPerLine = 10; // Aproximadamente 10 palabras por línea
+    const maxWords = maxLines * wordsPerLine;
+    
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -109,13 +118,13 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
           {events.map((event) => (
             <Card 
               key={event.event_id} 
-              className="p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="p-4 hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
               onClick={() => handleEventClick(event)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm font-medium text-gray-600">
                       {formatDate(event.event_date)}
                     </span>
                     <span className="text-gray-400">·</span>
@@ -124,18 +133,19 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
                     </span>
                   </div>
                   
-                  <h4 className="font-semibold text-gray-800 mb-2">
+                  <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <Stethoscope className="w-4 h-4 text-[#79D0B8]" />
                     {event.diagnosis}
                   </h4>
 
                   {event.note_text && (
-                    <p className="text-sm text-gray-700 line-clamp-2">
-                      "{event.note_text}"
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      "{truncateText(event.note_text, 2)}"
                     </p>
                   )}
                 </div>
                 
-                <ChevronRight className="w-5 h-5 text-gray-400 ml-4" />
+                <ChevronRight className="w-5 h-5 text-gray-400 ml-4 flex-shrink-0" />
               </div>
             </Card>
           ))}
