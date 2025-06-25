@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Pet } from '../../types';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +12,6 @@ interface MedicalHistory {
   previous_surgeries: { type: string; date: string; }[];
   allergies: string;
   chronic_conditions: string;
-  vaccines_document_url: string;
   created_at: string;
 }
 
@@ -41,7 +39,7 @@ const MedicalInfoViewer: React.FC<MedicalInfoViewerProps> = ({ pet }) => {
         }
 
         if (data) {
-          // Safely parse JSON fields, excluding current_medications
+          // Safely parse JSON fields
           const parsedData: MedicalHistory = {
             ...data,
             previous_surgeries: Array.isArray(data.previous_surgeries)

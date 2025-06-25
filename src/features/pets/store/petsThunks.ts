@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { petsApi } from '../api/petsApi';
 import { supabase } from '@/integrations/supabase/client';
@@ -276,49 +275,21 @@ export const uploadVaccineDocument = createAsyncThunk(
       const documentUrl = publicUrlData.publicUrl;
       console.log('Uploaded document URL:', documentUrl);
       
-      // First check if a pet_medical_history record already exists for this pet
-      const { data: existingRecord, error: fetchError } = await supabase
-        .from('pet_medical_history')
-        .select('id')
-        .eq('pet_id', petId)
-        .maybeSingle();
+      // Save to vaccine_documents table instead of pet_medical_history
+      const { error: insertError } = await supabase
+        .from('vaccine_documents')
+        .insert({
+          pet_id: petId,
+          document_url: documentUrl,
+          uploaded_by: (await supabase.auth.getUser()).data.user?.id || null
+        });
       
-      if (fetchError) {
-        console.error('Error checking for existing medical history:', fetchError);
+      if (insertError) {
+        console.error('Error saving vaccine document record:', insertError);
+        throw insertError;
       }
       
-      let updateError = null;
-      
-      if (existingRecord) {
-        // Update the existing record
-        console.log('Updating existing pet medical history with vaccine document URL');
-        const { error } = await supabase
-          .from('pet_medical_history')
-          .update({ 
-            vaccines_document_url: documentUrl,
-          })
-          .eq('pet_id', petId);
-        
-        updateError = error;
-      } else {
-        // Create a new medical history record
-        console.log('Creating new pet medical history with vaccine document URL');
-        const { error } = await supabase
-          .from('pet_medical_history')
-          .insert({ 
-            pet_id: petId,
-            vaccines_document_url: documentUrl 
-          });
-        
-        updateError = error;
-      }
-      
-      if (updateError) {
-        console.error('Error updating/creating pet medical history with vaccine document URL:', updateError);
-        throw updateError;
-      }
-      
-      console.log('Pet medical history updated with vaccine document URL');
+      console.log('Vaccine document record saved successfully');
       return { id: petId, url: documentUrl };
     } catch (error) {
       console.error('Error uploading vaccine document:', error);
