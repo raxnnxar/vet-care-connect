@@ -24,6 +24,7 @@ export const OWNER_ROUTES = {
   PROFILE: '/profile',
   PET_DETAIL: '/pets/:id',
   PET_MEDICAL_RECORDS: '/pets/:id/medical-records',
+  MEDICAL_HISTORY_DETAIL: '/history/:eventId',
   FIND_VETS: '/find-vets',
   VET_DETAIL: '/vets/:id',
   VET_REVIEW: '/vets/:id/review',

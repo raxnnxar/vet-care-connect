@@ -23,6 +23,7 @@ import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScre
 import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import TreatmentsScreen from '@/features/treatments/screens/TreatmentsScreen';
+import MedicalHistoryDetailScreen from '@/features/pets/screens/MedicalHistoryDetailScreen';
 
 const OwnerNavigator: React.FC = () => {
   return (
@@ -44,6 +45,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.PET_DETAIL} element={<PetDetailScreen />} />
       <Route path={OWNER_ROUTES.PET_MEDICAL_RECORDS} element={<PetMedicalRecordsScreen />} />
       <Route path="/pets/:id/edit" element={<PetEditScreen />} />
+      <Route path="/history/:eventId" element={<MedicalHistoryDetailScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />

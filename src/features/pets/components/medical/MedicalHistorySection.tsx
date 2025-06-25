@@ -69,9 +69,7 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
   };
 
   const handleEventClick = (event: MedicalHistoryEvent) => {
-    // Navigate to detailed view
-    console.log('Navigate to event detail:', event);
-    // TODO: Implementar navegación a detalle
+    navigate(`/owner/history/${event.event_id}`);
   };
 
   if (isLoading) {
@@ -132,20 +130,9 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
                   </div>
 
                   {event.note_text && (
-                    <p className="text-sm text-gray-700 mb-2 line-clamp-2">
+                    <p className="text-sm text-gray-700 line-clamp-2">
                       {event.note_text}
                     </p>
-                  )}
-
-                  {event.meds_summary && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">💊 </span>
-                      {event.meds_summary.split('\n').map((med, index) => (
-                        <div key={index} className="ml-4">
-                          {med}
-                        </div>
-                      ))}
-                    </div>
                   )}
                 </div>
                 
