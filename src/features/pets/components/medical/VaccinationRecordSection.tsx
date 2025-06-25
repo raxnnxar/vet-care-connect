@@ -2,19 +2,25 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
-import { Plus, Syringe, Calendar, AlertTriangle } from 'lucide-react';
+import { Plus, Syringe, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 import { Badge } from '@/ui/atoms/badge';
 import { formatDate } from '@/frontend/shared/utils/date';
+import VaccinationForm from './VaccinationForm';
+import VaccineDocumentsList from './VaccineDocumentsList';
 
 interface VaccinationRecord {
   id: string;
   vaccine_name: string;
   application_date: string;
-  next_due_date: string | null;
+  next_due_date?: string;
+  manufacturer?: string;
+  lot_number?: string;
+  administered_by?: string;
+  notes?: string;
   needs_booster: boolean;
-  notes: string | null;
-  administered_by: string | null;
 }
 
 interface VaccinationRecordSectionProps {
@@ -26,18 +32,20 @@ const VaccinationRecordSection: React.FC<VaccinationRecordSectionProps> = ({
   petId,
   onCountChange
 }) => {
-  const [vaccinations, setVaccinations] = useState<VaccinationRecord[]>([]);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [records, setRecords] = useState<VaccinationRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
   useEffect(() => {
-    fetchVaccinations();
+    fetchVaccinationRecords();
   }, [petId]);
 
   useEffect(() => {
-    onCountChange(vaccinations.length);
-  }, [vaccinations.length, onCountChange]);
+    onCountChange(records.length);
+  }, [records.length, onCountChange]);
 
-  const fetchVaccinations = async () => {
+  const fetchVaccinationRecords = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -47,24 +55,23 @@ const VaccinationRecordSection: React.FC<VaccinationRecordSectionProps> = ({
         .order('application_date', { ascending: false });
 
       if (error) throw error;
-
-      setVaccinations(data || []);
+      setRecords(data || []);
     } catch (error) {
-      console.error('Error fetching vaccinations:', error);
+      console.error('Error fetching vaccination records:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const isBoosterOverdue = (nextDueDate: string | null, needsBooster: boolean) => {
-    if (!needsBooster || !nextDueDate) return false;
-    return new Date(nextDueDate) < new Date();
+  const handleRecordAdded = () => {
+    fetchVaccinationRecords();
+    setShowAddDialog(false);
   };
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3].map(i => (
+        {[1, 2].map(i => (
           <Card key={i} className="p-4 animate-pulse">
             <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
             <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -82,6 +89,7 @@ const VaccinationRecordSection: React.FC<VaccinationRecordSectionProps> = ({
           Cartilla de Vacunación
         </h3>
         <Button
+          onClick={() => setShowAddDialog(true)}
           className="bg-[#79D0B8] hover:bg-[#5FBFB3]"
           size="sm"
         >
@@ -90,11 +98,13 @@ const VaccinationRecordSection: React.FC<VaccinationRecordSectionProps> = ({
         </Button>
       </div>
 
-      {vaccinations.length === 0 ? (
+      {/* Vaccination Records */}
+      {records.length === 0 ? (
         <Card className="p-6 text-center">
           <Syringe className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 mb-2">No hay vacunas registradas</p>
+          <p className="text-gray-500 mb-2">No hay registros de vacunación</p>
           <Button
+            onClick={() => setShowAddDialog(true)}
             variant="outline"
             className="border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8] hover:text-white"
           >
@@ -104,38 +114,34 @@ const VaccinationRecordSection: React.FC<VaccinationRecordSectionProps> = ({
         </Card>
       ) : (
         <div className="space-y-4">
-          {vaccinations.map((vaccination) => (
-            <Card key={vaccination.id} className="p-4">
-              <div className="flex items-start justify-between">
+          {records.map((record) => (
+            <Card key={record.id} className="p-4">
+              <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Syringe className="w-4 h-4 text-[#79D0B8]" />
-                    <h4 className="font-semibold text-gray-800">{vaccination.vaccine_name}</h4>
-                    {isBoosterOverdue(vaccination.next_due_date, vaccination.needs_booster) && (
-                      <Badge variant="destructive" className="flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3" />
-                        Refuerzo pendiente
+                    <h4 className="font-semibold text-gray-800">{record.vaccine_name}</h4>
+                    {record.needs_booster && (
+                      <Badge variant="outline" className="text-orange-600 border-orange-300">
+                        Requiere refuerzo
                       </Badge>
                     )}
                   </div>
                   
                   <div className="space-y-1 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>Aplicada: {formatDate(vaccination.application_date)}</span>
-                    </div>
-                    
-                    {vaccination.next_due_date && (
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>Refuerzo: {formatDate(vaccination.next_due_date)}</span>
-                      </div>
+                    <div>Aplicada: {formatDate(record.application_date)}</div>
+                    {record.next_due_date && (
+                      <div>Próxima: {formatDate(record.next_due_date)}</div>
                     )}
-                    
-                    {vaccination.notes && (
-                      <p className="text-gray-500 mt-2">
-                        Notas: {vaccination.notes}
-                      </p>
+                    {record.manufacturer && (
+                      <div>Laboratorio: {record.manufacturer}</div>
+                    )}
+                    {record.lot_number && (
+                      <div>Lote: {record.lot_number}</div>
+                    )}
+                    {record.notes && (
+                      <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                        {record.notes}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -143,6 +149,26 @@ const VaccinationRecordSection: React.FC<VaccinationRecordSectionProps> = ({
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Vaccine Documents Section */}
+      <Card className="p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <FileText className="w-5 h-5 text-[#79D0B8]" />
+          <h4 className="font-medium text-gray-800">Documentos Adjuntos</h4>
+        </div>
+        <VaccineDocumentsList 
+          petId={petId}
+          petOwnerId={user?.id || ''}
+        />
+      </Card>
+
+      {showAddDialog && (
+        <VaccinationForm
+          petId={petId}
+          onClose={() => setShowAddDialog(false)}
+          onVaccinationAdded={handleRecordAdded}
+        />
       )}
     </div>
   );

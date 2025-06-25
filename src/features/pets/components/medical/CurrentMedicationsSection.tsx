@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
-import { Plus, Pill, Calendar, Clock, User } from 'lucide-react';
+import { Plus, Pill, Calendar, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/state/store';
@@ -120,7 +120,8 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
         };
       });
 
-      setMedications([...transformedOwnerMeds, ...transformedVetMeds]);
+      // Order: 1st vet medications (active), then owner medications
+      setMedications([...transformedVetMeds, ...transformedOwnerMeds]);
     } catch (error) {
       console.error('Error fetching medications:', error);
     } finally {
@@ -218,20 +219,24 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h4 className="font-semibold text-gray-800">{medication.medication}</h4>
-                    <Badge 
-                      variant={medication.source === 'owner' ? 'default' : 'secondary'}
-                      className={medication.source === 'owner' ? 'bg-[#79D0B8]' : ''}
-                    >
-                      {medication.source === 'owner' ? 'Dueño' : `Vet: ${medication.prescribed_by}`}
-                    </Badge>
-                    {medication.category === 'cronico' && (
-                      <Badge variant="outline" className="text-blue-600 border-blue-300">
-                        Crónico
-                      </Badge>
-                    )}
-                    {medication.category === 'suplemento' && (
-                      <Badge variant="outline" className="text-green-600 border-green-300">
-                        Suplemento
+                    
+                    {/* New badge system */}
+                    {medication.source === 'owner' ? (
+                      <div className="flex gap-2">
+                        <Badge variant="default" className="bg-[#79D0B8]">
+                          Dueño
+                        </Badge>
+                        <Badge variant="outline" className={
+                          medication.category === 'cronico' 
+                            ? 'text-blue-600 border-blue-300' 
+                            : 'text-green-600 border-green-300'
+                        }>
+                          {medication.category === 'cronico' ? 'Crónico' : 'Suplemento'}
+                        </Badge>
+                      </div>
+                    ) : (
+                      <Badge variant="secondary">
+                        Veterinario: {medication.prescribed_by}
                       </Badge>
                     )}
                   </div>
