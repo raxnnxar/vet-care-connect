@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar } from 'lucide-react';
@@ -31,6 +30,8 @@ interface TreatmentMedication {
   instructions: string | null;
   created_at: string | null;
   treatment_case_id: string;
+  first_dose_at: string | null;
+  is_active: boolean | null;
 }
 
 const TreatmentsScreen = () => {
@@ -103,7 +104,7 @@ const TreatmentsScreen = () => {
             instructions_for_owner: treatment.instructions_for_owner,
             start_date: treatment.start_date,
             pet_name: (treatment.pets as any).name,
-            medications: activeMedications
+            medications: activeMedications as TreatmentMedication[]
           };
         })
       );

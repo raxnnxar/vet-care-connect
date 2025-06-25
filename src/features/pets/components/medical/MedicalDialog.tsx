@@ -30,7 +30,7 @@ interface MedicalDialogProps {
 const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode = 'edit' }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, control, watch } = useForm<MedicalFormValues>({
+  const { register, handleSubmit, control } = useForm<MedicalFormValues>({
     defaultValues: {
       surgeries: [{ type: '', date: '' }],
       allergies: '',
@@ -102,7 +102,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
         result = insertData;
       }
 
-      // Save medications to owner_medications table (only the fields that exist)
+      // Save medications to owner_medications table (only the new fields)
       const validMedications = data.medications.filter(med => med.name.trim() !== '');
       
       if (validMedications.length > 0) {
@@ -112,8 +112,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
           dosage: med.dosage,
           frequency_hours: med.frequency_hours,
           start_date: med.start_date,
-          end_date: med.is_permanent ? null : (med.end_date || null),
-          is_permanent: med.is_permanent
+          category: med.category
         }));
 
         console.log('Medications to save:', medicationsToInsert);
@@ -183,7 +182,7 @@ const MedicalDialog: React.FC<MedicalDialogProps> = ({ pet, onClose, open, mode 
               appendMedication={appendMedication}
               removeMedication={removeMedication}
               register={register}
-              watch={watch}
+              control={control}
             />
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
