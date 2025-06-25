@@ -8,8 +8,7 @@ export interface MedicalFormValues {
     dosage: string;
     frequency_hours: number;
     start_date: string;
-    is_permanent: boolean;
-    end_date: string;
+    category: 'cronico' | 'suplemento';
   }[];
 }
 
@@ -20,8 +19,7 @@ export interface OwnerMedication {
   dosage: string;
   frequency_hours: number;
   start_date: string;
-  end_date: string | null;
-  is_permanent: boolean;
+  category: 'cronico' | 'suplemento';
   created_at?: string;
 }
 

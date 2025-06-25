@@ -212,7 +212,7 @@ export type Database = {
       }
       owner_medications: {
         Row: {
-          chronic: boolean | null
+          category: Database["public"]["Enums"]["owner_med_category"] | null
           created_at: string | null
           dosage: string | null
           end_date: string | null
@@ -225,7 +225,7 @@ export type Database = {
           start_date: string | null
         }
         Insert: {
-          chronic?: boolean | null
+          category?: Database["public"]["Enums"]["owner_med_category"] | null
           created_at?: string | null
           dosage?: string | null
           end_date?: string | null
@@ -238,7 +238,7 @@ export type Database = {
           start_date?: string | null
         }
         Update: {
-          chronic?: boolean | null
+          category?: Database["public"]["Enums"]["owner_med_category"] | null
           created_at?: string | null
           dosage?: string | null
           end_date?: string | null
@@ -321,31 +321,25 @@ export type Database = {
           allergies: string | null
           chronic_conditions: string | null
           created_at: string | null
-          current_medications: Json | null
           id: string
           pet_id: string | null
           previous_surgeries: Json | null
-          vaccines_document_url: string | null
         }
         Insert: {
           allergies?: string | null
           chronic_conditions?: string | null
           created_at?: string | null
-          current_medications?: Json | null
           id?: string
           pet_id?: string | null
           previous_surgeries?: Json | null
-          vaccines_document_url?: string | null
         }
         Update: {
           allergies?: string | null
           chronic_conditions?: string | null
           created_at?: string | null
-          current_medications?: Json | null
           id?: string
           pet_id?: string | null
           previous_surgeries?: Json | null
-          vaccines_document_url?: string | null
         }
         Relationships: [
           {
@@ -667,9 +661,11 @@ export type Database = {
           created_at: string | null
           dosage: string
           duration_days: number
+          first_dose_at: string | null
           frequency_hours: number
           id: string
           instructions: string | null
+          is_active: boolean | null
           medication: string
           start_date: string
           treatment_case_id: string
@@ -678,9 +674,11 @@ export type Database = {
           created_at?: string | null
           dosage: string
           duration_days: number
+          first_dose_at?: string | null
           frequency_hours: number
           id?: string
           instructions?: string | null
+          is_active?: boolean | null
           medication: string
           start_date?: string
           treatment_case_id: string
@@ -689,9 +687,11 @@ export type Database = {
           created_at?: string | null
           dosage?: string
           duration_days?: number
+          first_dose_at?: string | null
           frequency_hours?: number
           id?: string
           instructions?: string | null
+          is_active?: boolean | null
           medication?: string
           start_date?: string
           treatment_case_id?: string
@@ -1063,6 +1063,7 @@ export type Database = {
         | "reprogramada"
         | "no_asistió"
         | "pendiente"
+      owner_med_category: "cronico" | "suplemento"
       payment_status: "pendiente" | "pagado" | "reembolsado" | "parcial"
     }
     CompositeTypes: {
@@ -1187,6 +1188,7 @@ export const Constants = {
         "no_asistió",
         "pendiente",
       ],
+      owner_med_category: ["cronico", "suplemento"],
       payment_status: ["pendiente", "pagado", "reembolsado", "parcial"],
     },
   },
