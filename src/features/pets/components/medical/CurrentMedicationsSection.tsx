@@ -17,8 +17,7 @@ interface Medication {
   dosage: string;
   frequency_hours: number;
   start_date: string;
-  end_date: string | null;
-  is_permanent: boolean;
+  category: 'cronico' | 'suplemento';
   source: 'owner' | 'vet';
   prescribed_by?: string;
   treatment_case_id?: string;
@@ -57,14 +56,13 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
       const { data: ownerMeds, error: ownerError } = await supabase
         .from('owner_medications')
         .select('*')
-        .eq('pet_id', petId)
-        .or('end_date.is.null,end_date.gte.' + new Date().toISOString().split('T')[0]);
+        .eq('pet_id', petId);
 
       if (ownerError) throw ownerError;
 
-      // Fetch vet medications from active treatments
+      // Fetch vet medications from active treatments using the view
       const { data: vetMeds, error: vetError } = await supabase
-        .from('treatment_medications')
+        .from('v_treatment_medications')
         .select(`
           *,
           treatment_cases!inner(
@@ -74,8 +72,7 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
           )
         `)
         .eq('treatment_cases.pet_id', petId)
-        .lte('treatment_cases.start_date', new Date().toISOString().split('T')[0])
-        .gte('start_date', new Date().toISOString().split('T')[0]);
+        .eq('is_active', true); // Only active treatments
 
       if (vetError) throw vetError;
 
@@ -98,21 +95,16 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
       // Transform owner medications
       const transformedOwnerMeds: Medication[] = (ownerMeds || []).map(med => ({
         id: med.id,
-        medication: med.medication,
+        medication: med.medication || '',
         dosage: med.dosage || '',
         frequency_hours: med.frequency_hours || 0,
         start_date: med.start_date || '',
-        end_date: med.end_date,
-        is_permanent: med.is_permanent || false,
+        category: med.category || 'cronico',
         source: 'owner' as const
       }));
 
       // Transform vet medications
       const transformedVetMeds: Medication[] = (vetMeds || []).map(med => {
-        const endDate = new Date(med.start_date);
-        endDate.setDate(endDate.getDate() + med.duration_days);
-        const isActive = endDate > new Date();
-        
         const vetProfile = vetProfiles.find(p => p.id === med.treatment_cases?.veterinarian_id);
         
         return {
@@ -121,13 +113,12 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
           dosage: med.dosage,
           frequency_hours: med.frequency_hours,
           start_date: med.start_date,
-          end_date: isActive ? endDate.toISOString().split('T')[0] : null,
-          is_permanent: false,
+          category: 'cronico' as const, // Vet medications are always chronic
           source: 'vet' as const,
           prescribed_by: vetProfile?.display_name || 'Veterinario',
           treatment_case_id: med.treatment_case_id
         };
-      }).filter(med => med.end_date === null || new Date(med.end_date) > new Date());
+      });
 
       setMedications([...transformedOwnerMeds, ...transformedVetMeds]);
     } catch (error) {
@@ -233,9 +224,14 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
                     >
                       {medication.source === 'owner' ? 'Dueño' : `Vet: ${medication.prescribed_by}`}
                     </Badge>
-                    {medication.is_permanent && (
+                    {medication.category === 'cronico' && (
                       <Badge variant="outline" className="text-blue-600 border-blue-300">
-                        Permanente
+                        Crónico
+                      </Badge>
+                    )}
+                    {medication.category === 'suplemento' && (
+                      <Badge variant="outline" className="text-green-600 border-green-300">
+                        Suplemento
                       </Badge>
                     )}
                   </div>
@@ -251,12 +247,7 @@ const CurrentMedicationsSection: React.FC<CurrentMedicationsSectionProps> = ({
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      <span>
-                        Inicio: {formatDate(medication.start_date)}
-                        {medication.end_date && !medication.is_permanent && (
-                          <> - Fin: {formatDate(medication.end_date)}</>
-                        )}
-                      </span>
+                      <span>Inicio: {formatDate(medication.start_date)}</span>
                     </div>
                   </div>
                 </div>

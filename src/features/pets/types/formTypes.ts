@@ -20,6 +20,7 @@ export interface OwnerMedication {
   frequency_hours: number;
   start_date: string;
   category: 'cronico' | 'suplemento';
+  instructions?: string;
   created_at?: string;
 }
 
