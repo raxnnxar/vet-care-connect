@@ -68,6 +68,11 @@ const MedicalHistoryDetailScreen: React.FC = () => {
     });
   };
 
+  const formatMedicationsList = (medsText: string) => {
+    const meds = medsText.split('\n').filter(Boolean);
+    return meds;
+  };
+
   if (isLoading) {
     return (
       <LayoutBase
@@ -167,11 +172,18 @@ const MedicalHistoryDetailScreen: React.FC = () => {
         {/* Medications Summary */}
         {historyDetail.meds_summary && (
           <Card className="p-4">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3">
               <Pill className="w-5 h-5 text-[#79D0B8]" />
               <h3 className="font-semibold text-gray-800">Medicamentos prescritos</h3>
             </div>
-            <p className="text-gray-700">{historyDetail.meds_summary}</p>
+            <div className="space-y-2">
+              {formatMedicationsList(historyDetail.meds_summary).map((medication, index) => (
+                <div key={index} className="flex items-start gap-2 py-1">
+                  <span className="text-[#79D0B8] mt-1 text-sm font-bold">•</span>
+                  <span className="text-gray-700 whitespace-pre-line flex-1">{medication}</span>
+                </div>
+              ))}
+            </div>
           </Card>
         )}
 
