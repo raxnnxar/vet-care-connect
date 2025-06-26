@@ -109,9 +109,6 @@ const MedicalHistoryDetailScreen: React.FC = () => {
         <div className="p-4">
           <Card className="p-4 text-center">
             <p>No se pudo encontrar el detalle de este evento médico.</p>
-            <Button className="mt-4 bg-[#79D0B8]" onClick={handleBack}>
-              Volver
-            </Button>
           </Card>
         </div>
       </LayoutBase>
@@ -186,14 +183,6 @@ const MedicalHistoryDetailScreen: React.FC = () => {
             </div>
           </Card>
         )}
-
-        {/* Back Button */}
-        <Button 
-          onClick={handleBack}
-          className="w-full bg-[#79D0B8] hover:bg-[#5FBFB3] text-white"
-        >
-          Volver
-        </Button>
       </div>
     </LayoutBase>
   );
