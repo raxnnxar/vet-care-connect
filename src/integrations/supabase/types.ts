@@ -254,6 +254,90 @@ export type Database = {
           },
         ]
       }
+      pet_allergies: {
+        Row: {
+          allergen: string
+          id: string
+          notes: string | null
+          pet_id: string
+          recorded_at: string | null
+          recorded_by: string | null
+        }
+        Insert: {
+          allergen: string
+          id?: string
+          notes?: string | null
+          pet_id: string
+          recorded_at?: string | null
+          recorded_by?: string | null
+        }
+        Update: {
+          allergen?: string
+          id?: string
+          notes?: string | null
+          pet_id?: string
+          recorded_at?: string | null
+          recorded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_allergies_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_allergies_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pet_chronic_conditions: {
+        Row: {
+          condition: string
+          id: string
+          notes: string | null
+          pet_id: string
+          recorded_at: string | null
+          recorded_by: string | null
+        }
+        Insert: {
+          condition: string
+          id?: string
+          notes?: string | null
+          pet_id: string
+          recorded_at?: string | null
+          recorded_by?: string | null
+        }
+        Update: {
+          condition?: string
+          id?: string
+          notes?: string | null
+          pet_id?: string
+          recorded_at?: string | null
+          recorded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_chronic_conditions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_chronic_conditions_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pet_grooming: {
         Row: {
           animals_accepted: Json | null
@@ -402,6 +486,51 @@ export type Database = {
             columns: ["primary_vet_id"]
             isOneToOne: false
             referencedRelation: "veterinarians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pet_surgeries: {
+        Row: {
+          id: string
+          notes: string | null
+          pet_id: string
+          procedure: string
+          recorded_at: string | null
+          recorded_by: string | null
+          surgery_date: string | null
+        }
+        Insert: {
+          id?: string
+          notes?: string | null
+          pet_id: string
+          procedure: string
+          recorded_at?: string | null
+          recorded_by?: string | null
+          surgery_date?: string | null
+        }
+        Update: {
+          id?: string
+          notes?: string | null
+          pet_id?: string
+          procedure?: string
+          recorded_at?: string | null
+          recorded_by?: string | null
+          surgery_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_surgeries_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_surgeries_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
