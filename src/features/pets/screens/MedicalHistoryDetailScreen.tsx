@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
-import { Card } from '@/ui/molecules/card';
-import { ArrowLeft, Stethoscope, Pill, FileText } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
+import { Badge } from '@/ui/atoms/badge';
+import { ArrowLeft, Calendar, User, FileText, Pill } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { formatDate } from '@/frontend/shared/utils/date';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
 
 interface MedicalHistoryDetail {
@@ -13,64 +15,46 @@ interface MedicalHistoryDetail {
   event_date: string;
   diagnosis: string;
   vet_name: string;
-  note_text?: string;
-  instructions_for_owner?: string;
-  meds_summary?: string;
+  note_text: string;
+  instructions_for_owner: string;
+  meds_summary: string;
   pet_id: string;
-  vet_id: string;
 }
 
 const MedicalHistoryDetailScreen: React.FC = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { id: petId, eventId } = useParams<{ id: string; eventId: string }>();
   const navigate = useNavigate();
-  
   const [historyDetail, setHistoryDetail] = useState<MedicalHistoryDetail | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!eventId) return;
+    const fetchHistoryDetail = async () => {
+      if (!petId || !eventId) return;
       
-      setIsLoading(true);
       try {
-        // Fetch medical history detail from v_medical_history
-        const { data: historyData, error: historyError } = await supabase
+        const { data, error } = await supabase
           .from('v_medical_history')
           .select('*')
           .eq('event_id', eventId)
-          .maybeSingle();
+          .eq('pet_id', petId)
+          .single();
 
-        if (historyError) {
-          console.error('Error fetching history detail:', historyError);
-        } else if (historyData) {
-          setHistoryDetail(historyData as MedicalHistoryDetail);
-        }
+        if (error) throw error;
+        setHistoryDetail(data);
       } catch (error) {
-        console.error('Error fetching detail data:', error);
+        console.error('Error fetching medical history detail:', error);
+        setError('No se pudo cargar el detalle del historial médico');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, [eventId]);
+    fetchHistoryDetail();
+  }, [petId, eventId]);
 
   const handleBack = () => {
-    navigate(-1);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatMedicationsList = (medsText: string) => {
-    const meds = medsText.split('\n').filter(Boolean);
-    return meds;
+    navigate(`/owner/pets/${petId}/medical`);
   };
 
   if (isLoading) {
@@ -81,7 +65,7 @@ const MedicalHistoryDetailScreen: React.FC = () => {
             <Button variant="ghost" size="icon" className="text-white" onClick={handleBack}>
               <ArrowLeft />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Detalle de historial</h1>
+            <h1 className="text-white font-medium text-lg ml-2">Detalle del historial</h1>
           </div>
         }
         footer={<NavbarInferior activeTab="profile" />}
@@ -93,7 +77,7 @@ const MedicalHistoryDetailScreen: React.FC = () => {
     );
   }
 
-  if (!historyDetail) {
+  if (error || !historyDetail) {
     return (
       <LayoutBase
         header={
@@ -101,14 +85,23 @@ const MedicalHistoryDetailScreen: React.FC = () => {
             <Button variant="ghost" size="icon" className="text-white" onClick={handleBack}>
               <ArrowLeft />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Detalle de historial</h1>
+            <h1 className="text-white font-medium text-lg ml-2">Detalle del historial</h1>
           </div>
         }
         footer={<NavbarInferior activeTab="profile" />}
       >
         <div className="p-4">
-          <Card className="p-4 text-center">
-            <p>No se pudo encontrar el detalle de este evento médico.</p>
+          <Card>
+            <CardContent className="p-6 text-center">
+              <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No se encontró el registro
+              </h3>
+              <p className="text-gray-500 mb-4">
+                {error || 'El registro médico solicitado no existe o no tienes permisos para verlo.'}
+              </p>
+              <Button onClick={handleBack}>Volver al expediente</Button>
+            </CardContent>
           </Card>
         </div>
       </LayoutBase>
@@ -122,65 +115,85 @@ const MedicalHistoryDetailScreen: React.FC = () => {
           <Button variant="ghost" size="icon" className="text-white" onClick={handleBack}>
             <ArrowLeft />
           </Button>
-          <h1 className="text-white font-medium text-lg ml-2">Detalle de historial</h1>
+          <h1 className="text-white font-medium text-lg ml-2">Detalle del historial</h1>
         </div>
       }
       footer={<NavbarInferior activeTab="profile" />}
     >
-      <div className="p-4 pb-20 space-y-6">
-        {/* Header Info */}
-        <Card className="p-4">
-          <div className="text-center space-y-2">
-            <h2 className="text-lg font-semibold text-gray-800">
-              {formatDate(historyDetail.event_date)}
-            </h2>
-            <p className="text-gray-600">Vet: {historyDetail.vet_name}</p>
-          </div>
+      <div className="p-4 pb-20 space-y-4">
+        {/* Diagnóstico principal */}
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-xl">
+                {historyDetail.diagnosis || 'Consulta médica'}
+              </CardTitle>
+              <Badge variant="outline">
+                <Calendar className="h-4 w-4 mr-1" />
+                {formatDate(historyDetail.event_date)}
+              </Badge>
+            </div>
+          </CardHeader>
         </Card>
 
-        {/* Diagnosis */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Stethoscope className="w-5 h-5 text-[#79D0B8]" />
-            <h3 className="font-semibold text-gray-800">Diagnóstico</h3>
-          </div>
-          <p className="text-gray-700">{historyDetail.diagnosis}</p>
-        </Card>
+        {/* Veterinario */}
+        {historyDetail.vet_name && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <User className="h-5 w-5 mr-2" />
+                Veterinario
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-gray-700">Dr. {historyDetail.vet_name}</p>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Clinical Note */}
+        {/* Notas médicas */}
         {historyDetail.note_text && (
-          <Card className="p-4">
-            <h3 className="font-semibold text-gray-800 mb-2">Nota clínica</h3>
-            <p className="text-gray-700">{historyDetail.note_text}</p>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Notas médicas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-gray-700 whitespace-pre-wrap">{historyDetail.note_text}</p>
+            </CardContent>
           </Card>
         )}
 
-        {/* Instructions for Owner */}
+        {/* Instrucciones para el dueño */}
         {historyDetail.instructions_for_owner && (
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <FileText className="w-5 h-5 text-[#79D0B8]" />
-              <h3 className="font-semibold text-gray-800">Instrucciones para el dueño</h3>
-            </div>
-            <p className="text-gray-700">{historyDetail.instructions_for_owner}</p>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-blue-600">
+                Instrucciones para el cuidado
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-gray-700 whitespace-pre-wrap">
+                {historyDetail.instructions_for_owner}
+              </p>
+            </CardContent>
           </Card>
         )}
 
-        {/* Medications Summary */}
+        {/* Medicamentos */}
         {historyDetail.meds_summary && (
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Pill className="w-5 h-5 text-[#79D0B8]" />
-              <h3 className="font-semibold text-gray-800">Medicamentos prescritos</h3>
-            </div>
-            <div className="space-y-2">
-              {formatMedicationsList(historyDetail.meds_summary).map((medication, index) => (
-                <div key={index} className="flex items-start gap-2 py-1">
-                  <span className="text-[#79D0B8] mt-1 text-sm font-bold">•</span>
-                  <span className="text-gray-700 whitespace-pre-line flex-1">{medication}</span>
-                </div>
-              ))}
-            </div>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center text-green-600">
+                <Pill className="h-5 w-5 mr-2" />
+                Medicamentos prescritos
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-gray-700 whitespace-pre-wrap">{historyDetail.meds_summary}</p>
+            </CardContent>
           </Card>
         )}
       </div>

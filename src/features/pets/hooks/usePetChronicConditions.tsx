@@ -16,7 +16,7 @@ export const usePetChronicConditions = (petId: string) => {
         .from('pet_chronic_conditions')
         .select('*')
         .eq('pet_id', petId)
-        .order('created_at', { ascending: false });
+        .order('recorded_at', { ascending: false });
 
       if (error) throw error;
       setConditions(data || []);
