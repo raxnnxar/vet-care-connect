@@ -19,6 +19,7 @@ interface MedicalHistoryDetail {
   instructions_for_owner: string;
   meds_summary: string;
   pet_id: string;
+  vet_id: string;
 }
 
 const MedicalHistoryDetailScreen: React.FC = () => {
@@ -30,7 +31,11 @@ const MedicalHistoryDetailScreen: React.FC = () => {
 
   useEffect(() => {
     const fetchHistoryDetail = async () => {
-      if (!petId || !eventId) return;
+      if (!petId || !eventId) {
+        setError('Parámetros de navegación faltantes');
+        setIsLoading(false);
+        return;
+      }
       
       console.log('Fetching history detail for:', { petId, eventId });
       
@@ -61,7 +66,7 @@ const MedicalHistoryDetailScreen: React.FC = () => {
   }, [petId, eventId]);
 
   const handleBack = () => {
-    navigate(`/pets/${petId}/medical-records`);
+    navigate(`/owner/pets/${petId}/medical-records`);
   };
 
   if (isLoading) {
