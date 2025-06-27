@@ -396,28 +396,19 @@ export type Database = {
       }
       pet_medical_history: {
         Row: {
-          allergies: string | null
-          chronic_conditions: string | null
           created_at: string | null
           id: string
           pet_id: string | null
-          previous_surgeries: Json | null
         }
         Insert: {
-          allergies?: string | null
-          chronic_conditions?: string | null
           created_at?: string | null
           id?: string
           pet_id?: string | null
-          previous_surgeries?: Json | null
         }
         Update: {
-          allergies?: string | null
-          chronic_conditions?: string | null
           created_at?: string | null
           id?: string
           pet_id?: string | null
-          previous_surgeries?: Json | null
         }
         Relationships: [
           {
