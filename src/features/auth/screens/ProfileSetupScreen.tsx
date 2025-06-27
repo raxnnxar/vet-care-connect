@@ -125,7 +125,7 @@ const ProfileSetupScreen = () => {
     setCurrentPets(prevPets => [...prevPets, newPet]);
   };
 
-  const isFormValid = true; // Simplificado para este ejemplo
+  const isFormValid = true;
 
   if (isProfileLoading) {
     return (
@@ -166,12 +166,11 @@ const ProfileSetupScreen = () => {
         </div>
       </div>
       
-      {/* Botón fijo en la parte inferior */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#79D0B8] shadow-lg">
         <div className="container mx-auto max-w-md">
           <FinishSetupButton
             onClick={() => handleProfileSubmit({
-              phoneNumber: '',  // Deberías obtener los valores reales del formulario aquí
+              phoneNumber: '',
             })}
             disabled={!isFormValid || isSaving}
             text="Guardar y continuar"

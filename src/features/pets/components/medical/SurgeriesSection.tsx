@@ -5,15 +5,15 @@ import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { Button } from '@/ui/atoms/button';
 import { UseFormRegister, UseFieldArrayReturn } from 'react-hook-form';
-import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface SurgeriesSectionProps {
   surgeryFields: any[];
-  appendSurgery: UseFieldArrayReturn<MedicalFormValues, "surgeries">['append'];
-  removeSurgery: UseFieldArrayReturn<MedicalFormValues, "surgeries">['remove'];
-  register: UseFormRegister<MedicalFormValues>;
+  appendSurgery: UseFieldArrayReturn<any, "surgeries">['append'];
+  removeSurgery: UseFieldArrayReturn<any, "surgeries">['remove'];
+  register: UseFormRegister<any>;
 }
 
+// Este componente está obsoleto - usar OnboardingSurgeriesSection en su lugar
 const SurgeriesSection = ({ 
   surgeryFields, 
   appendSurgery, 
@@ -22,35 +22,18 @@ const SurgeriesSection = ({
 }: SurgeriesSectionProps) => {
   return (
     <div className="space-y-2">
-      <Label className="font-medium text-base">Cirugías previas</Label>
-      {surgeryFields.map((field, index) => (
-        <div key={field.id} className="flex gap-2">
-          <Input
-            placeholder="Tipo de cirugía"
-            {...register(`surgeries.${index}.type`)}
-          />
-          <Input
-            type="date"
-            {...register(`surgeries.${index}.date`)}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => removeSurgery(index)}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
+      <Label className="font-medium text-base">Cirugías previas (Componente obsoleto)</Label>
+      <p className="text-sm text-gray-600">
+        Este componente ya no se usa - utilizar OnboardingSurgeriesSection
+      </p>
       <Button
         type="button"
         variant="outline"
-        onClick={() => appendSurgery({ type: '', date: '' })}
+        disabled
         className="flex items-center gap-2"
       >
         <Plus className="h-4 w-4" />
-        Agregar cirugía
+        Componente obsoleto
       </Button>
     </div>
   );

@@ -3,25 +3,26 @@ import React from 'react';
 import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { UseFormRegister } from 'react-hook-form';
-import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface ChronicConditionsSectionProps {
-  register: UseFormRegister<MedicalFormValues>;
+  register: UseFormRegister<any>;
 }
 
+// Este componente está obsoleto - usar OnboardingChronicConditionsSection en su lugar
 const ChronicConditionsSection = ({ register }: ChronicConditionsSectionProps) => {
   return (
     <div className="space-y-2">
       <Label htmlFor="chronicConditions">
-        Condiciones crónicas
+        Condiciones crónicas (Componente obsoleto)
       </Label>
       <Input
         {...register('chronicConditions')}
         id="chronicConditions"
-        placeholder="Describe cualquier condición crónica..."
+        placeholder="Este componente será eliminado - usar las nuevas tablas"
+        disabled
       />
       <p className="text-sm text-gray-600">
-        Incluye condiciones como diabetes, artritis, problemas cardíacos, etc.
+        Este componente ya no se usa - utilizar OnboardingChronicConditionsSection
       </p>
     </div>
   );

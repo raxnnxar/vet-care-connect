@@ -3,25 +3,26 @@ import React from 'react';
 import { Label } from '@/ui/atoms/label';
 import { Input } from '@/ui/atoms/input';
 import { UseFormRegister } from 'react-hook-form';
-import { MedicalFormValues } from '@/features/pets/types/formTypes';
 
 interface AllergiesSectionProps {
-  register: UseFormRegister<MedicalFormValues>;
+  register: UseFormRegister<any>;
 }
 
+// Este componente está obsoleto - usar OnboardingAllergiesSection en su lugar
 const AllergiesSection = ({ register }: AllergiesSectionProps) => {
   return (
     <div className="space-y-2">
       <Label htmlFor="allergies">
-        Alergias conocidas
+        Alergias conocidas (Componente obsoleto)
       </Label>
       <Input
         {...register('allergies')}
         id="allergies"
-        placeholder="Describe cualquier alergia conocida..."
+        placeholder="Este componente será eliminado - usar las nuevas tablas"
+        disabled
       />
       <p className="text-sm text-gray-600">
-        Incluye alergias a medicamentos, alimentos o sustancias ambientales
+        Este componente ya no se usa - utilizar OnboardingAllergiesSection
       </p>
     </div>
   );

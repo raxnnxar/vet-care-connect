@@ -23,7 +23,7 @@ import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScre
 import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import TreatmentsScreen from '@/features/treatments/screens/TreatmentsScreen';
-import MedicalHistoryDetailScreen from '@/features/pets/screens/MedicalHistoryDetailScreen';
+// Removed MedicalHistoryDetailScreen - no longer using pet_medical_history
 
 const OwnerNavigator: React.FC = () => {
   return (
@@ -45,13 +45,12 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.PET_DETAIL} element={<PetDetailScreen />} />
       <Route path={OWNER_ROUTES.PET_MEDICAL_RECORDS} element={<PetMedicalRecordsScreen />} />
       <Route path="/pets/:id/edit" element={<PetEditScreen />} />
-      <Route path="/history/:eventId" element={<MedicalHistoryDetailScreen />} />
+      {/* Removed /history/:eventId route - using v_medical_history view instead */}
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.TREATMENTS} element={<TreatmentsScreen />} />
       
-      {/* Redirect legacy grooming routes to new estetica routes */}
       <Route path="/groomers/:id" element={<GroomingDetailScreen />} />
       <Route path="/groomers/:id/review" element={<GroomingReviewScreen />} />
       

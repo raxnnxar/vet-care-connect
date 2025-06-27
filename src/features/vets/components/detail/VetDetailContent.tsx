@@ -30,7 +30,6 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
   const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Debug: Log the complete data object to see what we're receiving
   console.log('VetDetailContent - Complete data object:', data);
   console.log('VetDetailContent - Location data:', {
     clinic_address: data.clinicAddress,
@@ -38,7 +37,6 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
     clinic_longitude: data.clinicLongitude
   });
 
-  // Use the displayName directly from the formatted data
   const displayName = data.displayName || '';
   
   const firstNameEndsWithA = displayName.split(' ')[0].toLowerCase().endsWith('a');
@@ -54,7 +52,6 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
 
   return (
     <>
-      {/* Back button that floats on top of the header */}
       <div className="absolute top-4 left-4 z-10">
         <Button 
           variant="ghost" 
@@ -65,7 +62,6 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
         </Button>
       </div>
       
-      {/* Hero Section with clickable rating */}
       <VetProfileHero 
         displayName={vetName}
         specializations={specializations}
@@ -79,32 +75,26 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
       />
       
       <div className="p-4 pb-28 bg-gray-50">
-        {/* Animals Treated Section */}
         <div className="mb-4">
           <VetAnimalsTreatedSection animals={data.animalsTreated || []} />
         </div>
         
-        {/* About Section */}
         <div className="mb-4">
           <VetAboutSection bio={data.bio} />
         </div>
         
-        {/* Services Section */}
         <div className="mb-4">
           <VetServicesSection services={Array.isArray(data.servicesOffered) ? data.servicesOffered : []} />
         </div>
         
-        {/* Education Section */}
         <div className="mb-4">
           <VetEducationSection education={data.education || []} />
         </div>
         
-        {/* Certifications Section */}
         <div className="mb-4">
           <VetCertificationsSection certifications={data.certifications || []} />
         </div>
         
-        {/* Location Section */}
         <div className="mb-6">
           <VetLocationSection 
             address={data.clinicAddress}
@@ -113,13 +103,11 @@ const VetDetailContent: React.FC<VetDetailContentProps> = ({
           />
         </div>
         
-        {/* Action Buttons */}
         <VetActionButtons 
           onBookAppointment={onBookAppointment}
           onSendMessage={onSendMessage}
         />
 
-        {/* Reviews Dialog */}
         <ReviewsDialog
           isOpen={reviewsDialogOpen}
           setIsOpen={setReviewsDialogOpen}
