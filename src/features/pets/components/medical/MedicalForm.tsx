@@ -38,39 +38,8 @@ const MedicalForm: React.FC<MedicalFormProps> = ({ petId, onComplete }) => {
 
   const onSubmit = async (data: MedicalFormValues) => {
     try {
-      // Save medical history
-      if (data.allergies || data.chronicConditions || data.surgeries.length > 0) {
-        const { error: historyError } = await supabase
-          .from('pet_medical_history')
-          .upsert({
-            pet_id: petId,
-            allergies: data.allergies || null,
-            chronic_conditions: data.chronicConditions || null,
-            previous_surgeries: data.surgeries.length > 0 ? data.surgeries : null
-          });
-
-        if (historyError) throw historyError;
-      }
-
-      // Save medications
-      if (data.medications.length > 0) {
-        const medicationsToInsert = data.medications.map(med => ({
-          pet_id: petId,
-          medication: med.name,
-          dosage: med.dosage,
-          frequency_hours: med.frequency_hours,
-          start_date: med.start_date,
-          category: med.category,
-          instructions: null
-        }));
-
-        const { error: medicationsError } = await supabase
-          .from('owner_medications')
-          .insert(medicationsToInsert);
-
-        if (medicationsError) throw medicationsError;
-      }
-
+      // This form is now obsolete - just complete the flow
+      // The new onboarding process uses the specialized components
       toast.success('Información médica guardada exitosamente');
       onComplete();
     } catch (error) {
@@ -83,33 +52,14 @@ const MedicalForm: React.FC<MedicalFormProps> = ({ petId, onComplete }) => {
     <Card className="p-6 max-w-2xl mx-auto">
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">
-          Información Médica
+          Información Médica (Componente obsoleto)
         </h2>
         <p className="text-sm text-gray-600">
-          Proporciona información médica relevante de tu mascota (opcional)
+          Este formulario está siendo reemplazado por los nuevos componentes especializados
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <SurgeriesSection 
-          surgeryFields={surgeryFields}
-          appendSurgery={appendSurgery}
-          removeSurgery={removeSurgery}
-          register={register}
-        />
-
-        <AllergiesSection register={register} />
-
-        <ChronicConditionsSection register={register} />
-
-        <OwnerMedicationsSection
-          medicationFields={medicationFields}
-          appendMedication={appendMedication}
-          removeMedication={removeMedication}
-          register={register}
-          control={control}
-        />
-
         <div className="flex gap-3 pt-4">
           <Button
             type="button"
@@ -124,7 +74,7 @@ const MedicalForm: React.FC<MedicalFormProps> = ({ petId, onComplete }) => {
             disabled={isSubmitting}
             className="flex-1 bg-[#79D0B8] hover:bg-[#5FBFB3]"
           >
-            {isSubmitting ? 'Guardando...' : 'Guardar información médica'}
+            {isSubmitting ? 'Guardando...' : 'Continuar'}
           </Button>
         </div>
       </form>

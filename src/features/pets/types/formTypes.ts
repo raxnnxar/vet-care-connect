@@ -1,6 +1,29 @@
+import { Control, FieldErrors } from 'react-hook-form';
 
+// Form values for pet creation/editing
+export interface PetFormValues {
+  name: string;
+  species: string;
+  breed: string;
+  customSpecies: string;
+  age?: number;
+  weight?: number;
+  sex: string;
+  temperament: string;
+  additionalNotes: string;
+}
+
+// Props for PetBasicInfo component
+export interface PetBasicInfoProps {
+  control: Control<PetFormValues>;
+  register: any;
+  errors: FieldErrors<PetFormValues>;
+  selectedSpecies: string;
+}
+
+// Updated MedicalFormValues for the new structure
 export interface MedicalFormValues {
-  // Campos obsoletos mantenidos solo para compatibilidad temporal
+  // Keep old fields for backward compatibility but mark as obsolete
   allergies?: string;
   chronicConditions?: string;
   surgeries?: Array<{
@@ -8,15 +31,17 @@ export interface MedicalFormValues {
     date: string;
   }>;
   
-  // Nota: Estos campos ya no se usan en el flujo actual
-  // La información médica ahora se guarda en:
-  // - pet_allergies
-  // - pet_chronic_conditions  
-  // - pet_surgeries
-  // - owner_medications
+  // New medications field for owner medications
+  medications?: Array<{
+    name: string;
+    dosage: string;
+    frequency_hours: number;
+    start_date: string;
+    category: 'cronico' | 'suplemento';
+  }>;
 }
 
-// Nuevos tipos para las tablas especializadas
+// New types for the specialized tables
 export interface PetAllergy {
   id: string;
   pet_id: string;
