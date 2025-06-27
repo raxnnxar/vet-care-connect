@@ -61,7 +61,7 @@ const MedicalHistoryDetailScreen: React.FC = () => {
   }, [petId, eventId]);
 
   const handleBack = () => {
-    navigate(`/owner/pets/${petId}/medical-records`);
+    navigate(`/pets/${petId}/medical-records`);
   };
 
   if (isLoading) {

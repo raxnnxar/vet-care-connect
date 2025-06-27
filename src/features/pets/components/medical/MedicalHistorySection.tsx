@@ -58,8 +58,8 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
   }, [petId, onCountChange]);
 
   const handleHistoryClick = (eventId: string) => {
-    console.log('Navigating to:', `/owner/pets/${petId}/medical/history/${eventId}`);
-    navigate(`/owner/pets/${petId}/medical/history/${eventId}`);
+    console.log('Navigating to medical history detail:', `/pets/${petId}/medical/history/${eventId}`);
+    navigate(`/pets/${petId}/medical/history/${eventId}`);
   };
 
   if (isLoading) {
@@ -101,7 +101,7 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
       {history.map((event) => (
         <Card 
           key={event.event_id} 
-          className="cursor-pointer hover:shadow-md transition-shadow h-[120px]"
+          className="cursor-pointer hover:shadow-md transition-shadow"
           onClick={() => handleHistoryClick(event.event_id)}
         >
           <CardHeader className="pb-2">
