@@ -18,12 +18,12 @@ import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
 import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
 import PetDetailScreen from '@/features/pets/screens/PetDetailScreen';
 import PetMedicalRecordsScreen from '@/features/pets/screens/PetMedicalRecordsScreen';
+import MedicalHistoryDetailScreen from '@/features/pets/screens/MedicalHistoryDetailScreen';
 import PetEditScreen from '@/features/pets/screens/PetEditScreen';
 import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScreen';
 import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import TreatmentsScreen from '@/features/treatments/screens/TreatmentsScreen';
-// Removed MedicalHistoryDetailScreen - no longer using pet_medical_history
 
 const OwnerNavigator: React.FC = () => {
   return (
@@ -44,8 +44,8 @@ const OwnerNavigator: React.FC = () => {
       <Route path="/pets/:id" element={<PetDetailScreen />} />
       <Route path={OWNER_ROUTES.PET_DETAIL} element={<PetDetailScreen />} />
       <Route path={OWNER_ROUTES.PET_MEDICAL_RECORDS} element={<PetMedicalRecordsScreen />} />
+      <Route path="/owner/pets/:id/medical/history/:eventId" element={<MedicalHistoryDetailScreen />} />
       <Route path="/pets/:id/edit" element={<PetEditScreen />} />
-      {/* Removed /history/:eventId route - using v_medical_history view instead */}
       <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
       <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />

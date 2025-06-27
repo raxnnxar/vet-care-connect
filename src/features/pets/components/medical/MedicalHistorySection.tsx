@@ -100,12 +100,12 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
       {history.map((event) => (
         <Card 
           key={event.event_id} 
-          className="cursor-pointer hover:shadow-md transition-shadow"
+          className="cursor-pointer hover:shadow-md transition-shadow h-[120px]"
           onClick={() => handleHistoryClick(event.event_id)}
         >
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
-              <CardTitle className="text-lg font-medium">
+              <CardTitle className="text-lg font-bold">
                 {event.diagnosis || 'Consulta médica'}
               </CardTitle>
               <Badge variant="outline" className="ml-2">
@@ -123,20 +123,8 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
             )}
             
             {event.note_text && (
-              <p className="text-sm text-gray-700 mb-2 line-clamp-2">
+              <p className="text-sm text-gray-700 line-clamp-2">
                 {event.note_text}
-              </p>
-            )}
-            
-            {event.instructions_for_owner && (
-              <p className="text-sm text-blue-600 mb-2">
-                <strong>Instrucciones:</strong> {event.instructions_for_owner}
-              </p>
-            )}
-            
-            {event.meds_summary && (
-              <p className="text-sm text-green-600">
-                <strong>Medicamentos:</strong> {event.meds_summary}
               </p>
             )}
           </CardContent>

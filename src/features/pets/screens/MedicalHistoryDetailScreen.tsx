@@ -54,7 +54,7 @@ const MedicalHistoryDetailScreen: React.FC = () => {
   }, [petId, eventId]);
 
   const handleBack = () => {
-    navigate(`/owner/pets/${petId}/medical`);
+    navigate(`/owner/pets/${petId}/medical-records`);
   };
 
   if (isLoading) {
@@ -175,9 +175,15 @@ const MedicalHistoryDetailScreen: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-gray-700 whitespace-pre-wrap">
-                {historyDetail.instructions_for_owner}
-              </p>
+              <div className="space-y-2">
+                {historyDetail.instructions_for_owner.split('\n').map((line, index) => (
+                  line.trim() && (
+                    <p key={index} className="text-gray-700">
+                      • {line.trim()}
+                    </p>
+                  )
+                ))}
+              </div>
             </CardContent>
           </Card>
         )}
@@ -192,7 +198,15 @@ const MedicalHistoryDetailScreen: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-gray-700 whitespace-pre-wrap">{historyDetail.meds_summary}</p>
+              <div className="space-y-2">
+                {historyDetail.meds_summary.split('\n').map((line, index) => (
+                  line.trim() && (
+                    <p key={index} className="text-gray-700">
+                      • {line.trim()}
+                    </p>
+                  )
+                ))}
+              </div>
             </CardContent>
           </Card>
         )}
