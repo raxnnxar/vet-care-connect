@@ -24,6 +24,7 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({ petId, petOwnerId
   const { surgeries } = usePetSurgeries(petId);
   const { medications } = usePetMedications(petId);
   const [medicationsCount, setMedicationsCount] = React.useState(0);
+  const [historyCount, setHistoryCount] = React.useState(0);
 
   // Fetch pet data for header
   const [pet, setPet] = React.useState<Pet | null>(null);
@@ -81,9 +82,14 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({ petId, petOwnerId
           </TabsTrigger>
           <TabsTrigger 
             value="history" 
-            className="data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8]"
+            className="data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative"
           >
             Historial
+            {historyCount > 0 && (
+              <Badge variant="secondary" className="ml-2 bg-[#79D0B8] text-white text-xs h-5 min-w-5 flex items-center justify-center">
+                {historyCount}
+              </Badge>
+            )}
           </TabsTrigger>
         </TabsList>
 
@@ -104,7 +110,10 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({ petId, petOwnerId
         </TabsContent>
 
         <TabsContent value="history" className="mt-4">
-          <MedicalHistorySection petId={petId} />
+          <MedicalHistorySection 
+            petId={petId} 
+            onCountChange={setHistoryCount}
+          />
         </TabsContent>
       </Tabs>
     </div>
