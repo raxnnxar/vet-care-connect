@@ -13,17 +13,10 @@ interface DigitalVaccinationSectionProps {
 
 const DigitalVaccinationSection: React.FC<DigitalVaccinationSectionProps> = ({ petId }) => {
   const [showForm, setShowForm] = useState(false);
-  const { records, isLoading, isCreating, createRecord, deleteRecord } = useVaccinationRecords(petId);
+  const { records, isLoading, createRecord } = useVaccinationRecords(petId);
 
   const handleVaccinationAdded = () => {
     setShowForm(false);
-    // Refresh will happen automatically through the hook
-  };
-
-  const handleDeleteRecord = async (recordId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este registro de vacunación?')) {
-      await deleteRecord(recordId);
-    }
   };
 
   return (
@@ -63,8 +56,7 @@ const DigitalVaccinationSection: React.FC<DigitalVaccinationSectionProps> = ({ p
       ) : (
         <VaccinationRecordsList
           records={records}
-          onDelete={handleDeleteRecord}
-          canDelete={true}
+          petId={petId}
         />
       )}
     </div>
