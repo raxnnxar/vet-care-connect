@@ -58,7 +58,6 @@ const MedicalHistorySection: React.FC<MedicalHistorySectionProps> = ({
   }, [petId, onCountChange]);
 
   const handleHistoryClick = (eventId: string) => {
-    console.log('Navigating to:', `/owner/pets/${petId}/medical/history/${eventId}`);
     navigate(`/owner/pets/${petId}/medical/history/${eventId}`);
   };
 

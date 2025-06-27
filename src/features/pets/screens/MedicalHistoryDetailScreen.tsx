@@ -32,8 +32,6 @@ const MedicalHistoryDetailScreen: React.FC = () => {
     const fetchHistoryDetail = async () => {
       if (!petId || !eventId) return;
       
-      console.log('Fetching history detail for:', { petId, eventId });
-      
       try {
         const { data, error } = await supabase
           .from('v_medical_history')
@@ -42,12 +40,7 @@ const MedicalHistoryDetailScreen: React.FC = () => {
           .eq('pet_id', petId)
           .single();
 
-        if (error) {
-          console.error('Supabase error:', error);
-          throw error;
-        }
-        
-        console.log('History detail data:', data);
+        if (error) throw error;
         setHistoryDetail(data);
       } catch (error) {
         console.error('Error fetching medical history detail:', error);
