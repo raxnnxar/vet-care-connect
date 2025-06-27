@@ -1,11 +1,15 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/ui/atoms/button';
+import { FileText } from 'lucide-react';
 import AppointmentInfoCard from './AppointmentInfoCard';
 import PetInfoCard from './PetInfoCard';
 import OwnerInfoCard from './OwnerInfoCard';
 import ClinicalNoteCard from './ClinicalNoteCard';
 import TreatmentPlanCard from './TreatmentPlanCard';
 import AppointmentActionButtons from './AppointmentActionButtons';
+import MedicalPeekSection from '@/components/medical/MedicalPeekSection';
 import { getStatusBadge } from '@/features/vets/utils/appointmentUtils';
 
 interface AppointmentDetailContentProps {
@@ -29,6 +33,12 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
   onSendMessage,
   getAppointmentDateString
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewMedicalRecord = () => {
+    navigate(`/vet/detalles-cita/${appointment.id}/expediente-medico`);
+  };
+
   return (
     <div className="p-4 space-y-6 pb-20">
       <AppointmentInfoCard 
@@ -37,6 +47,26 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
       />
       
       <PetInfoCard pet={appointment.pets} />
+      
+      {/* Peek section con información médica importante */}
+      {appointment.pets?.id && (
+        <MedicalPeekSection
+          petId={appointment.pets.id}
+          onViewFullMedical={handleViewMedicalRecord}
+        />
+      )}
+      
+      {/* Botón para ver expediente médico completo */}
+      <div className="flex justify-center">
+        <Button
+          variant="outline"
+          onClick={handleViewMedicalRecord}
+          className="border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8] hover:text-white"
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          Ver expediente médico completo
+        </Button>
+      </div>
       
       <OwnerInfoCard ownerInfo={appointment.pet_owners} />
       

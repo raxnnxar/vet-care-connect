@@ -11,6 +11,7 @@ import ChatsScreen from '@/features/chats/screens/ChatsScreen';
 import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import DetallesCitaScreen from '@/features/vets/screens/DetallesCitaScreen';
+import VetPetMedicalScreen from '@/features/vets/screens/VetPetMedicalScreen';
 
 interface UnderConstructionPageProps {
   title: string;
@@ -50,6 +51,7 @@ const VetNavigator: React.FC = () => {
       <Route path={VET_ROUTES.INDIVIDUAL_CHAT.replace('/vet', '')} element={<IndividualChatScreen />} />
       <Route path="agenda" element={<VetWeeklyAgendaScreen />} />
       <Route path="detalles-cita/:id" element={<DetallesCitaScreen />} />
+      <Route path="detalles-cita/:id/expediente-medico" element={<VetPetMedicalScreen />} />
       <Route path="*" element={<VetDashboard />} />
     </Routes>
   );
