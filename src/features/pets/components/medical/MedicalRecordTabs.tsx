@@ -23,6 +23,7 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({ petId, petOwnerId
   const { conditions } = usePetChronicConditions(petId);
   const { surgeries } = usePetSurgeries(petId);
   const { medications } = usePetMedications(petId);
+  const [medicationsCount, setMedicationsCount] = React.useState(0);
 
   // Fetch pet data for header
   const [pet, setPet] = React.useState<Pet | null>(null);
@@ -55,9 +56,9 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({ petId, petOwnerId
             className="data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative"
           >
             Medicamentos
-            {medications.length > 0 && (
+            {medicationsCount > 0 && (
               <Badge variant="secondary" className="ml-2 bg-[#79D0B8] text-white text-xs h-5 min-w-5 flex items-center justify-center">
-                {medications.length}
+                {medicationsCount}
               </Badge>
             )}
           </TabsTrigger>
@@ -87,11 +88,15 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({ petId, petOwnerId
         </TabsList>
 
         <TabsContent value="medications" className="mt-4">
-          <CurrentMedicationsSection petId={petId} />
+          <CurrentMedicationsSection 
+            petId={petId} 
+            petOwnerId={petOwnerId}
+            onCountChange={setMedicationsCount}
+          />
         </TabsContent>
 
         <TabsContent value="vaccines" className="mt-4">
-          <DigitalVaccinationSection petId={petId} petOwnerId={petOwnerId} />
+          <DigitalVaccinationSection petId={petId} />
         </TabsContent>
 
         <TabsContent value="surgeries" className="mt-4">
@@ -99,12 +104,7 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({ petId, petOwnerId
         </TabsContent>
 
         <TabsContent value="history" className="mt-4">
-          <MedicalHistorySection 
-            petId={petId} 
-            allergies={allergies}
-            conditions={conditions}
-            surgeries={surgeries}
-          />
+          <MedicalHistorySection petId={petId} />
         </TabsContent>
       </Tabs>
     </div>
