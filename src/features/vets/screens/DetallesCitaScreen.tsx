@@ -10,13 +10,11 @@ import AppointmentDetailHeader from '@/features/vets/components/appointment-deta
 import AppointmentDetailLoading from '@/features/vets/components/appointment-detail/AppointmentDetailLoading';
 import AppointmentDetailError from '@/features/vets/components/appointment-detail/AppointmentDetailError';
 import AppointmentDetailContent from '@/features/vets/components/appointment-detail/AppointmentDetailContent';
-import MedicalHistoryViewer from '@/features/vets/components/appointment-detail/MedicalHistoryViewer';
 import RejectAppointmentModal from '@/features/vets/components/RejectAppointmentModal';
 
 const DetallesCitaScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [showFullMedicalHistory, setShowFullMedicalHistory] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
   
@@ -25,10 +23,10 @@ const DetallesCitaScreen: React.FC = () => {
   
   const goBack = () => navigate(-1);
 
+  // Placeholder function - no longer used
   const handleViewMedicalHistory = () => {
-    if (appointmentDetails?.appointment?.pets?.id) {
-      setShowFullMedicalHistory(true);
-    }
+    // This function is kept for compatibility but does nothing
+    console.log('Medical history view removed - using new tables');
   };
 
   const handleSendMessageClick = () => {
@@ -46,16 +44,6 @@ const DetallesCitaScreen: React.FC = () => {
   }
   
   const { appointment, medicalHistory } = appointmentDetails;
-  
-  // Show full medical history modal
-  if (showFullMedicalHistory && appointment.pets) {
-    return (
-      <MedicalHistoryViewer
-        pet={appointment.pets}
-        onBack={() => setShowFullMedicalHistory(false)}
-      />
-    );
-  }
   
   return (
     <LayoutBase

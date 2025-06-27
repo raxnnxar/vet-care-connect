@@ -2,7 +2,6 @@
 import React from 'react';
 import AppointmentInfoCard from './AppointmentInfoCard';
 import PetInfoCard from './PetInfoCard';
-import MedicalHistoryCard from './MedicalHistoryCard';
 import OwnerInfoCard from './OwnerInfoCard';
 import ClinicalNoteCard from './ClinicalNoteCard';
 import TreatmentPlanCard from './TreatmentPlanCard';
@@ -38,11 +37,6 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
       />
       
       <PetInfoCard pet={appointment.pets} />
-      
-      <MedicalHistoryCard 
-        medicalHistory={medicalHistory}
-        onViewFullHistory={onViewFullHistory}
-      />
       
       <OwnerInfoCard ownerInfo={appointment.pet_owners} />
       

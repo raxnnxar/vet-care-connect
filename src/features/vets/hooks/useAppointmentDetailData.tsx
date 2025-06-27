@@ -39,23 +39,9 @@ export const useAppointmentDetailData = (id?: string) => {
         throw appointmentError;
       }
       
-      // Fetch medical history if pet exists
-      let medicalHistory = null;
-      if (appointment.pets?.id) {
-        const { data: medical, error: medicalError } = await supabase
-          .from('pet_medical_history')
-          .select('*')
-          .eq('pet_id', appointment.pets.id)
-          .maybeSingle();
-        
-        if (!medicalError) {
-          medicalHistory = medical;
-        }
-      }
-      
       return {
         appointment,
-        medicalHistory
+        medicalHistory: null // No longer fetching medical history from pet_medical_history
       };
     },
     enabled: !!id

@@ -5,7 +5,7 @@ import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
 import { Textarea } from '@/ui/atoms/textarea';
 import { Label } from '@/ui/atoms/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/atoms/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/molecules/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/molecules/dialog';
 import { Plus, Pencil, Trash } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,7 +17,7 @@ interface Medication {
   dosage?: string;
   frequency_hours?: number;
   start_date?: string;
-  category: string;
+  category: 'cronico' | 'suplemento';
   instructions?: string;
 }
 
@@ -33,9 +33,9 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
   const [formData, setFormData] = useState({
     medication: '',
     dosage: '',
-    frequency_hours: '',
+    frequency_hours: 24,
     start_date: '',
-    category: 'cronico',
+    category: 'cronico' as 'cronico' | 'suplemento',
     instructions: ''
   });
 
@@ -63,7 +63,7 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
     setFormData({
       medication: '',
       dosage: '',
-      frequency_hours: '',
+      frequency_hours: 24,
       start_date: '',
       category: 'cronico',
       instructions: ''
@@ -74,11 +74,11 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
   const handleEdit = (medication: Medication) => {
     setEditingMedication(medication);
     setFormData({
-      medication: medication.medication || '',
+      medication: medication.medication,
       dosage: medication.dosage || '',
-      frequency_hours: medication.frequency_hours?.toString() || '',
+      frequency_hours: medication.frequency_hours || 24,
       start_date: medication.start_date || '',
-      category: medication.category || 'cronico',
+      category: medication.category,
       instructions: medication.instructions || ''
     });
     setShowDialog(true);
@@ -92,20 +92,18 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
 
     setIsLoading(true);
     try {
-      const medicationData = {
-        medication: formData.medication.trim(),
-        dosage: formData.dosage.trim() || null,
-        frequency_hours: formData.frequency_hours ? parseInt(formData.frequency_hours) : null,
-        start_date: formData.start_date || null,
-        category: formData.category as 'cronico' | 'agudo' | 'suplemento',
-        instructions: formData.instructions.trim() || null
-      };
-
       if (editingMedication) {
         // Update existing medication
         const { error } = await supabase
           .from('owner_medications')
-          .update(medicationData)
+          .update({
+            medication: formData.medication.trim(),
+            dosage: formData.dosage.trim() || null,
+            frequency_hours: formData.frequency_hours,
+            start_date: formData.start_date || null,
+            category: formData.category,
+            instructions: formData.instructions.trim() || null
+          })
           .eq('id', editingMedication.id);
 
         if (error) throw error;
@@ -116,7 +114,12 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
           .from('owner_medications')
           .insert({
             pet_id: petId,
-            ...medicationData
+            medication: formData.medication.trim(),
+            dosage: formData.dosage.trim() || null,
+            frequency_hours: formData.frequency_hours,
+            start_date: formData.start_date || null,
+            category: formData.category,
+            instructions: formData.instructions.trim() || null
           });
 
         if (error) throw error;
@@ -149,40 +152,21 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
     }
   };
 
-  const formatFrequency = (hours: number) => {
-    if (hours === 24) return 'Una vez al día';
-    if (hours === 12) return 'Cada 12 horas';
-    if (hours === 8) return 'Cada 8 horas';
-    if (hours === 6) return 'Cada 6 horas';
-    return `Cada ${hours} horas`;
-  };
-
-  const categoryLabels = {
-    cronico: 'Crónico',
-    agudo: 'Agudo',
-    suplemento: 'Suplemento'
-  };
-
   return (
     <>
       <Card className="p-4">
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold text-gray-800">Medicamentos actuales</h3>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAdd}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Añadir medicamento
-            </Button>
-          </div>
-          <p className="text-sm text-gray-600">
-            Ayuda a los veterinarios a conocer si tu mascota actualmente toma algún medicamento para una condición crónica diagnosticada anteriormente o algún suplemento.
-          </p>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">Medicamentos</h3>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAdd}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Añadir medicamento
+          </Button>
         </div>
 
         {medications.length === 0 ? (
@@ -192,20 +176,16 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
             {medications.map((medication) => (
               <div key={medication.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-medium text-gray-800">{medication.medication}</p>
-                    <span className="text-xs bg-gray-200 px-2 py-1 rounded">
-                      {categoryLabels[medication.category as keyof typeof categoryLabels]}
-                    </span>
-                  </div>
+                  <p className="font-medium text-gray-800">{medication.medication}</p>
                   {medication.dosage && (
                     <p className="text-sm text-gray-600">Dosis: {medication.dosage}</p>
                   )}
                   {medication.frequency_hours && (
-                    <p className="text-sm text-gray-600">Frecuencia: {formatFrequency(medication.frequency_hours)}</p>
+                    <p className="text-sm text-gray-600">Frecuencia: cada {medication.frequency_hours} horas</p>
                   )}
+                  <p className="text-xs text-gray-500 capitalize">{medication.category}</p>
                   {medication.instructions && (
-                    <p className="text-sm text-gray-600">{medication.instructions}</p>
+                    <p className="text-sm text-gray-600 mt-1">{medication.instructions}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -231,7 +211,7 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
       </Card>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
               {editingMedication ? 'Editar medicamento' : 'Añadir medicamento'}
@@ -250,42 +230,25 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
             </div>
             
             <div>
-              <Label htmlFor="category">Categoría</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cronico">Crónico</SelectItem>
-                  <SelectItem value="agudo">Agudo</SelectItem>
-                  <SelectItem value="suplemento">Suplemento</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
               <Label htmlFor="dosage">Dosis</Label>
               <Input
                 id="dosage"
                 value={formData.dosage}
                 onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
-                placeholder="Ej: 1 tableta, 5ml..."
+                placeholder="Ej: 1 tableta, 5ml, etc."
               />
             </div>
             
             <div>
-              <Label htmlFor="frequency_hours">Frecuencia (horas)</Label>
-              <Select value={formData.frequency_hours} onValueChange={(value) => setFormData({ ...formData, frequency_hours: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar frecuencia" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="6">Cada 6 horas</SelectItem>
-                  <SelectItem value="8">Cada 8 horas</SelectItem>
-                  <SelectItem value="12">Cada 12 horas</SelectItem>
-                  <SelectItem value="24">Una vez al día</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="frequency">Frecuencia (horas)</Label>
+              <Input
+                id="frequency"
+                type="number"
+                min="1"
+                value={formData.frequency_hours}
+                onChange={(e) => setFormData({ ...formData, frequency_hours: parseInt(e.target.value) || 24 })}
+                placeholder="24"
+              />
             </div>
             
             <div>
@@ -299,13 +262,31 @@ const OnboardingMedicationsSection: React.FC<OnboardingMedicationsSectionProps> 
             </div>
             
             <div>
-              <Label htmlFor="instructions">Instrucciones</Label>
+              <Label htmlFor="category">Categoría</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value: 'cronico' | 'suplemento') => 
+                  setFormData({ ...formData, category: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cronico">Crónico</SelectItem>
+                  <SelectItem value="suplemento">Suplemento</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="instructions">Instrucciones adicionales</Label>
               <Textarea
                 id="instructions"
                 value={formData.instructions}
                 onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-                placeholder="Instrucciones adicionales..."
-                rows={2}
+                placeholder="Instrucciones especiales..."
+                rows={3}
               />
             </div>
             
