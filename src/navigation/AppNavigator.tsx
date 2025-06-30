@@ -48,11 +48,11 @@ const AppNavigator = () => {
         location.pathname.includes('/appointments') ||
         location.pathname.includes('/agenda') ||
         location.pathname.includes('/pets') ||
-        location.pathname.includes('/search-vet') || // Add this to prevent redirect from search screen
         location.pathname.includes('/find-vets') ||
         location.pathname.includes('/vets/') ||
         location.pathname.includes('/notifications') ||
-        location.pathname.includes('/settings')
+        location.pathname.includes('/settings') ||
+        location.pathname === '/owner/search-vet' // Specifically handle the search vet route
       ) {
         console.log('User is on a specific screen, allowing completion of flow');
         return;

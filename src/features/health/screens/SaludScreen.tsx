@@ -49,6 +49,7 @@ const SaludScreen = () => {
   };
 
   const handleSearchPress = () => {
+    console.log('Navigating to search vet screen');
     navigate('/owner/search-vet');
   };
 
@@ -63,7 +64,17 @@ const SaludScreen = () => {
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
         {/* Search Bar - Made Pressable */}
-        <div onClick={handleSearchPress} className="cursor-pointer">
+        <div 
+          onClick={handleSearchPress} 
+          className="cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleSearchPress();
+            }
+          }}
+        >
           <SearchBar 
             searchQuery=""
             onSearchChange={() => {}} // No-op since it's read-only
