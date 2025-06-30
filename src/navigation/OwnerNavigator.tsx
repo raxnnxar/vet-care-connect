@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { OWNER_ROUTES } from './navigationConfig';
@@ -53,7 +54,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.TREATMENTS} element={<TreatmentsScreen />} />
       
-      {/* New Search Vets Route */}
+      {/* Search Vets Route - accessible from SaludScreen */}
       <Route path="/search-vets" element={<SearchVetsScreen />} />
       
       {/* Global Find Vets Screen - accessible from anywhere */}
