@@ -31,7 +31,7 @@ const AppNavigator = () => {
       console.log('Current role info:', { userRole, providerType });
       console.log('Current path:', location.pathname);
       
-      // Skip navigation logic if user is already on specific screens or vet routes
+      // Skip navigation logic if user is already on specific screens or nested routes
       if (
         location.pathname === ROUTES.PROFILE_SETUP || 
         location.pathname === '/location-setup' ||
@@ -47,9 +47,14 @@ const AppNavigator = () => {
         location.pathname.includes('/detalles-cita') ||
         location.pathname.includes('/appointments') ||
         location.pathname.includes('/agenda') ||
-        location.pathname.includes('/pets') // Add pets routes to avoid redirects during pet management
+        location.pathname.includes('/pets') ||
+        location.pathname.includes('/search-vet') || // Add this to prevent redirect from search screen
+        location.pathname.includes('/find-vets') ||
+        location.pathname.includes('/vets/') ||
+        location.pathname.includes('/notifications') ||
+        location.pathname.includes('/settings')
       ) {
-        console.log('User is on a setup/profile/chat/review/vet/pets screen, allowing completion of flow');
+        console.log('User is on a specific screen, allowing completion of flow');
         return;
       }
       
@@ -99,7 +104,7 @@ const AppNavigator = () => {
       console.log('No user found in AppNavigator');
       
       // If no user and not on auth routes, redirect to login
-      // BUT don't redirect if we're in the middle of pet creation flow
+      // BUT don't redirect if we're in the middle of specific flows
       if (
         !location.pathname.startsWith('/login') && 
         !location.pathname.startsWith('/signup') &&
