@@ -14,6 +14,7 @@ import OwnerProfileScreen from '@/features/owner/screens/OwnerProfileScreen';
 import ChatsScreen from '@/features/chats/screens/ChatsScreen';
 import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
 import FindVetsScreen from '@/features/vets/screens/FindVetsScreen';
+import SearchVetScreen from '@/features/vets/screens/SearchVetScreen';
 import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
 import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
 import PetDetailScreen from '@/features/pets/screens/PetDetailScreen';
@@ -40,6 +41,7 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.CHATS} element={<ChatsScreen />} />
       <Route path={OWNER_ROUTES.INDIVIDUAL_CHAT} element={<IndividualChatScreen />} />
       <Route path={OWNER_ROUTES.FIND_VETS} element={<FindVetsScreen />} />
+      <Route path="/owner/search-vet" element={<SearchVetScreen />} />
       <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
       <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />
       <Route path="/pets/:id" element={<PetDetailScreen />} />
