@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Pressable } from 'react-native';
 import NavbarInferior from '@/frontend/navigation/components/NavbarInferior';
 import SaludHeader from '../components/SaludHeader';
 import PrimaryVet from '../components/PrimaryVet';
@@ -64,13 +63,13 @@ const SaludScreen = () => {
 
       <main className="flex-1 px-4 pb-24 pt-5 overflow-auto space-y-6">
         {/* Search Bar - Made Pressable */}
-        <Pressable onPress={handleSearchPress}>
+        <div onClick={handleSearchPress} className="cursor-pointer">
           <SearchBar 
             searchQuery=""
             onSearchChange={() => {}} // No-op since it's read-only
             readOnly
           />
-        </Pressable>
+        </div>
 
         {/* Primary Vet Section */}
         {primaryVetError ? (

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Filter } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
-import VetCard from '../components/VetCard';
+import VetCard from '@/features/health/components/VetCard';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
 import { useDebounce } from '@/hooks/use-debounce';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,7 +18,7 @@ interface VetFilters {
   max_dist_m: number | null;
 }
 
-interface Veterinarian {
+interface SearchVeterinarian {
   id: string;
   name: string;
   firstName: string;
@@ -42,7 +42,7 @@ const SearchVetScreen = () => {
     rating_min: null,
     max_dist_m: null
   });
-  const [vets, setVets] = useState<Veterinarian[]>([]);
+  const [vets, setVets] = useState<SearchVeterinarian[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paginationOffset, setPaginationOffset] = useState(0);
