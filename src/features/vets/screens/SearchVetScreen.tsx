@@ -237,16 +237,16 @@ const SearchVetScreen = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3">
+      {/* Header with primary color background */}
+      <div className="bg-[#91CFC2] shadow-sm border-b border-gray-200 px-4 py-3">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleBackPress}
-            className="p-2"
+            className="p-2 text-white hover:bg-white/20"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-600" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
             <Input
@@ -255,16 +255,16 @@ const SearchVetScreen = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
-              className="border-0 shadow-none focus:ring-0 text-base"
+              className="border-0 shadow-none focus:ring-0 text-base bg-white/90 placeholder:text-gray-500"
             />
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="p-2"
+            className="p-2 text-white hover:bg-white/20"
             onClick={() => setShowFiltersModal(true)}
           >
-            <Filter className="h-5 w-5 text-gray-600" />
+            <Filter className="h-5 w-5" />
           </Button>
         </div>
       </div>

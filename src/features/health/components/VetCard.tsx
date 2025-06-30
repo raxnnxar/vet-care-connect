@@ -4,6 +4,7 @@ import { Star, MapPin } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
 import { calculateDistance, translateAnimals } from '@/utils/distanceUtils';
+import { translateSpecialization } from '@/features/vets/utils/vetDetailUtils';
 
 interface VetCardProps {
   vet: {
@@ -26,19 +27,19 @@ interface VetCardProps {
 }
 
 const VetCard: React.FC<VetCardProps> = ({ vet, onClick, userLocation }) => {
-  // Format specialization to display in uppercase with +X for additional ones
+  // Format specialization to display in Spanish with proper formatting
   const formatSpecialization = () => {
     if (!vet.specialization || vet.specialization.length === 0) {
-      return "MEDICINA GENERAL";
+      return "Medicina general";
     }
     
-    const primary = vet.specialization[0].toUpperCase();
+    const primarySpec = translateSpecialization(vet.specialization[0]);
     
     if (vet.specialization.length > 1) {
-      return `${primary} +${vet.specialization.length - 1}`;
+      return `${primarySpec} +${vet.specialization.length - 1}`;
     }
     
-    return primary;
+    return primarySpec;
   };
   
   // Format animals treated using translation

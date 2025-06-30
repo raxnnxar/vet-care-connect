@@ -1,27 +1,32 @@
 
 import { animalTranslationMap } from '@/utils/distanceUtils';
 
+// Dictionary for translating specializations from English to Spanish
+const SPECIALIZATION_LABELS_ES: Record<string, string> = {
+  general: "Medicina general",
+  internal_medicine: "Medicina interna", 
+  surgery: "Cirugía",
+  dermatology: "Dermatología",
+  ophthalmology: "Oftalmología",
+  dentistry: "Odontología",
+  anesthesiology: "Anestesiología",
+  oncology: "Oncología",
+  cardiology: "Cardiología",
+  neurology: "Neurología",
+  exotic_medicine: "Medicina de animales exóticos",
+  large_animals: "Medicina de animales grandes",
+  emergency: "Emergencias y cuidados críticos",
+  rehabilitation: "Rehabilitación y fisioterapia",
+  behavior: "Etología",
+  pathology: "Patología",
+  sports_medicine: "Medicina deportiva para animales",
+  nutrition: "Nutriología",
+  preventive_medicine: "Medicina preventiva y bienestar animal",
+};
+
 // Helper function to translate specialization to human-readable format
 export const translateSpecialization = (spec: string): string => {
-  const translations: Record<string, string> = {
-    'cardiology': 'Cardiología',
-    'dermatology': 'Dermatología',
-    'orthopedics': 'Ortopedia',
-    'neurology': 'Neurología',
-    'ophthalmology': 'Oftalmología',
-    'oncology': 'Oncología',
-    'general': 'Medicina General',
-    'surgery': 'Cirugía',
-    'dentistry': 'Odontología',
-    'nutrition': 'Nutrición',
-    'internal_medicine': 'Medicina Interna',
-    'emergency': 'Emergencias',
-    'rehabilitation': 'Rehabilitación',
-    'exotics': 'Animales Exóticos',
-    // Add more translations as needed
-  };
-  
-  return translations[spec.toLowerCase()] || spec;
+  return SPECIALIZATION_LABELS_ES[spec.toLowerCase()] || spec;
 };
 
 // Helper function to format animals treated using centralized translation
@@ -53,3 +58,6 @@ export const getInitials = (displayName: string): string => {
   }
   return '';
 };
+
+// Export the specialization dictionary for use in other components
+export { SPECIALIZATION_LABELS_ES };
