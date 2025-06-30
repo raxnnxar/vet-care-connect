@@ -108,6 +108,10 @@ const FindVetsScreen = () => {
     performSearch(searchTerm, userLocation, filters);
   };
 
+  const handleSearchBarClick = () => {
+    setIsFiltersOpen(true);
+  };
+
   const handleFiltersApply = (newFilters: SearchFilters) => {
     setFilters(newFilters);
     setIsFiltersOpen(false);
@@ -200,6 +204,19 @@ const FindVetsScreen = () => {
     }
   };
 
+  const removeFilter = (type: 'animals' | 'specialties' | 'priceCategories' | 'minRating', value?: string) => {
+    const newFilters = { ...filters };
+    
+    if (type === 'minRating') {
+      newFilters.minRating = 0;
+    } else if (value) {
+      newFilters[type] = newFilters[type].filter(item => item !== value);
+    }
+    
+    setFilters(newFilters);
+    performSearch(searchTerm, userLocation, newFilters);
+  };
+
   return (
     <LayoutBase
       header={
@@ -226,9 +243,11 @@ const FindVetsScreen = () => {
               <Input
                 type="search"
                 placeholder="Buscar por nombre o especialidad"
-                className="pl-10 pr-4 py-3 w-full rounded-full border border-gray-300 focus:border-[#79D0B8] focus:ring-[#79D0B8]"
+                className="pl-10 pr-4 py-3 w-full rounded-full border border-gray-300 focus:border-[#79D0B8] focus:ring-[#79D0B8] cursor-pointer"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onClick={handleSearchBarClick}
+                readOnly
               />
             </div>
             <Button
@@ -248,23 +267,42 @@ const FindVetsScreen = () => {
             <p className="text-sm text-gray-600 mb-2">Filtros aplicados:</p>
             <div className="flex flex-wrap gap-2">
               {filters.animals.map(animal => (
-                <span key={animal} className="px-2 py-1 bg-[#79D0B8]/20 text-[#79D0B8] rounded-full text-xs">
+                <span 
+                  key={animal} 
+                  className="px-2 py-1 bg-[#79D0B8]/20 text-[#79D0B8] rounded-full text-xs flex items-center gap-1 cursor-pointer"
+                  onClick={() => removeFilter('animals', animal)}
+                >
                   {animal}
+                  <span className="ml-1 hover:bg-[#79D0B8]/30 rounded-full w-4 h-4 flex items-center justify-center text-xs">×</span>
                 </span>
               ))}
               {filters.specialties.map(specialty => (
-                <span key={specialty} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                <span 
+                  key={specialty} 
+                  className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center gap-1 cursor-pointer"
+                  onClick={() => removeFilter('specialties', specialty)}
+                >
                   {specialty}
+                  <span className="ml-1 hover:bg-blue-200 rounded-full w-4 h-4 flex items-center justify-center text-xs">×</span>
                 </span>
               ))}
               {filters.priceCategories.map(price => (
-                <span key={price} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                <span 
+                  key={price} 
+                  className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs flex items-center gap-1 cursor-pointer"
+                  onClick={() => removeFilter('priceCategories', price)}
+                >
                   {getPriceSymbol(price)}
+                  <span className="ml-1 hover:bg-green-200 rounded-full w-4 h-4 flex items-center justify-center text-xs">×</span>
                 </span>
               ))}
               {filters.minRating > 0 && (
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                <span 
+                  className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs flex items-center gap-1 cursor-pointer"
+                  onClick={() => removeFilter('minRating')}
+                >
                   ⭐ {filters.minRating}+
+                  <span className="ml-1 hover:bg-yellow-200 rounded-full w-4 h-4 flex items-center justify-center text-xs">×</span>
                 </span>
               )}
             </div>
