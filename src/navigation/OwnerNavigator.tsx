@@ -53,6 +53,9 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.TREATMENTS} element={<TreatmentsScreen />} />
       
+      {/* Global Find Vets Screen - accessible from anywhere */}
+      <Route path="/find-vets" element={<FindVetsScreen />} />
+      
       <Route path="/groomers/:id" element={<GroomingDetailScreen />} />
       <Route path="/groomers/:id/review" element={<GroomingReviewScreen />} />
       
