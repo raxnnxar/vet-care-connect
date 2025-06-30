@@ -51,8 +51,7 @@ const AppNavigator = () => {
         location.pathname.includes('/find-vets') ||
         location.pathname.includes('/vets/') ||
         location.pathname.includes('/notifications') ||
-        location.pathname.includes('/settings') ||
-        location.pathname === '/owner/search-vet' // Specifically handle the search vet route
+        location.pathname.includes('/settings')
       ) {
         console.log('User is on a specific screen, allowing completion of flow');
         return;
