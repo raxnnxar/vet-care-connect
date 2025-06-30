@@ -5,7 +5,7 @@ import { ArrowLeft, Search, Filter } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
 import VetCard from '@/features/health/components/VetCard';
-import VetFiltersModal from '@/features/vets/components/VetFiltersModal';
+import VetFiltersModal, { animalsMap, specMap } from '@/features/vets/components/VetFiltersModal';
 import ActiveFiltersChips from '@/features/vets/components/ActiveFiltersChips';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -97,13 +97,26 @@ const SearchVetScreen = () => {
     setError(null);
     
     try {
+      // Convertir filtros de español a inglés para la base de datos
+      const apiAnimals = filters.animals.map(animal => animalsMap[animal]).filter(Boolean);
+      const apiSpecialties = filters.specialties.map(specialty => specMap[specialty]).filter(Boolean);
+      
+      console.log('Searching with filters:', {
+        query: debouncedQuery,
+        apiAnimals,
+        apiSpecialties,
+        priceCategories: filters.priceCategories,
+        minRating: filters.minRating,
+        maxDistanceKm: filters.maxDistanceKm
+      });
+
       // First try using the RPC function for proper search with filters
       const { data: rpcData, error: rpcError } = await supabase.rpc('search_veterinarians', {
         p_lat: userLocation.lat,
         p_lon: userLocation.lon,
         p_query: debouncedQuery || null,
-        p_animals: filters.animals.length > 0 ? filters.animals : null,
-        p_specialties: filters.specialties.length > 0 ? filters.specialties : null,
+        p_animals: apiAnimals.length > 0 ? apiAnimals : null,
+        p_specialties: apiSpecialties.length > 0 ? apiSpecialties : null,
         p_price_cat: filters.priceCategories.length > 0 ? filters.priceCategories : null,
         p_rating_min: filters.minRating > 0 ? filters.minRating : null,
         p_max_dist_m: filters.maxDistanceKm < 20 ? filters.maxDistanceKm * 1000 : null,
@@ -127,12 +140,12 @@ const SearchVetScreen = () => {
 
       // Transform data to match SearchVet interface
       const transformedVets: SearchVet[] = (data || []).map((vet: any) => {
-        const fullName = `Dr. ${vet.id.substring(0, 8)}`;
-        const nameParts = fullName.split(' ');
+        const displayName = vet.display_name || `Dr. ${vet.id.substring(0, 8)}`;
+        const nameParts = displayName.split(' ');
         
         return {
           id: vet.id,
-          name: fullName,
+          name: displayName,
           firstName: nameParts[0] || 'Dr.',
           lastName: nameParts.slice(1).join(' ') || vet.id.substring(0, 8),
           specialization: Array.isArray(vet.specialization) ? vet.specialization : [],

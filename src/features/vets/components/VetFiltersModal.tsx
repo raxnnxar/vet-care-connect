@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { X, Star } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
@@ -24,14 +25,46 @@ interface VetFiltersModalProps {
   onApplyFilters: (filters: VetFilters) => void;
 }
 
-const AVAILABLE_ANIMALS = [
-  'Perro', 'Gato', 'Conejo', 'Reptil', 'Ave', 'Roedor', 'Caballo', 'Otro'
-];
+// Mapeos de UI (español) a Base de Datos (inglés)
+const animalsMap: Record<string, string> = {
+  'Perros': 'dog',
+  'Gatos': 'cat',
+  'Aves': 'bird',
+  'Reptiles': 'reptile',
+  'Roedores': 'rodent',
+  'Conejos': 'rabbit',
+  'Peces': 'fish',
+  'Anfibios': 'amphibian',
+  'Exóticos': 'exotic',
+  'Animales de granja': 'farm',
+  'Equinos': 'horse'
+};
 
-const AVAILABLE_SPECIALTIES = [
-  'Medicina General', 'Dermatología', 'Urgencias', 'Cirugía', 'Cardiología', 
-  'Oncología', 'Oftalmología', 'Traumatología', 'Nutrición', 'Comportamiento'
-];
+const specMap: Record<string, string> = {
+  'Medicina general': 'general',
+  'Medicina Interna': 'internal_medicine',
+  'Cirugía': 'surgery',
+  'Dermatología': 'dermatology',
+  'Oftalmología': 'ophthalmology',
+  'Odontología': 'dentistry',
+  'Anestesiología': 'anesthesiology',
+  'Oncología': 'oncology',
+  'Cardiología': 'cardiology',
+  'Neurología': 'neurology',
+  'Medicina de Animales Exóticos': 'exotic_animals',
+  'Medicina de Animales Grandes': 'large_animals',
+  'Emergencias y Cuidados Críticos': 'emergency',
+  'Rehabilitación y Fisioterapia': 'rehabilitation',
+  'Etología': 'behavior',
+  'Patología': 'pathology',
+  'Medicina deportiva para animales': 'sports_medicine',
+  'Nutriología': 'nutrition',
+  'Medicina preventiva y bienestar animal': 'preventive'
+};
+
+// Listas disponibles para la UI
+const AVAILABLE_ANIMALS = Object.keys(animalsMap);
+const AVAILABLE_SPECIALTIES = Object.keys(specMap);
 
 const PRICE_CATEGORIES = [
   { value: '$', label: 'Económico ($)' },
@@ -100,7 +133,7 @@ const VetFiltersModal: React.FC<VetFiltersModalProps> = ({
       {/* Animals Section */}
       <div>
         <h3 className="font-medium mb-3 text-[#1F2937]">Animales que trata</h3>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {AVAILABLE_ANIMALS.map((animal) => (
             <div key={animal} className="flex items-center space-x-2">
               <Checkbox
@@ -122,7 +155,7 @@ const VetFiltersModal: React.FC<VetFiltersModalProps> = ({
       {/* Specialties Section */}
       <div>
         <h3 className="font-medium mb-3 text-[#1F2937]">Especialidades</h3>
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
           {AVAILABLE_SPECIALTIES.map((specialty) => (
             <div key={specialty} className="flex items-center space-x-2">
               <Checkbox
@@ -243,4 +276,6 @@ const VetFiltersModal: React.FC<VetFiltersModalProps> = ({
   );
 };
 
+// Exportar los mapeos para uso en otros componentes
+export { animalsMap, specMap };
 export default VetFiltersModal;

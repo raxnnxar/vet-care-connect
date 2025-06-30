@@ -1323,38 +1323,13 @@ export type Database = {
           categoria_precio: string | null
           clinic_latitude: number | null
           clinic_longitude: number | null
+          display_name: string | null
           emergency_services: boolean | null
           id: string | null
           precio_promedio: number | null
           profile_image_url: string | null
           specialization: Json | null
           total_reviews: number | null
-        }
-        Insert: {
-          animals_treated?: Json | null
-          average_rating?: number | null
-          categoria_precio?: never
-          clinic_latitude?: number | null
-          clinic_longitude?: number | null
-          emergency_services?: boolean | null
-          id?: string | null
-          precio_promedio?: never
-          profile_image_url?: string | null
-          specialization?: Json | null
-          total_reviews?: number | null
-        }
-        Update: {
-          animals_treated?: Json | null
-          average_rating?: number | null
-          categoria_precio?: never
-          clinic_latitude?: number | null
-          clinic_longitude?: number | null
-          emergency_services?: boolean | null
-          id?: string | null
-          precio_promedio?: never
-          profile_image_url?: string | null
-          specialization?: Json | null
-          total_reviews?: number | null
         }
         Relationships: [
           {
@@ -1411,6 +1386,7 @@ export type Database = {
           categoria_precio: string | null
           clinic_latitude: number | null
           clinic_longitude: number | null
+          display_name: string | null
           emergency_services: boolean | null
           id: string | null
           precio_promedio: number | null
