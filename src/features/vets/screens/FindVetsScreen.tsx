@@ -12,14 +12,15 @@ import { getUserLocation, calculateDistance } from '@/utils/distanceUtils';
 import { toast } from 'sonner';
 import FindVetsFiltersModal from '../components/FindVetsFiltersModal';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
+import { Json } from '@/integrations/supabase/types';
 
 interface VetSearchResult {
   id: string;
   profile_image_url?: string;
   average_rating: number;
   total_reviews: number;
-  specialization: string[];
-  animals_treated: string[];
+  specialization: Json;
+  animals_treated: Json;
   categoria_precio: string;
   clinic_latitude: number;
   clinic_longitude: number;
@@ -131,30 +132,54 @@ const FindVetsScreen = () => {
     );
   };
 
-  const formatSpecialization = (specializations: string[]) => {
-    if (!specializations || specializations.length === 0) {
+  const formatSpecialization = (specializations: Json) => {
+    if (!specializations) {
       return "MEDICINA GENERAL";
     }
     
-    const primary = specializations[0].toUpperCase();
+    // Handle Json type - could be string[] or string
+    let specArray: string[] = [];
+    if (Array.isArray(specializations)) {
+      specArray = specializations as string[];
+    } else if (typeof specializations === 'string') {
+      specArray = [specializations];
+    }
     
-    if (specializations.length > 1) {
-      return `${primary} +${specializations.length - 1}`;
+    if (specArray.length === 0) {
+      return "MEDICINA GENERAL";
+    }
+    
+    const primary = specArray[0].toUpperCase();
+    
+    if (specArray.length > 1) {
+      return `${primary} +${specArray.length - 1}`;
     }
     
     return primary;
   };
 
-  const formatAnimalsTreated = (animals: string[]) => {
-    if (!animals || animals.length === 0) {
+  const formatAnimalsTreated = (animals: Json) => {
+    if (!animals) {
       return "Trata: Animales domésticos";
     }
     
-    if (animals.length <= 2) {
-      return `Trata: ${animals.join(', ')}`;
+    // Handle Json type - could be string[] or string
+    let animalsArray: string[] = [];
+    if (Array.isArray(animals)) {
+      animalsArray = animals as string[];
+    } else if (typeof animals === 'string') {
+      animalsArray = [animals];
     }
     
-    return `Trata: ${animals[0]}, ${animals[1]} +${animals.length - 2}`;
+    if (animalsArray.length === 0) {
+      return "Trata: Animales domésticos";
+    }
+    
+    if (animalsArray.length <= 2) {
+      return `Trata: ${animalsArray.join(', ')}`;
+    }
+    
+    return `Trata: ${animalsArray[0]}, ${animalsArray[1]} +${animalsArray.length - 2}`;
   };
 
   const getInitials = (name: string) => {
