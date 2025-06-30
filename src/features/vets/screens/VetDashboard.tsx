@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { ArrowRight } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
 import { format, addDays, startOfWeek, endOfWeek, addWeeks, subWeeks, startOfDay } from 'date-fns';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getVetAppointments, getVetAppointmentsByDate, getVetAppointmentDates, Appointment } from '../api/vetAppointmentsApi';
 import { toast } from 'sonner';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
@@ -18,6 +20,7 @@ const VetDashboard: React.FC = () => {
   const [weeks, setWeeks] = useState<Date[][]>([]);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(5);
   const { user } = useSelector((state: any) => state.auth);
+  const navigate = useNavigate();
   
   // State for appointments
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -128,6 +131,10 @@ const VetDashboard: React.FC = () => {
     setSelectedDate(date);
   };
 
+  const handleViewHistory = () => {
+    navigate('/vet/historial-citas');
+  };
+
   return (
     <LayoutBase
       header={<VetSearchHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
@@ -158,7 +165,7 @@ const VetDashboard: React.FC = () => {
         {/* Appointment History Section */}
         <Card 
           className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
-          onClick={() => console.log('Ver historial clicked')}
+          onClick={handleViewHistory}
         >
           <span className="font-medium">Ver historial de citas</span>
           <ArrowRight size={20} className="text-gray-500" />
