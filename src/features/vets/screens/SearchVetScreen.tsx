@@ -5,6 +5,8 @@ import { ArrowLeft, Search, Filter } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
 import VetCard from '@/features/health/components/VetCard';
+import VetFiltersModal from '@/features/vets/components/VetFiltersModal';
+import ActiveFiltersChips from '@/features/vets/components/ActiveFiltersChips';
 import LoadingSpinner from '@/frontend/ui/components/LoadingSpinner';
 import { useDebounce } from '@/hooks/use-debounce';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +31,22 @@ interface SearchVet {
   animalsTreated: string[];
 }
 
+interface VetFilters {
+  animals: string[];
+  specialties: string[];
+  priceCategories: string[];
+  minRating: number;
+  maxDistanceKm: number;
+}
+
+const defaultFilters: VetFilters = {
+  animals: [],
+  specialties: [],
+  priceCategories: [],
+  minRating: 0,
+  maxDistanceKm: 20
+};
+
 const SearchVetScreen = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -37,6 +55,8 @@ const SearchVetScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [filters, setFilters] = useState<VetFilters>(defaultFilters);
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
 
   const debouncedQuery = useDebounce(query, 300);
 
@@ -77,11 +97,16 @@ const SearchVetScreen = () => {
     setError(null);
     
     try {
-      // First try using the RPC function for proper search
+      // First try using the RPC function for proper search with filters
       const { data: rpcData, error: rpcError } = await supabase.rpc('search_veterinarians', {
         p_lat: userLocation.lat,
         p_lon: userLocation.lon,
         p_query: debouncedQuery || null,
+        p_animals: filters.animals.length > 0 ? filters.animals : null,
+        p_specialties: filters.specialties.length > 0 ? filters.specialties : null,
+        p_price_cat: filters.priceCategories.length > 0 ? filters.priceCategories : null,
+        p_rating_min: filters.minRating > 0 ? filters.minRating : null,
+        p_max_dist_m: filters.maxDistanceKm < 20 ? filters.maxDistanceKm * 1000 : null,
         p_limit: 20,
         p_offset: 0
       });
@@ -114,7 +139,7 @@ const SearchVetScreen = () => {
           imageUrl: vet.profile_image_url || '/placeholder.svg',
           rating: vet.average_rating || 0,
           reviewCount: vet.total_reviews || 0,
-          distance: userLocation ? '1.2 km' : 'N/A', // Calculate real distance if needed
+          distance: userLocation ? '1.2 km' : 'N/A',
           clinic: 'Clínica Veterinaria',
           address: 'Dirección de la clínica',
           availableDays: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
@@ -137,9 +162,9 @@ const SearchVetScreen = () => {
     } finally {
       setLoading(false);
     }
-  }, [userLocation, debouncedQuery, toast]);
+  }, [userLocation, debouncedQuery, filters, toast]);
 
-  // Search when location is available and query changes
+  // Search when location is available and query/filters change
   useEffect(() => {
     if (userLocation) {
       searchVets();
@@ -152,6 +177,46 @@ const SearchVetScreen = () => {
 
   const handleVetPress = (vetId: string) => {
     navigate(`/owner/vets/${vetId}`);
+  };
+
+  const handleApplyFilters = (newFilters: VetFilters) => {
+    setFilters(newFilters);
+  };
+
+  const handleRemoveFilter = (filterType: string, value?: string) => {
+    setFilters(prev => {
+      const newFilters = { ...prev };
+      
+      switch (filterType) {
+        case 'animals':
+          if (value) {
+            newFilters.animals = prev.animals.filter(a => a !== value);
+          }
+          break;
+        case 'specialties':
+          if (value) {
+            newFilters.specialties = prev.specialties.filter(s => s !== value);
+          }
+          break;
+        case 'priceCategories':
+          if (value) {
+            newFilters.priceCategories = prev.priceCategories.filter(c => c !== value);
+          }
+          break;
+        case 'minRating':
+          newFilters.minRating = 0;
+          break;
+        case 'maxDistanceKm':
+          newFilters.maxDistanceKm = 20;
+          break;
+      }
+      
+      return newFilters;
+    });
+  };
+
+  const handleClearAllFilters = () => {
+    setFilters(defaultFilters);
   };
 
   return (
@@ -181,11 +246,19 @@ const SearchVetScreen = () => {
             variant="ghost"
             size="sm"
             className="p-2"
+            onClick={() => setShowFiltersModal(true)}
           >
             <Filter className="h-5 w-5 text-gray-600" />
           </Button>
         </div>
       </div>
+
+      {/* Active filters chips */}
+      <ActiveFiltersChips
+        filters={filters}
+        onRemoveFilter={handleRemoveFilter}
+        onClearAll={handleClearAllFilters}
+      />
 
       {/* Content */}
       <div className="flex-1 px-4 py-4 overflow-auto">
@@ -225,6 +298,14 @@ const SearchVetScreen = () => {
           </div>
         )}
       </div>
+
+      {/* Filters Modal */}
+      <VetFiltersModal
+        open={showFiltersModal}
+        onClose={() => setShowFiltersModal(false)}
+        filters={filters}
+        onApplyFilters={handleApplyFilters}
+      />
     </div>
   );
 };
