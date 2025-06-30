@@ -3,6 +3,7 @@ import React from 'react';
 import { Star, MapPin } from 'lucide-react';
 import { Card } from '@/ui/molecules/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/ui/atoms/avatar';
+import { calculateDistance, translateAnimals } from '@/utils/distanceUtils';
 
 interface VetCardProps {
   vet: {
@@ -14,13 +15,17 @@ interface VetCardProps {
     imageUrl: string;
     rating: number;
     reviewCount: number;
-    distance: string;
+    distance?: string;
     animalsTreated: string[];
+    // Add these properties for distance calculation
+    clinic_latitude?: number | null;
+    clinic_longitude?: number | null;
   };
   onClick: (vetId: string) => void;
+  userLocation?: { lat: number; lon: number } | null;
 }
 
-const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
+const VetCard: React.FC<VetCardProps> = ({ vet, onClick, userLocation }) => {
   // Format specialization to display in uppercase with +X for additional ones
   const formatSpecialization = () => {
     if (!vet.specialization || vet.specialization.length === 0) {
@@ -36,17 +41,32 @@ const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
     return primary;
   };
   
-  // Format animals treated
+  // Format animals treated using translation
   const formatAnimalsTreated = () => {
     if (!vet.animalsTreated || vet.animalsTreated.length === 0) {
-      return "Trata: Animales domésticos";
+      return "Trata: Información no disponible";
     }
     
-    if (vet.animalsTreated.length <= 2) {
-      return `Trata: ${vet.animalsTreated.join(', ')}`;
+    const translatedAnimals = translateAnimals(vet.animalsTreated);
+    return `Trata: ${translatedAnimals}`;
+  };
+  
+  // Calculate real distance
+  const getDistance = () => {
+    if (vet.distance) {
+      return vet.distance; // Use provided distance if available
     }
     
-    return `Trata: ${vet.animalsTreated[0]}, ${vet.animalsTreated[1]} +${vet.animalsTreated.length - 2}`;
+    if (userLocation && vet.clinic_latitude && vet.clinic_longitude) {
+      return calculateDistance(
+        userLocation.lat,
+        userLocation.lon,
+        vet.clinic_latitude,
+        vet.clinic_longitude
+      );
+    }
+    
+    return "Ubicación no disponible";
   };
   
   // Generate initials for the avatar
@@ -81,7 +101,7 @@ const VetCard: React.FC<VetCardProps> = ({ vet, onClick }) => {
           <span className="ml-1 text-xs text-gray-500">({vet.reviewCount} reseñas)</span>
           <div className="ml-auto flex items-center text-xs text-gray-500">
             <MapPin className="w-3 h-3 mr-1" />
-            {vet.distance}
+            {getDistance()}
           </div>
         </div>
       </div>

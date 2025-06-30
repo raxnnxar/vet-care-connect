@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Filter } from 'lucide-react';
@@ -29,6 +28,8 @@ interface SearchVet {
   phone: string;
   emergencyServices: boolean;
   animalsTreated: string[];
+  clinic_latitude?: number | null;
+  clinic_longitude?: number | null;
 }
 
 interface VetFilters {
@@ -152,14 +153,16 @@ const SearchVetScreen = () => {
           imageUrl: vet.profile_image_url || '/placeholder.svg',
           rating: vet.average_rating || 0,
           reviewCount: vet.total_reviews || 0,
-          distance: userLocation ? '1.2 km' : 'N/A',
+          distance: '', // Will be calculated in VetCard component
           clinic: 'Clínica Veterinaria',
           address: 'Dirección de la clínica',
           availableDays: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
           description: 'Veterinario especializado en el cuidado de mascotas',
           phone: '+52 55 1234 5678',
           emergencyServices: vet.emergency_services || false,
-          animalsTreated: Array.isArray(vet.animals_treated) ? vet.animals_treated : []
+          animalsTreated: Array.isArray(vet.animals_treated) ? vet.animals_treated : [],
+          clinic_latitude: vet.clinic_latitude,
+          clinic_longitude: vet.clinic_longitude
         };
       });
 
@@ -306,6 +309,7 @@ const SearchVetScreen = () => {
                 key={vet.id}
                 vet={vet}
                 onClick={() => handleVetPress(vet.id)}
+                userLocation={userLocation}
               />
             ))}
           </div>

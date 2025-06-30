@@ -2,25 +2,11 @@
 import React from 'react';
 import { PawPrint, Dog, Cat } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/molecules/card';
+import { animalTranslationMap } from '@/utils/distanceUtils';
 
 interface VetAnimalsTreatedSectionProps {
   animals: string[];
 }
-
-// Map for translating animal types to Spanish with proper capitalization
-const animalTranslations: Record<string, string> = {
-  'dog': 'Perro',
-  'cat': 'Gato',
-  'bird': 'Ave',
-  'rabbit': 'Conejo',
-  'rodent': 'Roedor',
-  'reptile': 'Reptil',
-  'fish': 'Pez',
-  'horse': 'Caballo',
-  'exotic': 'Exótico',
-  'farm_animals': 'Animales de Granja',
-  'small_mammals': 'Pequeños Mamíferos'
-};
 
 // Function to get the appropriate icon for each animal
 const AnimalIcon = ({ animalType }: { animalType: string }) => {
@@ -39,9 +25,9 @@ const VetAnimalsTreatedSection: React.FC<VetAnimalsTreatedSectionProps> = ({ ani
     return null;
   }
   
-  // Translate animal types
+  // Translate animal types using the centralized map
   const translatedAnimals = animals.map(animal => 
-    animalTranslations[animal.toLowerCase()] || animal
+    animalTranslationMap[animal.toLowerCase()] || animal
   );
 
   return (
@@ -63,7 +49,7 @@ const VetAnimalsTreatedSection: React.FC<VetAnimalsTreatedSectionProps> = ({ ani
                 <AnimalIcon animalType={animal} />
               </div>
               <span className="text-center text-sm font-medium">
-                {animalTranslations[animal.toLowerCase()] || animal}
+                {animalTranslationMap[animal.toLowerCase()] || animal}
               </span>
             </div>
           ))}

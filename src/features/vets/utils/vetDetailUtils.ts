@@ -1,4 +1,6 @@
 
+import { animalTranslationMap } from '@/utils/distanceUtils';
+
 // Helper function to translate specialization to human-readable format
 export const translateSpecialization = (spec: string): string => {
   const translations: Record<string, string> = {
@@ -22,31 +24,20 @@ export const translateSpecialization = (spec: string): string => {
   return translations[spec.toLowerCase()] || spec;
 };
 
-// Helper function to format animals treated 
+// Helper function to format animals treated using centralized translation
 export const formatAnimalsTreated = (animals: string[]) => {
   if (!animals || animals.length === 0) {
-    return "Animales domésticos";
+    return "Información no disponible";
   }
   
-  const translateAnimal = (animal: string): string => {
-    const translations: Record<string, string> = {
-      'dog': 'Perros',
-      'cat': 'Gatos',
-      'bird': 'Aves',
-      'rabbit': 'Conejos',
-      'rodent': 'Roedores',
-      'reptile': 'Reptiles',
-      'fish': 'Peces',
-      'horse': 'Caballos',
-      'exotic': 'Exóticos',
-      'farm_animals': 'Animales de Granja',
-      'small_mammals': 'Pequeños Mamíferos'
-    };
-    
-    return translations[animal.toLowerCase()] || animal;
-  };
+  const translatedAnimals = animals
+    .map(animal => animalTranslationMap[animal.toLowerCase()] || animal)
+    .filter(Boolean);
   
-  const translatedAnimals = animals.map(translateAnimal);
+  if (translatedAnimals.length === 0) {
+    return "Información no disponible";
+  }
+  
   return translatedAnimals.join(', ');
 };
 

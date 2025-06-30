@@ -71,3 +71,41 @@ export const getUserLocation = (): Promise<{ latitude: number; longitude: number
     );
   });
 };
+
+/**
+ * Translation map for animal types from English (DB) to Spanish (UI)
+ */
+export const animalTranslationMap: Record<string, string> = {
+  'dog': 'Perro',
+  'cat': 'Gato',
+  'bird': 'Ave',
+  'reptile': 'Reptil',
+  'rodent': 'Roedor',
+  'rabbit': 'Conejo',
+  'fish': 'Pez',
+  'amphibian': 'Anfibio',
+  'exotic': 'Exótico',
+  'farm': 'Animales de granja',
+  'horse': 'Equino'
+};
+
+/**
+ * Translate animal types from English to Spanish
+ * @param animals Array of animal types in English
+ * @returns Formatted string with animals in Spanish
+ */
+export const translateAnimals = (animals: string[]): string => {
+  if (!animals || animals.length === 0) {
+    return "Información no disponible";
+  }
+
+  const translatedAnimals = animals
+    .map(animal => animalTranslationMap[animal.toLowerCase()] || animal)
+    .filter(Boolean);
+
+  if (translatedAnimals.length === 0) {
+    return "Información no disponible";
+  }
+
+  return translatedAnimals.join(', ');
+};
