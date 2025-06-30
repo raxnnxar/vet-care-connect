@@ -41,7 +41,8 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.CHATS} element={<ChatsScreen />} />
       <Route path={OWNER_ROUTES.INDIVIDUAL_CHAT} element={<IndividualChatScreen />} />
       <Route path={OWNER_ROUTES.FIND_VETS} element={<FindVetsScreen />} />
-      <Route path="/owner/search-vet" element={<SearchVetScreen />} />
+      {/* FIXED: Ensure search-vet route is mapped correctly */}
+      <Route path="search-vet" element={<SearchVetScreen />} />
       <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
       <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />
       <Route path="/pets/:id" element={<PetDetailScreen />} />

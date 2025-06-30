@@ -36,44 +36,10 @@ const SearchVetScreen = () => {
   const [vets, setVets] = useState<SearchVet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
 
   const debouncedQuery = useDebounce(query, 300);
 
-  // Get user location on mount
-  useEffect(() => {
-    const getUserLocation = async () => {
-      try {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              setUserLocation({
-                lat: position.coords.latitude,
-                lon: position.coords.longitude
-              });
-            },
-            (error) => {
-              console.warn('Location access denied:', error);
-              // Use default location if geolocation fails
-              setUserLocation({ lat: 19.4326, lon: -99.1332 }); // Mexico City default
-            }
-          );
-        } else {
-          setUserLocation({ lat: 19.4326, lon: -99.1332 }); // Mexico City default
-        }
-      } catch (error) {
-        console.warn('Geolocation not supported:', error);
-        setUserLocation({ lat: 19.4326, lon: -99.1332 }); // Mexico City default
-      }
-    };
-
-    getUserLocation();
-  }, []);
-
-  // Search function
   const searchVets = useCallback(async () => {
-    if (!userLocation) return;
-
     setLoading(true);
     setError(null);
     
@@ -89,14 +55,14 @@ const SearchVetScreen = () => {
 
       // Transform data to match SearchVet interface
       const transformedVets: SearchVet[] = (data || []).map((vet: any) => {
-        const fullName = `Dr. Veterinario ${vet.id.substring(0, 8)}`;
+        const fullName = `Dr. ${vet.id.substring(0, 8)}`;
         const nameParts = fullName.split(' ');
         
         return {
           id: vet.id,
           name: fullName,
           firstName: nameParts[0] || 'Dr.',
-          lastName: nameParts.slice(1).join(' ') || `Veterinario ${vet.id.substring(0, 8)}`,
+          lastName: nameParts.slice(1).join(' ') || vet.id.substring(0, 8),
           specialization: Array.isArray(vet.specialization) ? vet.specialization : [],
           imageUrl: vet.profile_image_url || '/placeholder.svg',
           rating: vet.average_rating || 0,
@@ -124,14 +90,12 @@ const SearchVetScreen = () => {
     } finally {
       setLoading(false);
     }
-  }, [userLocation, toast]);
+  }, [toast]);
 
   // Search when component mounts or query changes
   useEffect(() => {
-    if (userLocation) {
-      searchVets();
-    }
-  }, [userLocation, debouncedQuery, searchVets]);
+    searchVets();
+  }, [debouncedQuery, searchVets]);
 
   const handleBackPress = () => {
     navigate('/owner/salud');

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -49,6 +48,7 @@ const AppNavigator = () => {
         location.pathname.includes('/agenda') ||
         location.pathname.includes('/pets') ||
         location.pathname.includes('/find-vets') ||
+        location.pathname.includes('/search-vet') || // FIXED: Added search-vet to exclusion
         location.pathname.includes('/vets/') ||
         location.pathname.includes('/notifications') ||
         location.pathname.includes('/settings')
