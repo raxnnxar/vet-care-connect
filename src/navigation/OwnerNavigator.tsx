@@ -25,7 +25,6 @@ import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScre
 import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import TreatmentsScreen from '@/features/treatments/screens/TreatmentsScreen';
-import SearchVetsScreen from '@/features/vets/screens/SearchVetsScreen';
 
 const OwnerNavigator: React.FC = () => {
   return (
@@ -53,12 +52,6 @@ const OwnerNavigator: React.FC = () => {
       <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />
       <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
       <Route path={OWNER_ROUTES.TREATMENTS} element={<TreatmentsScreen />} />
-      
-      {/* Search Vets Route - accessible from SaludScreen */}
-      <Route path="/search-vets" element={<SearchVetsScreen />} />
-      
-      {/* Global Find Vets Screen - accessible from anywhere */}
-      <Route path="/find-vets" element={<FindVetsScreen />} />
       
       <Route path="/groomers/:id" element={<GroomingDetailScreen />} />
       <Route path="/groomers/:id/review" element={<GroomingReviewScreen />} />

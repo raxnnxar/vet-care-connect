@@ -466,24 +466,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_primary_grooming"
-            columns: ["primary_grooming_id"]
-            isOneToOne: false
-            referencedRelation: "v_pet_grooming_search"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "pet_owners_id_fkey"
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pet_owners_primary_vet_id_fkey"
-            columns: ["primary_vet_id"]
-            isOneToOne: false
-            referencedRelation: "v_veterinarians_search"
             referencedColumns: ["id"]
           },
           {
@@ -608,20 +594,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pets_primary_grooming_id_fkey"
-            columns: ["primary_grooming_id"]
-            isOneToOne: false
-            referencedRelation: "v_pet_grooming_search"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pets_primary_vet_id_fkey"
-            columns: ["primary_vet_id"]
-            isOneToOne: false
-            referencedRelation: "v_veterinarians_search"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "pets_primary_vet_id_fkey"
             columns: ["primary_vet_id"]
             isOneToOne: false
@@ -694,20 +666,6 @@ export type Database = {
             columns: ["grooming_id"]
             isOneToOne: false
             referencedRelation: "pet_grooming"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_grooming_id_fkey"
-            columns: ["grooming_id"]
-            isOneToOne: false
-            referencedRelation: "v_pet_grooming_search"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_veterinarian_id_fkey"
-            columns: ["veterinarian_id"]
-            isOneToOne: false
-            referencedRelation: "v_veterinarians_search"
             referencedColumns: ["id"]
           },
           {
@@ -801,13 +759,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "treatment_cases_veterinarian_id_fkey"
-            columns: ["veterinarian_id"]
-            isOneToOne: false
-            referencedRelation: "v_veterinarians_search"
             referencedColumns: ["id"]
           },
           {
@@ -1017,13 +968,6 @@ export type Database = {
             foreignKeyName: "vet_medical_records_veterinarian_id_fkey"
             columns: ["veterinarian_id"]
             isOneToOne: false
-            referencedRelation: "v_veterinarians_search"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vet_medical_records_veterinarian_id_fkey"
-            columns: ["veterinarian_id"]
-            isOneToOne: false
             referencedRelation: "veterinarians"
             referencedColumns: ["id"]
           },
@@ -1058,13 +1002,6 @@ export type Database = {
           veterinarian_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "vet_personal_notes_veterinarian_id_fkey"
-            columns: ["veterinarian_id"]
-            isOneToOne: false
-            referencedRelation: "v_veterinarians_search"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "vet_personal_notes_veterinarian_id_fkey"
             columns: ["veterinarian_id"]
@@ -1105,13 +1042,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vet_pet_notes_veterinarian_id_fkey"
-            columns: ["veterinarian_id"]
-            isOneToOne: false
-            referencedRelation: "v_veterinarians_search"
             referencedColumns: ["id"]
           },
           {
@@ -1213,53 +1143,6 @@ export type Database = {
         }
         Relationships: []
       }
-      v_pet_grooming_search: {
-        Row: {
-          animals_accepted: Json | null
-          average_rating: number | null
-          business_name: string | null
-          categoria_precio: string | null
-          id: string | null
-          latitude: number | null
-          longitude: number | null
-          precio_promedio: number | null
-          profile_image_url: string | null
-          total_reviews: number | null
-        }
-        Insert: {
-          animals_accepted?: Json | null
-          average_rating?: number | null
-          business_name?: string | null
-          categoria_precio?: never
-          id?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          precio_promedio?: never
-          profile_image_url?: string | null
-          total_reviews?: number | null
-        }
-        Update: {
-          animals_accepted?: Json | null
-          average_rating?: number | null
-          business_name?: string | null
-          categoria_precio?: never
-          id?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          precio_promedio?: never
-          profile_image_url?: string | null
-          total_reviews?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pet_grooming_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "service_providers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       v_treatment_medications: {
         Row: {
           created_at: string | null
@@ -1316,56 +1199,6 @@ export type Database = {
           },
         ]
       }
-      v_veterinarians_search: {
-        Row: {
-          animals_treated: Json | null
-          average_rating: number | null
-          categoria_precio: string | null
-          clinic_latitude: number | null
-          clinic_longitude: number | null
-          emergency_services: boolean | null
-          id: string | null
-          precio_promedio: number | null
-          profile_image_url: string | null
-          specialization: Json | null
-          total_reviews: number | null
-        }
-        Insert: {
-          animals_treated?: Json | null
-          average_rating?: number | null
-          categoria_precio?: never
-          clinic_latitude?: number | null
-          clinic_longitude?: number | null
-          emergency_services?: boolean | null
-          id?: string | null
-          precio_promedio?: never
-          profile_image_url?: string | null
-          specialization?: Json | null
-          total_reviews?: number | null
-        }
-        Update: {
-          animals_treated?: Json | null
-          average_rating?: number | null
-          categoria_precio?: never
-          clinic_latitude?: number | null
-          clinic_longitude?: number | null
-          emergency_services?: boolean | null
-          id?: string | null
-          precio_promedio?: never
-          profile_image_url?: string | null
-          specialization?: Json | null
-          total_reviews?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "veterinarians_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "service_providers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Functions: {
       create_pet_grooming: {
@@ -1387,37 +1220,6 @@ export type Database = {
       get_or_create_conversation: {
         Args: { user1_uuid: string; user2_uuid: string }
         Returns: string
-      }
-      haversine_m: {
-        Args: { lat1: number; lon1: number; lat2: number; lon2: number }
-        Returns: number
-      }
-      search_veterinarians: {
-        Args: {
-          p_lat: number
-          p_lon: number
-          p_query?: string
-          p_animals?: string[]
-          p_specialties?: string[]
-          p_price_cat?: string[]
-          p_rating_min?: number
-          p_max_dist_m?: number
-          p_limit?: number
-          p_offset?: number
-        }
-        Returns: {
-          animals_treated: Json | null
-          average_rating: number | null
-          categoria_precio: string | null
-          clinic_latitude: number | null
-          clinic_longitude: number | null
-          emergency_services: boolean | null
-          id: string | null
-          precio_promedio: number | null
-          profile_image_url: string | null
-          specialization: Json | null
-          total_reviews: number | null
-        }[]
       }
       send_message: {
         Args: {
