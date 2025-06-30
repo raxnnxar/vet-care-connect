@@ -36,21 +36,68 @@ const SearchVetScreen = () => {
   const [vets, setVets] = useState<SearchVet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
 
   const debouncedQuery = useDebounce(query, 300);
 
+  // Get user location on mount
+  useEffect(() => {
+    const getUserLocation = async () => {
+      try {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              setUserLocation({
+                lat: position.coords.latitude,
+                lon: position.coords.longitude
+              });
+            },
+            (error) => {
+              console.warn('Location access denied:', error);
+              // Use default location if geolocation fails (Mexico City)
+              setUserLocation({ lat: 19.4326, lon: -99.1332 });
+            }
+          );
+        } else {
+          setUserLocation({ lat: 19.4326, lon: -99.1332 });
+        }
+      } catch (error) {
+        console.warn('Geolocation not supported:', error);
+        setUserLocation({ lat: 19.4326, lon: -99.1332 });
+      }
+    };
+
+    getUserLocation();
+  }, []);
+
   const searchVets = useCallback(async () => {
+    if (!userLocation) return;
+    
     setLoading(true);
     setError(null);
     
     try {
-      const { data, error: searchError } = await supabase
-        .from('v_veterinarians_search')
-        .select('*')
-        .limit(20);
+      // First try using the RPC function for proper search
+      const { data: rpcData, error: rpcError } = await supabase.rpc('search_veterinarians', {
+        p_lat: userLocation.lat,
+        p_lon: userLocation.lon,
+        p_query: debouncedQuery || null,
+        p_limit: 20,
+        p_offset: 0
+      });
 
-      if (searchError) {
-        throw searchError;
+      let data = rpcData;
+      
+      // If RPC fails, fallback to the view
+      if (rpcError) {
+        console.warn('RPC search failed, falling back to view:', rpcError);
+        const { data: viewData, error: viewError } = await supabase
+          .from('v_veterinarians_search')
+          .select('*')
+          .limit(20);
+          
+        if (viewError) throw viewError;
+        data = viewData;
       }
 
       // Transform data to match SearchVet interface
@@ -67,7 +114,7 @@ const SearchVetScreen = () => {
           imageUrl: vet.profile_image_url || '/placeholder.svg',
           rating: vet.average_rating || 0,
           reviewCount: vet.total_reviews || 0,
-          distance: '1.2 km',
+          distance: userLocation ? '1.2 km' : 'N/A', // Calculate real distance if needed
           clinic: 'Clínica Veterinaria',
           address: 'Dirección de la clínica',
           availableDays: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
@@ -90,12 +137,14 @@ const SearchVetScreen = () => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [userLocation, debouncedQuery, toast]);
 
-  // Search when component mounts or query changes
+  // Search when location is available and query changes
   useEffect(() => {
-    searchVets();
-  }, [debouncedQuery, searchVets]);
+    if (userLocation) {
+      searchVets();
+    }
+  }, [userLocation, searchVets]);
 
   const handleBackPress = () => {
     navigate('/owner/salud');
