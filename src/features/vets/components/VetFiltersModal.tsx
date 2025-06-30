@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { X, Star } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
@@ -8,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/ui/atoms/radio-group';
 import { Checkbox } from '@/ui/atoms/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/molecules/dialog';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/ui/molecules/drawer';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface VetFilters {
   animals: string[];
@@ -46,7 +45,7 @@ const VetFiltersModal: React.FC<VetFiltersModalProps> = ({
   filters,
   onApplyFilters
 }) => {
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [tempFilters, setTempFilters] = useState<VetFilters>(filters);
 
   useEffect(() => {
