@@ -10,22 +10,37 @@ import PetSelector from '../components/PetSelector';
 import VetTabs from '../components/VetTabs';
 import VeterinariansTab from '../components/VeterinariansTab';
 import HospitalesTab from '../components/HospitalesTab';
+import { useVeterinariansData } from '../hooks/useVeterinariansData';
 
 const SaludScreen = () => {
   const [activeTab, setActiveTab] = useState('veterinarios');
+  const [selectedPetId, setSelectedPetId] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
+  const { vets } = useVeterinariansData();
 
   const handleSearchClick = () => {
     navigate('/owner/search-vets');
   };
 
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
+  const handleVetClick = (vetId: string) => {
+    navigate(`/vets/${vetId}`);
+  };
+
+  const handlePetChange = (petId: string) => {
+    setSelectedPetId(petId);
+  };
+
   return (
     <LayoutBase
-      header={<SaludHeader />}
-      footer={<NavbarInferior activeTab="salud" />}
+      header={<SaludHeader onBackClick={handleBackClick} />}
+      footer={<NavbarInferior activeTab="home" />}
     >
       <div className="p-4 pb-20">
-        <PetSelector />
+        <PetSelector selectedPetId={selectedPetId} onPetChange={handlePetChange} />
         
         {/* Search Bar - Now Pressable */}
         <div className="mb-6" onClick={handleSearchClick}>
@@ -52,9 +67,16 @@ const SaludScreen = () => {
           </div>
         </div>
 
-        <VetTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <VetTabs 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab}
+          vets={vets}
+          onVetClick={handleVetClick}
+        />
         
-        {activeTab === 'veterinarios' && <VeterinariansTab />}
+        {activeTab === 'veterinarios' && (
+          <VeterinariansTab vets={vets} onVetClick={handleVetClick} />
+        )}
         {activeTab === 'hospitales' && <HospitalesTab />}
       </div>
     </LayoutBase>
