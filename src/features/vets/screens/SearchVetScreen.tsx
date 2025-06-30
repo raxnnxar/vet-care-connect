@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 interface SearchVet {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
   specialization: string[];
   imageUrl: string;
   rating: number;
@@ -86,22 +88,29 @@ const SearchVetScreen = () => {
       }
 
       // Transform data to match SearchVet interface
-      const transformedVets: SearchVet[] = (data || []).map((vet: any) => ({
-        id: vet.id,
-        name: `Dr. Veterinario ${vet.id.substring(0, 8)}`,
-        specialization: Array.isArray(vet.specialization) ? vet.specialization : [],
-        imageUrl: vet.profile_image_url || '/placeholder.svg',
-        rating: vet.average_rating || 0,
-        reviewCount: vet.total_reviews || 0,
-        distance: '1.2 km',
-        clinic: 'Clínica Veterinaria',
-        address: 'Dirección de la clínica',
-        availableDays: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
-        description: 'Veterinario especializado en el cuidado de mascotas',
-        phone: '+52 55 1234 5678',
-        emergencyServices: vet.emergency_services || false,
-        animalsTreated: Array.isArray(vet.animals_treated) ? vet.animals_treated : []
-      }));
+      const transformedVets: SearchVet[] = (data || []).map((vet: any) => {
+        const fullName = `Dr. Veterinario ${vet.id.substring(0, 8)}`;
+        const nameParts = fullName.split(' ');
+        
+        return {
+          id: vet.id,
+          name: fullName,
+          firstName: nameParts[0] || 'Dr.',
+          lastName: nameParts.slice(1).join(' ') || `Veterinario ${vet.id.substring(0, 8)}`,
+          specialization: Array.isArray(vet.specialization) ? vet.specialization : [],
+          imageUrl: vet.profile_image_url || '/placeholder.svg',
+          rating: vet.average_rating || 0,
+          reviewCount: vet.total_reviews || 0,
+          distance: '1.2 km',
+          clinic: 'Clínica Veterinaria',
+          address: 'Dirección de la clínica',
+          availableDays: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+          description: 'Veterinario especializado en el cuidado de mascotas',
+          phone: '+52 55 1234 5678',
+          emergencyServices: vet.emergency_services || false,
+          animalsTreated: Array.isArray(vet.animals_treated) ? vet.animals_treated : []
+        };
+      });
 
       setVets(transformedVets);
     } catch (err) {
