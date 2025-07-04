@@ -11,7 +11,8 @@ const ServiceCategoryGrid = () => {
       id: 'health',
       title: 'Salud',
       icon: Stethoscope,
-      color: 'bg-gradient-to-r from-blue-400 to-blue-500',
+      backgroundColor: 'bg-orange-50/50',
+      iconColor: 'bg-gradient-to-br from-orange-400 to-orange-500',
       description: 'Veterinarios y urgencias',
       route: '/owner/salud'
     },
@@ -19,7 +20,8 @@ const ServiceCategoryGrid = () => {
       id: 'grooming',
       title: 'Estética',
       icon: Scissors,
-      color: 'bg-gradient-to-r from-purple-400 to-purple-500',
+      backgroundColor: 'bg-purple-50/50',
+      iconColor: 'bg-gradient-to-br from-purple-400 to-purple-500',
       description: 'Servicios de belleza y cuidado',
       route: '/owner/estetica'
     },
@@ -27,7 +29,8 @@ const ServiceCategoryGrid = () => {
       id: 'treatments',
       title: 'Tratamientos',
       icon: Pill,
-      color: 'bg-gradient-to-r from-green-400 to-green-500',
+      backgroundColor: 'bg-blue-50/50',
+      iconColor: 'bg-gradient-to-br from-teal-500 to-teal-600',
       description: 'Gestiona medicación y cuidados',
       route: '/owner/treatments'
     },
@@ -35,7 +38,8 @@ const ServiceCategoryGrid = () => {
       id: 'nearby',
       title: 'Cerca de ti',
       icon: MapPin,
-      color: 'bg-gradient-to-r from-orange-400 to-orange-500',
+      backgroundColor: 'bg-amber-50/50',
+      iconColor: 'bg-gradient-to-br from-amber-400 to-orange-400',
       description: 'Servicios cercanos a tu ubicación',
       route: '/owner/find-vets'
     }
@@ -46,28 +50,40 @@ const ServiceCategoryGrid = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold mb-6 text-gray-800">Servicios</h2>
-      <div className="space-y-3">
+    <div className="space-y-6">
+      {/* Saludo personalizado */}
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          ¡Hola! 🐾
+        </h2>
+        <p className="text-gray-600 text-lg">
+          ¿Qué necesita tu mascota hoy?
+        </p>
+      </div>
+
+      {/* Tarjetas de servicios */}
+      <div className="space-y-4">
         {serviceCategories.map((category) => {
           const IconComponent = category.icon;
           return (
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.route)}
-              className="w-full bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 text-left group hover:scale-[1.02] active:scale-[0.98]"
+              className={`w-full ${category.backgroundColor} rounded-2xl p-6 border border-white/60 hover:shadow-lg hover:shadow-gray-100/80 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] backdrop-blur-sm`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`${category.color} w-12 h-12 rounded-full flex items-center justify-center shadow-sm`}>
-                    <IconComponent className="w-6 h-6 text-white" />
+                <div className="flex items-center space-x-5">
+                  <div className={`${category.iconColor} w-14 h-14 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow`}>
+                    <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800 text-lg mb-1">{category.title}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{category.description}</p>
+                    <h3 className="font-bold text-gray-800 text-xl mb-1.5">{category.title}</h3>
+                    <p className="text-gray-600 text-base leading-relaxed">{category.description}</p>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/60 group-hover:bg-white/80 transition-colors">
+                  <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" strokeWidth={2} />
+                </div>
               </div>
             </button>
           );
