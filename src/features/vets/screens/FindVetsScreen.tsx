@@ -33,18 +33,14 @@ const FindVetsScreen = () => {
             >
               <ArrowLeft size={24} />
             </Button>
-            <h1 className="text-xl font-medium text-white">Todo para tu mascota cerca de ti</h1>
+            <h1 className="text-xl font-medium text-white">Mapa</h1>
           </div>
         </div>
       }
       footer={<NavbarInferior activeTab="home" />}
     >
       <div className="p-4 pb-20">
-        {/* Mapa de veterinarios - movido desde OwnerHomeScreen */}
-        <div className="mb-6">
-          <VeterinariansMap />
-        </div>
-
+        {/* Barra de búsqueda - movida encima del mapa */}
         <form onSubmit={handleSearch} className="mb-6">
           <div className="relative">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -58,9 +54,9 @@ const FindVetsScreen = () => {
           </div>
         </form>
 
-        {/* Placeholder for search results */}
-        <div className="space-y-4">
-          <p className="text-gray-500 text-center my-8">Busca veterinarios cercanos para agendar una cita</p>
+        {/* Mapa de veterinarios */}
+        <div className="mb-6">
+          <VeterinariansMap />
         </div>
       </div>
     </LayoutBase>
