@@ -5,6 +5,7 @@ import { SearchIcon, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/ui/atoms/button';
 import { Input } from '@/ui/atoms/input';
+import VeterinariansMap from '@/features/home/components/VeterinariansMap';
 
 const FindVetsScreen = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,13 +33,18 @@ const FindVetsScreen = () => {
             >
               <ArrowLeft size={24} />
             </Button>
-            <h1 className="text-xl font-medium text-white">Buscar Veterinarios</h1>
+            <h1 className="text-xl font-medium text-white">Todo para tu mascota cerca de ti</h1>
           </div>
         </div>
       }
       footer={<NavbarInferior activeTab="home" />}
     >
       <div className="p-4 pb-20">
+        {/* Mapa de veterinarios - movido desde OwnerHomeScreen */}
+        <div className="mb-6">
+          <VeterinariansMap />
+        </div>
+
         <form onSubmit={handleSearch} className="mb-6">
           <div className="relative">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
