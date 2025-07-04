@@ -1,11 +1,13 @@
+
 import React from 'react';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
-import { ChevronRight, Moon, Bell, Lock, HelpCircle, LifeBuoy, LogOut, Globe, Palette, MapPin } from 'lucide-react';
+import { ChevronRight, Bell, Lock, HelpCircle, LifeBuoy, LogOut, MapPin } from 'lucide-react';
 import { Button } from '@/ui/atoms/button';
 import { Switch } from '@/ui/atoms/switch';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { useLocationSharing } from '../hooks/useLocationSharing';
+
 const SettingItem: React.FC<{
   icon: React.ReactNode;
   title: string;
@@ -32,6 +34,7 @@ const SettingItem: React.FC<{
       {rightElement || <ChevronRight className="h-5 w-5 text-gray-400" />}
     </Button>;
 };
+
 const SettingsScreen = () => {
   const navigate = useNavigate();
   const {
@@ -50,17 +53,6 @@ const SettingsScreen = () => {
           <h1 className="text-white font-medium text-lg">Configuración</h1>
         </div>} footer={<NavbarInferior activeTab="home" />}>
       <div className="p-4 pb-20 space-y-6">
-        {/* Appearance Settings */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50">
-            <h2 className="font-medium">Apariencia</h2>
-          </div>
-          <div className="divide-y">
-            <SettingItem icon={<Moon className="h-5 w-5 text-[#5FBFB3]" />} title="Modo oscuro" rightElement={<Switch />} />
-            <SettingItem icon={<Palette className="h-5 w-5 text-[#5FBFB3]" />} title="Tema" description="Personaliza los colores de la app" />
-          </div>
-        </div>
-
         {/* Notification Settings */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="px-4 py-3 bg-gray-50">
@@ -81,16 +73,6 @@ const SettingsScreen = () => {
               <SettingItem icon={<MapPin className="h-5 w-5 text-[#5FBFB3]" />} title="Compartir ubicación" rightElement={<Switch checked={shareLocation} onCheckedChange={handleLocationSharingToggle} disabled={isLoading} />} />
             </div>
           </div>}
-
-        {/* Language Settings */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50">
-            <h2 className="font-medium">Idioma</h2>
-          </div>
-          <div>
-            <SettingItem icon={<Globe className="h-5 w-5 text-[#5FBFB3]" />} title="Idioma" description="Español" />
-          </div>
-        </div>
 
         {/* Security Settings */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -121,4 +103,5 @@ const SettingsScreen = () => {
       </div>
     </LayoutBase>;
 };
+
 export default SettingsScreen;
