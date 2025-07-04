@@ -8,47 +8,47 @@ import { Pet } from '@/features/pets/types';
 import ProfileHeader from '../components/ProfileHeader';
 import ContactInformation from '../components/ContactInformation';
 import PetManagementSection from '../components/PetManagementSection';
-
 const OwnerProfileScreen = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const {
+    user
+  } = useSelector((state: RootState) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
   const [editedPhone, setEditedPhone] = useState('');
   const [editedAddress, setEditedAddress] = useState('');
   const [userDetails, setUserDetails] = useState({
     phone: '',
     address: '',
-    profilePicture: '',
+    profilePicture: ''
   });
   const [showPetForm, setShowPetForm] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
-  const { getCurrentUserPets, createPet, updatePet } = usePets();
+  const {
+    getCurrentUserPets,
+    createPet,
+    updatePet
+  } = usePets();
   const [userPets, setUserPets] = useState<Pet[]>([]);
   const [isLoadingPets, setIsLoadingPets] = useState(true);
-
   useEffect(() => {
     const fetchUserDetails = async () => {
       if (user?.id) {
-        const { data, error } = await supabase
-          .from('pet_owners')
-          .select('phone_number, address, profile_picture_url')
-          .eq('id', user.id)
-          .single();
-
+        const {
+          data,
+          error
+        } = await supabase.from('pet_owners').select('phone_number, address, profile_picture_url').eq('id', user.id).single();
         if (data) {
           setUserDetails({
             phone: data.phone_number || '',
             address: data.address || '',
-            profilePicture: data.profile_picture_url || '',
+            profilePicture: data.profile_picture_url || ''
           });
           setEditedPhone(data.phone_number || '');
           setEditedAddress(data.address || '');
         }
-
         setIsLoadingPets(true);
         try {
           const petsResult = await getCurrentUserPets();
-          
           if (petsResult && 'payload' in petsResult && Array.isArray(petsResult.payload)) {
             setUserPets(petsResult.payload);
           }
@@ -60,26 +60,20 @@ const OwnerProfileScreen = () => {
         }
       }
     };
-
     fetchUserDetails();
   }, [user, getCurrentUserPets]);
-
   const handlePetClick = (pet: Pet) => {
     setSelectedPet(pet);
   };
-
   const handlePetFormSubmit = async (petData: any): Promise<Pet | null> => {
     try {
       if (!petData.owner_id && user?.id) {
         petData.owner_id = user.id;
       }
-      
       console.log('Submitting pet with data:', petData);
-      
       if (editingPet) {
         console.log('Updating existing pet:', editingPet.id);
         const updatedPet = await updatePet(editingPet.id, petData);
-        
         if (updatedPet) {
           const updatedPetData = updatedPet as Pet;
           setUserPets(prev => prev.map(p => p.id === editingPet.id ? updatedPetData : p));
@@ -91,11 +85,9 @@ const OwnerProfileScreen = () => {
         console.log('Creating new pet with owner_id:', petData.owner_id);
         const newPet = await createPet(petData);
         console.log('Create pet result:', newPet);
-        
         if (newPet) {
           const newPetData = newPet as Pet;
           console.log('New pet created:', newPetData);
-          
           setUserPets(prev => [...prev, newPetData]);
           setShowPetForm(false);
           return newPetData;
@@ -107,17 +99,15 @@ const OwnerProfileScreen = () => {
       return null;
     }
   };
-
   const handlePetUpdate = async (petData: any): Promise<Pet | null> => {
     try {
       if (!selectedPet) return null;
-      
-      const petUpdateData = { ...petData };
-      
+      const petUpdateData = {
+        ...petData
+      };
       if (petUpdateData.petPhotoFile) {
         const photoFile = petUpdateData.petPhotoFile;
         delete petUpdateData.petPhotoFile;
-        
         if (photoFile) {
           console.log('Uploading pet photo separately');
           try {
@@ -130,13 +120,10 @@ const OwnerProfileScreen = () => {
           }
         }
       }
-      
       if (petUpdateData.medicalHistory) {
         delete petUpdateData.medicalHistory;
       }
-      
       const result = await updatePet(selectedPet.id, petUpdateData);
-      
       if (result) {
         const updatedPet = result as Pet;
         setUserPets(prev => prev.map(p => p.id === updatedPet.id ? updatedPet : p));
@@ -148,57 +135,19 @@ const OwnerProfileScreen = () => {
       return null;
     }
   };
-
   const handlePetAdded = (pet: Pet) => {
     setUserPets(prev => [...prev, pet]);
   };
-
-  return (
-    <LayoutBase
-      header={
-        <div className="flex justify-between items-center px-4 py-3 bg-[#5FBFB3]">
+  return <LayoutBase header={<div className="flex justify-between items-center px-4 py-3 bg-[#79d0b8]">
           <h1 className="text-white font-medium text-lg">Mi Perfil</h1>
-        </div>
-      }
-      footer={<NavbarInferior activeTab="profile" />}
-    >
+        </div>} footer={<NavbarInferior activeTab="profile" />}>
       <div className="flex flex-col p-4 pb-20">
-        <ProfileHeader 
-          userDetails={userDetails} 
-          user={user} 
-          setUserDetails={setUserDetails}
-        />
+        <ProfileHeader userDetails={userDetails} user={user} setUserDetails={setUserDetails} />
 
-        <ContactInformation
-          userDetails={userDetails}
-          user={user}
-          editedPhone={editedPhone}
-          editedAddress={editedAddress}
-          setEditedPhone={setEditedPhone}
-          setEditedAddress={setEditedAddress}
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
-          setUserDetails={setUserDetails}
-        />
+        <ContactInformation userDetails={userDetails} user={user} editedPhone={editedPhone} editedAddress={editedAddress} setEditedPhone={setEditedPhone} setEditedAddress={setEditedAddress} isEditing={isEditing} setIsEditing={setIsEditing} setUserDetails={setUserDetails} />
 
-        <PetManagementSection
-          pets={userPets}
-          isLoading={isLoadingPets}
-          onPetAdded={handlePetAdded}
-          userPets={userPets}
-          handlePetClick={handlePetClick}
-          handlePetUpdate={handlePetUpdate}
-          handlePetFormSubmit={handlePetFormSubmit}
-          selectedPet={selectedPet}
-          setSelectedPet={setSelectedPet}
-          editingPet={editingPet}
-          setEditingPet={setEditingPet}
-          showPetForm={showPetForm}
-          setShowPetForm={setShowPetForm}
-        />
+        <PetManagementSection pets={userPets} isLoading={isLoadingPets} onPetAdded={handlePetAdded} userPets={userPets} handlePetClick={handlePetClick} handlePetUpdate={handlePetUpdate} handlePetFormSubmit={handlePetFormSubmit} selectedPet={selectedPet} setSelectedPet={setSelectedPet} editingPet={editingPet} setEditingPet={setEditingPet} showPetForm={showPetForm} setShowPetForm={setShowPetForm} />
       </div>
-    </LayoutBase>
-  );
+    </LayoutBase>;
 };
-
 export default OwnerProfileScreen;
