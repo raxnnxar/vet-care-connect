@@ -33,18 +33,13 @@ const FindVetsScreen = () => {
             >
               <ArrowLeft size={24} />
             </Button>
-            <h1 className="text-xl font-medium text-white">Todo para tu mascota cerca de ti</h1>
           </div>
         </div>
       }
       footer={<NavbarInferior activeTab="home" />}
     >
       <div className="p-4 pb-20">
-        {/* Mapa de veterinarios - movido desde OwnerHomeScreen */}
-        <div className="mb-6">
-          <VeterinariansMap />
-        </div>
-
+        {/* Buscador - ahora entre header y título del mapa */}
         <form onSubmit={handleSearch} className="mb-6">
           <div className="relative">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -57,6 +52,12 @@ const FindVetsScreen = () => {
             />
           </div>
         </form>
+
+        {/* Título y mapa */}
+        <div className="mb-6">
+          <h1 className="text-xl font-medium text-gray-800 mb-4">Todo para tu mascota cerca de ti</h1>
+          <VeterinariansMap />
+        </div>
 
         {/* Placeholder for search results */}
         <div className="space-y-4">
