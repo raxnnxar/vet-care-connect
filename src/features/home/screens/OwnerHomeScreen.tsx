@@ -59,7 +59,7 @@ const OwnerHomeScreen = () => {
           {/* Full width - Salud */}
           <button
             onClick={() => {}}
-            className="w-full bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-24"
+            className="w-full bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-20"
           >
             <div className="flex items-center justify-between h-full">
               <div className="flex items-center space-x-4">
@@ -80,7 +80,7 @@ const OwnerHomeScreen = () => {
           <div className="flex gap-2.5">
             <button
               onClick={() => {}}
-              className="flex-1 bg-white rounded-2xl p-3 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-28"
+              className="flex-1 bg-white rounded-2xl p-3 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-24"
             >
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="bg-[#91CFC2] w-10 h-10 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow mb-2">
@@ -92,7 +92,7 @@ const OwnerHomeScreen = () => {
             
             <button
               onClick={() => {}}
-              className="flex-1 bg-white rounded-2xl p-3 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-28"
+              className="flex-1 bg-white rounded-2xl p-3 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-24"
             >
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="bg-[#91CFC2] w-10 h-10 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow mb-2">
@@ -109,7 +109,7 @@ const OwnerHomeScreen = () => {
           {/* Full width - Tratamientos */}
           <button
             onClick={() => {}}
-            className="w-full bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-24"
+            className="w-full bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-20"
           >
             <div className="flex items-center justify-between h-full">
               <div className="flex items-center space-x-4">
@@ -122,7 +122,7 @@ const OwnerHomeScreen = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </LayoutBase>
