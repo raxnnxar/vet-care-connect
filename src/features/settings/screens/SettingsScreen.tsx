@@ -55,6 +55,14 @@ const SettingsScreen = () => {
     navigate('/owner/update-password');
   };
 
+  const handleFAQ = () => {
+    navigate('/owner/faq');
+  };
+
+  const handleContactSupport = () => {
+    navigate('/owner/contact-support');
+  };
+
   return (
     <LayoutBase 
       header={
@@ -118,8 +126,16 @@ const SettingsScreen = () => {
             <h2 className="font-medium">Ayuda y soporte</h2>
           </div>
           <div className="divide-y">
-            <SettingItem icon={<HelpCircle className="h-5 w-5 text-[#5FBFB3]" />} title="Preguntas frecuentes" />
-            <SettingItem icon={<LifeBuoy className="h-5 w-5 text-[#5FBFB3]" />} title="Contactar soporte" />
+            <SettingItem 
+              icon={<HelpCircle className="h-5 w-5 text-[#5FBFB3]" />} 
+              title="Preguntas frecuentes" 
+              onClick={handleFAQ}
+            />
+            <SettingItem 
+              icon={<LifeBuoy className="h-5 w-5 text-[#5FBFB3]" />} 
+              title="Contactar soporte" 
+              onClick={handleContactSupport}
+            />
           </div>
         </div>
 

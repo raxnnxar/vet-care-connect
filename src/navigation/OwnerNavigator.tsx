@@ -34,6 +34,8 @@ import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen'
 import NotificationsScreen from '@/features/notifications/screens/NotificationsScreen';
 import SettingsScreen from '@/features/settings/screens/SettingsScreen';
 import UpdatePasswordScreen from '@/features/settings/screens/UpdatePasswordScreen';
+import FAQScreen from '@/features/settings/screens/FAQScreen';
+import ContactSupportScreen from '@/features/settings/screens/ContactSupportScreen';
 
 const OwnerNavigator = () => {
   return (
@@ -59,6 +61,8 @@ const OwnerNavigator = () => {
       <Route path="/notifications" element={<NotificationsScreen />} />
       <Route path="/settings" element={<SettingsScreen />} />
       <Route path="/update-password" element={<UpdatePasswordScreen />} />
+      <Route path="/faq" element={<FAQScreen />} />
+      <Route path="/contact-support" element={<ContactSupportScreen />} />
     </Routes>
   );
 };
