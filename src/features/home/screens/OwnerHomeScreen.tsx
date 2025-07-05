@@ -25,21 +25,21 @@ const OwnerHomeScreen = () => {
     >
       <div className="flex flex-col min-h-full bg-[#F9FAFB]">
         {/* Hero Banner with Dog Image */}
-        <div className="relative h-64 overflow-hidden">
+        <div className="relative h-80 overflow-hidden">
           <img 
-            src="/lovable-uploads/aff64c25-ce5f-49be-b091-39c5eaa9e165.png" 
+            src="/lovable-uploads/0f0767ea-1b64-4af7-be2f-f95987c50c3b.png" 
             alt="Perro amigable"
             className="w-full h-full object-cover object-center"
           />
           {/* Gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/20 to-transparent"></div>
           
           {/* Text overlay */}
           <ServiceCategoryGrid />
         </div>
 
         {/* Search Bar */}
-        <div className="px-4 -mt-8 relative z-10 mb-6">
+        <div className="px-4 -mt-6 relative z-10 mb-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <input 
               type="text" 
@@ -59,13 +59,13 @@ const OwnerHomeScreen = () => {
           {/* Full width - Salud */}
           <button
             onClick={() => {}}
-            className="w-full bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-32"
+            className="w-full bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-36"
           >
             <div className="flex items-center justify-between h-full">
               <div className="flex items-center space-x-4">
                 <div className="bg-[#91CFC2] w-16 h-16 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443a55.381 55.381 0 015.25 2.882V15" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                   </svg>
                 </div>
                 <div className="flex-1">
@@ -80,12 +80,12 @@ const OwnerHomeScreen = () => {
           <div className="flex gap-4">
             <button
               onClick={() => {}}
-              className="flex-1 bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-36"
+              className="flex-1 bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-40"
             >
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="bg-[#91CFC2] w-14 h-14 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow mb-3">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7.848 8.25l1.536.887M7.848 8.25a3 3 0 11-5.196-3 3 3 0 015.196 3zm1.536.887a2.165 2.165 0 011.083 1.839c.005.351.054.695.14 1.024M9.384 9.137l2.077 1.199M7.848 15.75l1.536-.887m-1.536.887a3 3 0 11-5.196 3 3 3 0 015.196-3zm1.536-.887a2.165 2.165 0 001.083-1.838c.005-.352.054-.695.14-1.025m-1.223 2.863l2.077-1.199m0-9.02a4.5 4.5 0 105.2 8.656m2.227-4.993c0 .690.56 1.25 1.25 1.25s1.25-.56 1.25-1.25-.56-1.25-1.25-1.25-1.25.56-1.25 1.25z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 15.75l.394 1.183a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
                   </svg>
                 </div>
                 <h3 className="font-semibold text-gray-800 text-base">Estética</h3>
@@ -94,7 +94,7 @@ const OwnerHomeScreen = () => {
             
             <button
               onClick={() => {}}
-              className="flex-1 bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-36"
+              className="flex-1 bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-40"
             >
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="bg-[#91CFC2] w-14 h-14 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow mb-3">
@@ -111,13 +111,13 @@ const OwnerHomeScreen = () => {
           {/* Full width - Tratamientos */}
           <button
             onClick={() => {}}
-            className="w-full bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-32"
+            className="w-full bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] h-36"
           >
             <div className="flex items-center justify-between h-full">
               <div className="flex items-center space-x-4">
                 <div className="bg-[#91CFC2] w-16 h-16 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.169.659 1.591L19.8 14.5M14.25 3.104c.251.023.501.05.75.082M19.8 14.5l-2.436 2.436a2.25 2.25 0 01-1.591.659h-6.546a2.25 2.25 0 01-1.591-.659L5 14.5m14.8 0a3 3 0 01-4.094-1.085A100.375 100.375 0 0012 13.5a100.375 100.375 0 00-3.706.415 3 3 0 01-4.094 1.085m0 0v1.25a.75.75 0 00.75.75h13.5a.75.75 0 00.75-.75V14.5" />
                   </svg>
                 </div>
                 <div className="flex-1">
