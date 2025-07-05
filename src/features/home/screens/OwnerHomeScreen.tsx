@@ -23,9 +23,9 @@ const OwnerHomeScreen = () => {
       } 
       footer={<NavbarInferior activeTab="home" />}
     >
-      <div className="flex flex-col gap-6 p-4 pb-20">
+      <div className="flex flex-col h-full p-4 pb-20">
         {/* Search Bar */}
-        <div className="relative">
+        <div className="relative mb-4">
           <input 
             type="text" 
             placeholder="Buscar servicios veterinarios..." 
