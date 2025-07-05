@@ -7,8 +7,6 @@ import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
 import OwnerProfileScreen from '@/features/owner/screens/OwnerProfileScreen';
 
 // Pet management screens
-import PetsScreen from '@/pages/_pets/PetsScreen';
-import AddPetScreen from '@/pages/_pets/AddPetScreen';
 import PetDetailScreen from '@/features/pets/screens/PetDetailScreen';
 import PetEditScreen from '@/features/pets/screens/PetEditScreen';
 import PetMedicalRecordsScreen from '@/features/pets/screens/PetMedicalRecordsScreen';
@@ -42,8 +40,6 @@ const OwnerNavigator = () => {
     <Routes>
       <Route path="/" element={<OwnerHomeScreen />} />
       <Route path="/profile" element={<OwnerProfileScreen />} />
-      <Route path="/pets" element={<PetsScreen />} />
-      <Route path="/pets/add" element={<AddPetScreen />} />
       <Route path="/pets/:id" element={<PetDetailScreen />} />
       <Route path="/pets/:id/edit" element={<PetEditScreen />} />
       <Route path="/pets/:id/medical" element={<PetMedicalRecordsScreen />} />
