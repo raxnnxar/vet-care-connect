@@ -27,10 +27,8 @@ const ServiceCategoryGrid = () => {
   return <div className="absolute inset-0 flex flex-col justify-center items-start px-4">
       {/* Greeting Section */}
       <div className="mb-6">
-        <h2 className="text-2xl mb-2 drop-shadow-sm font-bold text-white">
-          ¡Hola{displayName ? `, ${displayName}` : ''}!
-        </h2>
-        <div className="inline-block bg-white/90 backdrop-blur-sm rounded-full px-4 py-2">
+        
+        <div className="inline-block bg-white/90 backdrop-blur-sm rounded-full mx-[0px] px-[9px] py-[4px] my-[41px]">
           <p className="text-gray-700 text-sm font-medium">
             ¿Qué necesita tu mascota hoy?
           </p>
