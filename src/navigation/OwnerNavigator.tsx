@@ -1,65 +1,68 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { OWNER_ROUTES } from './navigationConfig';
-import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
+
+// Home and Profile screens
 import OwnerHomeScreen from '@/features/home/screens/OwnerHomeScreen';
-import SaludScreen from '@/features/health/screens/SaludScreen';
-import EsteticaScreen from '@/features/grooming/screens/EsteticaScreen';
-import OwnerAppointmentsScreen from '@/features/appointments/screens/OwnerAppointmentsScreen';
-import AppointmentDetailScreen from '@/features/appointments/screens/AppointmentDetailScreen';
-import BookAppointmentScreen from '@/features/appointments/screens/BookAppointmentScreen';
-import NotificationsScreen from '@/features/notifications/screens/NotificationsScreen';
 import OwnerProfileScreen from '@/features/owner/screens/OwnerProfileScreen';
-import ChatsScreen from '@/features/chats/screens/ChatsScreen';
-import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
-import FindVetsScreen from '@/features/vets/screens/FindVetsScreen';
-import SearchVetScreen from '@/features/vets/screens/SearchVetScreen';
-import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
-import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
+
+// Pet management screens
+import PetsScreen from '@/pages/_pets/PetsScreen';
+import AddPetScreen from '@/pages/_pets/AddPetScreen';
 import PetDetailScreen from '@/features/pets/screens/PetDetailScreen';
+import PetEditScreen from '@/features/pets/screens/PetEditScreen';
 import PetMedicalRecordsScreen from '@/features/pets/screens/PetMedicalRecordsScreen';
 import MedicalHistoryDetailScreen from '@/features/pets/screens/MedicalHistoryDetailScreen';
 import VaccinationDetailScreen from '@/features/pets/screens/VaccinationDetailScreen';
-import PetEditScreen from '@/features/pets/screens/PetEditScreen';
-import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScreen';
-import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
-import SettingsScreen from '@/features/settings/screens/SettingsScreen';
+
+// Appointment screens
+import OwnerAppointmentsScreen from '@/features/appointments/screens/OwnerAppointmentsScreen';
+import AppointmentDetailScreen from '@/features/appointments/screens/AppointmentDetailScreen';
+import BookAppointmentScreen from '@/features/appointments/screens/BookAppointmentScreen';
+
+// Vet and service screens
+import FindVetsScreen from '@/features/vets/screens/FindVetsScreen';
+import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
+import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
+import SaludScreen from '@/features/health/screens/SaludScreen';
+import EsteticaScreen from '@/features/grooming/screens/EsteticaScreen';
 import TreatmentsScreen from '@/features/treatments/screens/TreatmentsScreen';
 
-const OwnerNavigator: React.FC = () => {
+// Communication screens
+import ChatsScreen from '@/features/chats/screens/ChatsScreen';
+import IndividualChatScreen from '@/features/chats/screens/IndividualChatScreen';
+
+// Settings and notifications
+import NotificationsScreen from '@/features/notifications/screens/NotificationsScreen';
+import SettingsScreen from '@/features/settings/screens/SettingsScreen';
+import UpdatePasswordScreen from '@/features/settings/screens/UpdatePasswordScreen';
+
+const OwnerNavigator = () => {
   return (
     <Routes>
-      <Route path={OWNER_ROUTES.HOME} element={<OwnerHomeScreen />} />
-      <Route path={OWNER_ROUTES.SALUD} element={<SaludScreen />} />
-      <Route path={OWNER_ROUTES.ESTETICA} element={<EsteticaScreen />} />
-      <Route path={OWNER_ROUTES.APPOINTMENTS} element={<OwnerAppointmentsScreen />} />
-      <Route path={OWNER_ROUTES.APPOINTMENT_DETAIL} element={<AppointmentDetailScreen />} />
-      <Route path={OWNER_ROUTES.BOOK_APPOINTMENT} element={<BookAppointmentScreen />} />
-      <Route path={OWNER_ROUTES.NOTIFICATIONS} element={<NotificationsScreen />} />
-      <Route path={OWNER_ROUTES.PROFILE} element={<OwnerProfileScreen />} />
-      <Route path={OWNER_ROUTES.CHATS} element={<ChatsScreen />} />
-      <Route path={OWNER_ROUTES.INDIVIDUAL_CHAT} element={<IndividualChatScreen />} />
-      <Route path={OWNER_ROUTES.FIND_VETS} element={<FindVetsScreen />} />
-      {/* FIXED: Ensure search-vet route is mapped correctly */}
-      <Route path="search-vet" element={<SearchVetScreen />} />
-      <Route path={OWNER_ROUTES.VET_DETAIL} element={<VetDetailScreen />} />
-      <Route path={OWNER_ROUTES.VET_REVIEW} element={<VetReviewScreen />} />
+      <Route path="/" element={<OwnerHomeScreen />} />
+      <Route path="/profile" element={<OwnerProfileScreen />} />
+      <Route path="/pets" element={<PetsScreen />} />
+      <Route path="/pets/add" element={<AddPetScreen />} />
       <Route path="/pets/:id" element={<PetDetailScreen />} />
-      <Route path={OWNER_ROUTES.PET_DETAIL} element={<PetDetailScreen />} />
-      <Route path={OWNER_ROUTES.PET_MEDICAL_RECORDS} element={<PetMedicalRecordsScreen />} />
-      <Route path="/pets/:id/medical/history/:eventId" element={<MedicalHistoryDetailScreen />} />
-      <Route path="/pets/:id/medical/vaccines/:vaccineId" element={<VaccinationDetailScreen />} />
       <Route path="/pets/:id/edit" element={<PetEditScreen />} />
-      <Route path={OWNER_ROUTES.GROOMING_DETAIL} element={<GroomingDetailScreen />} />
-      <Route path={OWNER_ROUTES.GROOMING_REVIEW} element={<GroomingReviewScreen />} />
-      <Route path={OWNER_ROUTES.SETTINGS} element={<SettingsScreen />} />
-      <Route path={OWNER_ROUTES.TREATMENTS} element={<TreatmentsScreen />} />
-      
-      <Route path="/groomers/:id" element={<GroomingDetailScreen />} />
-      <Route path="/groomers/:id/review" element={<GroomingReviewScreen />} />
-      
-      <Route path="*" element={<OwnerHomeScreen />} />
+      <Route path="/pets/:id/medical" element={<PetMedicalRecordsScreen />} />
+      <Route path="/pets/:id/medical/:recordId" element={<MedicalHistoryDetailScreen />} />
+      <Route path="/pets/:id/vaccination/:vaccinationId" element={<VaccinationDetailScreen />} />
+      <Route path="/appointments" element={<OwnerAppointmentsScreen />} />
+      <Route path="/appointments/:id" element={<AppointmentDetailScreen />} />
+      <Route path="/appointments/book/:vetId" element={<BookAppointmentScreen />} />
+      <Route path="/find-vets" element={<FindVetsScreen />} />
+      <Route path="/vets/:id" element={<VetDetailScreen />} />
+      <Route path="/vets/:id/review" element={<VetReviewScreen />} />
+      <Route path="/salud" element={<SaludScreen />} />
+      <Route path="/estetica" element={<EsteticaScreen />} />
+      <Route path="/treatments" element={<TreatmentsScreen />} />
+      <Route path="/chats" element={<ChatsScreen />} />
+      <Route path="/chats/:conversationId" element={<IndividualChatScreen />} />
+      <Route path="/notifications" element={<NotificationsScreen />} />
+      <Route path="/settings" element={<SettingsScreen />} />
+      <Route path="/update-password" element={<UpdatePasswordScreen />} />
     </Routes>
   );
 };

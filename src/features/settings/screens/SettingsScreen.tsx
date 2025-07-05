@@ -45,13 +45,25 @@ const SettingsScreen = () => {
     isLoading,
     updateLocationSharing
   } = useLocationSharing();
+  
   const handleLocationSharingToggle = async () => {
     if (isLoading) return;
     await updateLocationSharing(!shareLocation);
   };
-  return <LayoutBase header={<div className="flex justify-between items-center px-4 py-3 bg-[#79d0b8]">
+
+  const handleUpdatePassword = () => {
+    navigate('/owner/update-password');
+  };
+
+  return (
+    <LayoutBase 
+      header={
+        <div className="flex justify-between items-center px-4 py-3 bg-[#79d0b8]">
           <h1 className="text-white font-medium text-lg">Configuración</h1>
-        </div>} footer={<NavbarInferior activeTab="home" />}>
+        </div>
+      } 
+      footer={<NavbarInferior activeTab="home" />}
+    >
       <div className="p-4 pb-20 space-y-6">
         {/* Notification Settings */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -65,14 +77,26 @@ const SettingsScreen = () => {
         </div>
 
         {/* Location Settings - Only for pet owners */}
-        {userRole === 'pet_owner' && <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        {userRole === 'pet_owner' && (
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="px-4 py-3 bg-gray-50">
               <h2 className="font-medium">Ubicación</h2>
             </div>
             <div>
-              <SettingItem icon={<MapPin className="h-5 w-5 text-[#5FBFB3]" />} title="Compartir ubicación" rightElement={<Switch checked={shareLocation} onCheckedChange={handleLocationSharingToggle} disabled={isLoading} />} />
+              <SettingItem 
+                icon={<MapPin className="h-5 w-5 text-[#5FBFB3]" />} 
+                title="Compartir ubicación" 
+                rightElement={
+                  <Switch 
+                    checked={shareLocation} 
+                    onCheckedChange={handleLocationSharingToggle} 
+                    disabled={isLoading} 
+                  />
+                } 
+              />
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Security Settings */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -80,7 +104,11 @@ const SettingsScreen = () => {
             <h2 className="font-medium">Seguridad</h2>
           </div>
           <div>
-            <SettingItem icon={<Lock className="h-5 w-5 text-[#5FBFB3]" />} title="Cambiar contraseña" />
+            <SettingItem 
+              icon={<Lock className="h-5 w-5 text-[#5FBFB3]" />} 
+              title="Cambiar contraseña" 
+              onClick={handleUpdatePassword}
+            />
           </div>
         </div>
 
@@ -96,12 +124,17 @@ const SettingsScreen = () => {
         </div>
 
         {/* Account Actions */}
-        <Button variant="outline" className="w-full border-red-500 text-red-500 hover:bg-red-500/10 flex items-center justify-center gap-2 py-6" onClick={() => navigate('/login')}>
+        <Button 
+          variant="outline" 
+          className="w-full border-red-500 text-red-500 hover:bg-red-500/10 flex items-center justify-center gap-2 py-6" 
+          onClick={() => navigate('/login')}
+        >
           <LogOut className="h-5 w-5" />
           <span>Cerrar sesión</span>
         </Button>
       </div>
-    </LayoutBase>;
+    </LayoutBase>
+  );
 };
 
 export default SettingsScreen;
