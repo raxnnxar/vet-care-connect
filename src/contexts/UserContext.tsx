@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { supabase } from '@/integrations/supabase/client';
 
 // Define types for user roles
-type UserRole = 'pet_owner' | 'service_provider' | null;
+type UserRole = 'pet_owner' | 'service_provider' | 'admin' | null;
 type ProviderType = 'veterinarian' | 'grooming' | null;
 
 interface UserContextType {
@@ -38,6 +38,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       
       try {
+        // First check the profiles table for admin role
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileData?.role === 'admin') {
+          setUserRole('admin');
+          setProviderType(null);
+          setIsLoading(false);
+          return;
+        }
+        
         // Check if user is a pet owner
         const { data: petOwnerData, error: petOwnerError } = await supabase
           .from('pet_owners')

@@ -14,6 +14,7 @@ import VetProfileSetupScreen from '../features/auth/screens/VetProfileSetupScree
 import VetLocationSetupScreen from '../features/auth/screens/VetLocationSetupScreen';
 import PetGroomingProfileSetupScreen from '../features/auth/screens/PetGroomingProfileSetupScreen';
 import GroomingLocationSetupScreen from '../features/auth/screens/GroomingLocationSetupScreen';
+import AdminDashboard from '../features/admin/screens/AdminDashboard';
 import { ROUTES } from '@/frontend/shared/constants/routes';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/contexts/UserContext';
@@ -83,7 +84,10 @@ const AppNavigator = () => {
       
       // Mejorado: Redirigir según el rol y tipo de usuario SOLO si está en la raíz
       if (location.pathname === '/') {
-        if (userRole === 'pet_owner') {
+        if (userRole === 'admin') {
+          console.log('Redirecting admin to admin dashboard');
+          navigate(ROUTES.ADMIN_DASHBOARD);
+        } else if (userRole === 'pet_owner') {
           console.log('Redirecting pet owner to owner home');
           navigate(ROUTES.OWNER);
         } else if (userRole === 'service_provider') {
@@ -131,6 +135,9 @@ const AppNavigator = () => {
       <Route path={ROUTES.GROOMING_PROFILE_SETUP} element={<PetGroomingProfileSetupScreen />} />
       <Route path={ROUTES.GROOMING_LOCATION_SETUP} element={<GroomingLocationSetupScreen />} />
       <Route path="/vet-location-setup" element={<VetLocationSetupScreen />} />
+      
+      {/* Admin routes */}
+      <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
       
       {/* Nested navigators */}
       <Route path={`${ROUTES.OWNER}/*`} element={<OwnerNavigator />} />

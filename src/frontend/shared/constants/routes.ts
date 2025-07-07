@@ -57,6 +57,10 @@ export const ROUTES = {
   GROOMING_NOTIFICATIONS: '/grooming/notifications',
   GROOMING_SETTINGS: '/grooming/settings',
   
+  // Admin routes
+  ADMIN: '/admin',
+  ADMIN_DASHBOARD: '/admin/dashboard',
+  
   // Common routes
   NOTIFICATIONS: '/notifications',
   SETTINGS: '/settings',
