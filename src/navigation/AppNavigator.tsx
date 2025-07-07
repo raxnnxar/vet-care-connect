@@ -95,7 +95,7 @@ const AppNavigator = () => {
       
       // Mejorado: Redirigir según el rol y tipo de usuario SOLO si está en la raíz
       if (location.pathname === '/') {
-        if (userRole === 'admin') {
+        if (userRole === 'admin' as UserRoleType) {
           console.log('Redirecting admin to admin dashboard');
           navigate(ROUTES.ADMIN_DASHBOARD);
         } else if (userRole === 'pet_owner') {

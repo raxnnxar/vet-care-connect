@@ -3,8 +3,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { supabase } from '@/integrations/supabase/client';
 
+// Import types from constants to ensure consistency
+import { UserRoleType } from '@/core/constants/app.constants';
+
 // Define types for user roles
-type UserRole = 'pet_owner' | 'service_provider' | 'admin' | null;
+type UserRole = UserRoleType | null;
 type ProviderType = 'veterinarian' | 'grooming' | null;
 
 interface UserContextType {
