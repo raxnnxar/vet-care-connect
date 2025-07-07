@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -31,6 +32,15 @@ const AppNavigator = () => {
       console.log('Current role info:', { userRole, providerType });
       console.log('Current path:', location.pathname);
       
+      // IMPORTANT: Handle admin users first before any other logic
+      if (userRole === 'admin') {
+        console.log('Admin user detected, redirecting to admin dashboard');
+        if (location.pathname !== ROUTES.ADMIN_DASHBOARD) {
+          navigate(ROUTES.ADMIN_DASHBOARD);
+        }
+        return;
+      }
+      
       // Skip navigation logic if user is already on specific screens or nested routes
       if (
         location.pathname === ROUTES.PROFILE_SETUP || 
@@ -49,7 +59,7 @@ const AppNavigator = () => {
         location.pathname.includes('/agenda') ||
         location.pathname.includes('/pets') ||
         location.pathname.includes('/find-vets') ||
-        location.pathname.includes('/search-vet') || // FIXED: Added search-vet to exclusion
+        location.pathname.includes('/search-vet') ||
         location.pathname.includes('/vets/') ||
         location.pathname.includes('/notifications') ||
         location.pathname.includes('/settings')
@@ -62,7 +72,8 @@ const AppNavigator = () => {
       if (
         location.pathname.startsWith('/owner') || 
         location.pathname.startsWith('/vet') ||
-        location.pathname.startsWith('/grooming')
+        location.pathname.startsWith('/grooming') ||
+        location.pathname.startsWith('/admin')
       ) {
         console.log('User is in a section, no redirect needed');
         return;
@@ -113,9 +124,10 @@ const AppNavigator = () => {
         !location.pathname.startsWith('/signup') &&
         !location.pathname.startsWith('/forgot-password') &&
         !location.pathname.startsWith('/reset-password') &&
-        !location.pathname.startsWith('/owner') && // Don't redirect if already in owner section
-        !location.pathname.startsWith('/vet') && // Don't redirect if already in vet section
-        !location.pathname.startsWith('/grooming') && // Don't redirect if already in grooming section
+        !location.pathname.startsWith('/owner') && 
+        !location.pathname.startsWith('/vet') && 
+        !location.pathname.startsWith('/grooming') && 
+        !location.pathname.startsWith('/admin') && 
         location.pathname !== '/'
       ) {
         console.log('No user and not on auth route or app sections, redirecting to login');

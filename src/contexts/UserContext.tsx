@@ -38,14 +38,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       
       try {
-        // First check the profiles table for admin role
+        // First check the profiles table for role
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
           .single();
         
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          throw profileError;
+        }
+
+        // If user has admin role in profiles, set it directly
         if (profileData?.role === 'admin') {
+          console.log('Admin role detected from profiles table');
           setUserRole('admin');
           setProviderType(null);
           setIsLoading(false);
@@ -53,7 +60,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         // Check if user is a pet owner
-        const { data: petOwnerData, error: petOwnerError } = await supabase
+        const { data: petOwnerData } = await supabase
           .from('pet_owners')
           .select('id')
           .eq('id', user.id)
@@ -67,7 +74,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         // Check if user is a service provider
-        const { data: providerData, error: providerError } = await supabase
+        const { data: providerData } = await supabase
           .from('service_providers')
           .select('id, provider_type')
           .eq('id', user.id)
