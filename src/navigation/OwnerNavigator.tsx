@@ -44,7 +44,7 @@ const OwnerNavigator = () => {
       <Route path="/profile" element={<OwnerProfileScreen />} />
       <Route path="/pets/:id" element={<PetDetailScreen />} />
       <Route path="/pets/:id/edit" element={<PetEditScreen />} />
-      <Route path="/pets/:id/medical" element={<PetMedicalRecordsScreen />} />
+      <Route path="/pets/:id/medical-records" element={<PetMedicalRecordsScreen />} />
       <Route path="/pets/:id/medical/:recordId" element={<MedicalHistoryDetailScreen />} />
       <Route path="/pets/:id/vaccination/:vaccinationId" element={<VaccinationDetailScreen />} />
       <Route path="/appointments" element={<OwnerAppointmentsScreen />} />

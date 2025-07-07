@@ -41,7 +41,7 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({
         .from('pets')
         .select('*')
         .eq('id', petId)
-        .single();
+        .maybeSingle();
       if (data) setPet(data as Pet);
     };
     fetchPet();
