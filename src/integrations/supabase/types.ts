@@ -1372,6 +1372,10 @@ export type Database = {
         Args: { lat1: number; lon1: number; lat2: number; lon2: number }
         Returns: number
       }
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       search_veterinarians: {
         Args: {
           p_lat: number
