@@ -35,7 +35,7 @@ const AppNavigator = () => {
       // IMPORTANT: Handle admin users first before any other logic
       if (userRole === 'admin') {
         console.log('Admin user detected, redirecting to admin dashboard');
-        if (location.pathname !== ROUTES.ADMIN_DASHBOARD) {
+        if (location.pathname !== ROUTES.ADMIN_DASHBOARD && !location.pathname.startsWith('/admin')) {
           navigate(ROUTES.ADMIN_DASHBOARD);
         }
         return;
