@@ -118,24 +118,32 @@ export const useAdminData = () => {
           id,
           name,
           species,
-          profiles!pets_owner_id_fkey (
-            email,
-            display_name
-          )
+          owner_id
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      const formattedPets = data?.map(pet => ({
-        id: pet.id,
-        name: pet.name,
-        species: pet.species,
-        owner_email: pet.profiles?.email || 'Sin email',
-        owner_name: pet.profiles?.display_name || 'Sin nombre'
-      })) || [];
+      // Get owner information for each pet
+      const petsWithOwners = await Promise.all(
+        (data || []).map(async (pet) => {
+          const { data: ownerData } = await supabase
+            .from('profiles')
+            .select('email, display_name')
+            .eq('id', pet.owner_id)
+            .single();
+
+          return {
+            id: pet.id,
+            name: pet.name,
+            species: pet.species,
+            owner_email: ownerData?.email || 'Sin email',
+            owner_name: ownerData?.display_name || 'Sin nombre'
+          };
+        })
+      );
       
-      setPets(formattedPets);
+      setPets(petsWithOwners);
     } catch (err) {
       console.error('Error fetching pets:', err);
       setError('Error al cargar mascotas');
@@ -150,30 +158,52 @@ export const useAdminData = () => {
           id,
           appointment_date,
           status,
-          pets!appointments_pet_id_fkey (
-            name
-          ),
-          profiles!appointments_owner_id_fkey (
-            email
-          ),
-          vet_profiles:profiles!appointments_provider_id_fkey (
-            email
-          )
+          pet_id,
+          owner_id,
+          provider_id
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      const formattedAppointments = data?.map(appointment => ({
-        id: appointment.id,
-        appointment_date: appointment.appointment_date,
-        status: appointment.status,
-        pet_name: appointment.pets?.name || 'Sin nombre',
-        owner_email: appointment.profiles?.email || 'Sin email',
-        vet_email: appointment.vet_profiles?.email || 'Sin asignar'
-      })) || [];
+      // Get additional information for each appointment
+      const appointmentsWithDetails = await Promise.all(
+        (data || []).map(async (appointment) => {
+          // Get pet name
+          const { data: petData } = await supabase
+            .from('pets')
+            .select('name')
+            .eq('id', appointment.pet_id)
+            .single();
+
+          // Get owner email
+          const { data: ownerData } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', appointment.owner_id)
+            .single();
+
+          // Get vet email
+          const { data: vetData } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', appointment.provider_id)
+            .single();
+
+          return {
+            id: appointment.id,
+            appointment_date: typeof appointment.appointment_date === 'string' 
+              ? appointment.appointment_date 
+              : JSON.stringify(appointment.appointment_date),
+            status: appointment.status || 'Sin estado',
+            pet_name: petData?.name || 'Sin nombre',
+            owner_email: ownerData?.email || 'Sin email',
+            vet_email: vetData?.email || 'Sin asignar'
+          };
+        })
+      );
       
-      setAppointments(formattedAppointments);
+      setAppointments(appointmentsWithDetails);
     } catch (err) {
       console.error('Error fetching appointments:', err);
       setError('Error al cargar citas');
