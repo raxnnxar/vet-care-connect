@@ -1,13 +1,16 @@
+
 import React from 'react';
 import { useAdminData } from '../hooks/useAdminData';
-import { AdminUserManagement } from '../components/AdminUserManagement';
 import { AdminAnalytics } from '../components/AdminAnalytics';
+import { AdminUsersSection } from '../components/sections/AdminUsersSection';
+import { AdminPetsSection } from '../components/sections/AdminPetsSection';
+import { AdminAppointmentsSection } from '../components/sections/AdminAppointmentsSection';
 import { AdminConfiguration } from '../components/AdminConfiguration';
 import { Button } from '@/ui/atoms/button';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminDashboard: React.FC = () => {
-  const { stats, users, loading, error, updateUserRole, refreshData } = useAdminData();
+  const { stats, users, pets, appointments, loading, error, updateUserRole, refreshData } = useAdminData();
   const { toast } = useToast();
 
   const handleUpdateUserRole = async (userId: string, newRole: string) => {
@@ -79,12 +82,14 @@ const AdminDashboard: React.FC = () => {
           {/* Analytics Section */}
           <AdminAnalytics stats={stats} loading={loading} />
 
-          {/* User Management Section */}
-          <AdminUserManagement 
-            users={users} 
-            loading={loading} 
-            onUpdateUserRole={handleUpdateUserRole}
-          />
+          {/* Users Management Section */}
+          <AdminUsersSection users={users} loading={loading} />
+
+          {/* Pets Management Section */}
+          <AdminPetsSection pets={pets} loading={loading} />
+
+          {/* Appointments Management Section */}
+          <AdminAppointmentsSection appointments={appointments} loading={loading} />
 
           {/* Configuration Section */}
           <AdminConfiguration />
