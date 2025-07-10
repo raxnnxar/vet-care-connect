@@ -60,7 +60,7 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({
         <div className="sticky top-0 bg-gray-50 z-10 border-b border-gray-200">
           <TabsList className="w-full h-auto bg-transparent p-2 gap-1 overflow-x-auto">
             <TabsTrigger value="medications" className="flex-shrink-0 px-3 py-2 text-sm font-medium data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative whitespace-nowrap">
-              <span>Medicamentos</span>
+              <span>Tratamientos</span>
               {medicationsCount > 0}
             </TabsTrigger>
             
@@ -75,9 +75,7 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({
             
             <TabsTrigger value="history" className="flex-shrink-0 px-3 py-2 text-sm font-medium data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative whitespace-nowrap">
               <span>Historial</span>
-              {historyCount > 0 && <span className="ml-2 w-5 h-5 bg-[#79D0B8] text-white text-xs rounded-full flex items-center justify-center">
-                  {historyCount}
-                </span>}
+              {historyCount > 0}
             </TabsTrigger>
           </TabsList>
         </div>
