@@ -50,55 +50,60 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({
   if (!pet) return null;
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 pb-4">
       {/* Header Card integrado con chips - solo si showHeader es true */}
       {showHeader && <PetHeaderCard pet={pet} />}
 
-      {/* Tabs pegados directamente al header */}
+      {/* Tabs optimizadas para mobile */}
       <Tabs defaultValue="medications" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-white border-b">
-          <TabsTrigger 
-            value="medications" 
-            className="data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative"
-          >
-            Medicamentos
-            {medicationsCount > 0 && (
-              <Badge variant="secondary" className="ml-2 bg-[#79D0B8] text-white text-xs h-5 min-w-5 flex items-center justify-center">
-                {medicationsCount}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="vaccines" 
-            className="data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8]"
-          >
-            Vacunas
-          </TabsTrigger>
-          <TabsTrigger 
-            value="surgeries" 
-            className="data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative"
-          >
-            Cirugías
-            {surgeries.length > 0 && (
-              <Badge variant="secondary" className="ml-2 bg-[#79D0B8] text-white text-xs h-5 min-w-5 flex items-center justify-center">
-                {surgeries.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="history" 
-            className="data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative"
-          >
-            Historial
-            {historyCount > 0 && (
-              <Badge variant="secondary" className="ml-2 bg-[#79D0B8] text-white text-xs h-5 min-w-5 flex items-center justify-center">
-                {historyCount}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
+        <div className="sticky top-0 bg-gray-50 z-10 border-b border-gray-200">
+          <TabsList className="w-full h-auto bg-transparent p-2 gap-1 overflow-x-auto">
+            <TabsTrigger 
+              value="medications" 
+              className="flex-shrink-0 px-3 py-2 text-sm font-medium data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative whitespace-nowrap"
+            >
+              <span>Medicamentos</span>
+              {medicationsCount > 0 && (
+                <span className="ml-2 w-5 h-5 bg-[#79D0B8] text-white text-xs rounded-full flex items-center justify-center">
+                  {medicationsCount}
+                </span>
+              )}
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="vaccines" 
+              className="flex-shrink-0 px-3 py-2 text-sm font-medium data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] whitespace-nowrap"
+            >
+              Vacunas
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="surgeries" 
+              className="flex-shrink-0 px-3 py-2 text-sm font-medium data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative whitespace-nowrap"
+            >
+              <span>Cirugías</span>
+              {surgeries.length > 0 && (
+                <span className="ml-2 w-5 h-5 bg-[#79D0B8] text-white text-xs rounded-full flex items-center justify-center">
+                  {surgeries.length}
+                </span>
+              )}
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="history" 
+              className="flex-shrink-0 px-3 py-2 text-sm font-medium data-[state=active]:bg-[#79D0B8]/10 data-[state=active]:text-[#4DA6A8] relative whitespace-nowrap"
+            >
+              <span>Historial</span>
+              {historyCount > 0 && (
+                <span className="ml-2 w-5 h-5 bg-[#79D0B8] text-white text-xs rounded-full flex items-center justify-center">
+                  {historyCount}
+                </span>
+              )}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="medications" className="mt-4">
+        <TabsContent value="medications" className="mt-0 px-4">
           <CurrentMedicationsSection 
             petId={petId} 
             petOwnerId={petOwnerId}
@@ -106,15 +111,15 @@ const MedicalRecordTabs: React.FC<MedicalRecordTabsProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="vaccines" className="mt-4">
+        <TabsContent value="vaccines" className="mt-0 px-4">
           <DigitalVaccinationSection petId={petId} />
         </TabsContent>
 
-        <TabsContent value="surgeries" className="mt-4">
+        <TabsContent value="surgeries" className="mt-0 px-4">
           <SurgeriesSection petId={petId} />
         </TabsContent>
 
-        <TabsContent value="history" className="mt-4">
+        <TabsContent value="history" className="mt-0 px-4">
           <MedicalHistorySection 
             petId={petId} 
             onCountChange={setHistoryCount}

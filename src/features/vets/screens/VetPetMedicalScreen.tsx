@@ -49,11 +49,16 @@ const VetPetMedicalScreen: React.FC = () => {
     return (
       <LayoutBase
         header={
-          <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
-            <Button variant="ghost" size="icon" className="text-white" onClick={handleBack}>
-              <ArrowLeft />
+          <div className="flex items-center px-4 py-4 bg-gradient-to-r from-[#79D0B8] to-[#5FBFB3] shadow-sm">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-white/20 w-10 h-10" 
+              onClick={handleBack}
+            >
+              <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Expediente médico</h1>
+            <h1 className="text-white font-semibold text-lg ml-3">Expediente médico</h1>
           </div>
         }
         footer={<NavbarInferior activeTab="home" />}
@@ -69,11 +74,16 @@ const VetPetMedicalScreen: React.FC = () => {
     return (
       <LayoutBase
         header={
-          <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
-            <Button variant="ghost" size="icon" className="text-white" onClick={handleBack}>
-              <ArrowLeft />
+          <div className="flex items-center px-4 py-4 bg-gradient-to-r from-[#79D0B8] to-[#5FBFB3] shadow-sm">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-white/20 w-10 h-10" 
+              onClick={handleBack}
+            >
+              <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Expediente médico</h1>
+            <h1 className="text-white font-semibold text-lg ml-3">Expediente médico</h1>
           </div>
         }
         footer={<NavbarInferior activeTab="home" />}
@@ -90,18 +100,28 @@ const VetPetMedicalScreen: React.FC = () => {
   return (
     <LayoutBase
       header={
-        <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
-          <Button variant="ghost" size="icon" className="text-white" onClick={handleBack}>
-            <ArrowLeft />
+        <div className="flex items-center px-4 py-4 bg-gradient-to-r from-[#79D0B8] to-[#5FBFB3] shadow-sm">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white hover:bg-white/20 w-10 h-10" 
+            onClick={handleBack}
+          >
+            <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-white font-medium text-lg ml-2">
-            Expediente médico - {petName}
-          </h1>
+          <div className="ml-3 flex-1 min-w-0">
+            <h1 className="text-white font-semibold text-lg truncate">
+              Expediente médico
+            </h1>
+            <p className="text-white/80 text-sm truncate">
+              {petName}
+            </p>
+          </div>
         </div>
       }
       footer={<NavbarInferior activeTab="home" />}
     >
-      <div className="pb-20">
+      <div className="bg-gray-50 min-h-screen pb-20">
         <MedicalRecordTabs
           petId={appointmentData.pet_id}
           petOwnerId={appointmentData.owner_id}
