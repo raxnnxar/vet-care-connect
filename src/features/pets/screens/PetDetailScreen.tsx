@@ -193,7 +193,7 @@ const PetDetailScreen: React.FC = () => {
       }
       footer={<NavbarInferior activeTab="profile" />}
     >
-      <div className="mobile-container mobile-padding pb-20 mobile-spacing">
+      <div className="p-4 pb-20 space-y-6">
         {/* Pet Image */}
         <div className="relative">
           {pet.profile_picture_url ? (

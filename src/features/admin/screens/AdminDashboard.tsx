@@ -56,15 +56,15 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background mobile-container mobile-padding">
-      <div className="w-full">
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 Panel de Administrador
               </h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
+              <p className="text-muted-foreground">
                 Bienvenido al panel de administración de Vett
               </p>
             </div>
@@ -72,14 +72,13 @@ const AdminDashboard: React.FC = () => {
               variant="outline" 
               onClick={refreshData}
               disabled={loading}
-              className="mobile-touch-target w-full sm:w-auto"
             >
               Actualizar Datos
             </Button>
           </div>
         </div>
 
-        <div className="mobile-spacing">
+        <div className="space-y-8">
           {/* Analytics Section */}
           <AdminAnalytics stats={stats} loading={loading} />
 

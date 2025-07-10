@@ -117,7 +117,7 @@ const NotificationsScreen = () => {
       footer={<NavbarInferior activeTab="home" />}
     >
       <ScrollArea className="h-full">
-        <div className="mobile-container mobile-padding pb-20">
+        <div className="p-4 pb-20">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-medium">Recientes</h2>
             <Button variant="ghost" size="sm" className="text-sm">

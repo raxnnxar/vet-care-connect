@@ -112,7 +112,7 @@ export const AdminAppointmentsSection: React.FC<AdminAppointmentsSectionProps> =
   }
 
   return (
-    <Card className="mobile-padding">
+    <Card className="p-6">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-foreground mb-4">
           Gestión de Citas
@@ -125,7 +125,7 @@ export const AdminAppointmentsSection: React.FC<AdminAppointmentsSectionProps> =
             placeholder="Buscar por mascota, dueño o veterinario..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 mobile-touch-target"
+            className="pl-10"
           />
         </div>
         
@@ -134,51 +134,43 @@ export const AdminAppointmentsSection: React.FC<AdminAppointmentsSectionProps> =
         </p>
       </div>
 
-      {/* Mobile responsive table container */}
-      <div className="mobile-table-wrapper">
-        <div className="border rounded-lg mobile-scroll-container" style={{ height: '400px' }}>
-          <Table className="min-w-full">
-            <TableHeader className="sticky top-0 bg-background z-10">
-              <TableRow>
-                <TableHead className="min-w-[100px]">Fecha</TableHead>
-                <TableHead className="min-w-[100px]">Mascota</TableHead>
-                <TableHead className="min-w-[120px]">Dueño</TableHead>
-                <TableHead className="min-w-[120px]">Veterinario</TableHead>
-                <TableHead className="min-w-[100px]">Estado</TableHead>
+      {/* Scrollable table container */}
+      <div className="border rounded-lg" style={{ height: '400px', overflow: 'auto' }}>
+        <Table>
+          <TableHeader className="sticky top-0 bg-background z-10">
+            <TableRow>
+              <TableHead>Fecha</TableHead>
+              <TableHead>Mascota</TableHead>
+              <TableHead>Dueño</TableHead>
+              <TableHead>Veterinario</TableHead>
+              <TableHead>Estado</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAppointments.map((appointment) => (
+              <TableRow key={appointment.id}>
+                <TableCell className="font-medium">
+                  {formatDate(appointment.appointment_date)}
+                </TableCell>
+                <TableCell>{appointment.pet_name || 'Sin nombre'}</TableCell>
+                <TableCell>{appointment.owner_email || 'Sin email'}</TableCell>
+                <TableCell>{appointment.vet_email || 'Sin asignar'}</TableCell>
+                <TableCell>
+                  <Badge variant={getStatusBadgeVariant(appointment.status)}>
+                    {getStatusLabel(appointment.status)}
+                  </Badge>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAppointments.map((appointment) => (
-                <TableRow key={appointment.id}>
-                  <TableCell className="text-sm">
-                    {formatDate(appointment.appointment_date)}
-                  </TableCell>
-                  <TableCell className="font-medium break-words">
-                    {appointment.pet_name || 'Sin nombre'}
-                  </TableCell>
-                  <TableCell className="break-all text-sm">
-                    {appointment.owner_email || 'Sin email'}
-                  </TableCell>
-                  <TableCell className="break-all text-sm">
-                    {appointment.vet_email || 'Sin asignar'}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusBadgeVariant(appointment.status)} className="whitespace-nowrap text-xs">
-                      {getStatusLabel(appointment.status)}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredAppointments.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                    No se encontraron citas
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+            {filteredAppointments.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  No se encontraron citas
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
     </Card>
   );

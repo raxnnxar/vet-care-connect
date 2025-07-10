@@ -130,38 +130,6 @@
   
   /* Refined focus states */
   .focus-visible:focus-visible {
-    @apply outline-none ring-2 ring-primary ring-opacity-50;
-  }
-
-  /* Mobile optimization utilities */
-  .mobile-container {
-    @apply w-full max-w-none px-4 mx-auto;
-  }
-
-  .mobile-safe-area {
-    @apply pb-safe-area-inset-bottom;
-  }
-
-  .mobile-scroll-container {
-    @apply overflow-x-hidden overflow-y-auto;
-  }
-
-  /* Touch-friendly button sizes */
-  .mobile-touch-target {
-    @apply min-h-[44px] min-w-[44px];
-  }
-
-  /* Responsive table wrapper */
-  .mobile-table-wrapper {
-    @apply overflow-x-auto -mx-4 px-4;
-  }
-
-  /* Mobile-optimized spacing */
-  .mobile-spacing {
-    @apply space-y-4;
-  }
-
-  .mobile-padding {
-    @apply p-4 sm:p-6;
+    @apply outline-none ring-2 ring-accent1 ring-opacity-50;
   }
 }
