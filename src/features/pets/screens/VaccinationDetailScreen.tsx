@@ -13,7 +13,7 @@ import { VaccinationRecord } from '../types/vaccinationTypes';
 import VaccinationForm from '../components/medical/VaccinationForm';
 
 const VaccinationDetailScreen: React.FC = () => {
-  const { id: petId, vaccineId } = useParams<{ id: string; vaccineId: string }>();
+  const { id: petId, vaccinationId: vaccineId } = useParams<{ id: string; vaccinationId: string }>();
   const navigate = useNavigate();
   const [vaccinationDetail, setVaccinationDetail] = useState<VaccinationRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);

@@ -23,7 +23,7 @@ const VaccinationRecordsList: React.FC<VaccinationRecordsListProps> = ({
   const navigate = useNavigate();
 
   const handleRecordClick = (recordId: string) => {
-    navigate(`/owner/pets/${petId}/medical/vaccines/${recordId}`);
+    navigate(`/owner/pets/${petId}/vaccination/${recordId}`);
   };
 
   if (records.length === 0) {

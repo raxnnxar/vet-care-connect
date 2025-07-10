@@ -23,7 +23,7 @@ interface MedicalHistoryDetail {
 }
 
 const MedicalHistoryDetailScreen: React.FC = () => {
-  const { id: petId, eventId } = useParams<{ id: string; eventId: string }>();
+  const { id: petId, recordId: eventId } = useParams<{ id: string; recordId: string }>();
   const navigate = useNavigate();
   const [historyDetail, setHistoryDetail] = useState<MedicalHistoryDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
