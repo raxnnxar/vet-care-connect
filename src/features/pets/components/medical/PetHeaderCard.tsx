@@ -1,185 +1,113 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@/ui/molecules/card';
-import { Button } from '@/ui/atoms/button';
-import { Plus } from 'lucide-react';
-import { Pet } from '../../types';
-import { usePetAllergies } from '../../hooks/usePetAllergies';
-import { usePetChronicConditions } from '../../hooks/usePetChronicConditions';
-import AllergyChip from './AllergyChip';
-import ChronicConditionChip from './ChronicConditionChip';
-import AllergyModal from './AllergyModal';
-import ChronicConditionModal from './ChronicConditionModal';
-import { PetAllergy, PetChronicCondition } from '../../types/formTypes';
+import { Badge } from '@/ui/atoms/badge';
+import { Pet } from '@/features/pets/types';
+import { usePetAllergies } from '@/features/pets/hooks/usePetAllergies';
+import { usePetChronicConditions } from '@/features/pets/hooks/usePetChronicConditions';
 
 interface PetHeaderCardProps {
   pet: Pet;
 }
 
 const PetHeaderCard: React.FC<PetHeaderCardProps> = ({ pet }) => {
-  const { allergies, addAllergy, updateAllergy, deleteAllergy } = usePetAllergies(pet.id);
-  const { conditions, addCondition, updateCondition, deleteCondition } = usePetChronicConditions(pet.id);
-  
-  const [allergyModalOpen, setAllergyModalOpen] = useState(false);
-  const [conditionModalOpen, setConditionModalOpen] = useState(false);
-  const [editingAllergy, setEditingAllergy] = useState<PetAllergy | null>(null);
-  const [editingCondition, setEditingCondition] = useState<PetChronicCondition | null>(null);
+  const { allergies } = usePetAllergies(pet.id);
+  const { conditions } = usePetChronicConditions(pet.id);
 
-  const displayedAllergies = allergies.slice(0, 3);
-  const remainingAllergiesCount = Math.max(0, allergies.length - 3);
-  
-  const displayedConditions = conditions.slice(0, 3);
-  const remainingConditionsCount = Math.max(0, conditions.length - 3);
-
-  const handleAllergyClick = (allergy: PetAllergy) => {
-    setEditingAllergy(allergy);
-    setAllergyModalOpen(true);
-  };
-
-  const handleConditionClick = (condition: PetChronicCondition) => {
-    setEditingCondition(condition);
-    setConditionModalOpen(true);
-  };
-
-  const handleAddAllergy = () => {
-    setEditingAllergy(null);
-    setAllergyModalOpen(true);
-  };
-
-  const handleAddCondition = () => {
-    setEditingCondition(null);
-    setConditionModalOpen(true);
-  };
-
-  const handleSaveAllergy = async (allergen: string, notes?: string) => {
-    if (editingAllergy) {
-      await updateAllergy(editingAllergy.id, allergen, notes);
-    } else {
-      await addAllergy(allergen, notes);
-    }
-  };
-
-  const handleSaveCondition = async (condition: string, notes?: string) => {
-    if (editingCondition) {
-      await updateCondition(editingCondition.id, condition, notes);
-    } else {
-      await addCondition(condition, notes);
-    }
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
-    <>
-      <Card className="p-4 mb-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-[#79D0B8] rounded-full flex items-center justify-center overflow-hidden">
-            {pet.profile_picture_url ? (
-              <img 
-                src={pet.profile_picture_url} 
-                alt={pet.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-white font-semibold text-lg">
-                {pet.name.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-gray-800">{pet.name}</h2>
-            <p className="text-sm text-gray-600">{pet.species} • {pet.breed || 'Raza no especificada'}</p>
-          </div>
+    <Card className="mx-4 mt-4 mb-0 p-4 bg-white border border-gray-100">
+      <div className="flex items-start gap-4">
+        {/* Avatar más grande */}
+        <div className="w-16 h-16 bg-[#79D0B8] rounded-full flex items-center justify-center flex-shrink-0">
+          {pet.profile_picture_url ? (
+            <img 
+              src={pet.profile_picture_url} 
+              alt={pet.name}
+              className="w-full h-full rounded-full object-cover"
+            />
+          ) : (
+            <span className="text-white font-bold text-xl">
+              {getInitials(pet.name)}
+            </span>
+          )}
         </div>
 
-        {/* Alergias */}
-        <div className="mb-3">
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-gray-700 mr-2">Alergias:</span>
-            {displayedAllergies.length > 0 ? (
-              <>
-                {displayedAllergies.map((allergy) => (
-                  <AllergyChip
-                    key={allergy.id}
-                    allergy={allergy}
-                    onClick={handleAllergyClick}
-                    onDelete={deleteAllergy}
-                    showDelete={true}
-                  />
+        {/* Información de la mascota */}
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl font-semibold text-gray-800 truncate">{pet.name}</h2>
+          <p className="text-gray-600 text-sm mt-1">
+            {pet.species} • {pet.breed || 'Raza no especificada'}
+          </p>
+          
+          {/* Edad y peso en una línea si están disponibles */}
+          {(pet.date_of_birth || pet.weight) && (
+            <p className="text-gray-500 text-xs mt-1">
+              {pet.date_of_birth && (
+                <>
+                  {(() => {
+                    const birthDate = new Date(pet.date_of_birth);
+                    const today = new Date();
+                    const ageInMs = today.getTime() - birthDate.getTime();
+                    const ageInYears = Math.floor(ageInMs / (1000 * 60 * 60 * 24 * 365));
+                    return ageInYears > 0 ? `${ageInYears} años` : 'Menos de 1 año';
+                  })()}
+                </>
+              )}
+              {pet.date_of_birth && pet.weight && ' • '}
+              {pet.weight && `${pet.weight} kg`}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Alergias y condiciones en tags compactos */}
+      {(allergies.length > 0 || conditions.length > 0) && (
+        <div className="mt-4 space-y-2">
+          {allergies.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-1">Alergias:</p>
+              <div className="flex flex-wrap gap-1">
+                {allergies.map((allergy) => (
+                  <Badge 
+                    key={allergy.id} 
+                    variant="outline" 
+                    className="text-xs px-2 py-1 h-auto text-red-600 border-red-200 bg-red-50"
+                  >
+                    {allergy.allergen}
+                  </Badge>
                 ))}
-                {remainingAllergiesCount > 0 && (
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                    +{remainingAllergiesCount} más
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="text-sm text-gray-400">Sin alergias registradas</span>
-            )}
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleAddAllergy}
-              className="bg-green-100 text-green-600 hover:bg-green-200 rounded-full px-2 py-0.5 text-sm h-auto"
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              Añadir
-            </Button>
-          </div>
-        </div>
-
-        {/* Condiciones Crónicas */}
-        <div>
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-gray-700 mr-2">Condiciones crónicas:</span>
-            {displayedConditions.length > 0 ? (
-              <>
-                {displayedConditions.map((condition) => (
-                  <ChronicConditionChip
-                    key={condition.id}
-                    condition={condition}
-                    onClick={handleConditionClick}
-                    onDelete={deleteCondition}
-                    showDelete={true}
-                  />
+              </div>
+            </div>
+          )}
+          
+          {conditions.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-1">Condiciones crónicas:</p>
+              <div className="flex flex-wrap gap-1">
+                {conditions.map((condition) => (
+                  <Badge 
+                    key={condition.id} 
+                    variant="outline" 
+                    className="text-xs px-2 py-1 h-auto text-orange-600 border-orange-200 bg-orange-50"
+                  >
+                    {condition.condition}
+                  </Badge>
                 ))}
-                {remainingConditionsCount > 0 && (
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                    +{remainingConditionsCount} más
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="text-sm text-gray-400">Sin condiciones crónicas</span>
-            )}
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleAddCondition}
-              className="bg-green-100 text-green-600 hover:bg-green-200 rounded-full px-2 py-0.5 text-sm h-auto"
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              Añadir
-            </Button>
-          </div>
+              </div>
+            </div>
+          )}
         </div>
-      </Card>
-
-      {/* Modales */}
-      <AllergyModal
-        open={allergyModalOpen}
-        onOpenChange={setAllergyModalOpen}
-        onSave={handleSaveAllergy}
-        allergy={editingAllergy}
-        title={editingAllergy ? 'Editar Alergia' : 'Añadir Alergia'}
-      />
-
-      <ChronicConditionModal
-        open={conditionModalOpen}
-        onOpenChange={setConditionModalOpen}
-        onSave={handleSaveCondition}
-        condition={editingCondition}
-        title={editingCondition ? 'Editar Condición' : 'Añadir Condición'}
-      />
-    </>
+      )}
+    </Card>
   );
 };
 

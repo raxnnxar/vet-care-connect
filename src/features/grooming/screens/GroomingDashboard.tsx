@@ -134,7 +134,7 @@ const GroomingDashboard: React.FC = () => {
       header={<GroomingSearchHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
       footer={<NavbarInferior activeTab="home" />}
     >
-      <div className="flex flex-col gap-6 p-4 pb-20 overflow-y-auto">
+      <div className="flex flex-col gap-6 mobile-container mobile-padding pb-20 mobile-scroll-container">
         {/* Calendar Section - Now first */}
         <GroomingCalendar 
           selectedDate={selectedDate}

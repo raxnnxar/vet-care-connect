@@ -80,7 +80,7 @@ export const AdminUsersSection: React.FC<AdminUsersSectionProps> = ({
   }
 
   return (
-    <Card className="p-6">
+    <Card className="mobile-padding">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-foreground mb-4">
           Gestión de Usuarios
@@ -93,7 +93,7 @@ export const AdminUsersSection: React.FC<AdminUsersSectionProps> = ({
             placeholder="Buscar por nombre o email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 mobile-touch-target"
           />
         </div>
         
@@ -102,39 +102,43 @@ export const AdminUsersSection: React.FC<AdminUsersSectionProps> = ({
         </p>
       </div>
 
-      {/* Scrollable table container */}
-      <div className="border rounded-lg" style={{ height: '400px', overflow: 'auto' }}>
-        <Table>
-          <TableHeader className="sticky top-0 bg-background z-10">
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Rol</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
-                  {user.display_name}
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Badge variant={getRoleBadgeVariant(user.role)}>
-                    {getRoleLabel(user.role)}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredUsers.length === 0 && (
+      {/* Mobile responsive table container */}
+      <div className="mobile-table-wrapper">
+        <div className="border rounded-lg mobile-scroll-container" style={{ height: '400px' }}>
+          <Table className="min-w-full">
+            <TableHeader className="sticky top-0 bg-background z-10">
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                  No se encontraron usuarios
-                </TableCell>
+                <TableHead className="min-w-[120px]">Nombre</TableHead>
+                <TableHead className="min-w-[150px]">Email</TableHead>
+                <TableHead className="min-w-[100px]">Rol</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium break-words">
+                    {user.display_name}
+                  </TableCell>
+                  <TableCell className="break-all text-sm">
+                    {user.email}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getRoleBadgeVariant(user.role)} className="whitespace-nowrap">
+                      {getRoleLabel(user.role)}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredUsers.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                    No se encontraron usuarios
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </Card>
   );

@@ -21,7 +21,7 @@ const NavbarInferior: React.FC<NavbarInferiorProps> = ({ activeTab = 'home' }) =
   
   // Create the proper styling for the nav bar to ensure it doesn't overlap with content
   return (
-    <div className="flex justify-around items-center py-3 px-4 bg-white border-t border-gray-200 shadow-md fixed bottom-0 left-0 right-0 z-20">
+    <div className="flex justify-around items-center py-4 px-2 bg-white border-t border-gray-200 shadow-md fixed bottom-0 left-0 right-0 z-20 min-h-[64px]">
       <NavItem 
         icon={<Calendar size={24} />} 
         label="Citas" 
@@ -68,12 +68,12 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, isActive }) => {
     <Link
       to={to}
       className={cn(
-        "flex flex-col items-center",
-        isActive ? "text-primary" : "text-gray-500"
+        "flex flex-col items-center mobile-touch-target min-w-[60px] py-2 px-1 rounded-lg transition-colors",
+        isActive ? "text-primary bg-primary/10" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
       )}
     >
       {icon}
-      <span className="text-xs mt-1">{label}</span>
+      <span className="text-xs mt-1 text-center leading-tight">{label}</span>
     </Link>
   );
 };

@@ -54,7 +54,7 @@ export const AdminPetsSection: React.FC<AdminPetsSectionProps> = ({
   }
 
   return (
-    <Card className="p-6">
+    <Card className="mobile-padding">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-foreground mb-4">
           Gestión de Mascotas
@@ -67,7 +67,7 @@ export const AdminPetsSection: React.FC<AdminPetsSectionProps> = ({
             placeholder="Buscar por nombre de mascota o email del dueño..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 mobile-touch-target"
           />
         </div>
         
@@ -76,37 +76,41 @@ export const AdminPetsSection: React.FC<AdminPetsSectionProps> = ({
         </p>
       </div>
 
-      {/* Scrollable table container */}
-      <div className="border rounded-lg" style={{ height: '400px', overflow: 'auto' }}>
-        <Table>
-          <TableHeader className="sticky top-0 bg-background z-10">
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Especie</TableHead>
-              <TableHead>Email del Dueño</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredPets.map((pet) => (
-              <TableRow key={pet.id}>
-                <TableCell className="font-medium">
-                  {pet.name}
-                </TableCell>
-                <TableCell className="capitalize">
-                  {pet.species}
-                </TableCell>
-                <TableCell>{pet.owner_email}</TableCell>
-              </TableRow>
-            ))}
-            {filteredPets.length === 0 && (
+      {/* Mobile responsive table container */}
+      <div className="mobile-table-wrapper">
+        <div className="border rounded-lg mobile-scroll-container" style={{ height: '400px' }}>
+          <Table className="min-w-full">
+            <TableHeader className="sticky top-0 bg-background z-10">
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                  No se encontraron mascotas
-                </TableCell>
+                <TableHead className="min-w-[100px]">Nombre</TableHead>
+                <TableHead className="min-w-[100px]">Especie</TableHead>
+                <TableHead className="min-w-[150px]">Email del Dueño</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredPets.map((pet) => (
+                <TableRow key={pet.id}>
+                  <TableCell className="font-medium break-words">
+                    {pet.name}
+                  </TableCell>
+                  <TableCell className="capitalize">
+                    {pet.species}
+                  </TableCell>
+                  <TableCell className="break-all text-sm">
+                    {pet.owner_email}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredPets.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                    No se encontraron mascotas
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </Card>
   );
