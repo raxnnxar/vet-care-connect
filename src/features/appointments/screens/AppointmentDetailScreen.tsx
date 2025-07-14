@@ -38,7 +38,7 @@ const AppointmentDetailScreen: React.FC = () => {
         .from('appointments')
         .select(`
           *,
-          pets:pet_id(id, name, species, breed, sex, date_of_birth, profile_picture_url)
+          pets!appointments_pet_id_fkey(id, name, species, breed, sex, date_of_birth, profile_picture_url)
         `)
         .eq('id', id)
         .single();
