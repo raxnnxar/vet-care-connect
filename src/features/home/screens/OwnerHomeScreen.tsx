@@ -23,7 +23,7 @@ const OwnerHomeScreen = () => {
   const handleTratamientosClick = () => {
     navigate('/owner/treatments');
   };
-  return <LayoutBase header={<div className="flex justify-between items-center px-4 py-3 bg-[#79d0b8]">
+  return <LayoutBase header={<div className="vett-header flex justify-between items-center">
           <VettLogo color="#FFFFFF" height={32} />
           <button className="text-white hover:bg-white/10 p-2 rounded-full transition-colors">
             <Bell size={24} />
@@ -57,7 +57,7 @@ const OwnerHomeScreen = () => {
         </div>
 
         {/* Service Modules - Optimized heights and spacing */}
-        <div className="px-4 pb-20 space-y-3">
+        <div className="px-4 vett-content-safe space-y-3">
           {/* Full width - Salud */}
           <button onClick={handleSaludClick} className="w-full bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 text-left group hover:scale-[1.01] active:scale-[0.99] mobile-touch-target min-h-[80px]">
             <div className="flex items-center justify-between h-full">

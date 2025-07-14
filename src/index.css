@@ -164,4 +164,14 @@
   .mobile-padding {
     @apply p-4 sm:p-6;
   }
+
+  /* Standardized header padding for green headers */
+  .vett-header {
+    @apply px-4 py-4 bg-[#79D0B8] text-white;
+  }
+
+  /* Ensure content doesn't get hidden behind bottom navigation */
+  .vett-content-safe {
+    @apply pb-24;
+  }
 }

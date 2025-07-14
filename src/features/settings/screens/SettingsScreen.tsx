@@ -66,13 +66,13 @@ const SettingsScreen = () => {
   return (
     <LayoutBase 
       header={
-        <div className="flex justify-between items-center px-4 py-3 bg-[#79d0b8]">
-          <h1 className="text-white font-medium text-lg">Configuración</h1>
+        <div className="vett-header flex justify-between items-center">
+          <h1 className="font-medium text-lg">Configuración</h1>
         </div>
       } 
       footer={<NavbarInferior activeTab="home" />}
     >
-      <div className="p-4 pb-20 space-y-6">
+      <div className="p-4 vett-content-safe space-y-6">
         {/* Notification Settings */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="px-4 py-3 bg-gray-50">

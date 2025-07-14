@@ -109,11 +109,11 @@ const PetDetailScreen: React.FC = () => {
 
   // Loading state
   if (isLoading) {
-    return <LayoutBase header={<div className="flex items-center px-4 py-3 bg-[#79D0B8]">
+    return <LayoutBase header={<div className="vett-header flex items-center">
             <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
               <ArrowLeft />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Detalles de la Mascota</h1>
+            <h1 className="font-medium text-lg ml-2">Detalles de la Mascota</h1>
           </div>} footer={<NavbarInferior activeTab="profile" />}>
         <div className="p-4 space-y-4">
           <div className="animate-pulse">
@@ -131,11 +131,11 @@ const PetDetailScreen: React.FC = () => {
 
   // Error state
   if (error || !pet) {
-    return <LayoutBase header={<div className="flex items-center px-4 py-3 bg-[#79D0B8]">
+    return <LayoutBase header={<div className="vett-header flex items-center">
             <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
               <ArrowLeft />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Error</h1>
+            <h1 className="font-medium text-lg ml-2">Error</h1>
           </div>} footer={<NavbarInferior activeTab="profile" />}>
         <div className="p-4">
           <Card className="p-6 text-center">
@@ -149,13 +149,13 @@ const PetDetailScreen: React.FC = () => {
   }
   const petAge = pet.date_of_birth ? calculateAge(pet.date_of_birth) : 'No especificada';
   const petDescription = pet.additional_notes || 'Sin descripción adicional';
-  return <LayoutBase header={<div className="flex items-center px-4 py-3 bg-[#79D0B8]">
+  return <LayoutBase header={<div className="vett-header flex items-center">
           <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
             <ArrowLeft />
           </Button>
-          <h1 className="text-white font-medium text-lg ml-2">{pet.name}</h1>
+          <h1 className="font-medium text-lg ml-2">{pet.name}</h1>
         </div>} footer={<NavbarInferior activeTab="profile" />}>
-      <div className="mobile-container mobile-padding pb-20 mobile-spacing">
+      <div className="mobile-container mobile-padding vett-content-safe mobile-spacing">
         {/* Pet Image */}
         <div className="relative">
           {pet.profile_picture_url ? <div className="h-64 rounded-xl overflow-hidden shadow-lg">

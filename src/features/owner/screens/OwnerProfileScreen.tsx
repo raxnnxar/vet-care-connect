@@ -138,10 +138,10 @@ const OwnerProfileScreen = () => {
   const handlePetAdded = (pet: Pet) => {
     setUserPets(prev => [...prev, pet]);
   };
-  return <LayoutBase header={<div className="flex justify-between items-center px-4 py-3 bg-[#79d0b8]">
-          <h1 className="text-white font-medium text-lg">Mi Perfil</h1>
+  return <LayoutBase header={<div className="vett-header flex justify-between items-center">
+          <h1 className="font-medium text-lg">Mi Perfil</h1>
         </div>} footer={<NavbarInferior activeTab="profile" />}>
-      <div className="flex flex-col mobile-container mobile-padding pb-20">
+      <div className="flex flex-col mobile-container mobile-padding vett-content-safe">
         <ProfileHeader userDetails={userDetails} user={user} setUserDetails={setUserDetails} />
 
         <ContactInformation userDetails={userDetails} user={user} editedPhone={editedPhone} editedAddress={editedAddress} setEditedPhone={setEditedPhone} setEditedAddress={setEditedAddress} isEditing={isEditing} setIsEditing={setIsEditing} setUserDetails={setUserDetails} />

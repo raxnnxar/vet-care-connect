@@ -58,7 +58,7 @@ const ChatsScreen: React.FC = () => {
       header={<ChatsHeader />}
       footer={<NavbarInferior activeTab="chats" />}
     >
-      <div className="mobile-container mobile-padding pb-20">
+      <div className="mobile-container mobile-padding vett-content-safe">
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (

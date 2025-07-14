@@ -60,11 +60,11 @@ const AppointmentDetailScreen: React.FC = () => {
     return (
       <LayoutBase
         header={
-          <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
+          <div className="vett-header flex items-center">
             <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
               <ArrowLeft />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Detalles de Cita</h1>
+            <h1 className="font-medium text-lg ml-2">Detalles de Cita</h1>
           </div>
         }
         footer={<NavbarInferior activeTab="appointments" />}
@@ -84,11 +84,11 @@ const AppointmentDetailScreen: React.FC = () => {
     return (
       <LayoutBase
         header={
-          <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
+          <div className="vett-header flex items-center">
             <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
               <ArrowLeft />
             </Button>
-            <h1 className="text-white font-medium text-lg ml-2">Detalles de Cita</h1>
+            <h1 className="font-medium text-lg ml-2">Detalles de Cita</h1>
           </div>
         }
         footer={<NavbarInferior activeTab="appointments" />}
@@ -178,16 +178,16 @@ const AppointmentDetailScreen: React.FC = () => {
   return (
     <LayoutBase
       header={
-        <div className="flex items-center px-4 py-3 bg-[#79D0B8]">
+        <div className="vett-header flex items-center">
           <Button variant="ghost" size="icon" className="text-white" onClick={goBack}>
             <ArrowLeft />
           </Button>
-          <h1 className="text-white font-medium text-lg ml-2">Detalles de Cita</h1>
+          <h1 className="font-medium text-lg ml-2">Detalles de Cita</h1>
         </div>
       }
       footer={<NavbarInferior activeTab="appointments" />}
     >
-      <div className="p-4 space-y-6 pb-20">
+      <div className="p-4 space-y-6 vett-content-safe">
         <AppointmentHeader
           date={appointmentDateString}
           time={appointmentTime}
