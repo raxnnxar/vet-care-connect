@@ -1,6 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/state/store';
 import { LayoutBase, NavbarInferior } from '@/frontend/navigation/components';
 import { Button } from '@/ui/atoms/button';
 import { ArrowLeft } from 'lucide-react';
@@ -13,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Pet } from '@/features/pets/types';
+import OwnerCancelAppointmentModal from '../components/OwnerCancelAppointmentModal';
 
 interface AppointmentPetResponse {
   id: string;
@@ -27,9 +30,11 @@ interface AppointmentPetResponse {
 const AppointmentDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.auth);
   const { appointments } = useAppointments();
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const { data: appointmentDetails, isLoading } = useQuery({
+  const { data: appointmentDetails, isLoading, refetch } = useQuery({
     queryKey: ['appointment', id],
     queryFn: async () => {
       if (!id) throw new Error('No appointment ID provided');
@@ -55,6 +60,15 @@ const AppointmentDetailScreen: React.FC = () => {
   });
 
   const goBack = () => navigate(-1);
+
+  const handleCancelSuccess = () => {
+    refetch();
+    navigate('/owner/appointments');
+  };
+
+  // Show cancel button only for pending or scheduled appointments
+  const showCancelButton = appointmentDetails && 
+    (appointmentDetails.status === 'pendiente' || appointmentDetails.status === 'programada');
 
   if (isLoading) {
     return (
@@ -207,7 +221,34 @@ const AppointmentDetailScreen: React.FC = () => {
           notes={appointmentDetails.notes}
           paymentStatus={appointmentDetails.payment_status}
         />
+
+        {/* Cancel button */}
+        {showCancelButton && (
+          <div className="mt-6">
+            <Button
+              variant="outline"
+              className="w-full border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+              onClick={() => setShowCancelModal(true)}
+            >
+              Cancelar cita
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Cancel modal */}
+      {appointmentDetails && pet && user && (
+        <OwnerCancelAppointmentModal
+          isOpen={showCancelModal}
+          onClose={() => setShowCancelModal(false)}
+          appointmentId={appointmentDetails.id}
+          ownerId={user.id}
+          vetId={appointmentDetails.provider_id || ''}
+          petName={pet.name}
+          ownerName={user.displayName || 'Dueño'}
+          onSuccess={handleCancelSuccess}
+        />
+      )}
     </LayoutBase>
   );
 };
