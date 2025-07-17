@@ -53,25 +53,6 @@ const VeterinarianCard: React.FC<VeterinarianCardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Provider info card - only show on first step */}
-      {currentStep === 1 && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-sm font-medium text-gray-600">
-                  {getProviderName().charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-900">{getProviderName()}</h3>
-                <p className="text-sm text-gray-500">{getProviderType()}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Step content */}
       <Card>
         <CardContent className="p-6">

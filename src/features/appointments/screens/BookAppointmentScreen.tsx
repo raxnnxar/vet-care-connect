@@ -247,7 +247,7 @@ const BookAppointmentScreen: React.FC = () => {
       }
       footer={<NavbarInferior activeTab="appointments" />}
     >
-      <div className="p-4 bg-gray-50 min-h-screen">
+      <div className="p-4 bg-gray-50 min-h-screen vett-content-safe">
         <StepsIndicator currentStep={currentStep} totalSteps={4} />
         
         <VeterinarianCard 

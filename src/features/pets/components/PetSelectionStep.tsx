@@ -56,7 +56,7 @@ const PetSelectionStep: React.FC<PetSelectionStepProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pt-4">
       <h3 className="font-medium text-gray-700 mb-4">Selecciona una mascota</h3>
       <div className="space-y-3">
         {pets.map((pet) => (
