@@ -34,6 +34,10 @@ const DetallesCitaScreen: React.FC = () => {
       handleSendMessage(appointmentDetails.appointment.owner_id);
     }
   };
+
+  const handleRejectOrCancel = () => {
+    setShowRejectModal(true);
+  };
   
   if (isLoading) {
     return <AppointmentDetailLoading onBack={goBack} />;
@@ -61,12 +65,12 @@ const DetallesCitaScreen: React.FC = () => {
         user={user}
         onViewFullHistory={handleViewMedicalHistory}
         onApprove={handleApproveAppointment}
-        onReject={() => setShowRejectModal(true)}
+        onReject={handleRejectOrCancel}
         onSendMessage={handleSendMessageClick}
         getAppointmentDateString={getAppointmentDateString}
       />
 
-      {/* Reject Modal */}
+      {/* Reject/Cancel Modal */}
       {appointmentDetails && (
         <RejectAppointmentModal
           isOpen={showRejectModal}
@@ -76,6 +80,7 @@ const DetallesCitaScreen: React.FC = () => {
           vetId={user?.id || ''}
           petName={appointmentDetails.appointment.pets?.name || 'la mascota'}
           onSuccess={handleRejectSuccess}
+          isConfirmedAppointment={appointment.status === 'programada'}
         />
       )}
     </LayoutBase>

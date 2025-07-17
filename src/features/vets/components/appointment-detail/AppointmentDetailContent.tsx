@@ -93,6 +93,19 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
         onReject={onReject}
         onSendMessage={onSendMessage}
       />
+
+      {/* Botón de cancelar cita para citas programadas */}
+      {appointment.status === 'programada' && (
+        <div className="flex justify-center mt-4">
+          <Button
+            variant="outline"
+            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+            onClick={onReject}
+          >
+            Cancelar cita
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
