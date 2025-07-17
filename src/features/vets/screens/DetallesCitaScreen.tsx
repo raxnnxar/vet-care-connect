@@ -18,7 +18,7 @@ const DetallesCitaScreen: React.FC = () => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
   
-  const { handleApproveAppointment, handleRejectSuccess, handleSendMessage } = useAppointmentActions(id);
+  const { handleApproveAppointment, handleRejectSuccess, handleSendMessage, handleMarkNoShow } = useAppointmentActions(id);
   const { data: appointmentDetails, isLoading, error } = useAppointmentDetailData(id);
   
   const goBack = () => navigate(-1);
@@ -67,6 +67,7 @@ const DetallesCitaScreen: React.FC = () => {
         onApprove={handleApproveAppointment}
         onReject={handleRejectOrCancel}
         onSendMessage={handleSendMessageClick}
+        onMarkNoShow={handleMarkNoShow}
         getAppointmentDateString={getAppointmentDateString}
       />
 

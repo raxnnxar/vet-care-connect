@@ -20,6 +20,7 @@ interface AppointmentDetailContentProps {
   onApprove: () => void;
   onReject: () => void;
   onSendMessage: () => void;
+  onMarkNoShow: () => void;
   getAppointmentDateString: (appointmentDate: any) => string;
 }
 
@@ -31,6 +32,7 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
   onApprove,
   onReject,
   onSendMessage,
+  onMarkNoShow,
   getAppointmentDateString
 }) => {
   const navigate = useNavigate();
@@ -38,6 +40,29 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
   const handleViewMedicalRecord = () => {
     navigate(`/vet/detalles-cita/${appointment.id}/expediente-medico`);
   };
+
+  // Función para determinar si la hora de la cita ya pasó
+  const isAppointmentTimePassed = () => {
+    if (!appointment.appointment_date) return false;
+    
+    const appointmentDate = appointment.appointment_date;
+    let dateTimeString = '';
+    
+    if (typeof appointmentDate === 'object' && appointmentDate.date && appointmentDate.time) {
+      dateTimeString = `${appointmentDate.date}T${appointmentDate.time}:00`;
+    } else if (typeof appointmentDate === 'string') {
+      dateTimeString = appointmentDate;
+    } else {
+      return false;
+    }
+    
+    const appointmentDateTime = new Date(dateTimeString);
+    const now = new Date();
+    
+    return now > appointmentDateTime;
+  };
+
+  const timePassed = isAppointmentTimePassed();
 
   return (
     <div className="p-4 space-y-6 pb-20">
@@ -94,8 +119,8 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
         onSendMessage={onSendMessage}
       />
 
-      {/* Botón de cancelar cita para citas programadas */}
-      {appointment.status === 'programada' && (
+      {/* Botón de cancelar cita para citas programadas - solo si no ha pasado la hora */}
+      {appointment.status === 'programada' && !timePassed && (
         <div className="flex justify-center mt-4">
           <Button
             variant="outline"
@@ -103,6 +128,19 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
             onClick={onReject}
           >
             Cancelar cita
+          </Button>
+        </div>
+      )}
+
+      {/* Botón de "No asistió" - solo si ya pasó la hora de la cita */}
+      {(appointment.status === 'programada' || appointment.status === 'completada') && timePassed && (
+        <div className="flex justify-center mt-4">
+          <Button
+            variant="outline"
+            className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+            onClick={onMarkNoShow}
+          >
+            No asistió
           </Button>
         </div>
       )}

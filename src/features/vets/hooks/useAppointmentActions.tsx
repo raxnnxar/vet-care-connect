@@ -80,9 +80,40 @@ export const useAppointmentActions = (appointmentId?: string) => {
     }
   };
 
+  const handleMarkNoShow = async () => {
+    if (!appointmentId) return;
+    
+    try {
+      console.log('Marking appointment as no show:', appointmentId);
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ status: 'no_asistió' })
+        .eq('id', appointmentId)
+        .select();
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log('Appointment marked as no show successfully:', data);
+      
+      // Invalidate and refetch queries
+      queryClient.invalidateQueries({ queryKey: ['appointment-details', appointmentId] });
+      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
+      
+      toast.success('Cita marcada como "No asistió"');
+    } catch (error) {
+      console.error('Error marking appointment as no show:', error);
+      toast.error('Error al marcar la cita');
+    }
+  };
+
   return {
     handleApproveAppointment,
     handleRejectSuccess,
-    handleSendMessage
+    handleSendMessage,
+    handleMarkNoShow
   };
 };

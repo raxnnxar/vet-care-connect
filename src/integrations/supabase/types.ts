@@ -1376,6 +1376,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: boolean
       }
+      mark_appointments_completed: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       search_veterinarians: {
         Args: {
           p_lat: number
