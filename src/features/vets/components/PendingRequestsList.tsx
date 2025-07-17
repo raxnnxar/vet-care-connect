@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/ui/molecules/card';
 import { Button } from '@/ui/atoms/button';
 import { Cat, Check, X, MessageSquare } from 'lucide-react';
@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { APPOINTMENT_STATUS } from '@/core/constants/app.constants';
 import { useEffect } from 'react';
+import RejectAppointmentModal from './RejectAppointmentModal';
 
 interface PendingRequest {
   id: string;
@@ -16,6 +17,7 @@ interface PendingRequest {
   time: string;
   date: string;
   serviceType: string;
+  ownerId: string;
 }
 
 interface PendingRequestsListProps {
@@ -30,6 +32,13 @@ interface PetData {
 const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: initialRequests }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<{
+    id: string;
+    petName: string;
+    ownerId: string;
+  } | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string>('');
 
   // Fetch pending appointment requests from Supabase with real-time updates
   const { data: requests, isLoading, refetch } = useQuery({
@@ -39,6 +48,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
       if (!user.user) throw new Error('No user logged in');
 
       console.log('Fetching pending requests for user:', user.user.id);
+      setCurrentUserId(user.user.id);
 
       const { data, error } = await supabase
         .from('appointments')
@@ -46,6 +56,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           id,
           appointment_date,
           service_type,
+          owner_id,
           pets!appointments_pet_id_fkey(id, name)
         `)
         .eq('provider_id', user.user.id)
@@ -117,7 +128,8 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
           petName,
           time: timeFormatted,
           date: dateFormatted,
-          serviceType
+          serviceType,
+          ownerId: appointment.owner_id
         };
       });
     },
@@ -227,33 +239,22 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
     }
   };
 
-  const handleRejectRequest = async (requestId: string) => {
-    try {
-      console.log('Rejecting request:', requestId);
-      const { data, error } = await supabase
-        .from('appointments')
-        .update({ status: APPOINTMENT_STATUS.CANCELLED })
-        .eq('id', requestId)
-        .select();
-      
-      if (error) {
-        throw error;
-      }
-      
-      console.log('Request rejected successfully:', data);
-      
-      // Invalidate and refetch the pending requests
-      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
-      
-      // Also invalidate any appointment-related queries
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
-      
-      toast.success('Cita rechazada correctamente');
-    } catch (error) {
-      console.error('Error rejecting request:', error);
-      toast.error('Error al rechazar la cita');
-    }
+  const handleRejectRequest = (request: PendingRequest) => {
+    setSelectedRequest({
+      id: request.id,
+      petName: request.petName,
+      ownerId: request.ownerId
+    });
+    setShowRejectModal(true);
+  };
+
+  const handleRejectSuccess = () => {
+    // Invalidate and refetch the pending requests
+    queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+    
+    // Also invalidate any appointment-related queries
+    queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    queryClient.invalidateQueries({ queryKey: ['vet-appointments'] });
   };
 
   return (
@@ -311,7 +312,7 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
                 size="icon"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRejectRequest(request.id);
+                  handleRejectRequest(request);
                 }}
               >
                 <X size={18} />
@@ -334,6 +335,19 @@ const PendingRequestsList: React.FC<PendingRequestsListProps> = ({ requests: ini
         <Card className="p-4 text-center text-gray-500">
           No hay solicitudes pendientes
         </Card>
+      )}
+
+      {/* Reject Modal */}
+      {selectedRequest && (
+        <RejectAppointmentModal
+          isOpen={showRejectModal}
+          onClose={() => setShowRejectModal(false)}
+          appointmentId={selectedRequest.id}
+          ownerId={selectedRequest.ownerId}
+          vetId={currentUserId}
+          petName={selectedRequest.petName}
+          onSuccess={handleRejectSuccess}
+        />
       )}
     </div>
   );
