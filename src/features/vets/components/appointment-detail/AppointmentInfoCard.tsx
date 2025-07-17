@@ -21,7 +21,9 @@ const AppointmentInfoCard: React.FC<AppointmentInfoCardProps> = ({
         return format(date, "d 'de' MMMM, yyyy", { locale: es });
       } else if (typeof dateData === 'object' && dateData !== null) {
         if (dateData.date) {
-          const date = new Date(dateData.date);
+          // Parse the date as local date to avoid timezone issues
+          const [year, month, day] = dateData.date.split('-').map(Number);
+          const date = new Date(year, month - 1, day);
           return format(date, "d 'de' MMMM, yyyy", { locale: es });
         }
       }
