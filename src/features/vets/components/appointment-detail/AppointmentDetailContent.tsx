@@ -119,31 +119,45 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
         onSendMessage={onSendMessage}
       />
 
-      {/* Botón de cancelar cita para citas programadas - solo si no ha pasado la hora */}
-      {appointment.status === 'programada' && !timePassed && (
-        <div className="flex justify-center mt-4">
+      {/* Action buttons container with better spacing and sizing */}
+      <div className="space-y-4">
+        {/* Botón de enviar mensaje - siempre visible */}
+        <div className="flex justify-center">
           <Button
             variant="outline"
-            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-            onClick={onReject}
+            className="w-full max-w-sm h-12 border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8] hover:text-white"
+            onClick={onSendMessage}
           >
-            Cancelar cita
+            Enviar mensaje
           </Button>
         </div>
-      )}
 
-      {/* Botón de "No asistió" - solo si ya pasó la hora de la cita */}
-      {(appointment.status === 'programada' || appointment.status === 'completada') && timePassed && (
-        <div className="flex justify-center mt-4">
-          <Button
-            variant="outline"
-            className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-            onClick={onMarkNoShow}
-          >
-            No asistió
-          </Button>
-        </div>
-      )}
+        {/* Botón de cancelar cita para citas programadas - solo si no ha pasado la hora */}
+        {appointment.status === 'programada' && !timePassed && (
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              className="w-full max-w-sm h-12 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+              onClick={onReject}
+            >
+              Cancelar cita
+            </Button>
+          </div>
+        )}
+
+        {/* Botón de "No asistió" - solo si ya pasó la hora de la cita */}
+        {(appointment.status === 'programada' || appointment.status === 'completada') && timePassed && (
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              className="w-full max-w-sm h-12 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+              onClick={onMarkNoShow}
+            >
+              No asistió
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
