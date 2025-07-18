@@ -39,7 +39,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
       )}
       <Button 
         variant="outline"
-        className="w-full border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10"
+        className="w-full max-w-sm mx-auto border-[#79D0B8] text-[#79D0B8] hover:bg-[#79D0B8]/10"
         onClick={onSendMessage}
       >
         <MessageSquare className="mr-2" size={16} />

@@ -121,10 +121,10 @@ const AppointmentDetailContent: React.FC<AppointmentDetailContentProps> = ({
 
       {/* Botón de cancelar cita para citas programadas - solo si no ha pasado la hora */}
       {appointment.status === 'programada' && !timePassed && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-2">
           <Button
             variant="outline"
-            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+            className="w-full max-w-sm border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
             onClick={onReject}
           >
             Cancelar cita
