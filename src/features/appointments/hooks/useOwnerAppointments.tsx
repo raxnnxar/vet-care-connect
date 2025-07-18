@@ -71,10 +71,13 @@ export const useOwnerAppointments = (activeTab: string) => {
           })
         );
 
-        // Filter appointments based on the current time and tab
+        // Filter appointments based on status, date and tab
         const now = new Date();
         const filteredAppointments = appointmentsWithDetails.filter(appointment => {
           if (!appointment.appointment_date) return false;
+          
+          // Don't show cancelled appointments in any tab
+          if (appointment.status === 'cancelada') return false;
           
           try {
             let appointmentDate: Date;
@@ -96,9 +99,11 @@ export const useOwnerAppointments = (activeTab: string) => {
             
             // Filter based on tab
             if (activeTab === 'upcoming') {
-              return appointmentDate >= now;
+              // Próximas: programada o pendiente + fecha futura
+              return ['programada', 'pendiente'].includes(appointment.status) && appointmentDate > now;
             } else {
-              return appointmentDate < now;
+              // Anteriores: completada o no_asistió + fecha pasada
+              return ['completada', 'no_asistió'].includes(appointment.status) && appointmentDate < now;
             }
           } catch (error) {
             console.error('Error parsing appointment date:', error);
