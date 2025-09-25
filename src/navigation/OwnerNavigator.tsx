@@ -24,6 +24,8 @@ import VetDetailScreen from '@/features/vets/screens/VetDetailScreen';
 import VetReviewScreen from '@/features/vets/screens/VetReviewScreen';
 import SaludScreen from '@/features/health/screens/SaludScreen';
 import EsteticaScreen from '@/features/grooming/screens/EsteticaScreen';
+import GroomingDetailScreen from '@/features/grooming/screens/GroomingDetailScreen';
+import GroomingReviewScreen from '@/features/grooming/screens/GroomingReviewScreen';
 import TreatmentsScreen from '@/features/treatments/screens/TreatmentsScreen';
 
 // Communication screens
@@ -55,6 +57,8 @@ const OwnerNavigator = () => {
       <Route path="/vets/:id/review" element={<VetReviewScreen />} />
       <Route path="/salud" element={<SaludScreen />} />
       <Route path="/estetica" element={<EsteticaScreen />} />
+      <Route path="/groomers/:id" element={<GroomingDetailScreen />} />
+      <Route path="/estetica/:id/review" element={<GroomingReviewScreen />} />
       <Route path="/treatments" element={<TreatmentsScreen />} />
       <Route path="/chats" element={<ChatsScreen />} />
       <Route path="/chats/:conversationId" element={<IndividualChatScreen />} />
